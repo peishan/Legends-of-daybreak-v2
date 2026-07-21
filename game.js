@@ -11000,7 +11000,7 @@ document.addEventListener('DOMContentLoaded', function() {
     lg('Welcome to Legends of Daybreak, San.');
     lg('Tap Adventure to start your journey!');
     showStory();
-      checkDailyLogin();
+    checkDayAdvance();
 
   }
   // Check for idle gains on load
