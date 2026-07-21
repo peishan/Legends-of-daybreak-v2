@@ -1626,6 +1626,7 @@ storyJournal: {
     cleared: [] // ids of RAIDS fully cleared at least once
   },
   strongholds: {}, // claimed strongholds, keyed by STRONGHOLDS id — set true once claimed
+  guildHallLevel: {}, // Guild Hall level per stronghold id (1 = just claimed, up to 5)
   strongholdTasks: [], // populated from STRONGHOLDS[id].tasks once a stronghold is claimed
   strongholdStipendDay: -1, // last gameDay a stronghold stipend was collected
   manaSpringUses: { day: 0, count: 0 },
@@ -3706,16 +3707,105 @@ const STRONGHOLDS = {
     stipend: { xp: 40, gold: 60 },
     tasks: [
       { id: 'st_tower_upkeep', n: 'Tower Upkeep', d: "Defeat 3 Planar Wisps to keep the tower's wards charged", t: 'kill_specific', target: 'Planar Wisp', c: 0, need: 3, rw: { xp: 90, g: 70 }, done: false, refreshDay: -1 },
-      { id: 'st_tower_rift_ward', n: 'Rift Ward', d: "Defeat 2 Rift Stalkers threatening the tower's seal", t: 'kill_specific', target: 'Rift Stalker', c: 0, need: 2, rw: { xp: 110, g: 85 }, done: false, refreshDay: -1 }
+      { id: 'st_tower_rift_ward', n: 'Rift Ward', d: "Defeat 2 Rift Stalkers threatening the tower's seal", t: 'kill_specific', target: 'Rift Stalker', c: 0, need: 2, rw: { xp: 110, g: 85 }, done: false, refreshDay: -1 },
+      { id: 'st_tower_armory', n: 'Armory Watch', d: "Defeat 3 Aether Golems guarding the Guild Armory", t: 'kill_specific', target: 'Aether Golem', c: 0, need: 3, rw: { xp: 130, g: 100 }, done: false, refreshDay: -1, minGuildLevel: 2 }
+    ],
+    // The Guild Hall is the core progression structure for this stronghold — everything
+    // else added to it later checks the current level here. Level 1 is automatic on
+    // claim (no cost); each level after that is a gold-gated upgrade with a concrete unlock.
+    guildHall: [
+      { level: 1, name: 'Guild Founded', cost: 0, desc: 'Free rest and a daily stipend — the tower answers to you now.' },
+      { level: 2, name: 'Guild Armory', cost: 800, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
+      { level: 3, name: 'Guild Training Grounds', cost: 2500, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
+      { level: 4, name: 'Guild Vault', cost: 6000, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
+      { level: 5, name: 'Guild Sanctum', cost: 15000, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
     ]
   }
 };
+
+function getGuildHallLevel(strongholdId) {
+  return G.guildHallLevel[strongholdId] || 0;
+}
+
+// Sums a stat across every unlocked Guild Hall level, for any stronghold that's been
+// claimed — e.g. getGuildHallStat('arcaneTower', 'xpBonus') adds up xpBonus from every
+// level 1..currentLevel that defines one.
+function getGuildHallStat(strongholdId, statKey) {
+  const def = STRONGHOLDS[strongholdId];
+  if (!def) return 0;
+  const level = getGuildHallLevel(strongholdId);
+  let total = 0;
+  for (let tier of def.guildHall) {
+    if (tier.level <= level && tier[statKey]) total += tier[statKey];
+  }
+  return total;
+}
+
+// Total bonus across ALL claimed strongholds (currently just the one, but this stays
+// correct automatically as more strongholds are added later).
+function getTotalGuildHallXpBonus() {
+  let total = 0;
+  for (let id in STRONGHOLDS) { if (G.strongholds[id]) total += getGuildHallStat(id, 'xpBonus'); }
+  return total;
+}
+function getTotalGuildHallGoldBonus() {
+  let total = 0;
+  for (let id in STRONGHOLDS) { if (G.strongholds[id]) total += getGuildHallStat(id, 'goldBonus'); }
+  return total;
+}
+
+function upgradeGuildHall(strongholdId) {
+  const def = STRONGHOLDS[strongholdId];
+  if (!def || !G.strongholds[strongholdId]) return;
+  const currentLevel = getGuildHallLevel(strongholdId);
+  const nextTier = def.guildHall.find(t => t.level === currentLevel + 1);
+  if (!nextTier) { lg('🏰 ' + def.name + "'s Guild Hall is already at maximum level."); return; }
+  if (G.p.gold < nextTier.cost) { lg('❌ Need ' + nextTier.cost + 'G to build ' + nextTier.name + ' (have ' + G.p.gold + 'G).'); return; }
+  G.p.gold -= nextTier.cost;
+  G.guildHallLevel[strongholdId] = nextTier.level;
+  lg('🏰 GUILD HALL UPGRADED: ' + nextTier.name + ' (Level ' + nextTier.level + ')!');
+  lg('   ' + nextTier.desc);
+  // Activate any tasks that were waiting on this level
+  if (def.tasks) {
+    for (let task of def.tasks) {
+      if ((task.minGuildLevel || 1) <= nextTier.level && !G.strongholdTasks.find(t => t.id === task.id)) {
+        G.strongholdTasks.push({ ...task, strongholdId });
+        lg('   New stronghold task available: ' + task.n);
+      }
+    }
+  }
+  render();
+}
+
+// Shared by both rest paths (temple instant-rest and camp/tavern ritual-rest) — grants
+// the daily stronghold stipend, scaled by the Guild Hall's stipend multiplier, and at
+// Guild Hall level 5 also grants a short all-stats blessing.
+function grantStrongholdStipend(site) {
+  if (!site.stronghold || G.strongholdStipendDay === G.gameDay) return;
+  const strongholdId = Object.keys(STRONGHOLDS).find(id => STRONGHOLDS[id].restSiteIds.includes(site.id));
+  const def = strongholdId ? STRONGHOLDS[strongholdId] : null;
+  if (!def || !def.stipend) return;
+  G.strongholdStipendDay = G.gameDay;
+  const level = getGuildHallLevel(strongholdId);
+  const stipendTier = def.guildHall.find(t => t.stipendMult && t.level <= level);
+  const mult = stipendTier ? stipendTier.stipendMult : 1;
+  const xp = Math.floor(def.stipend.xp * mult);
+  const gold = Math.floor(def.stipend.gold * mult);
+  G.p.xp += xp;
+  G.p.gold += gold;
+  lg('🏰 The tower provides for you: +' + xp + ' XP, +' + gold + 'G.');
+  if (getGuildHallStat(strongholdId, 'blessing')) {
+    G.p.buffs.push({ n: "Guildmaster's Blessing", t: 3, atk: Math.round(G.p.stats.int * 0.1) || 1, def: 1 });
+    lg("✨ The Guild Sanctum's blessing settles over you — +10% to all stats for your next 3 fights.");
+  }
+}
 
 function claimStronghold(id) {
   const def = STRONGHOLDS[id];
   if (!def) return;
   const alreadyClaimed = G.strongholds[id];
   G.strongholds[id] = true;
+  if (!G.guildHallLevel[id]) G.guildHallLevel[id] = 1; // Guild Founded is automatic on claim
   for (let siteId of def.restSiteIds) {
     const site = G.rest.sites.find(s => s.id === siteId);
     if (site) {
@@ -3725,8 +3815,9 @@ function claimStronghold(id) {
     }
   }
   if (def.tasks) {
+    const level = getGuildHallLevel(id);
     for (let task of def.tasks) {
-      if (!G.strongholdTasks.find(t => t.id === task.id)) {
+      if ((task.minGuildLevel || 1) <= level && !G.strongholdTasks.find(t => t.id === task.id)) {
         G.strongholdTasks.push({ ...task, strongholdId: id });
       }
     }
@@ -3913,8 +4004,12 @@ function handleRaidVictory() {
   if (!raid) { exitRaid(); return; }
   const stage = raid.stages[G.raid.stageIndex];
 
-  const txp = G.cbt.en.reduce((s, e) => s + e.xp, 0);
-  const tg2 = G.cbt.en.reduce((s, e) => s + e.g, 0);
+  let txp = G.cbt.en.reduce((s, e) => s + e.xp, 0);
+  let tg2 = G.cbt.en.reduce((s, e) => s + e.g, 0);
+  const guildXpBonus = getTotalGuildHallXpBonus();
+  const guildGoldBonus = getTotalGuildHallGoldBonus();
+  if (guildXpBonus > 0) txp = Math.floor(txp * (1 + guildXpBonus));
+  if (guildGoldBonus > 0) tg2 = Math.floor(tg2 * (1 + guildGoldBonus));
   G.p.xp += txp;
   G.p.gold += tg2;
   if (stage && stage.type === 'boss') G.p.bossKills = (G.p.bossKills || 0) + 1;
@@ -5248,7 +5343,7 @@ function finishPlayerTurn() {
 function handleVictory() {
   clearZoneBuffs(); // STAGE 3: Clear zone buffs on victory
 
-  const txp = G.cbt.en.reduce((s, e) => s + e.xp, 0);
+  let txp = G.cbt.en.reduce((s, e) => s + e.xp, 0);
   let tg2 = G.cbt.en.reduce((s, e) => s + e.g, 0);
   
   if (G.party[1].on) tg2 = Math.floor(tg2 * 1.2);
@@ -5257,6 +5352,10 @@ function handleVictory() {
     tg2 = Math.floor(tg2 * (1 + goldBonus));
     lg('💰 Synergy bonus: +' + Math.floor(goldBonus * 100) + '% gold!');
   }
+  const guildXpBonus = getTotalGuildHallXpBonus();
+  const guildGoldBonus = getTotalGuildHallGoldBonus();
+  if (guildXpBonus > 0) txp = Math.floor(txp * (1 + guildXpBonus));
+  if (guildGoldBonus > 0) tg2 = Math.floor(tg2 * (1 + guildGoldBonus));
   
   G.p.xp += txp;
   G.p.gold += tg2;
@@ -6183,16 +6282,7 @@ function startRest(siteId) {
     for (let p of G.party) { if (p.on) updateAffinity(p.n, 2); }
 
     // Stronghold daily stipend, same as the regular rest path
-    if (site.stronghold && G.strongholdStipendDay !== G.gameDay) {
-      const strongholdId = Object.keys(STRONGHOLDS).find(id => STRONGHOLDS[id].restSiteIds.includes(site.id));
-      const def = strongholdId ? STRONGHOLDS[strongholdId] : null;
-      if (def && def.stipend) {
-        G.strongholdStipendDay = G.gameDay;
-        G.p.xp += def.stipend.xp;
-        G.p.gold += def.stipend.gold;
-        lg('🏰 The tower provides for you: +' + def.stipend.xp + ' XP, +' + def.stipend.gold + 'G.');
-      }
-    }
+    grantStrongholdStipend(site);
 
     G.rest.active = false;
     G.rest.selectedSite = null;
@@ -6294,17 +6384,7 @@ function completeRest() {
   lg('💚 ' + healerName + ' has restored everyone to full health.');
 
   // Stronghold daily stipend — once per day, resting at a claimed stronghold site
-  if (G.rest.selectedSite && G.rest.selectedSite.stronghold && G.strongholdStipendDay !== G.gameDay) {
-    const strongholdId = Object.keys(STRONGHOLDS).find(id =>
-      STRONGHOLDS[id].restSiteIds.includes(G.rest.selectedSite.id));
-    const def = strongholdId ? STRONGHOLDS[strongholdId] : null;
-    if (def && def.stipend) {
-      G.strongholdStipendDay = G.gameDay;
-      G.p.xp += def.stipend.xp;
-      G.p.gold += def.stipend.gold;
-      lg('🏰 The tower provides for you: +' + def.stipend.xp + ' XP, +' + def.stipend.gold + 'G.');
-    }
-  }
+  if (G.rest.selectedSite) grantStrongholdStipend(G.rest.selectedSite);
   // Affinity gain for resting together
   for (let p of G.party) { if (p.on) updateAffinity(p.n, 2); }
   // Track rest_with quest progress
@@ -6843,6 +6923,10 @@ function handleGrindVictory() {
     txp = Math.floor(txp * (1 + tierBonus));
     tg2 = Math.floor(tg2 * (1 + tierBonus));
   }
+  const guildXpBonus = getTotalGuildHallXpBonus();
+  const guildGoldBonus = getTotalGuildHallGoldBonus();
+  if (guildXpBonus > 0) txp = Math.floor(txp * (1 + guildXpBonus));
+  if (guildGoldBonus > 0) tg2 = Math.floor(tg2 * (1 + guildGoldBonus));
   
   G.p.xp += txp;
   G.p.gold += tg2;
@@ -7130,7 +7214,42 @@ function sc(zi) {
 
 
 // AUTO-COMBAT SYSTEM
+// Builds and shows the level-up celebration overlay, then removes itself automatically.
+// Pure CSS/DOM, no dependencies — safe to call even if a previous one hasn't finished
+// (each call gets its own overlay element with a unique-enough lifecycle).
+function triggerLevelUpAnimation(newLevel) {
+  const overlay = document.createElement('div');
+  overlay.className = 'levelup-overlay';
+
+  overlay.innerHTML =
+    '<div class="levelup-burst"></div>' +
+    '<div class="levelup-burst"></div>' +
+    '<div class="levelup-content">' +
+      '<div class="levelup-title">✨ Level Up ✨</div>' +
+      '<div class="levelup-number">' + newLevel + '</div>' +
+    '</div>';
+
+  // Scatter a handful of sparkle emoji around the burst, each flying off in a
+  // different direction via a random CSS custom property pair.
+  const sparkleEmojis = ['✨', '⭐', '💫', '🌟'];
+  for (let i = 0; i < 8; i++) {
+    const s = document.createElement('div');
+    s.className = 'levelup-sparkle';
+    s.textContent = sparkleEmojis[i % sparkleEmojis.length];
+    const angle = (i / 8) * Math.PI * 2;
+    const dist = 70 + Math.random() * 40;
+    s.style.setProperty('--sx', Math.round(Math.cos(angle) * dist) + 'px');
+    s.style.setProperty('--sy', Math.round(Math.sin(angle) * dist) + 'px');
+    s.style.animationDelay = (Math.random() * 0.2) + 's';
+    overlay.appendChild(s);
+  }
+
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.remove(), 2300);
+}
+
 function lvlup(){
+  const startLvl = G.p.lvl;
   while(G.p.xp>=G.p.xpN){
     G.p.xp-=G.p.xpN; G.p.lvl++;
     // SOFTENED CURVE: 1.5x until Lv 15, then 1.35x for healthier late-game pacing
@@ -7168,6 +7287,9 @@ function lvlup(){
     checkJournalLevelUnlocks();
     checkStoryUnlock();
     checkQ();
+  }
+  if (G.p.lvl > startLvl && typeof triggerLevelUpAnimation === 'function') {
+    triggerLevelUpAnimation(G.p.lvl);
   }
 }
 function checkQ(){
@@ -7446,6 +7568,7 @@ function saveGame() {
     growthAbilityUsed: G.growthAbilityUsed,
     raidProgress: G.raidProgress,
     strongholdTasks: G.strongholdTasks,
+    guildHallLevel: G.guildHallLevel,
     strongholdStipendDay: G.strongholdStipendDay,
     strongholds: G.strongholds
   };
@@ -7616,6 +7739,7 @@ function loadGame() {
     G.raidProgress = data.raidProgress || { cleared: [] };
     G.strongholds = data.strongholds || {};
     G.strongholdTasks = data.strongholdTasks || [];
+    G.guildHallLevel = data.guildHallLevel || {};
     G.strongholdStipendDay = data.strongholdStipendDay !== undefined ? data.strongholdStipendDay : -1;
 
     G.p.lvl = data.player.lvl;
@@ -8171,10 +8295,6 @@ function render(){
   h+='<div class="sb"><span class="si">XP</span><div class="bar"><div class="bf bf-xp" style="width:'+((G.p.xp/G.p.xpN)*100)+'%"></div></div><span class="bt">'+G.p.xp+'/'+G.p.xpN+'</span></div>';
   h+='<div class="gold">GOLD: '+G.p.gold+'</div></div></div>';
   if(G.p.buffs.length>0)h+='<div class="buffs">'+G.p.buffs.map(b=>'<span class="bp">'+b.n+' ('+b.t+')</span>').join('')+'</div>';
-  const activeSyns = getActiveSynergies();
-  if(activeSyns.length > 0 && G.state === 'combat'){
-    h += '<div class="buffs">' + activeSyns.map(s => '<span class="bp" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">'+s.icon+' '+s.name+'</span>').join('') + '</div>';
-  }
   h+='<div class="content">';
   if(G.state=='menu')h+=rMenu();
   else if(G.state=='achievements')h+=rAchievements();
@@ -9376,8 +9496,6 @@ function rCbt() {
 
   // Condensed indicator badges — full text lives in the title attribute (tap-and-hold / hover), badge itself stays short
   const badges = [];
-  const synDesc = getSynergyDesc();
-  if (synDesc) badges.push({ icon: '✨', text: '', full: synDesc, color: 'var(--accent-light)' });
   if (zone && zone.elem) {
     const resStatus = getResonanceStatus(zone.n);
     badges.push({ icon: resStatus.icon, text: resStatus.status === 'matched' ? 'Resonance +25%' : resStatus.status === 'mismatched' ? 'Resonance -25%' : 'Neutral', full: resStatus.text, color: resStatus.color });
@@ -10084,6 +10202,36 @@ function rTemple() {
   return h2;
 }
 
+function rGuildHallPanel(strongholdId) {
+  const def = STRONGHOLDS[strongholdId];
+  if (!def) return '';
+  const level = getGuildHallLevel(strongholdId);
+  const maxLevel = def.guildHall[def.guildHall.length - 1].level;
+  const nextTier = def.guildHall.find(t => t.level === level + 1);
+  const currentTier = def.guildHall.find(t => t.level === level);
+
+  let h = '<div class="panel panel-gold">';
+  h += '<div class="panel-row">';
+  h += '<div class="panel-title panel-title-gold">🏰 ' + def.name + ' — Guild Hall</div>';
+  h += '<div class="btn-hint">Lv.' + level + '/' + maxLevel + '</div>';
+  h += '</div>';
+  if (currentTier) {
+    h += '<div class="btn-hint" style="margin-bottom:8px;"><b style="color:var(--gold);">' + currentTier.name + ':</b> ' + currentTier.desc + '</div>';
+  }
+  if (nextTier) {
+    const affordable = G.p.gold >= nextTier.cost;
+    h += '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px;">';
+    h += '<div style="font-size:11px;font-weight:600;color:var(--text);">Next: ' + nextTier.name + '</div>';
+    h += '<div style="font-size:10px;color:var(--text-dim);margin:4px 0;">' + nextTier.desc + '</div>';
+    h += '<button onclick="upgradeGuildHall(\'' + strongholdId + '\')" class="abtn' + (affordable ? '' : ' dis') + '" style="width:100%;margin:0;">' + (affordable ? 'Build for ' + nextTier.cost + 'G' : 'Need ' + nextTier.cost + 'G') + '</button>';
+    h += '</div>';
+  } else {
+    h += '<div class="btn-hint" style="text-align:center;color:var(--gold);">👑 Guild Hall fully built.</div>';
+  }
+  h += '</div>';
+  return h;
+}
+
 function rRest() {
   const dead = getDeadParty();
   if(dead.length > 0 && !G.rest.active) return rTemple();
@@ -10163,6 +10311,10 @@ function rRest() {
     h2 += '</div>';
   }
   h2 += '</div>';
+  for (let strongholdId in G.strongholds) {
+    if (!G.strongholds[strongholdId]) continue;
+    h2 += rGuildHallPanel(strongholdId);
+  }
   h2 += '<div class="rest-sites">';
   const zones = {};
   for (let site of G.rest.sites) {
