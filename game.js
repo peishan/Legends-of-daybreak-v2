@@ -8522,6 +8522,7 @@ G.currentWeather = data.currentWeather || 'clear';
 function resetGame() {
   if (confirm('Are you sure? ALL progress will be lost forever!')) {
     localStorage.removeItem(SAVE_KEY);
+    localStorage.removeItem('ldb_save_v4'); // legacy key — must clear too, or loadGame() silently resurrects it
     location.reload();
   }
 }
