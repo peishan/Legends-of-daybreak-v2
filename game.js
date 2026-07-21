@@ -3168,6 +3168,7 @@ function checkAchievements() {
       G.p.xp += ach.rw.xp;
       G.p.gold += ach.rw.g;
       lg('🏆 ACHIEVEMENT UNLOCKED: ' + ach.n + '! ' + ach.icon);
+      showToast('🏆 Achievement unlocked: ' + ach.n, 'success');
       if (ach.secret) {
         lg('   ' + ach.d);
         ach.revealed = true;
@@ -3530,10 +3531,12 @@ function checkDayAdvance() {
     // Consecutive day
     G.loginStreak = (G.loginStreak || 0) + 1;
     lg('📅 New day! Login streak: ' + G.loginStreak);
+    showToast('🎁 New day! Collect your rewards', 'gold');
   } else {
     // Missed one or more days
     G.loginStreak = 1;
     lg('📅 New day! Streak reset (missed ' + (daysPassed - 1) + ' day' + (daysPassed > 2 ? 's' : '') + ').');
+    showToast('🎁 New day! Collect your rewards', 'gold');
   }
   
   G.lastLoginDay = G.gameDay;
@@ -3670,6 +3673,7 @@ function checkJournalLevelUnlocks() {
     if (entry.unlockType === 'level' && G.p.lvl >= entry.unlockAt && !G.storyJournal.unlocked.includes(entry.id)) {
       G.storyJournal.unlocked.push(entry.id);
       lg('📖 Journal unlocked: ' + entry.title + '!');
+      showToast('📖 New story chapter unlocked!', 'gold');
     }
   }
 }
@@ -3683,6 +3687,7 @@ function checkStoryline() {
       if (!prev || prev.done) {
         s.unlocked = true;
         lg('📖 Storyline unlocked: Chapter ' + s.chapter + ' - ' + s.n + '!');
+        showToast('📖 New story chapter unlocked!', 'gold');
       }
     }
     if (s.unlocked && G.p.lvl >= s.need) {
@@ -3710,7 +3715,10 @@ function checkBountyKill(enemyName) {
         G.p.gold += b.rw.g;
         G.p.quests++;
         lg('💰 Bounty complete: ' + b.n + '! +' + b.rw.xp + 'XP +' + b.rw.g + 'G');
+        showToast('💰 ' + b.n + ' complete!', 'gold');
         lvlup();
+      } else {
+        showToast('💰 ' + b.target + ': ' + b.c + '/' + b.need);
       }
     }
   }
@@ -3724,7 +3732,10 @@ function checkBountyKill(enemyName) {
         G.p.xp += t.rw.xp;
         G.p.gold += t.rw.g;
         lg('🏰 Stronghold task complete: ' + t.n + '! +' + t.rw.xp + 'XP +' + t.rw.g + 'G');
+        showToast('🏰 ' + t.n + ' complete!', 'gold');
         lvlup();
+      } else {
+        showToast('🏰 ' + t.target + ': ' + t.c + '/' + t.need);
       }
     }
   }
@@ -3951,6 +3962,7 @@ function checkGuildContractKill(enemyName) {
     if (c.t === 'kill_specific' && enemyName === c.target) {
       c.c++;
       if (c.c >= c.need) completeGuildContract(c);
+      else showToast('🛡️ ' + c.target + ': ' + c.c + '/' + c.need);
     }
   }
 }
@@ -5766,6 +5778,7 @@ function handleVictory() {
     if (entry.unlockType === 'boss' && G.currentBoss && G.currentBoss.n === entry.unlockAt && !G.storyJournal.unlocked.includes(entry.id)) {
       G.storyJournal.unlocked.push(entry.id);
       lg('📖 Journal unlocked: ' + entry.title + '!');
+      showToast('📖 New story chapter unlocked!', 'gold');
     }
   }
   if (G.currentBoss && G.currentBoss.n === 'The Planarch') {
@@ -5801,12 +5814,14 @@ function handleVictory() {
       if (killedInThisFight > 0) {
         q.c += killedInThisFight;
         lg('📜 ' + q.n + ': ' + q.c + '/' + q.need + ' ' + q.target + ' defeated');
+        showToast('📜 ' + q.target + ': ' + q.c + '/' + q.need);
         if (q.c >= q.need) checkQ();
       }
     }
     if (q.t === 'boss_specific' && G.currentBoss && G.currentBoss.n === q.target) {
       q.c++;
       lg('📜 ' + q.n + ': ' + q.c + '/' + q.need + ' ' + q.target + ' defeated');
+      showToast('📜 ' + q.target + ': ' + q.c + '/' + q.need);
       if (q.c >= q.need) checkQ();
     }
   }
@@ -7518,6 +7533,7 @@ function sc(zi) {
     if (entry.unlockType === 'zone' && z.n === entry.unlockAt && !G.storyJournal.unlocked.includes(entry.id)) {
       G.storyJournal.unlocked.push(entry.id);
       lg('📖 Journal unlocked: ' + entry.title + '!');
+      showToast('📖 New story chapter unlocked!', 'gold');
     }
   }
   G.cbt.on=true; G.cbt.turn=0; G.cbt.en=[]; G.state='combat';
@@ -7833,6 +7849,28 @@ function sf(minutes){
 }
 
 function cf(){if(ft)clearInterval(ft);setS('menu');lg('Focus cancelled.');render();}
+
+// Small, auto-dismissing notification (top-right) — for quick status updates during a
+// grind (bounty progress, contract progress) and for events worth a brief heads-up
+// without cluttering the main log or requiring a screen change. Distinct from lg(),
+// which is the permanent scrolling log — toasts are ephemeral and supplementary.
+function showToast(text, type) {
+  let stack = document.querySelector('.toast-stack');
+  if (!stack) {
+    stack = document.createElement('div');
+    stack.className = 'toast-stack';
+    document.body.appendChild(stack);
+  }
+  const toast = document.createElement('div');
+  toast.className = 'toast' + (type ? ' toast-' + type : '');
+  toast.textContent = text;
+  stack.appendChild(toast);
+  setTimeout(() => toast.remove(), 3300);
+
+  // Cap the stack so a burst of events (e.g. clearing several bounties in one fight)
+  // doesn't pile up indefinitely — oldest drops off first.
+  while (stack.children.length > 4) stack.removeChild(stack.firstChild);
+}
 
 function lg(msg){
   G.log.push(msg); if(G.log.length>50)G.log.shift();
