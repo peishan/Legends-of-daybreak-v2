@@ -422,6 +422,13 @@ const G = {
     { n: 'Bladeless Barracks', lv: 38, elem: 'fire', d: 'Zaki trained here, once, checking his pack seventeen times. The barracks that stand now belong to someone harder, someone who stopped checking a long time ago and never told you why.', en: ['Burnt Recruit','Barracks Wraith','Hollow Drillmaster'], loot: ['Scorched Training Blade', 'Nervous Boy\'s Charm', 'Drillmaster\'s Whistle'], xp: 1180, dg: 'impossible' },
     { n: 'The Storm That Stayed', lv: 39, elem: 'lightning', d: 'Mezstorm\'s estrangement, given weather. A storm that never broke, never passed, never once let the sky remember what it looked like before the distance began.', en: ['Stormbound Wraith','Thunder Remnant','Static Husk'], loot: ['Frozen Lightning', 'Estranged Letter', 'Storm-Sealed Locket'], xp: 1240, dg: 'impossible' },
     { n: "Embercat's Grave", lv: 40, elem: 'fire', d: 'A place that should not exist — Soel reforms from spirit flame, always, everywhere. And yet here is a grave, and here is an ember guttering low, and here is proof that even the unkillable can be forgotten if enough time passes without anyone remembering to choose them.', en: ['Guttering Wisp','Fading Ember','Forgotten Familiar'], loot: ['Cooling Ember', 'Unraveled Collar', 'The Last Purr'], xp: 1300, dg: 'impossible' },
+
+    // === ACT 3: THE RECKONING (LV 41-45) ===
+    { n: 'The Empty Ledger', lv: 41, elem: 'none', d: "Aisyah's trade routes, kept with the same precision she always used, except every entry now reads the same word in a hand that used to be steady: gone, gone, gone. She has not said a word since you arrived.", en: ['Ledger Phantom','Tally Wraith','Route Ghost'], loot: ['Steady Hand Ledger', 'Uncollected Debt', 'Sister\'s Old Ink'], xp: 1360, dg: 'impossible' },
+    { n: 'The Weight You Carry', lv: 42, elem: 'void', d: 'A place built from every night you told Joel you were fine when you were not. Your own exhaustion, given a floor to stand on and a shape to wear. You did not know it followed you this far.', en: ['Doubt Wraith','Exhausted Echo','Silent Weight'], loot: ['Unspoken Fatigue', 'Borrowed Courage', 'The Smile You Practiced'], xp: 1420, dg: 'impossible' },
+    { n: "The Architect's Chamber", lv: 43, elem: 'arcane', d: "The place where the Planarch's death first cracked the world — not an accident, you realize now, but a door someone built on purpose and never finished closing. The chamber hums with the specific, deliberate silence of a plan.", en: ['Chamber Sentinel','Fractured Construct','Time-Loop Wraith'], loot: ['Architect\'s Blueprint', 'Unfinished Seal', 'First Crack Fragment'], xp: 1480, dg: 'impossible' },
+    { n: 'What Remains United', lv: 44, elem: 'lightning', d: "For the first time since the Breaking, this place does not test you alone. Every echo you have faced — Joel's, Eliz's, Zaki's, Mezstorm's, Aisyah's, your own — converges here, not as separate griefs anymore but as a single splintered court demanding to know why you keep choosing to stay whole.", en: ['Remnant Guard','Splinter Sentinel','Echo Legion'], loot: ['Splinter Court Seal', 'United Fragment', 'The Question They Ask'], xp: 1540, dg: 'impossible' },
+    { n: 'Where the Break Began', lv: 45, elem: 'void', d: 'The exact moment the world first fractured, replaying itself forever at the center of everything you have survived. This is not another echo. This is the source — the first break, still breaking, waiting for someone to finally answer it instead of just enduring it.', en: ['Fracture Remnant','Broken Reality','Echo of Everything'], loot: ['The First Break', 'Mended Fragment', 'Proof the World Can Heal'], xp: 1650, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -532,6 +539,14 @@ const G = {
     { id: 30, n: 'Bladeless Barracks', d: 'Defeat Rustbound Zaki at the Bladeless Barracks', t: 'boss_specific', target: 'Rustbound Zaki', c: 0, need: 1, rw: { xp: 3800, g: 4200 }, done: false, chain: 'long_silence', reqQuest: 29, hidden: true, revealed: false },
     { id: 31, n: 'The Storm That Stayed', d: 'Defeat Mezstorm Unbound and quiet the storm', t: 'boss_specific', target: 'Mezstorm Unbound', c: 0, need: 1, rw: { xp: 4100, g: 4500 }, done: false, chain: 'long_silence', reqQuest: 30, hidden: true, revealed: false },
     { id: 32, n: "Embercat's Grave", d: 'Defeat The Fading Familiar and end Act Two', t: 'boss_specific', target: 'The Fading Familiar', c: 0, need: 1, rw: { xp: 5000, g: 5500 }, done: false, chain: 'long_silence', reqQuest: 31, hidden: true, revealed: false },
+
+    // === ACT 3: THE RECKONING (LV 41-45) ===
+    { id: 33, n: 'The Reckoning', d: 'Reach Level 41 and face what you have not yet faced', t: 'reach_level', c: 0, need: 41, rw: { xp: 5200, g: 4400 }, done: false, chain: 'the_reckoning', reqQuest: 32 },
+    { id: 34, n: 'The Empty Ledger', d: 'Defeat Echo of Aisyah in The Empty Ledger', t: 'boss_specific', target: 'Echo of Aisyah', c: 0, need: 1, rw: { xp: 6200, g: 5300 }, done: false, chain: 'the_reckoning', reqQuest: 33, hidden: true, revealed: false },
+    { id: 35, n: 'The Weight You Carry', d: 'Defeat The Tired Version', t: 'boss_specific', target: 'The Tired Version', c: 0, need: 1, rw: { xp: 6700, g: 5700 }, done: false, chain: 'the_reckoning', reqQuest: 34, hidden: true, revealed: false },
+    { id: 36, n: "The Architect's Chamber", d: 'Defeat The Architect and uncover the truth of the Breaking', t: 'boss_specific', target: 'The Architect', c: 0, need: 1, rw: { xp: 7200, g: 6100 }, done: false, chain: 'the_reckoning', reqQuest: 35, hidden: true, revealed: false },
+    { id: 37, n: 'What Remains United', d: 'Defeat The Splinter Court', t: 'boss_specific', target: 'The Splinter Court', c: 0, need: 1, rw: { xp: 7700, g: 6500 }, done: false, chain: 'the_reckoning', reqQuest: 36, hidden: true, revealed: false },
+    { id: 38, n: 'Where the Break Began', d: 'Defeat The First Break and end Act Three', t: 'boss_specific', target: 'The First Break', c: 0, need: 1, rw: { xp: 9500, g: 8000 }, done: false, chain: 'the_reckoning', reqQuest: 37, hidden: true, revealed: false },
 
   ],
 
@@ -661,6 +676,7 @@ const G = {
     { id: 's10', n: 'The Breaking', d: 'Reach Level 30 and survive the wound left where the Planarch used to be', t: 'reach_level', c: 0, need: 30, rw: { xp: 1500, g: 2600 }, done: false, unlocked: false, chapter: 10 },
     { id: 's11', n: 'The Shattered Now', d: 'Reach Level 35 and end Act One at The Widow\'s Watch', t: 'reach_level', c: 0, need: 35, rw: { xp: 2200, g: 3400 }, done: false, unlocked: false, chapter: 11 },
     { id: 's12', n: 'The Long Silence', d: "Reach Level 40 and end Act Two at Embercat's Grave", t: 'reach_level', c: 0, need: 40, rw: { xp: 3000, g: 4500 }, done: false, unlocked: false, chapter: 12 },
+    { id: 's13', n: 'The Reckoning', d: 'Reach Level 45 and end Act Three where the world first broke', t: 'reach_level', c: 0, need: 45, rw: { xp: 4200, g: 6000 }, done: false, unlocked: false, chapter: 13 },
   ],
   log: ['Welcome to Legends of Daybreak, San.'],
 
@@ -967,6 +983,18 @@ const G = {
       mechanic: 'lightning_rod', rodTurns: 3, desc: 'Estrangement given permanent weather. Lightning strikes the weakest member every 3 turns — the storm always finds the distance that hurts most.' },
     { n: 'The Fading Familiar', zone: "Embercat's Grave", hp: 16000, mhp: 16000, atk: 162, def: 90, xp: 6500, g: 3400,
       mechanic: 'resurrect', resurrectCount: 1, desc: 'Even spirit-flame gutters if no one remembers to tend it. Resurrects once more before the ember finally goes out — a warning about what forgetting costs, wearing a familiar shape.' },
+
+    // === ACT 3: THE RECKONING (LV 41-45) ===
+    { n: 'Echo of Aisyah', zone: 'The Empty Ledger', hp: 16800, mhp: 16800, atk: 168, def: 94, xp: 7000, g: 3700,
+      mechanic: 'devour', devourTurn: 5, desc: 'A future where the trade routes ran out and she had nothing left to bargain with but desperation. Sharp-eyed and sharper-tongued, still — just aimed at herself now.' },
+    { n: 'The Tired Version', zone: 'The Weight You Carry', hp: 17600, mhp: 17600, atk: 174, def: 98, xp: 7500, g: 4000,
+      mechanic: 'apocalypse', apocalypseTurn: 4, desc: 'You, if you had stopped pretending to be fine a long time ago. It does not attack so much as it simply agrees with every doubt you have ever had about whether you can actually do this.' },
+    { n: 'The Architect', zone: "The Architect's Chamber", hp: 18400, mhp: 18400, atk: 180, def: 102, xp: 8000, g: 4300,
+      mechanic: 'reality_weave', weaveTurn: 4, desc: 'The one who built the door the Planarch fell through — on purpose, and never finished closing. Reweaves the battlefield\'s reality every 4 turns, still trying to complete a plan you are about to end.' },
+    { n: 'The Splinter Court', zone: 'What Remains United', hp: 19200, mhp: 19200, atk: 186, def: 106, xp: 8500, g: 4600,
+      mechanic: 'lightning_rod', rodTurns: 3, desc: 'Every echo you have faced, fused into one tribunal, demanding to know why you keep choosing to stay whole instead of breaking like the world did. You answer with your fists.' },
+    { n: 'The First Break', zone: 'Where the Break Began', hp: 21000, mhp: 21000, atk: 195, def: 112, xp: 9500, g: 5200,
+      mechanic: 'cosmic', desc: 'The original fracture, still happening, forever, at the center of everything. Not a monster. A wound that never got the chance to close — until now.' },
   ],
 
   currentBoss: null,
@@ -1537,6 +1565,92 @@ storyJournal: {
         ]
       }
 
+      ,{
+        id: 'journal_032',
+        title: 'What the Ledger Never Said',
+        chapter: 32,
+        unlockType: 'boss',
+        unlockAt: 'Echo of Aisyah',
+        icon: '📒',
+        summary: 'Aisyah finally gets the reckoning every other echo already had.',
+        scenes: [
+          { speaker: 'Narrator', text: "You realize it walking into the back room: every other echo, you have already faced. Joel's, twice over. Eliz's. Zaki's. Mezstorm's. Soel's. Aisyah taught you to trade before she taught you to fight, and somehow, in all of this, no one ever asked what she was carrying." },
+          { speaker: 'Aisyah', text: '"I did not think I needed one," Aisyah says, staring at the ledger with her own handwriting gone jagged across every page. "I am the one who counts things. Who keeps track. Who makes sure everyone else is fed before I say I am hungry too. I did not think that kind of carrying left a mark."' },
+          { speaker: 'Narrator', text: "The Echo of Aisyah rises from the columns of debt, sharp-eyed and sharper-tongued exactly like her, except every trade she makes now costs something she cannot afford, and she keeps making them anyway because stopping means admitting the ledger never balances." },
+          { speaker: 'Aisyah', text: '"I taught you the trade routes of Brunei before I taught you anything else," she says, low, watching the echo count coins that were never really there. "I want you to know why. It was the only language I had for love that did not feel like asking for something back."' },
+          { speaker: 'San', text: '"You never had to ask," you tell her, and mean it more than you have meant almost anything. "Family with knives is complicated and useful — you taught me that. You did not have to earn a place I already gave you."' },
+          { speaker: 'Narrator', text: 'The Echo does not fight so much as it finally, finally sets the ledger down — and when it dissolves, Aisyah exhales like she has been holding her breath since long before the world broke. She does not say anything else. She does not need to.' }
+        ]
+      }
+      ,{
+        id: 'journal_033',
+        title: 'The Version That Stopped Pretending',
+        chapter: 33,
+        unlockType: 'boss',
+        unlockAt: 'The Tired Version',
+        icon: '🕯️',
+        summary: "San's own exhaustion, finally given a name instead of a smile.",
+        scenes: [
+          { speaker: 'Narrator', text: 'This is the first echo that is entirely yours. Not a companion, not a lost future belonging to someone you love — just you, if you had stopped saying you were fine a long time before you actually meant it.' },
+          { speaker: 'San', text: '"I feel tired," you had told Zaki once, in a place that feels very far away now. "But I smile anyway." The Tired Version does not smile. It does not see the point of it anymore. That is the only difference between you.' },
+          { speaker: 'Narrator', text: "It does not attack the way other echoes do. It just agrees with you — every doubt you have ever had about whether you can actually carry a whole shattered world, whether San is even a name that means anything anymore, whether the youth Joel's magic restored was ever really given back to you or just borrowed." },
+          { speaker: 'Joel', text: '"You do not have to be brave for me," Joel says, quiet, steady, exactly the way he has been since the first day he asked to stand beside you while you found out why you were here. "I asked to walk with you. Not behind a version of you that never gets tired."' },
+          { speaker: 'Narrator', text: "You fight the Tired Version knowing, somewhere underneath the dice and the damage numbers, that this is the one echo you cannot simply defeat and walk away from. You have to actually answer it. So you do — not with certainty, but with the truth: you are tired, and you are still here, and those two things have always been allowed to sit in the same sentence." },
+          { speaker: 'San', text: '"I do not feel brave," you say, to the echo, to yourself, to no one. "I feel tired. I am doing it anyway. That was always the whole point."' }
+        ]
+      }
+      ,{
+        id: 'journal_034',
+        title: 'The Door Someone Built on Purpose',
+        chapter: 34,
+        unlockType: 'boss',
+        unlockAt: 'The Architect',
+        icon: '📐',
+        summary: 'The Breaking was not an accident. Someone built the door.',
+        scenes: [
+          { speaker: 'Narrator', text: "The chamber hums with a silence too deliberate to be ruins. Blueprints line walls that should have collapsed a dozen levels ago. This was not a tower that fell. This was a door someone built, and never finished closing." },
+          { speaker: 'Mezstorm', text: '"Storms do not build doors," Mezstorm says, running a hand along a seal still humming with old, patient intention. "Storms just happen. This — this was planned. Someone wanted the world to break exactly like this, exactly when it did."' },
+          { speaker: 'Narrator', text: 'The Architect does not look like a villain from a story. It looks like exhaustion given competence — something that built a plan so large it forgot to ask whether the plan should exist at all, and kept building anyway because stopping felt more frightening than finishing.' },
+          { speaker: 'Eliz', text: '"I know that feeling," Eliz says, and there is no triumph in her voice, only recognition. "The magic made a mistake with Mezstorm. Maybe the Architect made a mistake too. Maybe it is not evil. Maybe it is just someone who could not find the door back out of their own plan."' },
+          { speaker: 'San', text: '"That does not mean I let it finish," you say, and the fight that follows is not about hatred. It is about ending something that was always going to keep breaking the world unless someone chose, on purpose, to stop it.' },
+          { speaker: 'Narrator', text: 'When The Architect falls, the chamber does not celebrate. It just goes quiet — the specific quiet of a plan that will never complete, and a world that finally gets to stop bracing for the next piece of it.' }
+        ]
+      }
+      ,{
+        id: 'journal_035',
+        title: 'The Tribunal of Every Echo',
+        chapter: 35,
+        unlockType: 'boss',
+        unlockAt: 'The Splinter Court',
+        icon: '⚖️',
+        summary: 'Every grief you have survived, fused into one question: why do you keep choosing to stay whole?',
+        scenes: [
+          { speaker: 'Narrator', text: "For the first time since the Breaking, the place does not test you alone. Every echo converges here — Joel's twice-told grief, Eliz's uncaught future, Zaki's hardened silence, Mezstorm's permanent storm, Soel's guttering ember, Aisyah's unbalanced ledger, your own tired version — not separate anymore, but one splintered court." },
+          { speaker: 'Zaki', text: '"That is a lot of us," Zaki says, checking his pack once, twice, the old nervous habit steadying him the way it always has. "All in one place. Asking one question."' },
+          { speaker: 'Narrator', text: 'The Splinter Court does not attack so much as it interrogates — every strike carries the weight of a specific grief, demanding to know why, faced with every reason the world gave you to fracture like it did, you keep choosing to stay whole instead.' },
+          { speaker: 'Senedra', text: '"Because staying whole is not the absence of breaking," Senedra says, an arrow already nocked, her voice steady the way only someone who has found her way back a hundred times can manage. "It is choosing, every time, to find the path back anyway."' },
+          { speaker: 'Narrator', text: "The party fights as one, for the first time feeling less like individuals surviving separate griefs and more like what they actually are: people who chose each other, over and over, across every world this journey has thrown at them." },
+          { speaker: 'San', text: '"We stay whole," you say, to the tribunal, to the echoes, to the part of yourself that still sometimes doubts it, "because every single one of you already showed me it was possible. That is the whole answer. That has always been the whole answer."' }
+        ]
+      }
+      ,{
+        id: 'journal_036',
+        title: 'The First Break',
+        chapter: 36,
+        unlockType: 'boss',
+        unlockAt: 'The First Break',
+        icon: '🌍',
+        summary: 'Act Three ends where everything began — and proof, finally, that the world can be mended.',
+        scenes: [
+          { speaker: 'Narrator', text: 'This is not another echo of grief. This is the source — the exact moment the world first fractured, replaying itself forever at the center of everything you have survived. Not a monster. A wound that never got the chance to close.' },
+          { speaker: 'Joel', text: '"The tower answers to you now," Joel says, quiet, remembering his own words from a lifetime of zones ago. "Maybe the whole world does too, if we are brave enough to actually try closing this instead of just surviving around it."' },
+          { speaker: 'Narrator', text: 'The First Break does not have a voice, not really — it is closer to a held breath the size of a world, repeating the instant of its own fracture over and over because no one before you ever stayed long enough to answer it.' },
+          { speaker: 'Aisyah', text: '"I have spent this whole journey counting what was lost," Aisyah says, and for the first time her voice does not sound like a ledger. "Let me count something else for once. Let me count what is still here."' },
+          { speaker: 'Narrator', text: 'The fight is not a battle so much as an answer, finally given — San\'s staff, Joel\'s shield, Aisyah\'s blades, Mezstorm\'s storm, Eliz\'s light, Senedra\'s arrows, Zaki\'s sword, Soel\'s claws, all of it together, closing a door that has been open since before any of you arrived.' },
+          { speaker: 'San', text: 'When The First Break finally quiets, the silence that follows is different from every silence before it. Not absence. Not grief. Just the world, for the first time in this whole shattered future, allowed to rest. "It can be mended," you say, to Joel, to all of them, to yourself. "We just proved it. Whatever comes next — we know that now."' }
+        ]
+      }
+
 
 
 
@@ -1603,6 +1717,12 @@ storyJournal: {
     { id: 'barracks_camp', name: 'Old Drill Yard', type: 'camp', zone: 'Bladeless Barracks', zoneLv: 38, desc: 'A cleared patch where recruits used to run laps. The ground remembers footsteps that aren\'t yours.', unlocked: false, icon: '⛺', cost: 0 },
     { id: 'storm_camp', name: 'The Eye', type: 'camp', zone: 'The Storm That Stayed', zoneLv: 39, desc: 'A small pocket of calm at the center of a storm that never ends. It holds, for now.', unlocked: false, icon: '⛺', cost: 0 },
     { id: 'ember_camp', name: "The Last Warm Stone", type: 'camp', zone: "Embercat's Grave", zoneLv: 40, desc: 'A single stone that still holds heat, long after everything around it went cold.', unlocked: false, icon: '⛺', cost: 0 },
+    // === ACT 3: THE RECKONING (LV 41-45) REST SITES ===
+    { id: 'ledger_camp', name: "The Back Room", type: 'camp', zone: 'The Empty Ledger', zoneLv: 41, desc: "The room behind the stall where Aisyah used to count coin. It still smells like her ink.", unlocked: false, icon: '⛺', cost: 0 },
+    { id: 'weight_camp', name: 'Where You Set It Down', type: 'camp', zone: 'The Weight You Carry', zoneLv: 42, desc: 'A place to rest that does not ask you to be fine first.', unlocked: false, icon: '⛺', cost: 0 },
+    { id: 'architect_camp', name: "The Chamber Threshold", type: 'camp', zone: "The Architect's Chamber", zoneLv: 43, desc: 'Just outside the humming door. Close enough to watch it, far enough to breathe.', unlocked: false, icon: '⛺', cost: 0 },
+    { id: 'united_camp', name: 'The Gathering Ground', type: 'camp', zone: 'What Remains United', zoneLv: 44, desc: 'Every echo you have faced left a mark here. It somehow still feels like the safest place you have found.', unlocked: false, icon: '⛺', cost: 0 },
+    { id: 'firstbreak_camp', name: 'The Mended Seam', type: 'camp', zone: 'Where the Break Began', zoneLv: 45, desc: 'The one place in the fracture that has already started to heal.', unlocked: false, icon: '⛺', cost: 0 },
     // Phase 3 mana springs
     { id: 'ms_spring3', name: 'Infernal Mana Spring', type: 'mana_spring', zone: 'Infernal Crucible', zoneLv: 23, desc: 'A spring of liquid flame that burns cold. Each sip sears the mind with forbidden knowledge.', unlocked: false, icon: '💧', cost: 20 },
     { id: 'ms_spring4', name: 'Abyssal Mana Spring', type: 'mana_spring', zone: 'Tidal Abyss', zoneLv: 25, desc: 'Dark water that glows with inner light. Drinking it feels like drowning in stars.', unlocked: false, icon: '💧', cost: 25 },
@@ -2753,6 +2873,23 @@ const ENEMY_REGISTRY = {
   'Guttering Wisp': { template: 'striker', elem: 'fire', zoneLv: 40 },
   'Fading Ember': { template: 'balanced', elem: 'fire', zoneLv: 40 },
   'Forgotten Familiar': { template: 'tank', elem: 'fire', zoneLv: 40 },
+
+  // === ACT 3: THE RECKONING (LV 41-45) ===
+  'Ledger Phantom': { template: 'balanced', elem: 'none', zoneLv: 41 },
+  'Tally Wraith': { template: 'striker', elem: 'none', zoneLv: 41 },
+  'Route Ghost': { template: 'tank', elem: 'none', zoneLv: 41 },
+  'Doubt Wraith': { template: 'striker', elem: 'void', zoneLv: 42 },
+  'Exhausted Echo': { template: 'balanced', elem: 'void', zoneLv: 42 },
+  'Silent Weight': { template: 'tank', elem: 'void', zoneLv: 42 },
+  'Chamber Sentinel': { template: 'tank', elem: 'arcane', zoneLv: 43 },
+  'Fractured Construct': { template: 'balanced', elem: 'arcane', zoneLv: 43 },
+  'Time-Loop Wraith': { template: 'striker', elem: 'arcane', zoneLv: 43 },
+  'Remnant Guard': { template: 'tank', elem: 'lightning', zoneLv: 44 },
+  'Splinter Sentinel': { template: 'balanced', elem: 'lightning', zoneLv: 44 },
+  'Echo Legion': { template: 'striker', elem: 'lightning', zoneLv: 44 },
+  'Fracture Remnant': { template: 'balanced', elem: 'void', zoneLv: 45 },
+  'Broken Reality': { template: 'striker', elem: 'void', zoneLv: 45 },
+  'Echo of Everything': { template: 'tank', elem: 'void', zoneLv: 45 },
 };
 
 
