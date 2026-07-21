@@ -592,6 +592,25 @@ const G = {
 
   ],
 
+  // Guild Contracts — bigger, rarer versions of bounties, refreshing weekly instead of
+  // daily, and rewarding Guild Reputation (a separate track from gold/XP) alongside the
+  // usual rewards. Distinct from the Stronghold entirely — the Guild is a membership and
+  // reputation system, not tied to owning any location.
+  guildContracts: [
+    { id: 'gc1', n: 'Goblin Warband', d: 'Defeat 8 Goblins for the Guild', t: 'kill_specific', target: 'Goblin', c: 0, need: 8, rw: { xp: 150, g: 100 }, rep: 20, done: false, refreshWeek: -1, minLv: 1, maxLv: 8 },
+    { id: 'gc2', n: 'Contract: Frozen Knight', d: 'Defeat the Frozen Knight for the Guild', t: 'boss_specific', target: 'Frozen Knight', c: 0, need: 1, rw: { xp: 300, g: 200 }, rep: 35, done: false, refreshWeek: -1, minLv: 5, maxLv: 12 },
+    { id: 'gc3', n: 'Rift Stalker Purge', d: 'Defeat 6 Rift Stalkers for the Guild', t: 'kill_specific', target: 'Rift Stalker', c: 0, need: 6, rw: { xp: 500, g: 350 }, rep: 50, done: false, refreshWeek: -1, minLv: 8, maxLv: 16 },
+    { id: 'gc4', n: 'Contract: Elder Dragon', d: 'Defeat the Elder Dragon for the Guild', t: 'boss_specific', target: 'Elder Dragon', c: 0, need: 1, rw: { xp: 800, g: 550 }, rep: 70, done: false, refreshWeek: -1, minLv: 12, maxLv: 20 },
+    { id: 'gc5', n: 'Void Weaver Contract', d: 'Defeat 5 Void Weavers for the Guild', t: 'kill_specific', target: 'Void Weaver', c: 0, need: 5, rw: { xp: 1100, g: 750 }, rep: 90, done: false, refreshWeek: -1, minLv: 16, maxLv: 24 },
+    { id: 'gc6', n: 'Contract: The Astral Devourer', d: 'Defeat The Astral Devourer for the Guild', t: 'boss_specific', target: 'The Astral Devourer', c: 0, need: 1, rw: { xp: 1500, g: 1000 }, rep: 120, done: false, refreshWeek: -1, minLv: 20, maxLv: 28 },
+    { id: 'gc7', n: 'Chronomancer Contract', d: 'Defeat 5 Chronomancers for the Guild', t: 'kill_specific', target: 'Chronomancer', c: 0, need: 5, rw: { xp: 1900, g: 1300 }, rep: 150, done: false, refreshWeek: -1, minLv: 24, maxLv: 30 },
+    { id: 'gc8', n: 'Contract: The Planarch', d: 'Defeat The Planarch for the Guild', t: 'boss_specific', target: 'The Planarch', c: 0, need: 1, rw: { xp: 2500, g: 1700 }, rep: 190, done: false, refreshWeek: -1, minLv: 28, maxLv: 34 },
+    { id: 'gc9', n: 'Ruin Stalker Contract', d: 'Defeat 5 Ruin Stalkers for the Guild', t: 'kill_specific', target: 'Ruin Stalker', c: 0, need: 5, rw: { xp: 3000, g: 2000 }, rep: 220, done: false, refreshWeek: -1, minLv: 30, maxLv: 36 },
+    { id: 'gc10', n: 'Contract: The Fracture', d: 'Defeat The Fracture for the Guild', t: 'boss_specific', target: 'The Fracture', c: 0, need: 1, rw: { xp: 3800, g: 2600 }, rep: 270, done: false, refreshWeek: -1, minLv: 34, maxLv: 40 },
+    { id: 'gc11', n: 'Road Wraith Contract', d: 'Defeat 5 Road Wraiths for the Guild', t: 'kill_specific', target: 'Road Wraith', c: 0, need: 5, rw: { xp: 4500, g: 3100 }, rep: 310, done: false, refreshWeek: -1, minLv: 36, maxLv: 42 },
+    { id: 'gc12', n: 'Contract: Echo of Joel', d: 'Defeat Echo of Joel for the Guild', t: 'boss_specific', target: 'Echo of Joel', c: 0, need: 1, rw: { xp: 5500, g: 3800 }, rep: 360, done: false, refreshWeek: -1, minLv: 38, maxLv: 44 },
+  ],
+
 
   achievements: [
     { id: 'first_blood', n: 'First Blood', d: 'Defeat your first monster', icon: '🩸', t: 'kills', need: 1, rw: { xp: 25, g: 10 }, done: false, secret: false },
@@ -1627,6 +1646,11 @@ storyJournal: {
   },
   strongholds: {}, // claimed strongholds, keyed by STRONGHOLDS id — set true once claimed
   guildHallLevel: {}, // Guild Hall level per stronghold id (1 = just claimed, up to 5)
+  guildJoined: false, // The Guild — separate from any Stronghold, auto-joins at level 5
+  guildRep: 0, // lifetime reputation total, determines rank, never spent
+  guildRepBalance: 0, // spendable reputation currency for the Guild Shop
+  strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
+  siegeDefense: { active: false, strongholdId: null, wave: 0, maxWaves: 3 },
   strongholdTasks: [], // populated from STRONGHOLDS[id].tasks once a stronghold is claimed
   strongholdStipendDay: -1, // last gameDay a stronghold stipend was collected
   manaSpringUses: { day: 0, count: 0 },
@@ -3463,6 +3487,8 @@ function checkDailyQuests(type, amount) {
 
 function refreshBounties() {
   refreshStrongholdTasks();
+  refreshGuildContracts();
+  checkStrongholdSiege();
   const today = G.gameDay;
   let refreshed = false;
 
@@ -3535,6 +3561,7 @@ function checkStoryline() {
 }
 
 function checkBountyKill(enemyName) {
+  checkGuildContractKill(enemyName);
   for (let b of G.bounties) {
     if (b.done) continue;
     if (b.t === 'kill_specific' && enemyName === b.target) {
@@ -3698,6 +3725,125 @@ const GRIND_TIERS = [
 // Claiming permanently unlocks and frees the location's rest sites, grants a daily
 // stipend for resting there, and unlocks a small set of stronghold-only tasks —
 // distinct from the regular bounty rotation, always available once claimed.
+// === GUILD ===
+// A membership and reputation system, entirely separate from the Stronghold — joining
+// the Guild doesn't require owning any location, and rank progress comes purely from
+// completing Guild Contracts. Reputation is tracked two ways, same pattern as XP vs Gold:
+// guildRep is the lifetime total (never spent, determines rank) and guildRepBalance is
+// the spendable currency (goes up when earned, down when spent in the Guild Shop).
+const GUILD_RANKS = [
+  { rank: 1, name: 'Guild Initiate', repReq: 0, desc: 'Joined the Guild. The Contract Board is open to you.' },
+  { rank: 2, name: 'Guild Associate', repReq: 150, desc: '+5% gold from every victory.', goldBonus: 0.05 },
+  { rank: 3, name: 'Guild Adventurer', repReq: 500, desc: '+5% XP from every victory.', xpBonus: 0.05 },
+  { rank: 4, name: 'Guild Veteran', repReq: 1200, desc: 'Another +5% gold and +5% XP.', goldBonus: 0.05, xpBonus: 0.05 },
+  { rank: 5, name: 'Guild Champion', repReq: 2500, desc: '+5% crit chance in combat.', critBonus: 0.05 },
+  { rank: 6, name: 'Guildmaster', repReq: 5000, desc: 'Another +10% gold and +10% XP, and the full Guild Shop opens to you.', goldBonus: 0.10, xpBonus: 0.10 }
+];
+
+const GUILD_SHOP = [
+  { n: 'Guild Sigil', slot: 'amulet', minRank: 2, cost: 100, atk: 3, def: 3, r: 'rare', d: 'Marks you as a Guild Associate in good standing.' },
+  { n: 'Guildmark Blade', slot: 'weapon', minRank: 3, cost: 250, atk: 12, int: 3, r: 'rare', d: 'Forged for Guild Adventurers who\'ve proven themselves.' },
+  { n: "Veteran's Plate", slot: 'armor', minRank: 4, cost: 400, def: 14, con: 3, r: 'epic', d: 'Armor reserved for Guild Veterans.' },
+  { n: "Champion's Ring", slot: 'ring', minRank: 5, cost: 600, atk: 6, def: 6, critChance: 0.03, r: 'epic', d: 'Worn by those the Guild calls Champion.' },
+  { n: "Guildmaster's Seal", slot: 'amulet', minRank: 6, cost: 1000, atk: 10, def: 10, int: 6, wis: 6, r: 'legendary', d: 'There is only one of these per Guildmaster. Yours, now.' }
+];
+
+function getGuildRank() {
+  let rank = 0;
+  for (let r of GUILD_RANKS) { if (G.guildRep >= r.repReq) rank = r.rank; }
+  return rank;
+}
+function getGuildRankDef() {
+  const rank = getGuildRank();
+  return GUILD_RANKS.find(r => r.rank === rank) || null;
+}
+function getGuildBonus(statKey) {
+  const rank = getGuildRank();
+  let total = 0;
+  for (let r of GUILD_RANKS) { if (r.rank <= rank && r[statKey]) total += r[statKey]; }
+  return total;
+}
+
+function checkGuildUnlock() {
+  if (!G.guildJoined && G.p.lvl >= 5) {
+    G.guildJoined = true;
+    lg('🛡️ You\'ve joined the Adventurers\' Guild! The Contract Board is open — check it for bigger jobs than the usual bounties.');
+    refreshGuildContracts();
+  }
+}
+
+function checkGuildRankUp(previousRank) {
+  const rank = getGuildRank();
+  if (rank > previousRank) {
+    const def = GUILD_RANKS.find(r => r.rank === rank);
+    if (def) {
+      lg('🛡️ GUILD RANK UP: ' + def.name + '!');
+      lg('   ' + def.desc);
+    }
+  }
+}
+
+// Guild Contracts refresh weekly (not daily like bounties) — bigger jobs, rarer refresh.
+function refreshGuildContracts() {
+  if (!G.guildJoined) return;
+  const week = Math.floor(G.gameDay / 7);
+  let refreshed = false;
+
+  const eligible = G.guildContracts.filter(c => {
+    if (!c.done || c.refreshWeek === week) return false;
+    const minLv = c.minLv || 1;
+    const maxLv = c.maxLv || 99;
+    return G.p.lvl >= minLv && G.p.lvl <= maxLv;
+  }).sort((a, b) => Math.abs((a.minLv || 1) - G.p.lvl) - Math.abs((b.minLv || 1) - G.p.lvl));
+
+  const pool = eligible.length > 0 ? eligible : G.guildContracts.filter(c => c.refreshWeek !== week && (c.minLv || 1) <= G.p.lvl);
+  const toRefresh = pool.slice(0, 3);
+  for (let c of toRefresh) {
+    c.done = false;
+    c.c = 0;
+    c.refreshWeek = week;
+    refreshed = true;
+  }
+  if (refreshed) lg('📋 New Guild Contracts posted on the board!');
+}
+
+function checkGuildContractKill(enemyName) {
+  if (!G.guildJoined) return;
+  for (let c of G.guildContracts) {
+    if (c.done) continue;
+    if (c.t === 'kill_specific' && enemyName === c.target) {
+      c.c++;
+      if (c.c >= c.need) completeGuildContract(c);
+    }
+  }
+}
+
+function completeGuildContract(c) {
+  c.done = true;
+  c.refreshWeek = Math.floor(G.gameDay / 7);
+  const previousRank = getGuildRank();
+  G.p.xp += c.rw.xp;
+  G.p.gold += c.rw.g;
+  G.guildRep += c.rep;
+  G.guildRepBalance += c.rep;
+  G.p.quests++;
+  lg('🛡️ Guild Contract complete: ' + c.n + '! +' + c.rw.xp + 'XP +' + c.rw.g + 'G +' + c.rep + ' Guild Rep');
+  checkGuildRankUp(previousRank);
+  lvlup();
+}
+
+function buyGuildItem(index) {
+  const item = GUILD_SHOP[index];
+  if (!item) return;
+  const rank = getGuildRank();
+  if (rank < item.minRank) { lg('❌ Requires Guild Rank ' + item.minRank + ' (' + GUILD_RANKS.find(r => r.rank === item.minRank).name + ').'); return; }
+  if (G.guildRepBalance < item.cost) { lg('❌ Need ' + item.cost + ' Guild Rep (have ' + G.guildRepBalance + ').'); return; }
+  G.guildRepBalance -= item.cost;
+  addI({ ...item });
+  lg('🛡️ Guild Shop: acquired ' + item.n + ' for ' + item.cost + ' Guild Rep.');
+  render();
+}
+
 const STRONGHOLDS = {
   arcaneTower: {
     name: 'Arcane Planar Tower',
@@ -3708,18 +3854,21 @@ const STRONGHOLDS = {
     tasks: [
       { id: 'st_tower_upkeep', n: 'Tower Upkeep', d: "Defeat 3 Planar Wisps to keep the tower's wards charged", t: 'kill_specific', target: 'Planar Wisp', c: 0, need: 3, rw: { xp: 90, g: 70 }, done: false, refreshDay: -1 },
       { id: 'st_tower_rift_ward', n: 'Rift Ward', d: "Defeat 2 Rift Stalkers threatening the tower's seal", t: 'kill_specific', target: 'Rift Stalker', c: 0, need: 2, rw: { xp: 110, g: 85 }, done: false, refreshDay: -1 },
-      { id: 'st_tower_armory', n: 'Armory Watch', d: "Defeat 3 Aether Golems guarding the Guild Armory", t: 'kill_specific', target: 'Aether Golem', c: 0, need: 3, rw: { xp: 130, g: 100 }, done: false, refreshDay: -1, minGuildLevel: 2 }
+      { id: 'st_tower_armory', n: 'Armory Watch', d: "Defeat 3 Aether Golems guarding the Tower Armory", t: 'kill_specific', target: 'Aether Golem', c: 0, need: 3, rw: { xp: 130, g: 100 }, done: false, refreshDay: -1, minGuildLevel: 2 }
     ],
     // The Guild Hall is the core progression structure for this stronghold — everything
     // else added to it later checks the current level here. Level 1 is automatic on
     // claim (no cost); each level after that is a gold-gated upgrade with a concrete unlock.
     guildHall: [
-      { level: 1, name: 'Guild Founded', cost: 0, desc: 'Free rest and a daily stipend — the tower answers to you now.' },
-      { level: 2, name: 'Guild Armory', cost: 800, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
-      { level: 3, name: 'Guild Training Grounds', cost: 2500, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
-      { level: 4, name: 'Guild Vault', cost: 6000, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
-      { level: 5, name: 'Guild Sanctum', cost: 15000, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
-    ]
+      { level: 1, name: 'Tower Claimed', cost: 0, desc: 'Free rest and a daily stipend — the tower answers to you now.' },
+      { level: 2, name: 'Tower Armory', cost: 800, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
+      { level: 3, name: 'Tower Training Grounds', cost: 2500, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
+      { level: 4, name: 'Tower Vault', cost: 6000, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
+      { level: 5, name: 'Tower Sanctum', cost: 15000, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
+    ],
+    zoneLv: 11, // used to scale siege-defense enemies
+    siegeEnemies: ['Planar Wisp', 'Rift Stalker', 'Void Weaver', 'Astral Construct'],
+    siegeReward: { xp: 350, gold: 300, guildRep: 25 }
   }
 };
 
@@ -3798,6 +3947,117 @@ function grantStrongholdStipend(site) {
     G.p.buffs.push({ n: "Guildmaster's Blessing", t: 3, atk: Math.round(G.p.stats.int * 0.1) || 1, def: 1 });
     lg("✨ The Guild Sanctum's blessing settles over you — +10% to all stats for your next 3 fights.");
   }
+}
+
+// === STRONGHOLD DEFENSE (SIEGE EVENTS) ===
+// Each claimed stronghold has a daily chance of coming under attack. When it does, a
+// banner appears offering a 3-wave elite defense fight — clear it for a bonus reward.
+// Ignoring it costs nothing except the reward; there's no permanent penalty for skipping
+// or losing, so this stays a bonus opportunity, not a punishing timer.
+const SIEGE_CHANCE = 0.25;
+const SIEGE_WAVES = 3;
+
+function checkStrongholdSiege() {
+  for (let id in G.strongholds) {
+    if (!G.strongholds[id]) continue;
+    const def = STRONGHOLDS[id];
+    if (!def || !def.siegeEnemies) continue;
+    if (!G.strongholdSiege[id]) G.strongholdSiege[id] = { active: false, day: -1 };
+    const siege = G.strongholdSiege[id];
+    if (siege.day === G.gameDay) continue; // already rolled today
+    siege.day = G.gameDay;
+    if (!siege.active && Math.random() < SIEGE_CHANCE) {
+      siege.active = true;
+      lg('⚔️ ' + def.name + ' is under siege! Defend it for a bonus reward.');
+    }
+  }
+}
+
+function startSiegeDefense(strongholdId) {
+  const def = STRONGHOLDS[strongholdId];
+  if (!def || !G.strongholdSiege[strongholdId]?.active) return;
+  G.siegeDefense.active = true;
+  G.siegeDefense.strongholdId = strongholdId;
+  G.siegeDefense.wave = 0;
+  G.siegeDefense.maxWaves = SIEGE_WAVES;
+  lg('⚔️ Defending ' + def.name + '! ' + SIEGE_WAVES + ' waves stand between the tower and disaster.');
+  startSiegeWave();
+}
+
+function startSiegeWave() {
+  const def = STRONGHOLDS[G.siegeDefense.strongholdId];
+  if (!def) return;
+  G.cbt.on = true;
+  G.cbt.turn = 0;
+  G.cbt.en = [];
+  G.state = 'combat';
+  G.currentBoss = null;
+
+  const waveSize = 2 + Math.floor(G.siegeDefense.wave / 2); // waves 0-1: 2 enemies, wave 2: 3 enemies
+  for (let i = 0; i < waveSize; i++) {
+    const name = def.siegeEnemies[Math.floor(Math.random() * def.siegeEnemies.length)];
+    const e = generateRaidEliteEnemy(name, def.zoneLv);
+    e.id = i;
+    G.cbt.en.push(e);
+  }
+  lg('⚔️ Wave ' + (G.siegeDefense.wave + 1) + '/' + G.siegeDefense.maxWaves + ' attacks ' + def.name + '!');
+  render();
+}
+
+function handleSiegeVictory() {
+  const def = STRONGHOLDS[G.siegeDefense.strongholdId];
+  if (!def) { exitSiegeDefense(); return; }
+
+  const txp = G.cbt.en.reduce((s, e) => s + e.xp, 0);
+  const tg2 = G.cbt.en.reduce((s, e) => s + e.g, 0);
+  G.p.xp += txp;
+  G.p.gold += tg2;
+  lg('🎉 Wave repelled! +' + txp + ' XP, +' + tg2 + 'G');
+
+  G.siegeDefense.wave++;
+  G.currentBoss = null;
+  G.cbt.autoCombat = false;
+  G.cbt.on = false;
+
+  if (G.siegeDefense.wave >= G.siegeDefense.maxWaves) {
+    // Siege fully repelled — bonus reward, and the siege is over
+    const reward = def.siegeReward || { xp: 0, gold: 0, guildRep: 0 };
+    G.p.xp += reward.xp;
+    G.p.gold += reward.gold;
+    if (reward.guildRep && G.guildJoined) {
+      const previousRank = getGuildRank();
+      G.guildRep += reward.guildRep;
+      G.guildRepBalance += reward.guildRep;
+      checkGuildRankUp(previousRank);
+    }
+    lg('🏰 SIEGE REPELLED! ' + def.name + ' is safe. Bonus: +' + reward.xp + ' XP, +' + reward.gold + 'G' + (reward.guildRep && G.guildJoined ? ', +' + reward.guildRep + ' Guild Rep' : '') + '.');
+    G.strongholdSiege[G.siegeDefense.strongholdId].active = false;
+    G.siegeDefense.active = false;
+    G.siegeDefense.strongholdId = null;
+    G.state = 'menu';
+    lvlup();
+    render();
+    return;
+  }
+
+  // Partial recovery between waves, same rhythm as raid stages
+  G.p.hp = Math.min(G.p.mhp, G.p.hp + Math.floor(G.p.mhp * RAID_STAGE_RECOVERY_PCT));
+  G.p.mp = Math.min(G.p.mmp, G.p.mp + Math.floor(G.p.mmp * RAID_STAGE_RECOVERY_PCT));
+  for (let p of G.party) {
+    if (p.on && p.hp > 0) p.hp = Math.min(p.mhp, p.hp + Math.floor(p.mhp * RAID_STAGE_RECOVERY_PCT));
+  }
+  startSiegeWave();
+}
+
+function exitSiegeDefense() {
+  lg('🚪 Left the siege defense. The tower still stands, but the threat remains — try again later.');
+  G.siegeDefense.active = false;
+  G.siegeDefense.strongholdId = null;
+  G.siegeDefense.wave = 0;
+  G.cbt.autoCombat = false;
+  G.cbt.on = false;
+  G.state = 'menu';
+  render();
 }
 
 function claimStronghold(id) {
@@ -4006,8 +4266,8 @@ function handleRaidVictory() {
 
   let txp = G.cbt.en.reduce((s, e) => s + e.xp, 0);
   let tg2 = G.cbt.en.reduce((s, e) => s + e.g, 0);
-  const guildXpBonus = getTotalGuildHallXpBonus();
-  const guildGoldBonus = getTotalGuildHallGoldBonus();
+  const guildXpBonus = getTotalGuildHallXpBonus() + getGuildBonus('xpBonus');
+  const guildGoldBonus = getTotalGuildHallGoldBonus() + getGuildBonus('goldBonus');
   if (guildXpBonus > 0) txp = Math.floor(txp * (1 + guildXpBonus));
   if (guildGoldBonus > 0) tg2 = Math.floor(tg2 * (1 + guildGoldBonus));
   G.p.xp += txp;
@@ -5352,8 +5612,8 @@ function handleVictory() {
     tg2 = Math.floor(tg2 * (1 + goldBonus));
     lg('💰 Synergy bonus: +' + Math.floor(goldBonus * 100) + '% gold!');
   }
-  const guildXpBonus = getTotalGuildHallXpBonus();
-  const guildGoldBonus = getTotalGuildHallGoldBonus();
+  const guildXpBonus = getTotalGuildHallXpBonus() + getGuildBonus('xpBonus');
+  const guildGoldBonus = getTotalGuildHallGoldBonus() + getGuildBonus('goldBonus');
   if (guildXpBonus > 0) txp = Math.floor(txp * (1 + guildXpBonus));
   if (guildGoldBonus > 0) tg2 = Math.floor(tg2 * (1 + guildGoldBonus));
   
@@ -5411,6 +5671,16 @@ function handleVictory() {
       q.c++;
       lg('📜 ' + q.n + ': ' + q.c + '/' + q.need + ' ' + q.target + ' defeated');
       if (q.c >= q.need) checkQ();
+    }
+  }
+
+  // Guild Contracts: boss-specific ones check the same way as boss-specific quests
+  if (G.guildJoined && G.currentBoss) {
+    for (let c of G.guildContracts) {
+      if (c.done) continue;
+      if (c.t === 'boss_specific' && G.currentBoss.n === c.target) {
+        completeGuildContract(c);
+      }
     }
   }
 
@@ -6923,8 +7193,8 @@ function handleGrindVictory() {
     txp = Math.floor(txp * (1 + tierBonus));
     tg2 = Math.floor(tg2 * (1 + tierBonus));
   }
-  const guildXpBonus = getTotalGuildHallXpBonus();
-  const guildGoldBonus = getTotalGuildHallGoldBonus();
+  const guildXpBonus = getTotalGuildHallXpBonus() + getGuildBonus('xpBonus');
+  const guildGoldBonus = getTotalGuildHallGoldBonus() + getGuildBonus('goldBonus');
   if (guildXpBonus > 0) txp = Math.floor(txp * (1 + guildXpBonus));
   if (guildGoldBonus > 0) tg2 = Math.floor(tg2 * (1 + guildGoldBonus));
   
@@ -7064,6 +7334,32 @@ handleDefeat = function() {
     render();
   } else {
     _originalHandleDefeatForRaid();
+  }
+};
+
+const _originalHandleVictoryForSiege = handleVictory;
+handleVictory = function() {
+  if (G.siegeDefense.active) handleSiegeVictory();
+  else _originalHandleVictoryForSiege();
+};
+
+const _originalHandleDefeatForSiege = handleDefeat;
+handleDefeat = function() {
+  if (G.siegeDefense.active) {
+    if (checkSecondWind()) { render(); return; }
+    const def = STRONGHOLDS[G.siegeDefense.strongholdId];
+    lg('💀 The defense falters at wave ' + (G.siegeDefense.wave + 1) + '/' + G.siegeDefense.maxWaves + ' — ' + (def ? def.name : 'the stronghold') + " isn't lost, but the reward slips away this time.");
+    G.p.hp = 1;
+    for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
+    G.cbt.autoCombat = false;
+    G.cbt.on = false;
+    G.siegeDefense.active = false;
+    G.siegeDefense.strongholdId = null;
+    G.siegeDefense.wave = 0;
+    G.state = 'menu';
+    render();
+  } else {
+    _originalHandleDefeatForSiege();
   }
 };
 
@@ -7286,6 +7582,7 @@ function lvlup(){
     checkStoryline();
     checkJournalLevelUnlocks();
     checkStoryUnlock();
+    checkGuildUnlock();
     checkQ();
   }
   if (G.p.lvl > startLvl && typeof triggerLevelUpAnimation === 'function') {
@@ -7569,6 +7866,11 @@ function saveGame() {
     raidProgress: G.raidProgress,
     strongholdTasks: G.strongholdTasks,
     guildHallLevel: G.guildHallLevel,
+    guildJoined: G.guildJoined,
+    guildRep: G.guildRep,
+    guildRepBalance: G.guildRepBalance,
+    guildContracts: G.guildContracts.map(c => ({ id: c.id, c: c.c, done: c.done, refreshWeek: c.refreshWeek })),
+    strongholdSiege: G.strongholdSiege,
     strongholdStipendDay: G.strongholdStipendDay,
     strongholds: G.strongholds
   };
@@ -7740,6 +8042,20 @@ function loadGame() {
     G.strongholds = data.strongholds || {};
     G.strongholdTasks = data.strongholdTasks || [];
     G.guildHallLevel = data.guildHallLevel || {};
+    G.guildJoined = data.guildJoined || false;
+    G.guildRep = data.guildRep || 0;
+    G.guildRepBalance = data.guildRepBalance !== undefined ? data.guildRepBalance : 0;
+    if (data.guildContracts) {
+      for (let c of G.guildContracts) {
+        const saved = data.guildContracts.find(sc => sc.id === c.id);
+        if (saved) {
+          c.c = saved.c;
+          c.done = saved.done;
+          c.refreshWeek = saved.refreshWeek;
+        }
+      }
+    }
+    G.strongholdSiege = data.strongholdSiege || {};
     G.strongholdStipendDay = data.strongholdStipendDay !== undefined ? data.strongholdStipendDay : -1;
 
     G.p.lvl = data.player.lvl;
@@ -8320,6 +8636,8 @@ function render(){
   else if(G.state=='grind_room')h+=rGrindRoom();
   else if(G.state=='raid_select')h+=rRaidSelect();
   else if(G.state=='raid_room')h+=rRaidRoom();
+  else if(G.state=='guild')h+=rGuild();
+  else if(G.state=='stronghold')h+=rStrongholds();
 
   h+='</div>';
   h+='<div class="log" id="log">'+G.log.map(m=>'<div class="le">'+m+'</div>').join('')+'</div>';
@@ -9289,6 +9607,118 @@ function rRaidRoom() {
 }
 
 
+function rStrongholds() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">🗼 Strongholds</div>';
+
+  const claimedIds = Object.keys(G.strongholds).filter(id => G.strongholds[id]);
+  if (claimedIds.length === 0) {
+    h += '<div class="panel" style="text-align:center;">';
+    h += '<div class="panel-title">🔒 No Stronghold Claimed Yet</div>';
+    h += '<div class="btn-hint" style="margin-top:6px;">Defeat The Planarch atop the Arcane Planar Tower to claim it.</div>';
+    h += '</div></div>';
+    return h;
+  }
+
+  for (let id of claimedIds) {
+    const def = STRONGHOLDS[id];
+    if (!def) continue;
+    h += '<div class="panel">';
+    h += '<div class="panel-title">' + def.icon + ' ' + def.name + '</div>';
+    h += '<div class="btn-hint" style="margin:6px 0;">' + def.desc + '</div>';
+    h += '</div>';
+    h += rSiegeBanner(id);
+    h += rGuildHallPanel(id);
+    h += '<button onclick="setS(\'rest\')" class="btn-outline-ghost" style="width:100%;margin-bottom:16px;">💤 Visit Rest Sites</button>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function rGuild() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">🛡️ Adventurers\' Guild</div>';
+
+  if (!G.guildJoined) {
+    h += '<div class="panel" style="text-align:center;">';
+    h += '<div class="panel-title">🔒 Not Yet a Member</div>';
+    h += '<div class="btn-hint" style="margin-top:6px;">The Guild opens its doors at Level 5. Keep adventuring.</div>';
+    h += '</div></div>';
+    return h;
+  }
+
+  const rank = getGuildRank();
+  const rankDef = getGuildRankDef();
+  const nextRank = GUILD_RANKS.find(r => r.rank === rank + 1);
+
+  // Rank + reputation panel
+  h += '<div class="panel panel-gold">';
+  h += '<div class="panel-row"><div class="panel-title panel-title-gold">🛡️ ' + (rankDef ? rankDef.name : 'Unranked') + '</div><div class="btn-hint">' + G.guildRep + ' Rep total</div></div>';
+  if (nextRank) {
+    const pct = Math.min(100, Math.floor(((G.guildRep - rankDef.repReq) / (nextRank.repReq - rankDef.repReq)) * 100));
+    h += '<div class="pbar" style="margin:8px 0;"><div class="pbar-fill" style="width:' + pct + '%;"></div></div>';
+    h += '<div class="btn-hint">' + (nextRank.repReq - G.guildRep) + ' Rep to ' + nextRank.name + '</div>';
+  } else {
+    h += '<div class="btn-hint" style="color:var(--gold);">Maximum rank reached.</div>';
+  }
+  h += '<div style="font-size:11px;color:var(--accent-light);margin-top:6px;">💰 ' + G.guildRepBalance + ' Rep available to spend</div>';
+  h += '</div>';
+
+  // Rank ladder
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">Rank Ladder</div>';
+  for (let r of GUILD_RANKS) {
+    const unlocked = rank >= r.rank;
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">';
+    h += '<div><span style="font-weight:600;color:' + (unlocked ? 'var(--gold)' : 'var(--text-dim)') + ';">' + (unlocked ? '✓ ' : '🔒 ') + r.name + '</span><div style="font-size:10px;color:var(--text-dim);">' + r.desc + '</div></div>';
+    h += '<div class="btn-hint">' + r.repReq + ' Rep</div>';
+    h += '</div>';
+  }
+  h += '</div>';
+
+  // Contract board
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">📋 Contract Board</div>';
+  const activeContracts = G.guildContracts.filter(c => c.refreshWeek === Math.floor(G.gameDay / 7));
+  if (activeContracts.length === 0) {
+    h += '<div class="btn-hint">No contracts posted yet — check back soon.</div>';
+  } else {
+    for (let c of activeContracts) {
+      h += '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px;">';
+      h += '<div style="font-weight:600;font-size:12px;">' + c.n + (c.done ? ' <span style="color:var(--success);">✓ Complete</span>' : '') + '</div>';
+      h += '<div style="font-size:10px;color:var(--text-dim);margin:4px 0;">' + c.d + '</div>';
+      if (!c.done) h += '<div class="pbar" style="margin-bottom:4px;"><div class="pbar-fill" style="width:' + Math.floor((c.c / c.need) * 100) + '%;"></div></div>';
+      h += '<div style="font-size:10px;color:var(--accent-light);">Reward: ' + c.rw.xp + 'XP · ' + c.rw.g + 'G · ' + c.rep + ' Rep</div>';
+      h += '</div>';
+    }
+  }
+  h += '</div>';
+
+  // Guild shop
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">🏪 Guild Shop</div>';
+  for (let i = 0; i < GUILD_SHOP.length; i++) {
+    const item = GUILD_SHOP[i];
+    const unlocked = rank >= item.minRank;
+    const affordable = G.guildRepBalance >= item.cost;
+    const rarityColor = item.r === 'legendary' || item.r === 'epic' ? '#a855f7' : item.r === 'rare' ? '#3b82f6' : '#9ca3af';
+    h += '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px;' + (unlocked ? '' : 'opacity:0.5;') + '">';
+    h += '<div style="font-weight:600;font-size:12px;color:' + rarityColor + ';">' + item.n + '</div>';
+    h += '<div style="font-size:10px;color:var(--text-dim);margin:4px 0;">' + item.d + '</div>';
+    if (unlocked) {
+      h += '<button onclick="buyGuildItem(' + i + ')" class="abtn' + (affordable ? '' : ' dis') + '" style="width:100%;margin:0;">' + (affordable ? 'Buy for ' + item.cost + ' Rep' : 'Need ' + item.cost + ' Rep') + '</button>';
+    } else {
+      h += '<div class="btn-hint">🔒 Requires ' + GUILD_RANKS.find(r => r.rank === item.minRank).name + '</div>';
+    }
+    h += '</div>';
+  }
+  h += '</div>';
+
+  h += '</div>';
+  return h;
+}
+
 function rMenu(){
   const primary=[
     {i:'⚔️',l:'Adventure',d:'Explore zones and fight',a:'explore'},
@@ -9297,6 +9727,10 @@ function rMenu(){
     {i:'⚔️',l:'Raid Mode',d:'Boss gauntlets + elites',a:'raid_select'},
   ];
   const sections=[
+    { title: '🏰 Guild & Stronghold', items: [
+      {i:'🛡️',l:'Guild',a:'guild'},
+      {i:'🗼',l:'Stronghold',a:'stronghold'},
+    ]},
     { title: '🧙 Character', items: [
       {i:'✨',l:'Skills',a:'skills'},
       {i:'🌳',l:'Skill Trees',a:'skilltree'},
@@ -10202,6 +10636,17 @@ function rTemple() {
   return h2;
 }
 
+function rSiegeBanner(strongholdId) {
+  const def = STRONGHOLDS[strongholdId];
+  const siege = G.strongholdSiege[strongholdId];
+  if (!def || !siege || !siege.active) return '';
+  return '<div class="panel panel-danger">' +
+    '<div class="panel-title" style="color:var(--danger);">⚔️ ' + def.name + ' is Under Siege!</div>' +
+    '<div class="btn-hint" style="margin:6px 0;">Defend it across ' + SIEGE_WAVES + ' waves for a bonus reward — or ignore it, no harm done either way.</div>' +
+    '<button onclick="startSiegeDefense(\'' + strongholdId + '\')" class="abtn" style="width:100%;margin:0;background:var(--danger);">⚔️ Defend the Tower</button>' +
+    '</div>';
+}
+
 function rGuildHallPanel(strongholdId) {
   const def = STRONGHOLDS[strongholdId];
   if (!def) return '';
@@ -10313,6 +10758,7 @@ function rRest() {
   h2 += '</div>';
   for (let strongholdId in G.strongholds) {
     if (!G.strongholds[strongholdId]) continue;
+    h2 += rSiegeBanner(strongholdId);
     h2 += rGuildHallPanel(strongholdId);
   }
   h2 += '<div class="rest-sites">';
