@@ -1,10 +1,12 @@
 // Legends of Daybreak — Service Worker
 // Bump CACHE_VERSION whenever you ship new game.js/styles.css/index.html so returning
-// players get the update instead of a stale cached copy.
-const CACHE_VERSION = 'daybreak-v1';
+// players get the update instead of a stale cached copy. NOTE: this is a fallback safety
+// net only — the fetch strategy below is network-first for the app shell specifically so
+// updates land automatically without needing to remember to bump this every time.
+const CACHE_VERSION = 'daybreak-v2';
 
-// Core app shell — required files. If any of these fail to fetch, install fails on
-// purpose, since the game can't run without them.
+// Core app shell — changes often during active development. Network-first: always try
+// to get the latest version when online, only falling back to cache when offline.
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -13,8 +15,9 @@ const CORE_ASSETS = [
   './manifest.json'
 ];
 
-// Optional assets — nice to have offline, but a missing one (e.g. portraits not yet
-// uploaded on this deployment) must not break the whole install.
+// Optional assets — images that rarely change once uploaded. Cache-first: faster loads,
+// no need to re-fetch every time, and a missing one (e.g. portraits not yet uploaded on
+// this deployment) must not break the whole install.
 const OPTIONAL_ASSETS = [
   './icons/icon-192.png',
   './icons/icon-512.png',
@@ -58,30 +61,47 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Cache-first for same-origin requests (app shell, portraits, icons), so the game
-// works offline once installed. Falls back to network, and if that also fails,
-// serves the cached index.html for navigation requests so the app shell still loads.
+// App shell files get network-first: try the network for the latest version, and only
+// fall back to cache if that fails (offline, or a flaky connection). This is the fix for
+// the bug where a cached game.js could get permanently stuck, since a pure cache-first
+// strategy never re-checks the network once something is cached.
+function isAppShellRequest(url) {
+  return CORE_ASSETS.some((asset) => url.pathname.endsWith(asset.replace('./', '/')) || url.pathname === '/' );
+}
+
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return; // let cross-origin (fonts CDN) pass through normally
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request)
+  if (event.request.mode === 'navigate' || isAppShellRequest(url)) {
+    // Network-first
+    event.respondWith(
+      fetch(event.request)
         .then((response) => {
-          // Cache a copy of successfully-fetched same-origin assets for next time
           if (response && response.status === 200) {
             const copy = response.clone();
             caches.open(CACHE_VERSION).then((cache) => cache.put(event.request, copy));
           }
           return response;
         })
-        .catch(() => {
-          if (event.request.mode === 'navigate') {
-            return caches.match('./index.html');
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Everything else (portraits, icons): cache-first, since these rarely change
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+      return fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const copy = response.clone();
+            caches.open(CACHE_VERSION).then((cache) => cache.put(event.request, copy));
           }
-        });
+          return response;
+        })
+        .catch(() => undefined);
     })
   );
 });
