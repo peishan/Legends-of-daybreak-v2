@@ -1779,6 +1779,66 @@ storyJournal: {
         ]
       }
 
+      ,{
+        id: 'journal_042',
+        title: 'Enough, Without Asking',
+        chapter: 42,
+        unlockType: 'level',
+        unlockAt: 27,
+        icon: '🕯️',
+        summary: 'San stops waiting for anyone\'s permission to be happy.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It is a quiet night, nothing dramatic, which is exactly the kind of night old memories choose to surface in. Joel notices before you say anything — he always does — and just sits, close, not asking. You end up telling him anyway.' },
+          { speaker: 'San', text: '"I went broke hiring a lawyer once," you say, turning a cup in your hands you are not drinking from. "Just to contact my ex. Not even for anything complicated — just so there would be a formal channel, so I would not have to do it myself. That is what it cost, in the old world, just to stop having to speak to someone directly. Money I did not have, for the privilege of distance."' },
+          { speaker: 'Joel', text: 'He does not say anything clever. He just listens, the way he always does, like every word you give him is worth keeping.' },
+          { speaker: 'San', text: '"Around the same time my father got retrenched," you continue. "Laid off, no warning, at an age where nobody was hiring him again. I went from being one of the people in the household to being the one holding it up. I did not choose that. It just became true one morning and stayed true."' },
+          { speaker: 'Narrator', text: 'You do not say it like a complaint. You say it like an old fact, worn smooth by repetition, the kind of thing that stopped hurting in the specific way and started just being architecture — load-bearing, permanent, part of the shape of your life.' },
+          { speaker: 'San', text: '"And somewhere in the middle of all that, I met you," you say, finally looking at him. "Before the divorce was finalized. Not after a respectable interval. During. And people at work had opinions about that. Loud ones. About what kind of person does not wait."' },
+          { speaker: 'Joel', text: '"What kind of person does not wait?" Joel asks, quiet, not rhetorical — he actually wants to know what you decided.' },
+          { speaker: 'San', text: '"A tired one," you say. "A person who was already drowning and found somebody who could actually hold weight. I do not think that needed their permission. I just used to think it did."' },
+          { speaker: 'Narrator', text: 'You are quiet for a moment, and Joel lets the quiet sit, because he has learned by now that your silences are not empty either — they are you deciding how much further into this you want to go tonight.' },
+          { speaker: 'San', text: '"My father has three daughters," you say, eventually. "All three of us have been divorced. I came close enough to it myself before things went the way they did that it barely counts as an exception. I think somewhere in him, watching that pattern, he stopped trusting that any relationship holds. Not because he does not love us. Because loving us and watching us get hurt, three times over, taught him to brace before anything even starts going wrong."' },
+          { speaker: 'San', text: '"And then I brought him you," you say, almost smiling, almost not. "Filipino, when our whole family is ethnic Chinese, roots going back through Brunei and Malaysia for generations. I do not think he is unkind about it. I think he is just — unsure. One more variable, stacked on top of a pattern that already scared him. He has never said a cruel word about it. He also has never quite said it is fine."' },
+          { speaker: 'Joel', text: '"Does that hurt?" Joel asks, direct, the way he asks the questions that actually matter.' },
+          { speaker: 'San', text: '"It used to," you admit. "I used to think if I just explained it well enough — the workplace, my father, all of it — someone would finally say the thing I wanted to hear. That I made the right call. That I am not the reckless daughter, the one who could not wait, the one who complicated an already-scared father\'s year."' },
+          { speaker: 'Narrator', text: 'You look at him properly now, steady, the same way he has looked at you since the very first day he asked to stand beside you and find out why you were here.' },
+          { speaker: 'San', text: '"I do not need that anymore," you say, and you can hear that it is true even as you say it, not just something you are trying to convince yourself of. "Not from the workplace that judged me. Not even from my father, though I hope, someday, he gets there in his own time. I know what we are. I do not need anyone else\'s permission to know it."' },
+          { speaker: 'Joel', text: '"Good," Joel says, simply, and takes your hand — not a grand gesture, just a steady one, exactly like him. "Because I was never going to wait for permission either. I asked to stand beside you. That was never conditional on anyone else agreeing it made sense."' },
+          { speaker: 'San', text: 'You lean into him, and for once the old memories do not follow you into the quiet after. They just stay where they belong — true, and past, and no longer load-bearing. "Enough," you say, mostly to yourself. "I am enough, without anyone else signing off on it. That took a long time to actually believe."' }
+        ]
+      }
+
+      ,{
+        id: 'journal_043',
+        title: 'The Question Neither of Them Answers',
+        chapter: 43,
+        unlockType: 'level',
+        unlockAt: 36,
+        icon: '🌱',
+        summary: 'San and Joel talk about children — and decide, together, not to decide yet.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Morning comes slow and gold through whatever passes for a window here, and neither of you moves for a long time, tangled in the specific quiet that follows a night neither of you planned and both of you wanted. It is Joel who finally says it, half a laugh in his voice, testing the weight of the question before he commits to it.' },
+          { speaker: 'Joel', text: '"Does magic change how that works?" he asks, not quite looking at you, one hand still resting where it fell. "Here. In this world. I do not actually know. Does anyone?"' },
+          { speaker: 'San', text: '"I do not know either," you admit, and the half-joke of it fades fast, the way these things do once you actually let yourself sit in them. "I have PCOS. In the old world that made the question complicated in one direction — sometimes harder than people expect, sometimes not, never predictable. I have no idea what it means here, where the rules are different for everything else too."' },
+          { speaker: 'Narrator', text: 'You say it plainly, the way you have learned to say true things about your own body after years of other people having opinions about it, and Joel does not flinch, does not reach for reassurance he cannot actually offer. He just listens, the way he always does.' },
+          { speaker: 'San', text: '"And I am not even divorced yet," you continue. "Not really. Not on paper. It is hanging, unfinished, one more thing I carry that has not resolved. If something happened before that resolved — a child, out of wedlock, with someone my parents already are not sure about — I do not think they could accept it. Not easily. Maybe not at all. They are not cruel people. They are just built by a world that had very firm ideas about the order things are supposed to happen in."' },
+          { speaker: 'Joel', text: '"And we cannot exactly ask that world for its blessing from here," Joel says, quiet, not bitter, just honest.' },
+          { speaker: 'San', text: '"No," you agree. "We cannot. So I need to know — truly know, not politely know — where you stand. Because I cannot carry this uncertainty for both of us."' },
+          { speaker: 'Narrator', text: "He takes his time answering, which you have come to understand is not hesitation so much as respect — he does not give you fast answers to slow questions." },
+          { speaker: 'Joel', text: '"I am not ready," he says, finally, plain as anything. "Not because of you. Because of everything else I am still carrying — the tower, the family, the promises I have not finished keeping to people who are not you. I do not think it would be fair to bring a child into the middle of commitments I have not finished honoring."' },
+          { speaker: 'San', text: '"But?" you ask, because you can hear there is one.' },
+          { speaker: 'Joel', text: '"But I am not closing the door either," he says. "If it happened — if it just happened, the way things happen — I would not be upset. I mean that. I am leaving it to god\'s will, whatever that looks like in a world with this many gods stacked on top of each other. I am not asking for it. I am not afraid of it either."' },
+          { speaker: 'San', text: '"You are sure?" you ask again, because it matters enough to ask twice.' },
+          { speaker: 'Joel', text: '"I am sure," he says, and takes your hand, steady as always. "Whatever comes, we face it the way we face everything. Together. I am not going anywhere regardless of what the answer turns out to be."' },
+          { speaker: 'Narrator', text: 'It should feel like a resolution. It does not, quite — it feels like a held breath, honest but unfinished, which is somehow more comforting than a clean answer would have been. You lie there a while longer, coin and magic and everything strange about this cosmic place suddenly very far away from the actual question underneath all of it.' },
+          { speaker: 'San', text: '"We are both breadwinners who left our parents behind," you say, eventually, quieter now, the guilt surfacing the way it always does when the room goes still enough to hear it. "Mine, yours. Somewhere, in worlds we cannot get back to, people who needed us are managing without us. I do not know how to hold that and also hold the question of bringing someone new into this. It feels like too much grief and too much hope in the same breath."' },
+          { speaker: 'Joel', text: '"Maybe it is both," Joel says. "Maybe it is allowed to be both."' },
+          { speaker: 'San', text: 'You do not answer that, not directly. Instead you decide, together, without ever quite saying it out loud as a decision: not to decide. Not today. Not while there is still a tower to hold, a family to protect, a world still learning how to mend. The question stays open, honestly open, neither closed nor chased.' },
+          { speaker: 'San', text: '"Priorities," you say, finally, sitting up, letting the morning actually start. "We focus on priorities. The rest finds us or it does not. Either way, we are still here for it."' },
+          { speaker: 'Joel', text: '"Together," Joel says, like it was never actually in question. "Whatever the answer turns out to be."' }
+        ]
+      }
+
 
 
 
@@ -1905,6 +1965,7 @@ storyJournal: {
   guildRepBalance: 0, // spendable reputation currency for the Guild Shop
   dragonHunt: { active: false, cleared: 0 }, // a legendary optional superboss, repeatable
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
+  bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
   strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
   siegeDefense: { active: false, strongholdId: null, wave: 0, maxWaves: 3 },
   strongholdTasks: [], // populated from STRONGHOLDS[id].tasks once a stronghold is claimed
@@ -8582,6 +8643,7 @@ function saveGame() {
     strongholdSiege: G.strongholdSiege,
     dragonHuntCleared: G.dragonHunt.cleared,
     strongholdCosmetics: G.strongholdCosmetics,
+    bondingSeenScenes: G.bonding.seenScenes,
     strongholdStipendDay: G.strongholdStipendDay,
     strongholds: G.strongholds
   };
@@ -8769,6 +8831,7 @@ function loadGame() {
     G.strongholdSiege = data.strongholdSiege || {};
     G.dragonHunt.cleared = data.dragonHuntCleared || 0;
     G.strongholdCosmetics = data.strongholdCosmetics || {};
+    G.bonding.seenScenes = data.bondingSeenScenes || [];
     G.strongholdStipendDay = data.strongholdStipendDay !== undefined ? data.strongholdStipendDay : -1;
 
     G.p.lvl = data.player.lvl;
@@ -8791,37 +8854,7 @@ function loadGame() {
       G.storyJournal.unlocked = data.player.storyJournal.unlocked || [];
       G.storyJournal.read = data.player.storyJournal.read || [];
     }
-    // Catch up any level-gated entries that should already be unlocked but were
-    // missed (e.g. by the old bug where this only checked inside an unrelated
-    // quest condition). Safe to run every load — it only ever adds, never removes.
     checkJournalLevelUnlocks();
-    
-    // MIGRATION: Unlock journal entries based on existing progress
-    // Runs if journal data is missing or empty (old saves or fresh installs)
-    const hasJournalData = data.player.storyJournal && 
-                           data.player.storyJournal.unlocked && 
-                           data.player.storyJournal.unlocked.length > 0;
-    if (!hasJournalData) {
-      for (let entry of G.storyJournal.entries) {
-        let shouldUnlock = false;
-        if (entry.unlockType === 'level' && G.p.lvl >= entry.unlockAt) {
-          shouldUnlock = true;
-        } else if (entry.unlockType === 'boss') {
-          // Check bestiary for boss kills
-          if (G.bestiary[entry.unlockAt] && G.bestiary[entry.unlockAt].kills > 0) {
-            shouldUnlock = true;
-          }
-        } else if (entry.unlockType === 'zone') {
-          // Check if zone rest site is unlocked (means visited)
-          const visited = G.rest.sites.find(s => s.zone === entry.unlockAt && s.unlocked);
-          if (visited) shouldUnlock = true;
-        }
-        if (shouldUnlock && !G.storyJournal.unlocked.includes(entry.id)) {
-          G.storyJournal.unlocked.push(entry.id);
-          lg('📖 Journal unlocked (migration): ' + entry.title);
-        }
-      }
-    }
 
 
 
@@ -8983,6 +9016,30 @@ function loadGame() {
     }
     if (data.bestiary) {
       G.bestiary = data.bestiary;
+    }
+    // Catch up any level/boss/zone-gated journal entries that should already be
+    // unlocked but were missed — e.g. a boss defeated through a path that didn't
+    // trigger the live in-combat check (Raid Mode, or before this system existed).
+    // Safe to run every load — only ever adds entries, never removes them. This used
+    // to be gated behind "only if the journal has zero unlocked entries so far," which
+    // meant it silently stopped working forever after the very first entry unlocked —
+    // and it ran before G.bestiary was even restored, so the boss check always failed.
+    for (let entry of G.storyJournal.entries) {
+      let shouldUnlock = false;
+      if (entry.unlockType === 'level' && G.p.lvl >= entry.unlockAt) {
+        shouldUnlock = true;
+      } else if (entry.unlockType === 'boss') {
+        if (G.bestiary[entry.unlockAt] && G.bestiary[entry.unlockAt].kills > 0) {
+          shouldUnlock = true;
+        }
+      } else if (entry.unlockType === 'zone') {
+        const visited = G.rest.sites.find(s => s.zone === entry.unlockAt && s.unlocked);
+        if (visited) shouldUnlock = true;
+      }
+      if (shouldUnlock && !G.storyJournal.unlocked.includes(entry.id)) {
+        G.storyJournal.unlocked.push(entry.id);
+        lg('📖 Journal unlocked: ' + entry.title);
+      }
     }
     // Direct catch-up independent of quest state entirely: if the bestiary shows you've
     // actually defeated The Planarch before, grant the stronghold regardless of whether
@@ -9328,6 +9385,7 @@ function render(){
   h+='<div class="sb"><span class="si">XP</span><div class="bar"><div class="bf bf-xp" style="width:'+((G.p.xp/G.p.xpN)*100)+'%"></div></div><span class="bt">'+G.p.xp+'/'+G.p.xpN+'</span></div>';
   h+='<div class="gold">GOLD: '+G.p.gold+'</div></div></div>';
   if(G.p.buffs.length>0)h+='<div class="buffs">'+G.p.buffs.map(b=>'<span class="bp">'+b.n+' ('+b.t+')</span>').join('')+'</div>';
+  if(G.p.ailments.length>0)h+='<div class="buffs">'+G.p.ailments.map(a=>'<span class="bp" style="background:var(--danger);">'+AILMENT_TYPES[a.type].icon+' '+a.n+'</span>').join('')+'</div>';
   h+='<div class="content">';
   if(G.state=='menu')h+=rMenu();
   else if(G.state=='achievements')h+=rAchievements();
@@ -9357,6 +9415,8 @@ function render(){
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='dragon_hunt')h+=rDragonHunt();
   else if(G.state=='forge')h+=rForge();
+  else if(G.state=='bonding')h+=rBonding();
+  else if(G.state=='bondingscene')h+=rBondingScene();
 
   h+='</div>';
   h+='<div class="log" id="log">'+G.log.map(m=>'<div class="le">'+m+'</div>').join('')+'</div>';
@@ -9385,7 +9445,8 @@ function attachEvents() {
     else if(a=='guild')setS('guild');
     else if(a=='stronghold')setS('stronghold');
     else if(a=='dragon_hunt')setS('dragon_hunt');
-    else if(a=='forge')setS('forge');});
+    else if(a=='forge')setS('forge');
+    else if(a=='bonding')setS('bonding');});
   });
  const btnClaimLogin = document.getElementById('btn-claim-login');
 if (btnClaimLogin) {
@@ -9740,6 +9801,74 @@ function rJournal(){
   }
   
   h+='</div>';
+  return h;
+}
+
+function rBondingScene(){
+  const scene = BONDING_SCENES.find(s => s.id === G.currentBondingScene);
+  if (!scene) return '<div>Scene not found</div>';
+  const scenes = (scene.id === 'joel_san_date' && G.currentBondingUseSoel && scene.scenesWithSoel) ? scene.scenesWithSoel : scene.scenes;
+
+  let h='<div style="padding:16px;max-width:500px;margin:0 auto;">';
+  h+='<div style="font-size:12px;color:var(--accent-light);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:8px;">💞 Bonding — '+scene.companion+'</div>';
+  h+='<h2 style="font-family:Cinzel,serif;font-size:22px;margin-bottom:4px;">'+scene.icon+' '+scene.title+'</h2>';
+  h+='<div style="width:100%;height:4px;background:var(--timer-bg);border-radius:2px;margin-bottom:24px;">';
+  h+='<div style="width:100%;height:100%;background:var(--accent);border-radius:2px;"></div></div>';
+
+  for(let s of scenes){
+    const speakerColor = getSpeakerColor(s.speaker);
+    const isDialogue = s.speaker !== 'Narrator';
+    const sceneClass = isDialogue ? 'journal-scene journal-scene-dialogue' : 'journal-scene journal-scene-narrator';
+    const textClass = isDialogue ? 'journal-text journal-text-dialogue' : 'journal-text journal-text-narrator';
+    const styleAttr = speakerColor ? ' style="--e-speaker:' + speakerColor + ';"' : '';
+    h+='<div class="'+sceneClass+'"'+styleAttr+'>';
+    if (isDialogue) h+='<div class="journal-speaker">'+s.speaker+'</div>';
+    h+='<div class="'+textClass+'">'+s.text+'</div>';
+    h+='</div>';
+  }
+
+  h+='<button class="fbtn" onclick="setS(\'bonding\')" style="margin-top:8px;">← Back</button>';
+  h+='</div>';
+  return h;
+}
+
+function rBonding(){
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">💞 Bonding</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Visit a location to spend time together. New scenes unlock as affinity grows \u2014 if nothing new is ready, you\'ll still gain a little affinity just from showing up.</div>';
+
+  h += '<div style="position:relative;width:280px;max-width:100%;margin:0 auto;height:' + (BONDING_LOCATIONS.length * 100 + 40) + 'px;">';
+  h += '<svg viewBox="0 0 280 ' + (BONDING_LOCATIONS.length * 100 + 40) + '" style="position:absolute;top:0;left:0;width:100%;height:100%;" preserveAspectRatio="none">';
+  const pts = BONDING_LOCATIONS.map((_, i) => ({ x: Math.round(140 + 85 * Math.sin(i * 0.9)), y: 40 + i * 100 }));
+  h += '<polyline points="' + pts.map(p => p.x + ',' + p.y).join(' ') + '" fill="none" stroke="var(--border)" stroke-width="3" stroke-dasharray="6,6"/>';
+  h += '</svg>';
+  for (let i = 0; i < BONDING_LOCATIONS.length; i++) {
+    const loc = BONDING_LOCATIONS[i], p = pts[i];
+    h += '<div class="bond-node map-node" onclick="visitBondingLocation(\'' + loc.id + '\')" style="border-color:var(--accent);background:radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--accent) 20%, var(--bg-card)), var(--bg-card));left:' + p.x + 'px;top:' + p.y + 'px;" title="' + loc.desc.replace(/"/g, '&quot;') + '"><span class="map-node-icon" style="font-size:28px;">' + loc.icon + '</span></div>';
+    h += '<div class="map-node-name" style="left:' + p.x + 'px;top:' + (p.y + 34) + 'px;">' + loc.n + '</div>';
+  }
+  h += '</div>';
+
+  const eligibleCount = getEligibleBondingScenes().length;
+  if (eligibleCount > 0) h += '<div style="text-align:center;color:var(--gold);font-size:12px;font-weight:600;margin:12px 0;">✨ ' + eligibleCount + ' new scene' + (eligibleCount > 1 ? 's' : '') + ' ready</div>';
+
+  h += '<div class="panel" style="margin-top:16px;">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">🎁 Gifts</div>';
+  h += '<div class="btn-hint" style="margin-bottom:10px;">Bought and given in one action \u2014 pick a companion, then a gift.</div>';
+  for (let p of G.party) {
+    if (!p.on) continue;
+    h += '<div style="font-size:11px;font-weight:700;color:' + p.col + ';margin:10px 0 6px;">' + p.n + '</div>';
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">';
+    for (let g of GIFTS) {
+      const loved = g.lovedBy === p.n;
+      const affordable = G.p.gold >= g.cost;
+      h += '<button onclick="giveGift(\'' + p.n + '\',\'' + g.id + '\')" class="abtn' + (affordable ? '' : ' dis') + '" style="margin:0;padding:6px 8px;font-size:10px;text-align:left;' + (loved ? 'border-color:var(--gold);' : '') + '" title="' + g.desc.replace(/"/g, '&quot;') + '">' + (loved ? '⭐ ' : '') + g.n + '<br><span style="opacity:0.7;">' + g.cost + 'G · +' + (g.affinity + (loved ? g.lovedBonus : 0)) + '</span></button>';
+    }
+    h += '</div>';
+  }
+  h += '</div>';
+
+  h += '</div>';
   return h;
 }
 
@@ -10456,6 +10585,210 @@ function rStrongholdCosmeticsShop() {
   return h;
 }
 
+// === GIFTS ===
+// Purchased and given in one action (no inventory step) — a direct way to show a
+// companion you were thinking of them, separate from the passive affinity gains from
+// resting/exploring together. A few are "loved" by a specific companion for a bonus.
+const GIFTS = [
+  { id: 'wildflowers', n: 'Wildflowers', cost: 20, affinity: 5, desc: 'Simple. Sincere. Never wrong.' },
+  { id: 'travel_rations', n: 'Travel Rations', cost: 15, affinity: 4, desc: 'Practical. Someone always needs more of these.' },
+  { id: 'river_stone', n: 'Polished River Stone', cost: 10, affinity: 3, desc: 'Smooth, cool, worn down by a hundred years of water. Small enough to keep in a pocket.' },
+  { id: 'fine_tea', n: 'Fine Tea Set', cost: 100, affinity: 12, lovedBy: 'Eliz', lovedBonus: 6, desc: 'Delicate porcelain, the kind that survives being loved carefully.' },
+  { id: 'trade_ledger', n: 'Fine Trade Ledger', cost: 80, affinity: 12, lovedBy: 'Aisyah', lovedBonus: 6, desc: 'Leather-bound, real parchment. Makes a trade route feel permanent.' },
+  { id: 'hunting_knife', n: 'Hand-Forged Hunting Knife', cost: 90, affinity: 12, lovedBy: 'Senedra', lovedBonus: 6, desc: 'Balanced, sharp \u2014 the kind of gift that says you noticed what she actually uses.' },
+  { id: 'sparring_gloves', n: 'Sparring Gloves', cost: 85, affinity: 12, lovedBy: 'Zaki', lovedBonus: 6, desc: 'Well-stitched, already broken in at the knuckles.' },
+  { id: 'storm_charm', n: 'Storm-Glass Charm', cost: 110, affinity: 12, lovedBy: 'Mezstorm', lovedBonus: 6, desc: 'Glass fused by real lightning. Hums, faintly, when the weather changes.' },
+  { id: 'buckler', n: 'Reinforced Buckler', cost: 95, affinity: 12, lovedBy: 'Joel', lovedBonus: 6, desc: 'Not for him to use. For him to know someone thought about keeping him safe too.' },
+  { id: 'warm_blanket', n: 'Impossibly Soft Blanket', cost: 70, affinity: 12, lovedBy: 'Soel', lovedBonus: 6, desc: 'He does not need it to stay warm. He wants it anyway.' },
+  { id: 'music_box', n: 'Gilded Music Box', cost: 500, affinity: 30, desc: 'Expensive enough to mean something on its own, no matter who receives it.' },
+];
+
+function giveGift(companionName, giftId) {
+  const gift = GIFTS.find(g => g.id === giftId);
+  const member = G.party.find(p => p.n === companionName);
+  if (!gift || !member || !member.on) return;
+  if (G.p.gold < gift.cost) { lg('❌ Need ' + gift.cost + 'G for ' + gift.n + '.'); return; }
+  G.p.gold -= gift.cost;
+  let total = gift.affinity;
+  let lovedMsg = '';
+  if (gift.lovedBy === companionName) {
+    total += gift.lovedBonus;
+    lovedMsg = ' ' + member.n + ' especially loves this.';
+  }
+  updateAffinity(companionName, total);
+  lg('🎁 Gave ' + gift.n + ' to ' + member.n + '! +' + total + ' affinity.' + lovedMsg);
+  render();
+}
+
+// === BONDING EVENTS ===
+// Purely flavor locations — visiting any of them doesn't restrict which scene can
+// trigger, it just sets the mood. Reachable from the Bonding menu screen.
+const BONDING_LOCATIONS = [
+  { id: 'fireside', n: 'The Fireside Camp', icon: '🔥', desc: 'Where the party actually talks, once the fighting stops for the night.' },
+  { id: 'overlook', n: 'The Quiet Overlook', icon: '🌄', desc: 'High enough up that the world looks smaller than it feels.' },
+  { id: 'market', n: 'The Old Market Street', icon: '🏮', desc: 'Still standing, somehow. Still smells like something worth trading for.' },
+  { id: 'yard', n: 'The Training Yard', icon: '🗡️', desc: 'Nobody comes here to actually train. Not really.' },
+  { id: 'river', n: 'The River Path', icon: '🌊', desc: 'A walk long enough for a conversation to actually go somewhere.' },
+];
+
+// One-time scenes, unlocked by affinity. Each triggers once, ever, the first time you
+// visit any Bonding location after crossing its threshold. minAffinity values are
+// deliberately reachable at the affinity levels normal play already produces.
+const BONDING_SCENES = [
+  {
+    id: 'joel_san_date', companion: 'Joel', minAffinity: 150, icon: '💜',
+    title: 'Just the Two of You',
+    scenes: [
+      { speaker: 'Narrator', text: "Joel asks, plainly, if you'd like to have dinner together. Not a tactical debrief. Not a rest-site check-in. Dinner. He says the word like it costs him something to say out loud, which, you realize, it probably does." },
+      { speaker: 'Joel', text: '"I know how this looks," he says, already half-regretting asking, in the specific way he regrets things that matter to him. "Everyone else is resting. I just thought \u2014 we do not do this. Just this. Often enough."' },
+      { speaker: 'San', text: '"We don\'t," you agree, and you are surprised by how much you want to. "Let\'s do this."' },
+      { speaker: 'Narrator', text: "He finds someplace quiet — not romantic on purpose, just quiet, which turns out to be exactly right. He talks less than usual. You talk more than usual, to fill the space, and he lets you, watching you with the same steady attention he brings to a shield wall." },
+      { speaker: 'Joel', text: '"I asked to stand beside you while you found out why you were here," he says, eventually, turning his cup in his hands instead of looking at you directly. "I do not think I ever asked if you wanted me beside you for the rest of it too. I am asking now."' },
+      { speaker: 'San', text: '"You never had to ask that one," you say. "But I am glad you did anyway."' }
+    ],
+    scenesWithSoel: [
+      { speaker: 'Narrator', text: "Joel asks, plainly, if you'd like to have dinner together, just the two of you. Soel is draped over his shoulders before he finishes the sentence, purring like he was invited, which, as far as Soel is concerned, he was." },
+      { speaker: 'Joel', text: '"Just the two of us," Joel says again, to Soel specifically, without much hope. Soel does not move. Joel sighs the particular sigh of a man who has already lost this argument. "Fine. The three of us."' },
+      { speaker: 'San', text: 'You laugh, actually laugh, for the first time in a while. "He chose us both. I do not think we get a vote."' },
+      { speaker: 'Narrator', text: 'Dinner happens anyway, Soel curled in Joel\'s lap the whole time, and it is somehow not less intimate for having a spirit cat as a chaperone — if anything, it feels more like the family the two of you are quietly building, one uninvited guest at a time.' },
+      { speaker: 'Joel', text: '"I asked to stand beside you while you found out why you were here," he says, one hand still absently scratching behind Soel\'s ears. "I am asking if you want me beside you for the rest of it too. Both of us, apparently."' },
+      { speaker: 'San', text: '"Both of you," you say. "I would not have it any other way."' }
+    ]
+  },
+  {
+    id: 'aisyah_hangout', companion: 'Aisyah', minAffinity: 150, icon: '🃏',
+    title: 'A Bad Hand of Cards',
+    scenes: [
+      { speaker: 'Narrator', text: 'Aisyah produces a deck of cards from somewhere you genuinely do not want to ask about and deals without being invited, which is very on-brand for her.' },
+      { speaker: 'Aisyah', text: '"You are terrible at this," she says, not unkindly, watching you lose track of your own hand for the third time. "You were terrible at this in the old world too. Some things survive the crossing between dimensions, apparently. Your card sense is not one of the good ones."' },
+      { speaker: 'San', text: '"I am playing a long game," you say. "A very long game. You will not understand the strategy until it is too late."' },
+      { speaker: 'Aisyah', text: '"You are bluffing with a pair of twos," she says, and lays down her own hand, and takes your gold with the specific satisfaction of an older sister who has been doing this since before you could count. "I taught you to trade. I did not teach you to lie about it convincingly. My mistake, evidently."' },
+      { speaker: 'Narrator', text: 'She deals again anyway, without being asked, because losing to your sister at cards by firelight turns out to be one of the more normal things that has happened to you in a very long time, and neither of you says out loud how much that normalcy is worth.' }
+    ]
+  },
+  {
+    id: 'aisyah_business', companion: 'Aisyah', minAffinity: 600, icon: '📒',
+    title: 'What She Left Behind',
+    scenes: [
+      { speaker: 'Narrator', text: 'You ask her, finally, about the business — the real one, the one from before, the trade routes and the ledgers and the fifty-something years of work she never talks about unless she is teaching you something practical with it.' },
+      { speaker: 'Aisyah', text: '"I built that from nothing," she says, and for once there is no joke underneath it. "Every route, every contact, every account. I was good at it. I was proud of it. And then the world ended and none of it mattered, and I picked up a knife instead of a ledger, and I have not let myself think about it since. Until you asked."' },
+      { speaker: 'San', text: '"Do you miss it?" you ask, and it feels like the first genuinely careful question you have ever asked her.' },
+      { speaker: 'Aisyah', text: '"Every day," she admits. "Not the gold. The building. Watching something grow because I was patient and clever enough to grow it. I do not get to build things anymore. I get to survive them." She is quiet for a moment. "Except this. This family. I suppose I am building that too, if I am honest. Just slower. With knives instead of contracts."' },
+      { speaker: 'San', text: '"That counts," you tell her. "That counts more than the ledgers ever did."' },
+      { speaker: 'Narrator', text: "She does not answer, but she does not deflect either, which from Aisyah is its own kind of agreement. She keeps the ledger from Nym's stall in her pack now. You have seen her write in it, some nights, when she thinks no one is watching." }
+    ]
+  },
+  {
+    id: 'eliz_family', companion: 'Eliz', minAffinity: 500, icon: '🕊️',
+    title: 'What She Carries',
+    scenes: [
+      { speaker: 'Narrator', text: "You ask her, gently, how she is really doing — not the healer-checking-in question, the real one. Eliz considers it seriously, the way she considers everything, turning the question over like she is checking it for sharp edges before deciding it is safe to answer." },
+      { speaker: 'Eliz', text: '"Everyone assumes the magic is the strange part of me," she says. "The textures, the colors, the way I perceive things no one else does. That part I have always had, even before all of this. I was already autistic in the old world. Aethon just gave the rest of you a word for what it looks like from the outside."' },
+      { speaker: 'San', text: '"Is that hard?" you ask. "People assuming the wrong thing is the strange part?"' },
+      { speaker: 'Eliz', text: '"Sometimes," she says, honestly. "But I would rather people ask badly than not ask at all. You asked. That already puts you ahead of most of the old world."' },
+      { speaker: 'Narrator', text: 'She is quiet for a while after that, and you let her be quiet, because you have learned that Eliz\'s silences are not empty — they are her actually thinking, carefully, about whether to keep going.' },
+      { speaker: 'Eliz', text: '"My mother was Mez, before the magic changed her into Mezstorm," she says, finally. "I do not know how to explain what that was like except that I lost a version of her and gained a different one, both real, both mine, and I am still learning how to hold both truths without one erasing the other. He is still my parent. That did not change. Only the shape of him did."' },
+      { speaker: 'San', text: 'You do not say anything clever. You just listen, because this is clearly not a wound that needs a solution — it needs a witness.' },
+      { speaker: 'Eliz', text: '"My father was never part of any of it," she adds, quieter now, the one part of the story with no magic to explain it away. "Not before the Breaking, not after. That absence does not need an accident to explain it. Some people just do not stay. I made my peace with that a long time before I made my peace with anything else."' },
+      { speaker: 'Narrator', text: 'She looks at you, and there is something steady underneath the vulnerability — not asking for pity, just finally letting someone see the whole shape of her.' },
+      { speaker: 'Eliz', text: '"I am telling you this because you are family, and family should know the real story, not the healer-shaped version of it," she says. "I am not broken because of any of it. I am just \u2014 fully myself. All of it. The magic, the mother who changed shape, the father who left, the way I feel textures no one else feels. It is a lot to carry. I carry it anyway. I am good at carrying things. It is why I heal people, I think."' },
+      { speaker: 'San', text: '"You do not carry it alone anymore," you tell her, and mean it completely.' }
+    ]
+  },
+  {
+    id: 'senedra_solitude', companion: 'Senedra', minAffinity: 200, icon: '🏹',
+    title: 'The Quiet She Chose',
+    scenes: [
+      { speaker: 'Narrator', text: "You find her sitting apart from the others, not sulking, just still, the way she gets sometimes when the party's noise adds up to more than she wants to carry that day." },
+      { speaker: 'Senedra', text: '"You do not have to sit with me out of obligation," she says, without turning around, already knowing it is you by footstep alone. "I am not lonely. I am just alone. There is a difference, even if most people do not believe me when I say it."' },
+      { speaker: 'San', text: '"I believe you," you say, and sit anyway, a comfortable distance away, not crowding the quiet she clearly chose on purpose.' },
+      { speaker: 'Senedra', text: '"I learned to track alone, mostly," she says, after a while, unprompted, which is rare for her. "My mother taught me the paths, but the actual walking — that was mine. Hours of it. Days, sometimes. You learn to like your own company, or the silence eats you. I chose to like it."' },
+      { speaker: 'San', text: '"Does the party ever feel like too much, after that?"' },
+      { speaker: 'Senedra', text: '"Sometimes," she admits. "Not because I do not love you all. Because I spent so long being the only voice in my own head that a room full of other people\'s feels loud, even when it is kind. I am still learning how to let it in without flinching."' },
+      { speaker: 'Narrator', text: 'She does not say more than that, and you do not push, and eventually she leans, just slightly, close enough that her shoulder rests against yours — not a big gesture, but from Senedra, it is practically a speech.' }
+    ]
+  },
+  {
+    id: 'senedra_family', companion: 'Senedra', minAffinity: 700, icon: '🎖️',
+    title: 'The Uniform in the Drawer',
+    scenes: [
+      { speaker: 'Narrator', text: "You ask about her family, carefully, since she has never offered it herself, and for a long moment you think she will simply decline the question the way she declines most things she has not decided to trust you with yet." },
+      { speaker: 'Senedra', text: '"My parents divorced when I was young," she says instead, finally, watching an arrow she is not actually fletching. "Before that, even. I do not remember them together, only apart, only the specific quiet of a house that used to have two people in it and then only had one."' },
+      { speaker: 'San', text: '"Which one did you stay with?"' },
+      { speaker: 'Senedra', text: '"My mother, mostly," she says. "Aisyah. Though she was not always the sharp-eyed trader you know now — she was younger too, once, and just as unmoored by it as I was. My father was military, in the old world. Deployed more than he was home, even before the divorce made it official. And then, one deployment, he did not come back at all. Missing in action. That is the whole story. No dramatic ending, no closure. Just a uniform in a drawer and a folded flag and a question that never got answered."' },
+      { speaker: 'Narrator', text: "She says it evenly, the way you say something you have said to yourself so many times it has worn smooth, like a river stone. But her hands have gone still on the arrow, and you notice." },
+      { speaker: 'Senedra', text: '"Zaki carries the same story, in his own way," she adds, quieter. "We do not talk about it with each other much. We do not need to. Some things you can just recognize in a sibling without saying them out loud."' },
+      { speaker: 'Senedra', text: '"I think that is why I learned to track," she continues. "I could not track him. No one could. So I got very, very good at finding everyone else instead. It does not fix anything. It just means I am never the reason someone stays lost."' },
+      { speaker: 'San', text: '"You have found every path I have ever needed," you tell her. "I do not think that is a coincidence."' },
+      { speaker: 'Senedra', text: 'She almost smiles at that — not quite, but almost, which from her is its own kind of gratitude.' }
+    ]
+  },
+  {
+    id: 'zaki_family', companion: 'Zaki', minAffinity: 700, icon: '🎖️',
+    title: 'Checking His Pack',
+    scenes: [
+      { speaker: 'Narrator', text: 'You catch Zaki checking his pack again, the old nervous habit, except this time he keeps going long after there is anything left to check, and you realize it is not about the pack at all.' },
+      { speaker: 'Zaki', text: '"My parents split up when I was a kid," he says, not looking up, hands still moving through the same three pockets over and over. "My mom \u2014 Aisyah \u2014 she held it together better than I gave her credit for at the time. My dad was military. He was gone a lot even before that. I got used to a version of him that mostly lived in phone calls and care packages."' },
+      { speaker: 'San', text: '"And after the divorce?"' },
+      { speaker: 'Zaki', text: '"Fewer phone calls," Zaki says. "Then one deployment, none at all. Missing in action. I was old enough to understand what that meant and too young to actually process it, so I did the thing you do when you are seventeen and do not know what else to do with a feeling that big — I got really into checking things. Making sure everything was where it should be. Because I could not control whether he came home, but I could control whether my boots were tied."' },
+      { speaker: 'Narrator', text: "He laughs, a little, at himself, but it does not quite land as a joke." },
+      { speaker: 'Zaki', text: '"Senedra had the same year, worse in some ways \u2014 she is older, she remembers more of him," he adds. "We do not talk about it much between us. Some things a sibling just knows without you having to say it."' },
+      { speaker: 'Zaki', text: '"Everyone thinks the pack-checking is nerves before a fight," he continues. "It is not, really. It is just — this. The same thing, still. Making sure the things I can control are actually controlled, because I learned early that the things I could not control could disappear without warning."' },
+      { speaker: 'San', text: '"I do not think that is nervous," you tell him. "I think that is love wearing a very practical disguise."' },
+      { speaker: 'Zaki', text: 'He looks up at that, surprised, like no one has ever put it that way to him before. "Yeah," he says, slowly. "Yeah, maybe it is."' }
+    ]
+  },
+  {
+    id: 'zaki_oldworld', companion: 'Zaki', minAffinity: 250, icon: '💪',
+    title: 'The Old World, Between Fights',
+    scenes: [
+      { speaker: 'Narrator', text: 'Zaki asks, out of nowhere, what your life actually looked like before all of this — not the ADHD-productivity-app version, the real day-to-day of it. You find yourself telling him more than you meant to.' },
+      { speaker: 'San', text: '"Gig work, mostly," you say. "Freelance stuff. Some weeks were fine. Some weeks I could not make myself start anything until 11pm and then I would do six hours of work in a panic. The usual."' },
+      { speaker: 'Zaki', text: '"That sounds exhausting," he says, and there is real sympathy in it, not pity. "I did some freelance stuff too, actually. Odd gigs. Never anything that stuck. I think I was always looking for something that felt like it mattered, and none of it quite did."' },
+      { speaker: 'San', text: '"Did you have people?" you ask. "Friends, I mean. Before."' },
+      { speaker: 'Zaki', text: '"A few," he says. "Gym friends, mostly — the kind where you know their whole workout split and nothing about their actual life. I used to go most days. Not even for the gains, honestly. Just for somewhere to be that had a routine I could not talk myself out of."' },
+      { speaker: 'Narrator', text: "You laugh, because you understand that completely — the specific comfort of a place that does not care how your week has been, only that you showed up." },
+      { speaker: 'San', text: '"I miss having a routine like that," you admit. "Something dumb and physical that did not require me to feel anything about it."' },
+      { speaker: 'Zaki', text: '"We could build one here," Zaki says, brightening, like this is obvious. "Sparring, every few days. Same time. No pressure, no big feelings required. Just showing up." He grins. "I will even let you win sometimes. Rarely. But sometimes."' },
+      { speaker: 'San', text: '"Deal," you say, and mean it more than the joke deserves.' }
+    ]
+  }
+];
+
+function getEligibleBondingScenes() {
+  return BONDING_SCENES.filter(s => {
+    if (G.bonding.seenScenes.includes(s.id)) return false;
+    const member = G.party.find(p => p.n === s.companion);
+    if (!member || !member.on) return false;
+    return (G.affinity[s.companion]?.val || 0) >= s.minAffinity;
+  });
+}
+
+function visitBondingLocation(locationId) {
+  const location = BONDING_LOCATIONS.find(l => l.id === locationId);
+  if (!location) return;
+
+  const eligible = getEligibleBondingScenes();
+  if (eligible.length > 0) {
+    const scene = eligible[Math.floor(Math.random() * eligible.length)];
+    G.bonding.seenScenes.push(scene.id);
+    G.currentBondingScene = scene.id;
+    G.currentBondingUseSoel = scene.id === 'joel_san_date' && G.party.some(p => p.n === 'Soel' && p.on) && Math.random() < 0.5;
+    setS('bondingscene');
+    return;
+  }
+
+  // No new scene available — small affinity gain and a short flavor line instead,
+  // so a visit is never wasted even once you've seen everything currently unlocked.
+  const activeCompanions = G.party.filter(p => p.on);
+  if (activeCompanions.length === 0) { lg('No one to spend time with right now.'); return; }
+  const companion = activeCompanions[Math.floor(Math.random() * activeCompanions.length)];
+  const gain = 3 + Math.floor(Math.random() * 5);
+  updateAffinity(companion.n, gain);
+  lg(location.icon + ' Time at ' + location.n + ' with ' + companion.n + '. +' + gain + ' affinity.');
+  render();
+}
+
 function rStrongholds() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🗼 Strongholds</div>';
@@ -10590,6 +10923,7 @@ function rMenu(){
       {i:'🌳',l:'Skill Trees',a:'skilltree'},
       {i:'🌟',l:'Talents',a:'talents'},
       {i:'💎',l:'Runes',a:'runes'},
+      {i:'💞',l:'Bonding',a:'bonding'},
     ]},
     { title: '🎒 Manage', items: [
       {i:'🎒',l:'Inventory',a:'inventory'},
@@ -10880,6 +11214,10 @@ function rCbt() {
   if (riftStatus) badges.push({ icon: riftStatus.icon, text: riftStatus.name, full: riftStatus.desc + ' (' + riftStatus.fightsLeft + ' left)', color: riftStatus.color });
   if (zone && G.zoneHazards[zone.n]) badges.push({ icon: '⚠️', text: G.zoneHazards[zone.n].name, full: G.zoneHazards[zone.n].desc, color: '#f59e0b' });
   if (G.currentBoss) badges.push({ icon: '🔥', text: 'Boss Ability', full: G.currentBoss.desc, color: 'var(--danger)' });
+  for (let a of G.p.ailments) {
+    const def = AILMENT_TYPES[a.type];
+    badges.push({ icon: def.icon, text: a.n, full: a.n + ' \u2014 ATK/DEF weakened' + (def.dmgPerTurn ? ', ' + def.dmgPerTurn + ' HP/turn' : '') + '. Rest will not cure this \u2014 needs the Temple or a high-level Eliz.', color: 'var(--danger)' });
+  }
 
   if (badges.length > 0) {
     h += '<div class="combat-badges">';
