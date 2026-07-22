@@ -769,6 +769,20 @@ const G = {
         { n: "Zaki's Temper Band", slot: 'ring', forCompanion: 'Zaki', q: 1, r: 'rare', price: 75, atk: 3, def: 1, spd: 0, d: 'A red armband that fuels rage. +3 ATK, +1 DEF' }
       ],
       unlocked: false, visitCount: 0 },
+    { n: 'Vessa', t: 'trader', title: 'The Hoardkeeper', icon: '💎', col: '#f5d76e', zone: "The Architect's Chamber", zoneLv: 43,
+      d: "She deals in nothing less than legendary. Where the gold comes from, she never says — only that a hoard this size doesn't build itself from common finds.",
+      stock: [
+        { n: 'The Last Word', slot: 'weapon', q: 1, r: 'legendary', price: 4500, atk: 20, int: 6, d: 'A staff carved from something that used to argue back.' },
+        { n: "Vessa's Ward", slot: 'armor', q: 1, r: 'legendary', price: 4200, def: 18, wis: 5, d: 'Armor that has never once failed to earn its price back.' },
+        { n: 'Crown of the Hoardkeeper', slot: 'head', q: 1, r: 'legendary', price: 3800, def: 10, int: 4, atk: 4, d: 'Every gem in it was once someone else\'s prized possession.' },
+        { n: 'Gauntlets of the Unshaken', slot: 'hands', q: 1, r: 'legendary', price: 3600, atk: 10, def: 6, d: 'Hands that have counted more gold than most kingdoms hold.' },
+        { n: 'Striders of the Last Mile', slot: 'feet', q: 1, r: 'legendary', price: 3600, spd: 10, def: 4, d: 'Boots for a road that never quite ends, worn by someone who never quite stops.' },
+        { n: "The Hoarder's Signet", slot: 'ring', q: 1, r: 'legendary', price: 3400, atk: 8, def: 8, goldFind: 0.15, d: 'Wearing it feels like the gold is somehow listening.' },
+        { n: 'Heart of the Hoard', slot: 'amulet', q: 1, r: 'legendary', price: 4800, atk: 8, def: 8, int: 4, wis: 4, d: 'At the center of every great hoard, there is one piece that isn\'t for sale. This is someone else\'s.' },
+        { n: "Joel's Aegis Eternal", slot: 'weapon', forCompanion: 'Joel', q: 1, r: 'legendary', price: 3200, atk: 8, def: 16, hp: 40, d: 'A shield that has never once let something through. +8 ATK, +16 DEF, +40 HP' },
+        { n: "Aisyah's Final Ledger", slot: 'weapon', forCompanion: 'Aisyah', q: 1, r: 'legendary', price: 3200, atk: 18, spd: 10, d: 'Blades sharp enough to close any account. +18 ATK, +10 SPD' }
+      ],
+      unlocked: false, visitCount: 0 },
     { n: 'Nym', t: 'trader', title: 'Targos Quartermaster', icon: '', col: '#16a34a', zone: 'Stormhold', zoneLv: 5,
       d: 'A gnomish quartermaster with a nose for quality gear. His prices are fair — his jokes are not.',
       stock: [
@@ -1890,6 +1904,7 @@ storyJournal: {
   guildRep: 0, // lifetime reputation total, determines rank, never spent
   guildRepBalance: 0, // spendable reputation currency for the Guild Shop
   dragonHunt: { active: false, cleared: 0 }, // a legendary optional superboss, repeatable
+  strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
   siegeDefense: { active: false, strongholdId: null, wave: 0, maxWaves: 3 },
   strongholdTasks: [], // populated from STRONGHOLDS[id].tasks once a stronghold is claimed
@@ -4128,6 +4143,98 @@ function buyGuildItem(index) {
   G.guildRepBalance -= item.cost;
   addI({ ...item });
   lg('🛡️ Guild Shop: acquired ' + item.n + ' for ' + item.cost + ' Guild Rep.');
+  render();
+}
+
+// === STRONGHOLD COSMETICS ===
+// A pure gold sink — no stat effects whatsoever. Exists so the gold Guild Shop/Stronghold
+// stipends/Dragon Hunt hoards produce has somewhere to go besides just accumulating.
+// "Tower Prestige" is a bragging-rights count only, never a mechanical bonus.
+// === EQUIPMENT FORGE ===
+// Upgrades gear you already own, rather than buying new pieces — a genuinely new lever,
+// since nothing else in the game lets you improve an item you have. Works uniformly on
+// San's and companions' equipped items, since both are plain item objects with the same
+// stat-field shape. Upgrades mutate the actual equipped item object directly (storing a
+// snapshot of its original stats the first time), so every existing stat-reading function
+// in combat/UI picks up the change automatically with no other code needing to know the
+// forge exists.
+const FORGE_UNLOCK_LEVEL = 20;
+const FORGE_MAX_LEVEL = 5;
+const FORGE_COSTS = [200, 500, 1200, 2500, 5000]; // cost to go from level index to index+1
+const FORGE_STAT_KEYS = ['atk', 'def', 'spd', 'hp', 'str', 'dex', 'con', 'int', 'wis', 'cha',
+  'fireDmg', 'iceDmg', 'lightDmg', 'voidDmg', 'fireRes', 'iceRes', 'lightRes', 'voidRes',
+  'lifeSteal', 'critChance', 'mpRegen', 'hpRegen', 'goldFind'];
+const FORGE_GROWTH_PER_LEVEL = 0.12; // +12% of original stats per upgrade level
+
+function isForgeUnlocked() {
+  return G.p.lvl >= FORGE_UNLOCK_LEVEL;
+}
+
+function forgeUpgradeItem(ownerName, slot) {
+  if (!isForgeUnlocked()) { lg('🔒 The Forge only opens for those Level ' + FORGE_UNLOCK_LEVEL + ' and above.'); return; }
+  const item = ownerName === 'San' ? G.p.eq[slot] : (G.party.find(p => p.n === ownerName) || {}).eq?.[slot];
+  if (!item) return;
+  const level = item.upgradeLevel || 0;
+  if (level >= FORGE_MAX_LEVEL) { lg('⚒️ ' + item.n + ' is already fully forged (+' + FORGE_MAX_LEVEL + ').'); return; }
+  const cost = FORGE_COSTS[level];
+  if (G.p.gold < cost) { lg('❌ Need ' + cost + 'G to forge ' + item.n + ' to +' + (level + 1) + ' (have ' + G.p.gold + 'G).'); return; }
+
+  // Snapshot original stats the first time this item is ever forged, so repeated
+  // upgrades compute from the true base rather than compounding on an already-boosted value.
+  if (!item.baseStats) {
+    item.baseStats = {};
+    for (let key of FORGE_STAT_KEYS) { if (item[key] !== undefined) item.baseStats[key] = item[key]; }
+  }
+
+  G.p.gold -= cost;
+  item.upgradeLevel = level + 1;
+  const mult = 1 + item.upgradeLevel * FORGE_GROWTH_PER_LEVEL;
+  for (let key in item.baseStats) {
+    item[key] = key === 'critChance' || key === 'lifeSteal' || key === 'mpRegen' || key === 'hpRegen' || key === 'goldFind'
+      ? Math.round((item.baseStats[key] * mult) * 1000) / 1000 // keep percentage-style stats precise
+      : Math.max(1, Math.round(item.baseStats[key] * mult));
+  }
+
+  lg('⚒️ ' + item.n + ' forged to +' + item.upgradeLevel + '!');
+
+  if (ownerName !== 'San') {
+    const member = G.party.find(p => p.n === ownerName);
+    if (member) recalcPartyMember(member);
+  }
+  render();
+}
+
+const STRONGHOLD_COSMETICS = [
+  { id: 'banner_violet', category: 'Banners', name: 'Violet Standard', cost: 300, desc: "A simple banner in San's colors, raised over the gate." },
+  { id: 'banner_gold', category: 'Banners', name: 'Golden Standard', cost: 1200, desc: 'Threaded with real gold. Catches the light from every angle.' },
+  { id: 'banner_crest', category: 'Banners', name: 'The Family Crest', cost: 4000, desc: 'Joel, Aisyah, Mezstorm, Eliz, Senedra, Zaki, Soel \u2014 woven into a single sigil. No two people made it the same way twice.' },
+
+  { id: 'grounds_herb', category: 'Grounds', name: 'Herb Garden', cost: 800, desc: 'Aisyah insists on planting the trade-route herbs she grew up with.' },
+  { id: 'grounds_moon', category: 'Grounds', name: 'Moonflower Garden', cost: 2500, desc: 'Blooms only at night. Eliz says the colors are different from what everyone else sees.' },
+  { id: 'grounds_grove', category: 'Grounds', name: 'The Sanctuary Grove', cost: 6000, desc: 'A quiet grove where the whole party can sit together and not think about the war for an hour.' },
+
+  { id: 'arch_battlements', category: 'Architecture', name: 'Reinforced Battlements', cost: 1800, desc: 'The tower was never actually in danger of falling \u2014 it just looks steadier now.' },
+  { id: 'arch_glass', category: 'Architecture', name: 'Stained Glass Windows', cost: 4500, desc: 'Each pane tells part of the journey. Joel picked the colors for his.' },
+  { id: 'arch_spire', category: 'Architecture', name: 'The Restored Spire', cost: 9000, desc: 'The tower stops looking like a ruin that survived and starts looking like a home that was rebuilt.' },
+
+  { id: 'mon_steadfast', category: 'Monuments', name: 'Statue of the Steadfast', cost: 7000, desc: 'Joel, shield raised, cast in bronze. He said it was unnecessary. He also visits it more than anyone.' },
+  { id: 'mon_wall', category: 'Monuments', name: 'Memorial Wall', cost: 10000, desc: 'Names of everyone lost along the way, so the tower remembers what it cost to get here.' },
+  { id: 'mon_beacon', category: 'Monuments', name: 'The Eternal Beacon', cost: 25000, desc: "A light at the top of the tower that never goes out. Visible from every zone you've ever walked through, if you know where to look." },
+];
+
+function getStrongholdPrestige() {
+  return Object.values(G.strongholdCosmetics).filter(Boolean).length;
+}
+
+function buyStrongholdCosmetic(id) {
+  const item = STRONGHOLD_COSMETICS.find(c => c.id === id);
+  if (!item) return;
+  if (G.strongholdCosmetics[id]) { lg('Already own ' + item.name + '.'); return; }
+  if (G.p.gold < item.cost) { lg('❌ Need ' + item.cost + 'G for ' + item.name + ' (have ' + G.p.gold + 'G).'); return; }
+  G.p.gold -= item.cost;
+  G.strongholdCosmetics[id] = true;
+  lg('🏰 ' + item.name + ' added to the tower!');
+  lg('   ' + item.desc);
   render();
 }
 
@@ -8162,6 +8269,7 @@ function cf(){if(ft)clearInterval(ft);setS('menu');lg('Focus cancelled.');render
 // Floating damage number over a specific DOM element (an enemy card, San's HP bar, etc.)
 // Purely cosmetic — never touches game state, safe to call from anywhere damage resolves.
 function showFloatingDamage(el, amount, opts = {}) {
+  if (!G.dragonHunt.active) return; // scoped to the Dragon Hunt only, per the original request
   if (!el) return;
   if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
   const span = document.createElement('div');
@@ -8379,6 +8487,7 @@ function saveGame() {
     guildContracts: G.guildContracts.map(c => ({ id: c.id, c: c.c, done: c.done, refreshWeek: c.refreshWeek })),
     strongholdSiege: G.strongholdSiege,
     dragonHuntCleared: G.dragonHunt.cleared,
+    strongholdCosmetics: G.strongholdCosmetics,
     strongholdStipendDay: G.strongholdStipendDay,
     strongholds: G.strongholds
   };
@@ -8565,6 +8674,7 @@ function loadGame() {
     }
     G.strongholdSiege = data.strongholdSiege || {};
     G.dragonHunt.cleared = data.dragonHuntCleared || 0;
+    G.strongholdCosmetics = data.strongholdCosmetics || {};
     G.strongholdStipendDay = data.strongholdStipendDay !== undefined ? data.strongholdStipendDay : -1;
 
     G.p.lvl = data.player.lvl;
@@ -9151,6 +9261,7 @@ function render(){
   else if(G.state=='guild')h+=rGuild();
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='dragon_hunt')h+=rDragonHunt();
+  else if(G.state=='forge')h+=rForge();
 
   h+='</div>';
   h+='<div class="log" id="log">'+G.log.map(m=>'<div class="le">'+m+'</div>').join('')+'</div>';
@@ -9178,7 +9289,8 @@ function attachEvents() {
     else if(a=='journal')setS('journal');
     else if(a=='guild')setS('guild');
     else if(a=='stronghold')setS('stronghold');
-    else if(a=='dragon_hunt')setS('dragon_hunt');});
+    else if(a=='dragon_hunt')setS('dragon_hunt');
+    else if(a=='forge')setS('forge');});
   });
  const btnClaimLogin = document.getElementById('btn-claim-login');
 if (btnClaimLogin) {
@@ -10125,6 +10237,69 @@ function rRaidRoom() {
 }
 
 
+function rForgeItemRow(ownerName, slot, item) {
+  const level = item.upgradeLevel || 0;
+  const maxed = level >= FORGE_MAX_LEVEL;
+  const cost = maxed ? 0 : FORGE_COSTS[level];
+  const affordable = G.p.gold >= cost;
+  const rarityColor = item.r ? (item.r==='epic'||item.r==='legendary'?'#a855f7':item.r==='rare'?'#3b82f6':item.r==='uncommon'?'#22c55e':'#9ca3af') : '#9ca3af';
+  let h = '<div style="background:var(--bg-card);border:1px solid ' + (level > 0 ? 'var(--gold)' : 'var(--border)') + ';border-radius:10px;padding:10px 12px;margin-bottom:6px;">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+  h += '<div style="font-size:12.5px;font-weight:700;color:' + rarityColor + ';">' + item.n + (level > 0 ? ' <span style="color:var(--gold);">+' + level + '</span>' : '') + '</div>';
+  if (maxed) {
+    h += '<span class="btn-hint" style="color:var(--gold);">MAX</span>';
+  } else {
+    h += '<button onclick="forgeUpgradeItem(\'' + ownerName + '\',\'' + slot + '\')" class="abtn' + (affordable ? '' : ' dis') + '" style="margin:0;padding:4px 10px;font-size:11px;">+1 for ' + cost + 'G</button>';
+  }
+  h += '</div>';
+  h += '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;">' + EQUIPMENT_SLOTS[slot]?.name || slot;
+  h += '</div></div>';
+  return h;
+}
+
+function rForge() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">⚒️ The Forge</div>';
+
+  const unlocked = isForgeUnlocked();
+  h += '<div class="panel' + (unlocked ? ' panel-gold' : '') + '" style="text-align:center;">';
+  h += '<div class="panel-title" style="' + (unlocked ? 'color:var(--gold);' : '') + '">Master Kessler, the Forgemaster</div>';
+  h += '<div class="btn-hint" style="margin-top:6px;line-height:1.5;">"Bring me what you already carry. I don\'t sell anything \u2014 I just make what\'s yours better." Upgrades any equipped item up to +' + FORGE_MAX_LEVEL + ', each level a straight stat boost. Gold only, no materials needed.</div>';
+  h += '</div>';
+
+  if (!unlocked) {
+    h += '<div class="panel" style="text-align:center;">';
+    h += '<div class="btn-hint">🔒 The Forge opens at Level ' + FORGE_UNLOCK_LEVEL + ' (currently Level ' + G.p.lvl + ')</div>';
+    h += '</div></div>';
+    return h;
+  }
+
+  // San's equipped gear
+  h += '<div class="panel"><div class="panel-title" style="margin-bottom:8px;">San</div>';
+  let anySan = false;
+  for (let slot of ['weapon', 'armor', 'head', 'hands', 'feet', 'ring1', 'ring2', 'amulet']) {
+    const item = G.p.eq[slot];
+    if (!item) continue;
+    anySan = true;
+    h += rForgeItemRow('San', slot, item);
+  }
+  if (!anySan) h += '<div class="btn-hint">Nothing equipped yet.</div>';
+  h += '</div>';
+
+  // Each active companion's equipped gear
+  for (let p of G.party) {
+    if (!p.on || !p.eq) continue;
+    const slots = Object.keys(p.eq).filter(s => p.eq[s]);
+    if (slots.length === 0) continue;
+    h += '<div class="panel"><div class="panel-title" style="margin-bottom:8px;">' + p.n + '</div>';
+    for (let slot of slots) h += rForgeItemRow(p.n, slot, p.eq[slot]);
+    h += '</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
 function rDragonHunt() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🐉 Dragon Hunt</div>';
@@ -10161,6 +10336,31 @@ function rDragonHunt() {
   return h;
 }
 
+function rStrongholdCosmeticsShop() {
+  const prestige = getStrongholdPrestige();
+  let h = '<div class="panel panel-gold">';
+  h += '<div class="panel-row"><div class="panel-title panel-title-gold">🏰 Tower Adornments</div><div class="btn-hint">⭐ Prestige ' + prestige + '/' + STRONGHOLD_COSMETICS.length + '</div></div>';
+  h += '<div class="btn-hint" style="margin-bottom:10px;">Purely cosmetic \u2014 no stat effects. A place for gold to go once you have more of it than you need.</div>';
+
+  const categories = [...new Set(STRONGHOLD_COSMETICS.map(c => c.category))];
+  for (let cat of categories) {
+    h += '<div style="font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em;margin:10px 0 6px;">' + cat + '</div>';
+    for (let item of STRONGHOLD_COSMETICS.filter(c => c.category === cat)) {
+      const owned = !!G.strongholdCosmetics[item.id];
+      const affordable = G.p.gold >= item.cost;
+      h += '<div style="background:var(--bg-card);border:1px solid ' + (owned ? 'var(--gold)' : 'var(--border)') + ';border-radius:10px;padding:10px 12px;margin-bottom:6px;">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+      h += '<div style="font-size:12.5px;font-weight:700;color:' + (owned ? 'var(--gold)' : 'var(--text)') + ';">' + (owned ? '✓ ' : '') + item.name + '</div>';
+      if (!owned) h += '<button onclick="buyStrongholdCosmetic(\'' + item.id + '\')" class="abtn' + (affordable ? '' : ' dis') + '" style="margin:0;padding:4px 10px;font-size:11px;">' + item.cost + 'G</button>';
+      h += '</div>';
+      h += '<div style="font-size:10.5px;color:var(--text-dim);margin-top:3px;line-height:1.4;">' + item.desc + '</div>';
+      h += '</div>';
+    }
+  }
+  h += '</div>';
+  return h;
+}
+
 function rStrongholds() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🗼 Strongholds</div>';
@@ -10185,6 +10385,8 @@ function rStrongholds() {
     h += rGuildHallPanel(id);
     h += '<button onclick="setS(\'rest\')" class="btn-outline-ghost" style="width:100%;margin-bottom:16px;">💤 Visit Rest Sites</button>';
   }
+
+  h += rStrongholdCosmeticsShop();
 
   h += '</div>';
   return h;
@@ -10297,6 +10499,7 @@ function rMenu(){
     { title: '🎒 Manage', items: [
       {i:'🎒',l:'Inventory',a:'inventory'},
       {i:'⚒️',l:'Crafting',a:'craft'},
+      {i:'🔨',l:'Forge',a:'forge'},
       {i:'🧳',l:'Traders',a:'npc'},
       {i:'📜',l:'Quests',a:'quest'},
     ]},
