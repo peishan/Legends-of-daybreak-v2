@@ -9962,6 +9962,18 @@ function rBonding(){
   const eligibleCount = getEligibleBondingScenes().length;
   if (eligibleCount > 0) h += '<div style="text-align:center;color:var(--gold);font-size:12px;font-weight:600;margin:12px 0;">✨ ' + eligibleCount + ' new scene' + (eligibleCount > 1 ? 's' : '') + ' ready</div>';
 
+  if (G.bonding.seenScenes.length > 0) {
+    h += '<div class="panel" style="margin-top:16px;">';
+    h += '<div class="panel-title" style="margin-bottom:8px;">📖 Scenes You\'ve Seen</div>';
+    h += '<div class="btn-hint" style="margin-bottom:10px;">Reread anytime \u2014 always shows the current version, including any corrections since you first saw it.</div>';
+    for (let sceneId of G.bonding.seenScenes) {
+      const scene = BONDING_SCENES.find(s => s.id === sceneId);
+      if (!scene) continue;
+      h += '<button onclick="rereadBondingScene(\'' + scene.id + '\')" class="btn-outline-ghost" style="width:100%;text-align:left;margin-bottom:6px;">' + scene.icon + ' ' + scene.title + ' <span style="opacity:0.6;">(' + scene.companion + ')</span></button>';
+    }
+    h += '</div>';
+  }
+
   h += '<div class="panel" style="margin-top:16px;">';
   h += '<div class="panel-title" style="margin-bottom:8px;">🎁 Gifts</div>';
   h += '<div class="btn-hint" style="margin-bottom:10px;">Bought and given in one action \u2014 pick a companion, then a gift.</div>';
@@ -10896,6 +10908,14 @@ function getEligibleBondingScenes() {
     if (!member || !member.on) return false;
     return (G.affinity[s.companion]?.val || 0) >= s.minAffinity;
   });
+}
+
+function rereadBondingScene(sceneId) {
+  const scene = BONDING_SCENES.find(s => s.id === sceneId);
+  if (!scene) return;
+  G.currentBondingScene = scene.id;
+  G.currentBondingUseSoel = scene.id === 'joel_san_date' && G.party.some(p => p.n === 'Soel' && p.on) && Math.random() < 0.5;
+  setS('bondingscene');
 }
 
 function visitBondingLocation(locationId) {
