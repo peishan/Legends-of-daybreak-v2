@@ -429,6 +429,13 @@ const G = {
     { n: "The Architect's Chamber", lv: 43, elem: 'arcane', d: "The place where the Planarch's death first cracked the world — not an accident, you realize now, but a door someone built on purpose and never finished closing. The chamber hums with the specific, deliberate silence of a plan.", en: ['Chamber Sentinel','Fractured Construct','Time-Loop Wraith'], loot: ['Architect\'s Blueprint', 'Unfinished Seal', 'First Crack Fragment'], xp: 1480, dg: 'impossible' },
     { n: 'What Remains United', lv: 44, elem: 'lightning', d: "For the first time since the Breaking, this place does not test you alone. Every echo you have faced — Joel's, Eliz's, Zaki's, Mezstorm's, Aisyah's, your own — converges here, not as separate griefs anymore but as a single splintered court demanding to know why you keep choosing to stay whole.", en: ['Remnant Guard','Splinter Sentinel','Echo Legion'], loot: ['Splinter Court Seal', 'United Fragment', 'The Question They Ask'], xp: 1540, dg: 'impossible' },
     { n: 'Where the Break Began', lv: 45, elem: 'void', d: 'The exact moment the world first fractured, replaying itself forever at the center of everything you have survived. This is not another echo. This is the source — the first break, still breaking, waiting for someone to finally answer it instead of just enduring it.', en: ['Fracture Remnant','Broken Reality','Echo of Everything'], loot: ['The First Break', 'Mended Fragment', 'Proof the World Can Heal'], xp: 1650, dg: 'impossible' },
+
+    // === ACT 4: THE MENDING (LV 46-50) ===
+    { n: 'The First Repair', lv: 46, elem: 'none', d: 'Mending is slower than breaking. You knew that already — you have spent a whole lifetime learning it — but knowing it and living it are different things, and the world does not want to be fixed all at once just because you finally believe it can be.', en: ['Rust Remnant','Decay Wisp','Unmended Shard'], loot: ['First Repaired Seam', 'Patient Hands', 'The Slow Work'], xp: 1720, dg: 'impossible' },
+    { n: 'What Almost Broke Again', lv: 47, elem: 'fire', d: 'Not every day of mending goes forward. Some days the old cracks reopen, and the fear comes back exactly the way it always did, and you have to relearn — again — that a setback is not the same thing as failing.', en: ['Backslide Wraith','Old Habit','Setback Sentinel'], loot: ['Reopened Seam', 'The Day You Almost Quit', 'Proof You Did Not'], xp: 1780, dg: 'impossible' },
+    { n: 'The Fear After the Storm', lv: 48, elem: 'void', d: 'What happens after? San and Joel\'s youth, restored by magic that was never meant to last forever — what happens when it runs out? What happens to a family built for survival once there is finally something worth surviving for?', en: ['Question Wraith','What-If Echo','Quiet Fear'], loot: ['Unanswered Question', 'Borrowed Time', 'The Courage to Not Know'], xp: 1840, dg: 'impossible' },
+    { n: 'Everyone, Together', lv: 49, elem: 'lightning', d: 'For the first time in this entire journey, every member of this family stands in the same place, at the same time, choosing the same thing. Joel. Aisyah. Mezstorm. Eliz. Senedra. Zaki. Soel. You. Whatever comes next, it will not be faced alone.', en: ['Unity Sentinel','Bonded Construct','Chorus Wisp'], loot: ['Chorus Fragment', 'The Whole Family', 'One Last Threshold'], xp: 1900, dg: 'impossible' },
+    { n: 'Daybreak', lv: 50, elem: 'arcane', d: 'The sun that could not rise on a broken world finally has somewhere to land. Not an ending — a morning. The first one this family has earned the right to actually see.', en: ['Dawnlight Sentinel','Last Shadow','First Light Construct'], loot: ['First Light', 'The Morning You Earned', 'Daybreak Itself'], xp: 2200, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -547,6 +554,14 @@ const G = {
     { id: 36, n: "The Architect's Chamber", d: 'Defeat The Architect and uncover the truth of the Breaking', t: 'boss_specific', target: 'The Architect', c: 0, need: 1, rw: { xp: 7200, g: 6100 }, done: false, chain: 'the_reckoning', reqQuest: 35, hidden: true, revealed: false },
     { id: 37, n: 'What Remains United', d: 'Defeat The Splinter Court', t: 'boss_specific', target: 'The Splinter Court', c: 0, need: 1, rw: { xp: 7700, g: 6500 }, done: false, chain: 'the_reckoning', reqQuest: 36, hidden: true, revealed: false },
     { id: 38, n: 'Where the Break Began', d: 'Defeat The First Break and end Act Three', t: 'boss_specific', target: 'The First Break', c: 0, need: 1, rw: { xp: 9500, g: 8000 }, done: false, chain: 'the_reckoning', reqQuest: 37, hidden: true, revealed: false },
+
+    // === ACT 4: THE MENDING (LV 46-50) — FINALE ===
+    { id: 39, n: 'The Mending', d: 'Reach Level 46 and begin the slow work of repair', t: 'reach_level', c: 0, need: 46, rw: { xp: 8000, g: 6500 }, done: false, chain: 'the_mending', reqQuest: 38 },
+    { id: 40, n: 'The First Repair', d: 'Defeat The Unmended', t: 'boss_specific', target: 'The Unmended', c: 0, need: 1, rw: { xp: 9500, g: 7800 }, done: false, chain: 'the_mending', reqQuest: 39, hidden: true, revealed: false },
+    { id: 41, n: 'What Almost Broke Again', d: 'Defeat The Relapse', t: 'boss_specific', target: 'The Relapse', c: 0, need: 1, rw: { xp: 10200, g: 8300 }, done: false, chain: 'the_mending', reqQuest: 40, hidden: true, revealed: false },
+    { id: 42, n: 'The Fear After the Storm', d: 'Defeat The Question of After', t: 'boss_specific', target: 'The Question of After', c: 0, need: 1, rw: { xp: 10900, g: 8800 }, done: false, chain: 'the_mending', reqQuest: 41, hidden: true, revealed: false },
+    { id: 43, n: 'Everyone, Together', d: 'Defeat The Unity Ward', t: 'boss_specific', target: 'The Unity Ward', c: 0, need: 1, rw: { xp: 11600, g: 9300 }, done: false, chain: 'the_mending', reqQuest: 42, hidden: true, revealed: false },
+    { id: 44, n: 'Daybreak', d: 'Defeat Daybreak Incarnate and see the morning through', t: 'boss_specific', target: 'Daybreak Incarnate', c: 0, need: 1, rw: { xp: 16000, g: 13000 }, done: false, chain: 'the_mending', reqQuest: 43, hidden: true, revealed: false },
 
   ],
 
@@ -677,6 +692,7 @@ const G = {
     { id: 's11', n: 'The Shattered Now', d: 'Reach Level 35 and end Act One at The Widow\'s Watch', t: 'reach_level', c: 0, need: 35, rw: { xp: 2200, g: 3400 }, done: false, unlocked: false, chapter: 11 },
     { id: 's12', n: 'The Long Silence', d: "Reach Level 40 and end Act Two at Embercat's Grave", t: 'reach_level', c: 0, need: 40, rw: { xp: 3000, g: 4500 }, done: false, unlocked: false, chapter: 12 },
     { id: 's13', n: 'The Reckoning', d: 'Reach Level 45 and end Act Three where the world first broke', t: 'reach_level', c: 0, need: 45, rw: { xp: 4200, g: 6000 }, done: false, unlocked: false, chapter: 13 },
+    { id: 's14', n: 'The Mending', d: 'Reach Level 50 and see Daybreak through to the end', t: 'reach_level', c: 0, need: 50, rw: { xp: 6000, g: 8500 }, done: false, unlocked: false, chapter: 14 },
   ],
   log: ['Welcome to Legends of Daybreak, San.'],
 
@@ -995,6 +1011,18 @@ const G = {
       mechanic: 'lightning_rod', rodTurns: 3, desc: 'Every echo you have faced, fused into one tribunal, demanding to know why you keep choosing to stay whole instead of breaking like the world did. You answer with your fists.' },
     { n: 'The First Break', zone: 'Where the Break Began', hp: 21000, mhp: 21000, atk: 195, def: 112, xp: 9500, g: 5200,
       mechanic: 'cosmic', desc: 'The original fracture, still happening, forever, at the center of everything. Not a monster. A wound that never got the chance to close — until now.' },
+
+    // === ACT 4: THE MENDING (LV 46-50) ===
+    { n: 'The Unmended', zone: 'The First Repair', hp: 22000, mhp: 22000, atk: 200, def: 116, xp: 10200, g: 5600,
+      mechanic: 'crush', crushTurn: 5, desc: 'Everything that has not yet been fixed, given weight. It does not fight so much as it presses down, patient, the way unfinished work always does.' },
+    { n: 'The Relapse', zone: 'What Almost Broke Again', hp: 23000, mhp: 23000, atk: 206, def: 120, xp: 10800, g: 5900,
+      mechanic: 'rampage', rampageTurn: 3, rampageDmg: 70, desc: 'The old fear, back exactly where it always used to live. Enrages after 3 turns — setbacks do not ask permission before they hit hardest.' },
+    { n: 'The Question of After', zone: 'The Fear After the Storm', hp: 24000, mhp: 24000, atk: 212, def: 124, xp: 11400, g: 6200,
+      mechanic: 'devour', devourTurn: 5, desc: "What happens when the borrowed youth runs out. What happens when survival stops being the whole point. It does not attack so much as it asks, over and over, a question with no easy answer." },
+    { n: 'The Unity Ward', zone: 'Everyone, Together', hp: 25000, mhp: 25000, atk: 218, def: 128, xp: 12000, g: 6500,
+      mechanic: 'phase', phases: 3, currentPhase: 1, phaseHp: 8333, desc: 'A trial built for a family, not a single hero — shifting through three phases that test whether you have actually learned to lean on each other, or just gotten good at surviving next to one another.' },
+    { n: 'Daybreak Incarnate', zone: 'Daybreak', hp: 28000, mhp: 28000, atk: 230, def: 136, xp: 15000, g: 9000,
+      mechanic: 'cosmic', desc: "The last resistance to a morning this family has spent a lifetime earning. Not a final villain in the old sense — the shape fear takes right before it finally, actually, lets go." },
   ],
 
   currentBoss: null,
@@ -1651,6 +1679,92 @@ storyJournal: {
         ]
       }
 
+      ,{
+        id: 'journal_037',
+        title: 'The Slow Work',
+        chapter: 37,
+        unlockType: 'boss',
+        unlockAt: 'The Unmended',
+        icon: '🔧',
+        summary: 'Mending is slower than breaking. The family learns to live with that.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The world does not fix itself the moment you decide it can. That is the first lesson of The First Repair, and it is not a comfortable one. Cracks that took an instant to open take much longer to close.' },
+          { speaker: 'Joel', text: '"Steadfast does not mean fast," Joel says, working a seam of broken reality with the same patient hands he has always had, second of four, breadwinner, stray-feeder, yours. "It means still here tomorrow. That is the whole trick."' },
+          { speaker: 'Narrator', text: 'The Unmended does not attack so much as it simply persists — a physical weight made of every repair still left undone, pressing down, patient, the way unfinished work always is.' },
+          { speaker: 'San', text: '"I used to think healing meant going back to how things were," you say, staff in hand, watching Joel work. "I do not think that anymore. I think it means building something new out of what is left. Slower. But real."' },
+          { speaker: 'Narrator', text: 'The fight is not fast either — a long, grinding thing, everyone taking turns bearing the weight so no one carries it alone. When The Unmended finally gives way, it does not feel like a victory so much as a first, small, real repair.' },
+          { speaker: 'Aisyah', text: '"One seam," Aisyah says, marking it in a ledger that finally has something other than debt written in it. "One seam mended. Plenty more. But one is not nothing."' }
+        ]
+      }
+      ,{
+        id: 'journal_038',
+        title: 'A Setback Is Not a Failure',
+        chapter: 38,
+        unlockType: 'boss',
+        unlockAt: 'The Relapse',
+        icon: '👁️',
+        summary: 'Not every day of mending goes forward. The family relearns an old lesson.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The cracks in What Almost Broke Again reopen exactly where you thought they had already closed. It is disorienting in a way none of the previous zones were — not new grief, but old grief, returning uninvited.' },
+          { speaker: 'Zaki', text: '"I checked my pack this morning and my hands were shaking," Zaki admits, quieter than usual, the old nervous habit gone rough at the edges. "I thought I was past that. I am not sure being past it was ever really the goal."' },
+          { speaker: 'Narrator', text: 'The Relapse fights like fear always fights — sudden, disproportionate, enraging fast, daring you to believe that one bad day undoes every good one that came before it.' },
+          { speaker: 'Eliz', text: '"It does not," Eliz says, simply, stepping between Zaki and the worst of it, her Guardian Spirit steady as it has always been. "A relapse is not a failure. It is just a hard day inside a long recovery. I would know. I have had several."' },
+          { speaker: 'Narrator', text: 'The party fights The Relapse the way they have learned to fight everything that matters — together, patiently, refusing to let one setback erase the whole record of showing up.' },
+          { speaker: 'San', text: 'When it finally falls, no one celebrates too loudly. You have learned, by now, that some victories are quiet ones. "We are still here," you say. "That is the only score that actually counts."' }
+        ]
+      }
+      ,{
+        id: 'journal_039',
+        title: 'What Happens After',
+        chapter: 39,
+        unlockType: 'boss',
+        unlockAt: 'The Question of After',
+        icon: '❓',
+        summary: "San and Joel's borrowed youth, and the question neither of them has asked out loud.",
+        scenes: [
+          { speaker: 'Narrator', text: 'The Fear After the Storm asks the question the whole family has been avoiding since the youth-restoring magic first took hold: what happens when it runs out? What happens to a family built entirely for survival once there is finally something worth surviving for?' },
+          { speaker: 'Joel', text: '"I have not asked because I was afraid of the answer," Joel admits, and it is the first time in this whole journey you have heard him sound uncertain. "But I am done being afraid of questions. What happens to us, San? After?"' },
+          { speaker: 'Narrator', text: "The Question of After does not attack so much as it interrogates — every strike carries the specific ache of not knowing, needling at every plan the family has never quite let themselves make." },
+          { speaker: 'San', text: '"I do not know," you say, and for once that admission does not feel like weakness. "I do not know how long this borrowed youth lasts. I do not know what comes after Daybreak. But I know I want to find out. With you. That is not nothing. That might be everything."' },
+          { speaker: 'Narrator', text: 'The fight ends not with an answer but with something better — permission. Permission to not know, and to want a future anyway. The Question of After does not need defeating so much as it needs, finally, an honest response.' },
+          { speaker: 'Joel', text: '"Then let us find out together," Joel says, and for the first time since the first day he asked to stand beside you, his voice sounds like relief instead of resolve.' }
+        ]
+      }
+      ,{
+        id: 'journal_040',
+        title: 'The Whole Family',
+        chapter: 40,
+        unlockType: 'boss',
+        unlockAt: 'The Unity Ward',
+        icon: '💝',
+        summary: 'Every member of this family, in the same place, choosing the same thing, for the first time.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Everyone, Together does not test strength. It tests something harder to fake — whether this family has actually learned to lean on each other, or just gotten very good at surviving next to one another.' },
+          { speaker: 'Senedra', text: '"I found the path here," Senedra says, arrow nocked, steady as the northern woods that raised her. "But I did not walk it alone. None of us have, not really, not since the beginning."' },
+          { speaker: 'Narrator', text: 'The Unity Ward shifts through three phases, and each one demands something different — first strength, then patience, then, finally, something that can only be described as trust: the willingness to let someone else carry the weight for a while.' },
+          { speaker: 'Mezstorm', text: '"I spent so long thinking distance was safety," Mezstorm says, storm answering to his hand the way it finally, properly does now. "Estranged. Hard. I do not have to be that anymore. None of us do."' },
+          { speaker: 'Narrator', text: 'The final phase breaks not because of any one hero\'s strike, but because eight people — San, Joel, Aisyah, Mezstorm, Eliz, Senedra, Zaki, Soel — commit to the same motion at the same moment, for the first time in the whole shattered future, completely undivided.' },
+          { speaker: 'San', text: 'Soel presses against your leg as the Ward dissolves, purring, unkillable, chosen and choosing back. "Everyone," you say, looking around at all of them, "together." It is not a strategy anymore. It is just what is true.' }
+        ]
+      }
+      ,{
+        id: 'journal_041',
+        title: 'Daybreak',
+        chapter: 41,
+        unlockType: 'boss',
+        unlockAt: 'Daybreak Incarnate',
+        icon: '🌅',
+        summary: 'Not an ending. A morning. The first one this family has earned the right to actually see.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The sun that could not rise on a broken world finally has somewhere to land. Daybreak Incarnate is not a villain in the old sense — it is the last shape fear takes right before it finally, actually, lets go.' },
+          { speaker: 'San', text: 'You think of every zone that led here — the rain, the box under Joel\'s porch, the trade routes Aisyah taught you before anything else, Mezstorm\'s storm finally pointed somewhere, Eliz\'s Guardian Spirit steady through every wound, Senedra finding paths no one else could see, Zaki checking his pack one more time, Soel choosing you, over and over, in every world.' },
+          { speaker: 'Narrator', text: 'The fight is not desperate. It is not even really a fight, not by the end — it is a family, fully present, fully together, finishing something they started a long time ago without knowing what it would cost or what it would become.' },
+          { speaker: 'Joel', text: '"I asked to stand beside you while you found out why you were here," Joel says, shield raised, voice steady as the very first day. "I think we found out. I think this is why."' },
+          { speaker: 'Narrator', text: 'When Daybreak Incarnate finally, gently, comes apart, it does not feel like a kill. It feels like a held breath, released. The sky over Aethon — over every shattered zone you have ever walked through — opens, and for the first time in this entire journey, the light is not artificial, not desperate, not borrowed. It is just morning.' },
+          { speaker: 'San', text: 'Everyone stands together in the new light — San, Joel, Aisyah, Mezstorm, Eliz, Senedra, Zaki, Soel. No one says anything grand. Aisyah counts something in her ledger and, for once, does not look worried. Zaki checks his pack, finds everything exactly where it should be, and smiles. Joel takes your hand. "Legends of Daybreak," you say, quiet, mostly to yourself, watching the sun actually rise. "I think that is us now." Whatever comes next, it will not be faced alone. It never really was.' }
+        ]
+      }
+
 
 
 
@@ -1723,6 +1837,12 @@ storyJournal: {
     { id: 'architect_camp', name: "The Chamber Threshold", type: 'camp', zone: "The Architect's Chamber", zoneLv: 43, desc: 'Just outside the humming door. Close enough to watch it, far enough to breathe.', unlocked: false, icon: '⛺', cost: 0 },
     { id: 'united_camp', name: 'The Gathering Ground', type: 'camp', zone: 'What Remains United', zoneLv: 44, desc: 'Every echo you have faced left a mark here. It somehow still feels like the safest place you have found.', unlocked: false, icon: '⛺', cost: 0 },
     { id: 'firstbreak_camp', name: 'The Mended Seam', type: 'camp', zone: 'Where the Break Began', zoneLv: 45, desc: 'The one place in the fracture that has already started to heal.', unlocked: false, icon: '⛺', cost: 0 },
+    // === ACT 4: THE MENDING (LV 46-50) REST SITES ===
+    { id: 'repair_camp', name: 'The Patient Workshop', type: 'camp', zone: 'The First Repair', zoneLv: 46, desc: 'Slow work, done well. There is no need to rush it here.', unlocked: false, icon: '⛺', cost: 0 },
+    { id: 'backslide_camp', name: "Yesterday's Ground", type: 'camp', zone: 'What Almost Broke Again', zoneLv: 47, desc: 'A setback is not a failure. This camp exists to remind you of that, every time you need it.', unlocked: false, icon: '⛺', cost: 0 },
+    { id: 'afterfear_camp', name: 'The Question Left Open', type: 'camp', zone: 'The Fear After the Storm', zoneLv: 48, desc: 'Not every question needs answering tonight.', unlocked: false, icon: '⛺', cost: 0 },
+    { id: 'unity_camp', name: 'The Whole Family', type: 'camp', zone: 'Everyone, Together', zoneLv: 49, desc: 'Every bedroll here is close enough to touch the next one. No one sleeps far from anyone else tonight.', unlocked: false, icon: '⛺', cost: 0 },
+    { id: 'daybreak_camp', name: 'The Last Camp Before Morning', type: 'camp', zone: 'Daybreak', zoneLv: 50, desc: 'You will not need this camp again after tonight. That is not a sad thing. That is the whole point.', unlocked: false, icon: '⛺', cost: 0 },
     // Phase 3 mana springs
     { id: 'ms_spring3', name: 'Infernal Mana Spring', type: 'mana_spring', zone: 'Infernal Crucible', zoneLv: 23, desc: 'A spring of liquid flame that burns cold. Each sip sears the mind with forbidden knowledge.', unlocked: false, icon: '💧', cost: 20 },
     { id: 'ms_spring4', name: 'Abyssal Mana Spring', type: 'mana_spring', zone: 'Tidal Abyss', zoneLv: 25, desc: 'Dark water that glows with inner light. Drinking it feels like drowning in stars.', unlocked: false, icon: '💧', cost: 25 },
@@ -2890,6 +3010,23 @@ const ENEMY_REGISTRY = {
   'Fracture Remnant': { template: 'balanced', elem: 'void', zoneLv: 45 },
   'Broken Reality': { template: 'striker', elem: 'void', zoneLv: 45 },
   'Echo of Everything': { template: 'tank', elem: 'void', zoneLv: 45 },
+
+  // === ACT 4: THE MENDING (LV 46-50) ===
+  'Rust Remnant': { template: 'tank', elem: 'none', zoneLv: 46 },
+  'Decay Wisp': { template: 'striker', elem: 'void', zoneLv: 46 },
+  'Unmended Shard': { template: 'balanced', elem: 'none', zoneLv: 46 },
+  'Backslide Wraith': { template: 'striker', elem: 'fire', zoneLv: 47 },
+  'Old Habit': { template: 'balanced', elem: 'fire', zoneLv: 47 },
+  'Setback Sentinel': { template: 'tank', elem: 'fire', zoneLv: 47 },
+  'Question Wraith': { template: 'balanced', elem: 'void', zoneLv: 48 },
+  'What-If Echo': { template: 'striker', elem: 'void', zoneLv: 48 },
+  'Quiet Fear': { template: 'tank', elem: 'void', zoneLv: 48 },
+  'Unity Sentinel': { template: 'tank', elem: 'lightning', zoneLv: 49 },
+  'Bonded Construct': { template: 'balanced', elem: 'lightning', zoneLv: 49 },
+  'Chorus Wisp': { template: 'striker', elem: 'lightning', zoneLv: 49 },
+  'Dawnlight Sentinel': { template: 'tank', elem: 'arcane', zoneLv: 50 },
+  'Last Shadow': { template: 'striker', elem: 'void', zoneLv: 50 },
+  'First Light Construct': { template: 'balanced', elem: 'arcane', zoneLv: 50 },
 };
 
 
@@ -7697,6 +7834,53 @@ function triggerLevelUpAnimation(newLevel) {
   setTimeout(() => overlay.remove(), 2300);
 }
 
+// Per-level growth, tailored per companion instead of uniform — matches the same
+// individual-identity approach as their equipment roles and hidden growth abilities.
+const COMPANION_LEVEL_GROWTH = {
+  Joel:     { mhp: 12, atk: 1, def: 2, spd: 0 }, // The Steadfast — bulwark, more HP/DEF than offense
+  Aisyah:   { mhp: 6,  atk: 2, def: 0, spd: 1 }, // Sisterblade — sharp and fast, fragile
+  Mezstorm: { mhp: 6,  atk: 2, def: 1, spd: 0 }, // Stormsinger — offense-focused caster
+  Eliz:     { mhp: 9,  atk: 1, def: 2, spd: 0 }, // Little Healer — durable support
+  Senedra:  { mhp: 7,  atk: 2, def: 0, spd: 1 }, // Swift Scout — precision and speed
+  Zaki:     { mhp: 10, atk: 2, def: 1, spd: 0 }, // Young Blade — balanced frontliner
+  Soel:     { mhp: 8,  atk: 1, def: 1, spd: 1 }, // The Familiar — matches his all-stats passive
+};
+
+// Original starting stats (before any growth) and unlock level per companion — used only
+// by the one-time retroactive growth fix below, matching the initial G.party definitions.
+const COMPANION_ORIGINAL_STATS = {
+  Joel:     { mhp: 120, atk: 6,  def: 8, spd: 4,  ul: 1 },
+  Aisyah:   { mhp: 70,  atk: 10, def: 4, spd: 9,  ul: 1 },
+  Mezstorm: { mhp: 60,  atk: 12, def: 3, spd: 6,  ul: 3 },
+  Eliz:     { mhp: 65,  atk: 4,  def: 5, spd: 5,  ul: 4 },
+  Senedra:  { mhp: 75,  atk: 8,  def: 5, spd: 10, ul: 6 },
+  Zaki:     { mhp: 100, atk: 9,  def: 6, spd: 6,  ul: 8 },
+  Soel:     { mhp: 55,  atk: 5,  def: 4, spd: 8,  ul: 10 },
+};
+
+// One-time fix for saves made before per-companion growth existed: recomputes each
+// companion's base stats as if their own tailored growth rate had applied since the
+// level they joined, instead of the old uniform +8/+1/+1 everyone got. Guarded by a
+// flag so it only ever runs once per save — running it twice would double-apply growth.
+function retroactivelyFixCompanionGrowth() {
+  if (G.retroactiveGrowthApplied) return;
+  for (let p of G.party) {
+    const original = COMPANION_ORIGINAL_STATS[p.n];
+    const growth = COMPANION_LEVEL_GROWTH[p.n];
+    if (!original || !growth || !p.base) continue;
+    const levelsGained = Math.max(0, G.p.lvl - original.ul);
+    p.base.mhp = original.mhp + growth.mhp * levelsGained;
+    p.base.atk = original.atk + growth.atk * levelsGained;
+    p.base.def = original.def + growth.def * levelsGained;
+    p.base.spd = original.spd + growth.spd * levelsGained;
+    const hpPct = p.mhp > 0 ? p.hp / p.mhp : 1;
+    recalcPartyMember(p);
+    p.hp = Math.max(1, Math.round(p.mhp * hpPct)); // keep the same HP% they had, not a full heal
+  }
+  G.retroactiveGrowthApplied = true;
+  lg('📈 Companion growth recalculated for the new per-character stat system.');
+}
+
 function lvlup(){
   const startLvl = G.p.lvl;
   while(G.p.xp>=G.p.xpN){
@@ -7711,17 +7895,22 @@ function lvlup(){
     G.p.stats.int+=2; G.p.stats.con+=1;
     lg('LEVEL UP! Now Level '+G.p.lvl+'!');
 
-    // === STAGE 2: PARTY AUTO STAT GROWTH ===
+    // === STAGE 2: PARTY AUTO STAT GROWTH (per-companion, tailored to their role) ===
     for(let p of G.party){
       if(p.on || p.ul <= G.p.lvl){
-        const oldMhp = p.mhp, oldAtk = p.atk, oldDef = p.def;
-        p.mhp += 8; 
-        p.hp = Math.min(p.mhp, p.hp + 8);
-        p.atk += 1; 
-        p.def += 1;
+        if (!p.base) p.base = { mhp: p.mhp, atk: p.atk, def: p.def, spd: p.spd };
+        const oldMhp = p.mhp, oldAtk = p.atk, oldDef = p.def, oldSpd = p.spd;
+        const growth = COMPANION_LEVEL_GROWTH[p.n] || { mhp: 8, atk: 1, def: 1, spd: 0 };
+        p.base.mhp += growth.mhp;
+        p.base.atk += growth.atk;
+        p.base.def += growth.def;
+        p.base.spd += growth.spd;
+        const hpBefore = p.hp;
+        recalcPartyMember(p);
+        p.hp = Math.min(p.mhp, hpBefore + growth.mhp); // heal by the HP gained, same feel as before
         // Only log for active members to avoid spam
         if(p.on){
-          lg('📈 ' + p.n + ' grows with you! HP ' + oldMhp + '→' + p.mhp + ' ATK ' + oldAtk + '→' + p.atk + ' DEF ' + oldDef + '→' + p.def);
+          lg('📈 ' + p.n + ' grows with you! HP ' + oldMhp + '→' + p.mhp + ' ATK ' + oldAtk + '→' + p.atk + ' DEF ' + oldDef + '→' + p.def + (growth.spd ? ' SPD ' + oldSpd + '→' + p.spd : ''));
         }
       }
     }
@@ -8041,6 +8230,7 @@ function saveGame() {
     raidProgress: G.raidProgress,
     strongholdTasks: G.strongholdTasks,
     guildHallLevel: G.guildHallLevel,
+    retroactiveGrowthApplied: G.retroactiveGrowthApplied,
     guildJoined: G.guildJoined,
     guildRep: G.guildRep,
     guildRepBalance: G.guildRepBalance,
@@ -8355,6 +8545,8 @@ function loadGame() {
         }
       }
     }
+    G.retroactiveGrowthApplied = data.retroactiveGrowthApplied || false;
+    retroactivelyFixCompanionGrowth();
 
         for (let q of G.quests) {
       const saved = data.quests.find(sq => sq.id === q.id);

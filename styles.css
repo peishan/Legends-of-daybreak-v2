@@ -239,7 +239,7 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .ftips li:last-child { border-bottom: none; }
 .ftips li::before { content: "→ "; color: var(--accent); font-weight: 700; }
 .cfb { padding: 12px 24px; border-radius: 12px; border: 1px solid var(--danger); background: transparent; color: var(--danger); font-size: 14px; font-weight: 600; cursor: pointer; user-select: none; }
-.log { background: var(--log-bg); border-top: 1px solid var(--border); padding: 14px 16px; max-height: 280px; overflow-y: auto; font-family: 'Nunito', sans-serif; font-size: 18px; line-height: 1.65; flex-shrink: 0; }
+.log { background: var(--log-bg); border-top: 1px solid var(--border); padding: 14px 16px; max-height: 280px; overflow-y: auto; font-family: 'Nunito', sans-serif; font-size: 16px; line-height: 1.6; flex-shrink: 0; }
 .le { padding: 4px 0; color: var(--text-dim); border-bottom: 1px solid var(--nav-bg); font-family: 'Nunito', sans-serif; }
 .le:last-child { border-bottom: none; }
 .nav { display: flex; justify-content: space-around; background: var(--nav-bg); border-top: 1px solid var(--border); padding: 10px 0 12px; position: sticky; bottom: 0; z-index: 10; flex-shrink: 0; }
