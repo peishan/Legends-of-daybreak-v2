@@ -121,7 +121,7 @@ const G = {
   },
   party: [
     { n: 'Joel', t: 'The Steadfast', r: 'Tank', hp: 120, mhp: 120, atk: 6, def: 8, spd: 4, on: true, d: 'Your partner and shield. Never lets you fight alone. A steadfast man from a Philippine village, second of four, breadwinner, stray-feeder, yours. He does not ask why you are here. He asks if you will let him stand beside you while you find out.', b: '+10% Max HP', col: '#7c3aed', affinityBonuses: [], gear: null, base: { mhp: 120, atk: 6, def: 8, spd: 4 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'Aisyah', t: 'Sisterblade', r: 'Rogue', hp: 70, mhp: 70, atk: 10, def: 4, spd: 9, on: true, d: 'Your sister, sharp-eyed and sharper-tongued. Your eldest sister, fifty-something in the old world, who taught you to trade before she taught you to fight. She taught you the trade routes of Brunei. Now she teaches you the dangerous paths of Aethon. Family is complicated. Family with knives is complicated and useful.', b: '+20% Gold found', col: '#059669', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 10, def: 4, spd: 9 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Aisyah', t: 'Sisterblade', r: 'Rogue', hp: 70, mhp: 70, atk: 10, def: 4, spd: 9, on: true, d: 'Your sister, sharp-eyed and sharper-tongued. Your eldest sister, who spent decades teaching secondary school math in the old world before she taught you to fight. Now she teaches you the dangerous paths of Aethon. Family is complicated. Family with knives is complicated and useful.', b: '+20% Gold found', col: '#059669', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 10, def: 4, spd: 9 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Mezstorm', t: 'Stormsinger', r: 'Mage', hp: 60, mhp: 60, atk: 12, def: 3, spd: 6, on: false, ul: 3, d: 'A wandering storm mage seeking purpose. He speaks to the storm. Sometimes, it answers. He was Mez once — your middle sister, estranged, hard, distant. The magic made a mistake. Rendered her male, like Edwin in the old tales. The memories are ghost-images now. Vague. Painful. Present.', b: '+15% Spell damage', col: '#0891b2', affinityBonuses: [], gear: null, base: { mhp: 60, atk: 12, def: 3, spd: 6 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Eliz', t: 'Little Healer', r: 'Healer', hp: 65, mhp: 65, atk: 4, def: 5, spd: 5, on: false, ul: 4, d: 'A gentle soul with hands that mend wounds. She is your niece, Mez\'s daughter, autistic in the old world — which here means she experiences magic in textures and colors no one else can perceive. She cannot be reduced below 1 HP — a Guardian Spirit, the game calls it. You call it Eliz being Eliz. The girl who has always endured.', b: '+25% Healing potency. Guardian Spirit: Cannot be reduced below 1 HP.', col: '#db2777', passive: 'guardian_spirit', resurrect: { name: 'Breath of Life', cooldown: 0, maxCooldown: 5, healPct: 0.5, desc: 'Revives a fallen ally with 50% HP. 5-turn cooldown.' }, affinityBonuses: [], gear: null, base: { mhp: 65, atk: 4, def: 5, spd: 5 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Senedra', t: 'Swift Scout', r: 'Ranger', hp: 75, mhp: 75, atk: 8, def: 5, spd: 10, on: false, ul: 6, d: 'An eagle-eyed tracker from the northern woods. She learned this from her mother. From Aisyah. She finds secret paths where others see only walls. She offers you pemmican and speaks of trade routes and dried goods. The real money is in dried goods. They travel. They last. They sell.', b: '+20% Crit chance', col: '#ca8a04', affinityBonuses: [], gear: null, base: { mhp: 75, atk: 8, def: 5, spd: 10 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
@@ -1119,9 +1119,9 @@ storyJournal: {
         icon: '🗡️',
         summary: 'Aisyah steps from the shadows. Family with knives.',
         scenes: [
-          { speaker: 'Aisyah', text: "\"Took you long enough,\" she says, stepping from the shadows. Her daggers glint like teeth. Your eldest sister, fifty-something in the old world, sharp-eyed and sharper-tongued, taught you to trade before she taught you to fight." },
+          { speaker: 'Aisyah', text: "\"Took you long enough,\" she says, stepping from the shadows. Her daggers glint like teeth. Your eldest sister, sharp-eyed and sharper-tongued, spent decades teaching secondary school math before any of this — but she taught you to fight long before that." },
           { speaker: 'Aisyah', text: "\"Mum asked me to check on you. I told her you were fine. Do not make me a liar.\" Her hands shake, just slightly. She has been looking for you. She always looks for you." },
-          { speaker: 'Narrator', text: "Aisyah joins your party. Family is complicated. Family with knives is complicated and useful. She taught you the trade routes of Brunei. Now she teaches you the dangerous paths of Aethon." }
+          { speaker: 'Narrator', text: "Aisyah joins your party. Family is complicated. Family with knives is complicated and useful. Now she teaches you the dangerous paths of Aethon." }
         ]
       },
             {
@@ -1619,7 +1619,7 @@ storyJournal: {
           { speaker: 'Narrator', text: "You realize it walking into the back room: every other echo, you have already faced. Joel's, twice over. Eliz's. Zaki's. Mezstorm's. Soel's. Aisyah taught you to trade before she taught you to fight, and somehow, in all of this, no one ever asked what she was carrying." },
           { speaker: 'Aisyah', text: '"I did not think I needed one," Aisyah says, staring at the ledger with her own handwriting gone jagged across every page. "I am the one who counts things. Who keeps track. Who makes sure everyone else is fed before I say I am hungry too. I did not think that kind of carrying left a mark."' },
           { speaker: 'Narrator', text: "The Echo of Aisyah rises from the columns of debt, sharp-eyed and sharper-tongued exactly like her, except every trade she makes now costs something she cannot afford, and she keeps making them anyway because stopping means admitting the ledger never balances." },
-          { speaker: 'Aisyah', text: '"I taught you the trade routes of Brunei before I taught you anything else," she says, low, watching the echo count coins that were never really there. "I want you to know why. It was the only language I had for love that did not feel like asking for something back."' },
+          { speaker: 'Aisyah', text: '"I taught secondary school math for decades before I taught you anything else with a blade in my hand," she says, low, watching the echo count coins that were never really there. "The trading only came later — the last handful of years, nothing more. I want you to know why any of it matters to me. It was the only language I had for love that did not feel like asking for something back."' },
           { speaker: 'San', text: '"You never had to ask," you tell her, and mean it more than you have meant almost anything. "Family with knives is complicated and useful — you taught me that. You did not have to earn a place I already gave you."' },
           { speaker: 'Narrator', text: 'The Echo does not fight so much as it finally, finally sets the ledger down — and when it dissolves, Aisyah exhales like she has been holding her breath since long before the world broke. She does not say anything else. She does not need to.' }
         ]
@@ -1966,6 +1966,7 @@ storyJournal: {
   dragonHunt: { active: false, cleared: 0 }, // a legendary optional superboss, repeatable
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
+  mercenary: { active: false, current: null }, // current offered contract, if any
   strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
   siegeDefense: { active: false, strongholdId: null, wave: 0, maxWaves: 3 },
   strongholdTasks: [], // populated from STRONGHOLDS[id].tasks once a stronghold is claimed
@@ -2106,9 +2107,9 @@ storyJournal: {
       { speaker: 'Narrator', text: 'Joel joins your party. His shield is heavy. His loyalty is heavier. In this world, as in the last, he is The Steadfast — the one who stands between you and everything that would harm you.' }
     ]},
     { title: 'Sisterblade', unlockLevel: 20, scenes: [
-      { speaker: 'Aisyah', text: '"Took you long enough," she says, stepping from the shadows. Her daggers glint like teeth. Your eldest sister, fifty-something in the old world, sharp-eyed and sharper-tongued, taught you to trade before she taught you to fight.' },
+      { speaker: 'Aisyah', text: '"Took you long enough," she says, stepping from the shadows. Her daggers glint like teeth. Your eldest sister, sharp-eyed and sharper-tongued, spent decades teaching secondary school math before any of this — but she taught you to fight long before that.' },
       { speaker: 'Aisyah', text: '"Mum asked me to check on you. I told her you were fine. Do not make me a liar." Her hands shake, just slightly. She has been looking for you. She always looks for you.' },
-      { speaker: 'Narrator', text: 'Aisyah joins your party. Family is complicated. Family with knives is complicated and useful. She taught you the trade routes of Brunei. Now she teaches you the dangerous paths of Aethon.' }
+      { speaker: 'Narrator', text: 'Aisyah joins your party. Family is complicated. Family with knives is complicated and useful. Now she teaches you the dangerous paths of Aethon.' }
     ]},
     { title: "The Healer's Light", unlockLevel: 21, scenes: [
       { speaker: 'Eliz', text: '"Your aura is frayed," she whispers, pressing a cool hand to your forehead. You did not hear her approach. She moves like silence, like the space between heartbeats.' },
@@ -3104,6 +3105,13 @@ const ENEMY_REGISTRY = {
   'Dawnlight Sentinel': { template: 'tank', elem: 'arcane', zoneLv: 50 },
   'Last Shadow': { template: 'striker', elem: 'void', zoneLv: 50 },
   'First Light Construct': { template: 'balanced', elem: 'arcane', zoneLv: 50 },
+
+  // === ROAD AMBUSH BANDITS (any level, scaled dynamically) ===
+  'Highwayman': { template: 'balanced', elem: 'none', zoneLv: 1 },
+  'Roadside Thug': { template: 'striker', elem: 'none', zoneLv: 1 },
+  'Masked Bandit': { template: 'balanced', elem: 'none', zoneLv: 1 },
+  'Ambush Scout': { template: 'striker', elem: 'none', zoneLv: 1 },
+  'Bandit Captain': { template: 'tank', elem: 'none', zoneLv: 1 },
 };
 
 
@@ -8024,6 +8032,100 @@ handleDefeat = function() {
   }
 };
 
+// === MERCENARY CONTRACTS ===
+// Zero-setup, always-available, short one-off fights with real flavor text — distinct
+// from Grind Room's endless waves. Ties back to San's own established gig-work
+// background: still picking up jobs, just with a sword now instead of a laptop.
+const MERCENARY_CONTRACTS = [
+  { id: 'cellar', title: 'Cellar Vermin', flavor: "A merchant's cellar has more legs in it than she'd like. Clear it out, get paid in coin instead of favors for once.", complete: 'The cellar is clear. She pays without haggling, which almost feels suspicious.', enemyCount: 1 },
+  { id: 'usual', title: 'The Usual', flavor: "No real details. Just \u201chandle it\u201d and a purse that doesn't ask questions.", complete: 'Handled. The purse, as promised, asks nothing.', enemyCount: 2 },
+  { id: 'caravan', title: 'Caravan Escort', flavor: "A short stretch of road, a nervous merchant, and whatever decided that stretch of road looked profitable.", complete: 'The caravan makes it through. The merchant stops being nervous exactly one stretch too late to be useful.', enemyCount: 2 },
+  { id: 'noise', title: 'Noise Complaint', flavor: "Someone's been \u201cpracticing\u201d too loud, too late, too armed. Time to have a word.", complete: 'The neighborhood is quiet again. The word was, in the end, mostly a sword.', enemyCount: 1 },
+  { id: 'delivery', title: 'Lost Delivery', flavor: "A shipment went missing between two very specific points. It did not walk off on its own.", complete: 'The shipment is recovered. It did, in fact, not walk off on its own.', enemyCount: 2 },
+  { id: 'shortnotice', title: 'Short Notice', flavor: "Someone needed this handled an hour ago. You were not doing anything else important.", complete: "Handled, an hour late and several coins richer for the inconvenience.", enemyCount: 1 },
+  { id: 'warehouse', title: 'Warehouse Watch', flavor: "One night, one warehouse, whoever thought it was unguarded.", complete: 'The warehouse remains exactly as guarded as advertised.', enemyCount: 3 },
+  { id: 'pest', title: 'Pest Control', flavor: "Magical vermin this time, not the mundane kind. Same job, worse smell.", complete: 'Pest control, completed. The smell, regrettably, lingers.', enemyCount: 2 },
+  { id: 'bridge', title: 'Bridge Toll Dispute', flavor: "Someone has been charging a toll that is not theirs to charge. Correct the misunderstanding.", complete: 'The misunderstanding is corrected, permanently and with enthusiasm.', enemyCount: 2 },
+  { id: 'reference', title: 'The Reference', flavor: "A past client vouched for you. New client, same rates, same lack of questions.", complete: 'Another satisfied client who will, in turn, vouch for you to someone else.', enemyCount: 1 },
+  { id: 'overdue', title: 'Overdue Payment', flavor: "Someone forgot who they owed. Refresh their memory.", complete: 'Their memory has been thoroughly refreshed.', enemyCount: 2 },
+  { id: 'quiet', title: 'Quiet Work', flavor: "In and out, minimal fuss, maximum discretion. Someone specifically requested you.", complete: 'In, out, done. Discretion, as requested, fully maintained.', enemyCount: 1 },
+];
+
+function getMercenaryContract() {
+  if (!G.mercenary.current) {
+    G.mercenary.current = MERCENARY_CONTRACTS[Math.floor(Math.random() * MERCENARY_CONTRACTS.length)];
+  }
+  return G.mercenary.current;
+}
+
+function startMercenaryContract() {
+  const contract = getMercenaryContract();
+  const zoneLv = Math.max(1, Math.min(G.p.lvl, 50));
+
+  G.mercenary.active = true;
+  G.cbt.on = true;
+  G.cbt.turn = 0;
+  G.cbt.en = [];
+  G.state = 'combat';
+  G.currentBoss = null;
+
+  rollWeather();
+
+  for (let i = 0; i < contract.enemyCount; i++) {
+    const name = ROAD_BANDITS[Math.floor(Math.random() * ROAD_BANDITS.length)];
+    const e = generateRaidEliteEnemy(name, zoneLv);
+    e.id = i;
+    G.cbt.en.push(e);
+  }
+  lg('📋 Contract accepted: ' + contract.title);
+  render();
+}
+
+function handleMercenaryVictory() {
+  const contract = G.mercenary.current;
+  const txp = G.cbt.en.reduce((s, e) => s + e.xp, 0);
+  const tg2 = G.cbt.en.reduce((s, e) => s + e.g, 0);
+  G.p.xp += txp;
+  G.p.gold += tg2;
+  checkAchievements();
+
+  lg('🎉 ' + (contract ? contract.title : 'Contract') + ' complete! +' + txp + ' XP, +' + tg2 + 'G');
+  if (contract) lg('   ' + contract.complete);
+
+  G.currentBoss = null;
+  G.cbt.autoCombat = false;
+  G.cbt.on = false;
+  G.mercenary.active = false;
+  G.mercenary.current = null; // ready for a fresh contract next visit
+  G.state = 'mercenary';
+  lvlup();
+  render();
+}
+
+const _originalHandleVictoryForMerc = handleVictory;
+handleVictory = function() {
+  if (G.mercenary.active) handleMercenaryVictory();
+  else _originalHandleVictoryForMerc();
+};
+
+const _originalHandleDefeatForMerc = handleDefeat;
+handleDefeat = function() {
+  if (G.mercenary.active) {
+    if (checkSecondWind()) { render(); return; }
+    lg('💀 The contract goes badly. No pay for a job half-finished.');
+    G.p.hp = 1;
+    for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
+    G.cbt.autoCombat = false;
+    G.cbt.on = false;
+    G.mercenary.active = false;
+    G.mercenary.current = null;
+    G.state = 'mercenary';
+    render();
+  } else {
+    _originalHandleDefeatForMerc();
+  }
+};
+
 function sc(zi) {
   const z=G.zones[zi];
   // 30% chance for explore event before combat
@@ -8037,6 +8139,12 @@ function sc(zi) {
     if (discoverSecret(z.n)) return;
   }
   if (checkMiniStory(z.n)) return;
+  // Road ambush: a frequent chance the trip itself gets interrupted before you ever
+  // reach the intended zone — a real, constant threat, not just danger once you arrive.
+  if (Math.random() < ROAD_AMBUSH_CHANCE) {
+    startRoadAmbush(z);
+    return;
+  }
     // Check zone-based journal unlocks
   for (let entry of G.storyJournal.entries) {
     if (entry.unlockType === 'zone' && z.n === entry.unlockAt && !G.storyJournal.unlocked.includes(entry.id)) {
@@ -8536,7 +8644,7 @@ function getEnemyArchetype(name) {
   if (/spider|arachnid/.test(n)) return 'arachnid';
   if (/serpent|snake/.test(n)) return 'serpent';
   if (/bat\b|wisp|drifter|fairy|mote/.test(n)) return 'flying';
-  if (/goblin|knight|guard\b|warden|king|lord|tyrant|foreman|keeper|collector|enforcer|peddler|looter|scavenger|watcher|mourner|auditor|sailor/.test(n)) return 'knight';
+  if (/goblin|knight|guard\b|warden|king|lord|tyrant|foreman|keeper|collector|enforcer|peddler|looter|scavenger|watcher|mourner|auditor|sailor|highwayman|thug|bandit|captain|scout/.test(n)) return 'knight';
   if (/imp|slime|elemental|beast|horror|demon|hollow|stalker|weaver|leviathan|kraken|behemoth/.test(n)) return 'elemental';
   if (/planarch|devourer|astral|nexus|void|reality|fragment|rift|dimensional|chronomancer|arbiter|architect|fracture/.test(n)) return 'eye';
   return 'default';
@@ -9416,6 +9524,7 @@ function render(){
   else if(G.state=='dragon_hunt')h+=rDragonHunt();
   else if(G.state=='forge')h+=rForge();
   else if(G.state=='bonding')h+=rBonding();
+  else if(G.state=='mercenary')h+=rMercenary();
   else if(G.state=='bondingscene')h+=rBondingScene();
 
   h+='</div>';
@@ -9446,7 +9555,8 @@ function attachEvents() {
     else if(a=='stronghold')setS('stronghold');
     else if(a=='dragon_hunt')setS('dragon_hunt');
     else if(a=='forge')setS('forge');
-    else if(a=='bonding')setS('bonding');});
+    else if(a=='bonding')setS('bonding');
+    else if(a=='mercenary')setS('mercenary');});
   });
  const btnClaimLogin = document.getElementById('btn-claim-login');
 if (btnClaimLogin) {
@@ -10524,6 +10634,23 @@ function rForge() {
   return h;
 }
 
+function rMercenary() {
+  const contract = getMercenaryContract();
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">📋 Mercenary Work</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Freelance work never really stopped, apparently \u2014 just the medium changed. Words to swords. Always something available, no setup required.</div>';
+
+  h += '<div class="panel panel-gold">';
+  h += '<div class="panel-title" style="color:var(--gold);">' + contract.title + '</div>';
+  h += '<div class="btn-hint" style="margin:10px 0;line-height:1.6;">' + contract.flavor + '</div>';
+  h += '<div class="btn-hint" style="margin-bottom:10px;">' + contract.enemyCount + ' opponent' + (contract.enemyCount > 1 ? 's' : '') + ' \u2014 a short, single fight.</div>';
+  h += '<button onclick="startMercenaryContract()" class="abtn" style="width:100%;">Take the Job</button>';
+  h += '</div>';
+
+  h += '</div>';
+  return h;
+}
+
 function rDragonHunt() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🐉 Dragon Hunt</div>';
@@ -10670,29 +10797,34 @@ const BONDING_SCENES = [
     id: 'aisyah_business', companion: 'Aisyah', minAffinity: 600, icon: '📒',
     title: 'What She Left Behind',
     scenes: [
-      { speaker: 'Narrator', text: 'You ask her, finally, about the business — the real one, the one from before, the trade routes and the ledgers and the fifty-something years of work she never talks about unless she is teaching you something practical with it.' },
-      { speaker: 'Aisyah', text: '"I built that from nothing," she says, and for once there is no joke underneath it. "Every route, every contact, every account. I was good at it. I was proud of it. And then the world ended and none of it mattered, and I picked up a knife instead of a ledger, and I have not let myself think about it since. Until you asked."' },
-      { speaker: 'San', text: '"Do you miss it?" you ask, and it feels like the first genuinely careful question you have ever asked her.' },
-      { speaker: 'Aisyah', text: '"Every day," she admits. "Not the gold. The building. Watching something grow because I was patient and clever enough to grow it. I do not get to build things anymore. I get to survive them." She is quiet for a moment. "Except this. This family. I suppose I am building that too, if I am honest. Just slower. With knives instead of contracts."' },
-      { speaker: 'San', text: '"That counts," you tell her. "That counts more than the ledgers ever did."' },
-      { speaker: 'Narrator', text: "She does not answer, but she does not deflect either, which from Aisyah is its own kind of agreement. She keeps the ledger from Nym's stall in her pack now. You have seen her write in it, some nights, when she thinks no one is watching." }
+      { speaker: 'Narrator', text: 'You ask her, finally, about the life before this one — not the trading, the real before, the chalk and the marked homework and the decades of secondary school math classes she never talks about unless she is teaching you something practical with it.' },
+      { speaker: 'Aisyah', text: '"I taught math for most of my working life," she says, and there is no performance in it, none of the sharp-tongued bravado she usually wears. "Secondary school. Decades of it. The reselling — the actual trading you know me for — that only started five, six years before all of this. I saw where the trend was going and I followed it, same as anyone smart enough to notice. It was never the whole story. It was just the newest chapter."' },
+      { speaker: 'San', text: '"Do you miss the classroom?" you ask, and it feels like the first genuinely careful question you have ever asked her.' },
+      { speaker: 'Aisyah', text: '"Every day," she admits. "Not the marking, god, never the marking. The teaching. Watching a student who insisted they were bad at math finally see the shape of an equation click into place. I do not get to build understanding in people anymore. I get to keep them alive instead. Different kind of lesson."' },
+      { speaker: 'Narrator', text: 'She is quiet for a moment, turning something over.' },
+      { speaker: 'Aisyah', text: '"Though I suppose I am still teaching, if I am honest," she says. "Just slower. With knives instead of chalk. You. Senedra and Zaki, in their own ways. I do not think the skill ever really left, just the classroom."' },
+      { speaker: 'San', text: '"That counts," you tell her. "That counts more than the classroom ever did."' },
+      { speaker: 'Narrator', text: "She does not answer, but she does not deflect either, which from Aisyah is its own kind of agreement. She keeps a small notebook in her pack now, the kind a teacher grades in. You have seen her write in it, some nights, when she thinks no one is watching." }
     ]
   },
   {
     id: 'eliz_family', companion: 'Eliz', minAffinity: 500, icon: '🕊️',
     title: 'What She Carries',
     scenes: [
-      { speaker: 'Narrator', text: "You ask her, gently, how she is really doing — not the healer-checking-in question, the real one. Eliz considers it seriously, the way she considers everything, turning the question over like she is checking it for sharp edges before deciding it is safe to answer." },
-      { speaker: 'Eliz', text: '"Everyone assumes the magic is the strange part of me," she says. "The textures, the colors, the way I perceive things no one else does. That part I have always had, even before all of this. I was already autistic in the old world. Aethon just gave the rest of you a word for what it looks like from the outside."' },
-      { speaker: 'San', text: '"Is that hard?" you ask. "People assuming the wrong thing is the strange part?"' },
-      { speaker: 'Eliz', text: '"Sometimes," she says, honestly. "But I would rather people ask badly than not ask at all. You asked. That already puts you ahead of most of the old world."' },
-      { speaker: 'Narrator', text: 'She is quiet for a while after that, and you let her be quiet, because you have learned that Eliz\'s silences are not empty — they are her actually thinking, carefully, about whether to keep going.' },
-      { speaker: 'Eliz', text: '"My mother was Mez, before the magic changed her into Mezstorm," she says, finally. "I do not know how to explain what that was like except that I lost a version of her and gained a different one, both real, both mine, and I am still learning how to hold both truths without one erasing the other. He is still my parent. That did not change. Only the shape of him did."' },
+      { speaker: 'Narrator', text: "You ask her, gently, how she is really doing — not the healer-checking-in question, the real one. It is a harder question to ask than it should be, given how much distance has sat between the two of you for so long, and you both know it." },
+      { speaker: 'Eliz', text: '"We have not talked like this in a long time," she says, not unkindly, just honestly, turning the question over like she is checking it for sharp edges before deciding it is safe to answer. "I do not think that is anyone\'s fault, exactly. We just fit different lives. You know that better than most."' },
+      { speaker: 'San', text: '"I know," you admit. "I have never been sure how to close that kind of distance. I am not sure I am closing it now. I am just trying."' },
+      { speaker: 'Eliz', text: '"That is enough to start with," she says, and something in her posture eases, just slightly. "Everyone assumes the magic is the strange part of me. The textures, the colors, the way I perceive things no one else does. That part I have always had, even before all of this. I was already autistic in the old world. Aethon just gave the rest of you a word for what it looks like from the outside."' },
+      { speaker: 'San', text: '"Was that hard? Growing up?"' },
+      { speaker: 'Eliz', text: '"Not at first," she says. "I idolized you, honestly, when I was small. You were the exciting relative, the one who felt like proof that a life could look different than the one right in front of me. Then I turned sixteen and something in me just — changed. I stopped being happy-go-lucky. I wanted space. Freedom. Time that belonged only to me. I got harder to reach, and harder on myself too — convinced sometimes that the world just did not like me very much, that socializing was a language everyone else had been handed and I had to translate from scratch every time."' },
+      { speaker: 'Narrator', text: 'You recognize the shape of that even if you never lived it exactly the same way — the particular exhaustion of being expected to perform a version of normal that was never actually built for you.' },
+      { speaker: 'Eliz', text: '"My mother has her own story, if you want it," she offers, watching you carefully, gauging whether this is a door you actually want opened. "She left home young — barely into her twenties, by her own account. Her first marriage ended when he cheated on her. She rebuilt herself after that, properly rebuilt — moved to Singapore, became someone sharper, more polished than the girl who left Brunei. Career woman. She met my father through work, out there. They were together a while before I came along. Shotgun marriage, if we are being honest about the timeline."' },
+      { speaker: 'San', text: 'You listen, quiet, because this is clearly a story she has needed to tell someone for a long time and never quite had the right person to tell it to.' },
+      { speaker: 'Eliz', text: '"Then the company they both worked for collapsed," she continues. "My mother pulled herself out of the wreckage the way she always does. My father did not — he found the bottom of a bottle instead, and a lot of cigarettes. And then you and your mother moved into our house, around when you were applying to study in Singapore after the exam in Brunei did not go the way anyone hoped. I do not think that was the reason things ended. I think it was just the last weight on a bridge that was already failing. They separated when I was one. I do not remember any of it firsthand. I only have the story, passed down in pieces."' },
+      { speaker: 'Eliz', text: '"My mother was Mez, before the magic changed her into Mezstorm," she adds, softer now. "I lost a version of her and gained a different one, both real, both mine, and I am still learning how to hold both truths without one erasing the other. He is still my parent. That did not change. Only the shape of him did."' },
       { speaker: 'San', text: 'You do not say anything clever. You just listen, because this is clearly not a wound that needs a solution — it needs a witness.' },
-      { speaker: 'Eliz', text: '"My father was never part of any of it," she adds, quieter now, the one part of the story with no magic to explain it away. "Not before the Breaking, not after. That absence does not need an accident to explain it. Some people just do not stay. I made my peace with that a long time before I made my peace with anything else."' },
-      { speaker: 'Narrator', text: 'She looks at you, and there is something steady underneath the vulnerability — not asking for pity, just finally letting someone see the whole shape of her.' },
-      { speaker: 'Eliz', text: '"I am telling you this because you are family, and family should know the real story, not the healer-shaped version of it," she says. "I am not broken because of any of it. I am just \u2014 fully myself. All of it. The magic, the mother who changed shape, the father who left, the way I feel textures no one else feels. It is a lot to carry. I carry it anyway. I am good at carrying things. It is why I heal people, I think."' },
-      { speaker: 'San', text: '"You do not carry it alone anymore," you tell her, and mean it completely.' }
+      { speaker: 'Eliz', text: '"I am telling you all of this because you are family, and family should know the real story, not the healer-shaped version of it," she says, finally looking at you directly. "I know we have been distant. Singapore moves differently than Brunei ever did, and so do the expectations that come with it, and I know you have never quite fit the shape people wanted you to be either. Maybe that is exactly why we drifted — too similar in the wrong way, both of us bad at performing what was expected. I do not know how to fix that in one conversation. I would like to try, though. Slowly."' },
+      { speaker: 'San', text: '"Slowly," you agree. "I would like that too. I am sorry it took this long for either of us to say so."' }
     ]
   },
   {
@@ -10710,15 +10842,17 @@ const BONDING_SCENES = [
   },
   {
     id: 'senedra_family', companion: 'Senedra', minAffinity: 700, icon: '🎖️',
-    title: 'The Uniform in the Drawer',
+    title: 'Before He Stopped Coming Back',
     scenes: [
       { speaker: 'Narrator', text: "You ask about her family, carefully, since she has never offered it herself, and for a long moment you think she will simply decline the question the way she declines most things she has not decided to trust you with yet." },
-      { speaker: 'Senedra', text: '"My parents divorced when I was young," she says instead, finally, watching an arrow she is not actually fletching. "Before that, even. I do not remember them together, only apart, only the specific quiet of a house that used to have two people in it and then only had one."' },
-      { speaker: 'San', text: '"Which one did you stay with?"' },
-      { speaker: 'Senedra', text: '"My mother, mostly," she says. "Aisyah. Though she was not always the sharp-eyed trader you know now — she was younger too, once, and just as unmoored by it as I was. My father was military, in the old world. Deployed more than he was home, even before the divorce made it official. And then, one deployment, he did not come back at all. Missing in action. That is the whole story. No dramatic ending, no closure. Just a uniform in a drawer and a folded flag and a question that never got answered."' },
+      { speaker: 'Senedra', text: '"My father had a reputation, before any of this," she says instead, finally, watching an arrow she is not actually fletching. "Some people called him a bad boy. Some called him worse — a gangster, a hooligan. For a while, when I was very small, that edge seemed almost charming. Dangerous in a way that felt like an adventure instead of a warning."' },
+      { speaker: 'San', text: '"What changed?"' },
+      { speaker: 'Senedra', text: '"An addiction took him," she says, plainly, not dressing it up. "I never knew exactly what, only that he found something that mattered to him more than any of us did, and there was not room left for anything else once it had him. He would disappear for months at a time. Money went with him, every time — taken from my mother\'s savings, like providing for us mattered less than keeping his supply going."' },
       { speaker: 'Narrator', text: "She says it evenly, the way you say something you have said to yourself so many times it has worn smooth, like a river stone. But her hands have gone still on the arrow, and you notice." },
-      { speaker: 'Senedra', text: '"Zaki carries the same story, in his own way," she adds, quieter. "We do not talk about it with each other much. We do not need to. Some things you can just recognize in a sibling without saying them out loud."' },
-      { speaker: 'Senedra', text: '"I think that is why I learned to track," she continues. "I could not track him. No one could. So I got very, very good at finding everyone else instead. It does not fix anything. It just means I am never the reason someone stays lost."' },
+      { speaker: 'Senedra', text: '"My mother tried to salvage it every single time he came back," she continues. "Aisyah. Though she was not always the sharp-eyed trader you know now — she was younger, and hope is its own kind of exhausting labor, and she did that labor over and over, believing each return might be the one that stuck."' },
+      { speaker: 'Senedra', text: '"I was his favorite, before," she adds, quieter. "I remember that clearly, and painfully — being chosen, being the one he noticed. And then watching that favor evaporate right along with everything else he was losing. One day he simply stopped coming back at all. No goodbye. No explanation. It took my mother years to even finalize the divorce, because you cannot divorce someone who will not show up long enough to end it properly."' },
+      { speaker: 'Senedra', text: '"Zaki carries the same story, in his own way," she says. "Different angle on it — he was never the favorite, so he lost less of that particular thing. We do not talk about it with each other much. We do not need to. Some things you can just recognize in a sibling without saying them out loud."' },
+      { speaker: 'Senedra', text: '"I think that is why I learned to track," she continues. "I could not track him. No one could. So I got very, very good at finding everyone else instead. It does not fix anything. It just means I am never the reason someone stays lost. And it means I am careful now, with being anyone\'s favorite. I know exactly what that costs when it is taken away."' },
       { speaker: 'San', text: '"You have found every path I have ever needed," you tell her. "I do not think that is a coincidence."' },
       { speaker: 'Senedra', text: 'She almost smiles at that — not quite, but almost, which from her is its own kind of gratitude.' }
     ]
@@ -10728,14 +10862,14 @@ const BONDING_SCENES = [
     title: 'Checking His Pack',
     scenes: [
       { speaker: 'Narrator', text: 'You catch Zaki checking his pack again, the old nervous habit, except this time he keeps going long after there is anything left to check, and you realize it is not about the pack at all.' },
-      { speaker: 'Zaki', text: '"My parents split up when I was a kid," he says, not looking up, hands still moving through the same three pockets over and over. "My mom \u2014 Aisyah \u2014 she held it together better than I gave her credit for at the time. My dad was military. He was gone a lot even before that. I got used to a version of him that mostly lived in phone calls and care packages."' },
-      { speaker: 'San', text: '"And after the divorce?"' },
-      { speaker: 'Zaki', text: '"Fewer phone calls," Zaki says. "Then one deployment, none at all. Missing in action. I was old enough to understand what that meant and too young to actually process it, so I did the thing you do when you are seventeen and do not know what else to do with a feeling that big — I got really into checking things. Making sure everything was where it should be. Because I could not control whether he came home, but I could control whether my boots were tied."' },
+      { speaker: 'Zaki', text: '"I was not the favorite," he says, not looking up, hands still moving through the same three pockets over and over. "Senedra was. So I had less of my father to begin with, which meant less got taken when things fell apart. Less is not nothing, though. What I remember most is the money disappearing — not really understanding why, as a kid, why there was suddenly nothing left, why my mom\'s face changed every time she checked her cards."' },
+      { speaker: 'San', text: '"Your mom being Aisyah," you say, and he nods.' },
+      { speaker: 'Zaki', text: '"Eventually she cut off his access to her money completely," Zaki continues. "That felt like the real ending, more than any conversation ever could have been. He had an addiction — I do not know exactly what, we never talked about the specifics, just that he found something that mattered to him more than any of us did. There stopped being room for anything else once it had him. He would vanish for months. Then one day he just did not come back at all. No goodbye. Years of nothing after that, before the divorce was even final."' },
       { speaker: 'Narrator', text: "He laughs, a little, at himself, but it does not quite land as a joke." },
-      { speaker: 'Zaki', text: '"Senedra had the same year, worse in some ways \u2014 she is older, she remembers more of him," he adds. "We do not talk about it much between us. Some things a sibling just knows without you having to say it."' },
-      { speaker: 'Zaki', text: '"Everyone thinks the pack-checking is nerves before a fight," he continues. "It is not, really. It is just — this. The same thing, still. Making sure the things I can control are actually controlled, because I learned early that the things I could not control could disappear without warning."' },
+      { speaker: 'Zaki', text: '"So the pack-checking," he says. "Everyone thinks it is nerves before a fight. It is not, really. I grew up somewhere money and people could just vanish overnight, no warning. So I learned to make sure of the things I actually could make sure of. Boots tied. Supplies counted. Small, controllable things, because the big ones never asked my permission before disappearing."' },
       { speaker: 'San', text: '"I do not think that is nervous," you tell him. "I think that is love wearing a very practical disguise."' },
-      { speaker: 'Zaki', text: 'He looks up at that, surprised, like no one has ever put it that way to him before. "Yeah," he says, slowly. "Yeah, maybe it is."' }
+      { speaker: 'Zaki', text: 'He looks up at that, surprised, like no one has ever put it that way to him before. "Yeah," he says, slowly. "Yeah, maybe it is."' },
+      { speaker: 'Zaki', text: '"My mom found happiness again, eventually," he adds, and this part of the story visibly sits easier in him. "Years later. And I actually got a real father figure out of it — maybe because I never had as much invested in the first one to compare it against. I could just let the new one be what it was. Senedra holds it a little more carefully. She remembers more of the original to measure against. I got lucky, I think, in the worst possible way — I had less to lose, so I had more room left over to just accept something good when it finally showed up."' }
     ]
   },
   {
@@ -10743,9 +10877,9 @@ const BONDING_SCENES = [
     title: 'The Old World, Between Fights',
     scenes: [
       { speaker: 'Narrator', text: 'Zaki asks, out of nowhere, what your life actually looked like before all of this — not the ADHD-productivity-app version, the real day-to-day of it. You find yourself telling him more than you meant to.' },
-      { speaker: 'San', text: '"Gig work, mostly," you say. "Freelance stuff. Some weeks were fine. Some weeks I could not make myself start anything until 11pm and then I would do six hours of work in a panic. The usual."' },
-      { speaker: 'Zaki', text: '"That sounds exhausting," he says, and there is real sympathy in it, not pity. "I did some freelance stuff too, actually. Odd gigs. Never anything that stuck. I think I was always looking for something that felt like it mattered, and none of it quite did."' },
-      { speaker: 'San', text: '"Did you have people?" you ask. "Friends, I mean. Before."' },
+      { speaker: 'San', text: '"Freelance writing, mostly," you say. "Chapters on an online story website, whenever I actually had readers waiting. Copywriting the rest of the time, for whoever was paying. Some weeks were fine. Some weeks I could not make myself start anything until 11pm and then I would write six hours straight in a panic. The usual."' },
+      { speaker: 'Zaki', text: '"That sounds exhausting," he says, and there is real sympathy in it, not pity. "I did the gig work, actually — odd jobs, whatever paid that week. Never anything that stuck. I think I was always looking for something that felt like it mattered, and none of it quite did. Writing sounds like it at least gave you that, some weeks."' },
+      { speaker: 'San', text: '"Some weeks," you agree. "The good ones. Did you have people?" you ask. "Friends, I mean. Before."' },
       { speaker: 'Zaki', text: '"A few," he says. "Gym friends, mostly — the kind where you know their whole workout split and nothing about their actual life. I used to go most days. Not even for the gains, honestly. Just for somewhere to be that had a routine I could not talk myself out of."' },
       { speaker: 'Narrator', text: "You laugh, because you understand that completely — the specific comfort of a place that does not care how your week has been, only that you showed up." },
       { speaker: 'San', text: '"I miss having a routine like that," you admit. "Something dumb and physical that did not require me to feel anything about it."' },
@@ -10786,6 +10920,38 @@ function visitBondingLocation(locationId) {
   const gain = 3 + Math.floor(Math.random() * 5);
   updateAffinity(companion.n, gain);
   lg(location.icon + ' Time at ' + location.n + ' with ' + companion.n + '. +' + gain + ' affinity.');
+  render();
+}
+
+// === ROAD AMBUSHES ===
+// A frequent, real interruption while traveling — the trip itself gets ambushed before
+// you ever reach the intended zone, matching BG2's constant road-encounter threat. This
+// REPLACES that trip's combat rather than adding an extra fight on top, so trip length
+// stays consistent. Flows through the normal combat victory path unchanged — it's just
+// a different enemy roster for a single fight, not a new multi-stage structure.
+const ROAD_AMBUSH_CHANCE = 0.25;
+const ROAD_BANDITS = ['Highwayman', 'Roadside Thug', 'Masked Bandit', 'Ambush Scout', 'Bandit Captain'];
+
+function startRoadAmbush(zone) {
+  G.cbt.on = true;
+  G.cbt.turn = 0;
+  G.cbt.en = [];
+  G.state = 'combat';
+  G.currentBoss = null;
+
+  rollWeather();
+  applyZoneBuffs(zone.n);
+
+  const enemyCount = 2 + Math.floor(Math.random() * 2); // 2-3 bandits
+  for (let i = 0; i < enemyCount; i++) {
+    const name = ROAD_BANDITS[Math.floor(Math.random() * ROAD_BANDITS.length)];
+    const e = generateRaidEliteEnemy(name, zone.lv); // reuses the elite stat template — bandits should sting a little more than common trash
+    e.id = i;
+    // Bandits carry stolen loot — modest gold bonus over a normal encounter of the same level
+    e.g = Math.floor(e.g * 1.4);
+    G.cbt.en.push(e);
+  }
+  lg('🗡️ AMBUSH! The road to ' + zone.n + ' was not as empty as it looked.');
   render();
 }
 
@@ -10913,6 +11079,9 @@ function rMenu(){
   const sections=[
     { title: '🐉 Legendary Hunts', items: [
       {i:'🐉',l:'Dragon Hunt',a:'dragon_hunt'},
+    ]},
+    { title: '📋 Quick Work', items: [
+      {i:'📋',l:'Mercenary',a:'mercenary'},
     ]},
     { title: '🏰 Guild & Stronghold', items: [
       {i:'🛡️',l:'Guild',a:'guild'},
