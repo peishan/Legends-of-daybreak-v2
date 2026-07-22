@@ -1889,6 +1889,7 @@ storyJournal: {
   guildJoined: false, // The Guild — separate from any Stronghold, auto-joins at level 5
   guildRep: 0, // lifetime reputation total, determines rank, never spent
   guildRepBalance: 0, // spendable reputation currency for the Guild Shop
+  dragonHunt: { active: false, cleared: 0 }, // a legendary optional superboss, repeatable
   strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
   siegeDefense: { active: false, strongholdId: null, wave: 0, maxWaves: 3 },
   strongholdTasks: [], // populated from STRONGHOLDS[id].tasks once a stronghold is claimed
@@ -4346,6 +4347,84 @@ function exitSiegeDefense() {
   render();
 }
 
+// === DRAGON HUNT ===
+// An optional, legendary superboss fight in the BG2/IWD2 tradition — dragons there are
+// notoriously long, grinding fights, not quick skirmishes. Vaelithorn is deliberately
+// far tougher than any story boss (including the level-50 finale) so a full, well-geared
+// party genuinely needs many rounds to bring it down. Unlocked at level 35, repeatable.
+const DRAGON_HUNT_UNLOCK_LEVEL = 35;
+const VAELITHORN = {
+  n: 'Vaelithorn, the Ancient Wyrm',
+  hp: 38000, mhp: 38000, atk: 220, def: 140, xp: 22000, g: 14000,
+  mechanic: 'rampage', rampageTurn: 4, rampageDmg: 95,
+  desc: 'Older than the Breaking itself. Its hoard is real — so is the wait to earn it. Breathes fire across the whole party every 4 turns.'
+};
+
+function isDragonHuntUnlocked() {
+  return G.p.lvl >= DRAGON_HUNT_UNLOCK_LEVEL;
+}
+
+function startDragonHunt() {
+  if (!isDragonHuntUnlocked()) {
+    lg('🔒 Vaelithorn only stirs for those Level ' + DRAGON_HUNT_UNLOCK_LEVEL + ' and above.');
+    return;
+  }
+  G.dragonHunt.active = true;
+  G.cbt.on = true;
+  G.cbt.turn = 0;
+  G.cbt.en = [];
+  G.state = 'combat';
+  G.currentBoss = JSON.parse(JSON.stringify(VAELITHORN));
+  G.currentBoss.id = 98;
+  G.cbt.en.push(G.currentBoss);
+  lg('🐉 Vaelithorn, the Ancient Wyrm, opens one eye. This will take everything you have.');
+  lg('   ' + VAELITHORN.desc);
+  render();
+}
+
+function handleDragonHuntVictory() {
+  const txp = G.cbt.en.reduce((s, e) => s + e.xp, 0);
+  const tg2 = G.cbt.en.reduce((s, e) => s + e.g, 0);
+  G.p.xp += txp;
+  G.p.gold += tg2;
+  G.p.bossKills = (G.p.bossKills || 0) + 1;
+  G.dragonHunt.cleared++;
+  checkAchievements();
+
+  lg('🎉 VAELITHORN FALLS! +' + txp + ' XP, +' + tg2 + 'G');
+  lg('🐉 The hoard is yours.');
+
+  // The massive hoard — a large flat gold bonus plus guaranteed high-rarity loot,
+  // separate from and on top of the normal combat rewards above.
+  const hoardGold = 15000 + Math.floor(Math.random() * 10000);
+  G.p.gold += hoardGold;
+  lg('💰 HOARD: +' + hoardGold + 'G');
+
+  const hoardSlots = ['weapon', 'armor', 'amulet'];
+  for (let slot of hoardSlots) {
+    const item = generateItem(slot, 50, 'legendary');
+    if (item) {
+      addI(item);
+      lg('✨ HOARD: ' + item.n + ' (Legendary)');
+    }
+  }
+  const epicSlots = ['ring', 'head', 'hands'];
+  const epicSlot = epicSlots[Math.floor(Math.random() * epicSlots.length)];
+  const epicItem = generateItem(epicSlot, 50, 'epic');
+  if (epicItem) {
+    addI(epicItem);
+    lg('✨ HOARD: ' + epicItem.n + ' (Epic)');
+  }
+
+  G.currentBoss = null;
+  G.cbt.autoCombat = false;
+  G.cbt.on = false;
+  G.dragonHunt.active = false;
+  G.state = 'menu';
+  lvlup();
+  render();
+}
+
 function claimStronghold(id) {
   const def = STRONGHOLDS[id];
   if (!def) return;
@@ -5127,6 +5206,7 @@ function doPhysicalAttack(target) {
   
   let finalDamage = Math.max(1, damageResult.total - Math.floor((target.def || 0) / 2));
   target.hp -= finalDamage;
+  showEnemyDamage(target, finalDamage, attackResult.isCrit);
   
   const dmgFlavor = getDamageFlavor(finalDamage, attackResult.isCrit);
   lg(dmgFlavor + ' Staff swing hits ' + target.n + ' for ' + finalDamage + '!');
@@ -5284,6 +5364,7 @@ function doPartyAttack(member) {
   
   let finalDamage = Math.max(1, damageResult.total - Math.floor((target.def || 0) / 3));
   target.hp -= finalDamage;
+  showEnemyDamage(target, finalDamage, attackResult.isCrit);
   
   const critTag = attackResult.isCrit ? ' 💥CRIT' : '';
   lg('⚔️ ' + member.n + ' hits ' + target.n + ' for ' + finalDamage + critTag);
@@ -5303,10 +5384,12 @@ function doEnemyAttack(enemy) {
     for (let s of enemy.status) {
       if (s.type === 'burn' && s.dmg) {
         enemy.hp -= s.dmg;
+        showEnemyDamage(enemy, s.dmg, false);
         lg('🔥 ' + enemy.n + ' takes ' + s.dmg + ' burn damage!');
       }
       if (s.type === 'poison' && s.dmg) {
         enemy.hp -= s.dmg;
+        showEnemyDamage(enemy, s.dmg, false);
         lg('☠️ ' + enemy.n + ' takes ' + s.dmg + ' poison damage!');
       }
       if (s.type === 'shock') {
@@ -5395,8 +5478,7 @@ function doEnemyAttack(enemy) {
   }
   
   target.hp -= finalDamage;
-  
-  const critTag = attackResult.isCrit ? ' 💥CRIT' : '';
+  if (target === G.p) showPlayerDamage(finalDamage, attackResult.isCrit);
   lg('🗡️ ' + enemy.n + ' hits ' + (target.n || 'you') + ' for ' + finalDamage + critTag);
 
   // Eliz's The Space Between: when her own strength gives out mid-fight, she finds one
@@ -6256,6 +6338,7 @@ function pa(si, ti) {
   finalDamage = applySynergyDamage(finalDamage, 'spell');
   finalDamage = Math.max(1, finalDamage);
   tg.hp -= finalDamage;
+  showEnemyDamage(tg, finalDamage, isCrit);
   
   const dmgFlavor = getDamageFlavor(finalDamage, isCrit);
   lg(dmgFlavor + ' ' + sk.n + ' deals ' + finalDamage + ' to ' + tg.n + '!');
@@ -7657,6 +7740,29 @@ handleDefeat = function() {
   }
 };
 
+const _originalHandleVictoryForDragon = handleVictory;
+handleVictory = function() {
+  if (G.dragonHunt.active) handleDragonHuntVictory();
+  else _originalHandleVictoryForDragon();
+};
+
+const _originalHandleDefeatForDragon = handleDefeat;
+handleDefeat = function() {
+  if (G.dragonHunt.active) {
+    if (checkSecondWind()) { render(); return; }
+    lg('💀 Vaelithorn proves too much this time. The wyrm sleeps on, hoard untouched.');
+    G.p.hp = 1;
+    for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
+    G.cbt.autoCombat = false;
+    G.cbt.on = false;
+    G.dragonHunt.active = false;
+    G.state = 'menu';
+    render();
+  } else {
+    _originalHandleDefeatForDragon();
+  }
+};
+
 function sc(zi) {
   const z=G.zones[zi];
   // 30% chance for explore event before combat
@@ -8053,6 +8159,32 @@ function cf(){if(ft)clearInterval(ft);setS('menu');lg('Focus cancelled.');render
 // grind (bounty progress, contract progress) and for events worth a brief heads-up
 // without cluttering the main log or requiring a screen change. Distinct from lg(),
 // which is the permanent scrolling log — toasts are ephemeral and supplementary.
+// Floating damage number over a specific DOM element (an enemy card, San's HP bar, etc.)
+// Purely cosmetic — never touches game state, safe to call from anywhere damage resolves.
+function showFloatingDamage(el, amount, opts = {}) {
+  if (!el) return;
+  if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+  const span = document.createElement('div');
+  span.className = 'dmg-float' + (opts.crit ? ' crit' : '') + (opts.heal ? ' heal' : '');
+  span.textContent = (opts.heal ? '+' : '-') + amount;
+  el.appendChild(span);
+  setTimeout(() => span.remove(), 900);
+}
+
+// Enemy took damage — finds that enemy's card by its position in G.cbt.en.
+function showEnemyDamage(target, amount, isCrit) {
+  const idx = G.cbt.en.indexOf(target);
+  if (idx < 0) return;
+  const el = document.querySelector('.ecard-compact[data-i="' + idx + '"] .hps');
+  showFloatingDamage(el, amount, { crit: isCrit });
+}
+
+// San took damage — anchors to his HP bar specifically.
+function showPlayerDamage(amount, isCrit) {
+  const el = document.querySelector('.hdr-r .bar');
+  showFloatingDamage(el, amount, { crit: isCrit });
+}
+
 function showToast(text, type) {
   let stack = document.querySelector('.toast-stack');
   if (!stack) {
@@ -8246,6 +8378,7 @@ function saveGame() {
     guildRepBalance: G.guildRepBalance,
     guildContracts: G.guildContracts.map(c => ({ id: c.id, c: c.c, done: c.done, refreshWeek: c.refreshWeek })),
     strongholdSiege: G.strongholdSiege,
+    dragonHuntCleared: G.dragonHunt.cleared,
     strongholdStipendDay: G.strongholdStipendDay,
     strongholds: G.strongholds
   };
@@ -8431,6 +8564,7 @@ function loadGame() {
       }
     }
     G.strongholdSiege = data.strongholdSiege || {};
+    G.dragonHunt.cleared = data.dragonHuntCleared || 0;
     G.strongholdStipendDay = data.strongholdStipendDay !== undefined ? data.strongholdStipendDay : -1;
 
     G.p.lvl = data.player.lvl;
@@ -9016,6 +9150,7 @@ function render(){
   else if(G.state=='raid_room')h+=rRaidRoom();
   else if(G.state=='guild')h+=rGuild();
   else if(G.state=='stronghold')h+=rStrongholds();
+  else if(G.state=='dragon_hunt')h+=rDragonHunt();
 
   h+='</div>';
   h+='<div class="log" id="log">'+G.log.map(m=>'<div class="le">'+m+'</div>').join('')+'</div>';
@@ -9042,7 +9177,8 @@ function attachEvents() {
     else if(a=='runes')setS('runes');
     else if(a=='journal')setS('journal');
     else if(a=='guild')setS('guild');
-    else if(a=='stronghold')setS('stronghold');});
+    else if(a=='stronghold')setS('stronghold');
+    else if(a=='dragon_hunt')setS('dragon_hunt');});
   });
  const btnClaimLogin = document.getElementById('btn-claim-login');
 if (btnClaimLogin) {
@@ -9989,6 +10125,42 @@ function rRaidRoom() {
 }
 
 
+function rDragonHunt() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">🐉 Dragon Hunt</div>';
+
+  const unlocked = isDragonHuntUnlocked();
+
+  h += '<div class="panel' + (unlocked ? ' panel-gold' : '') + '" style="text-align:center;">';
+  h += '<div class="panel-title" style="' + (unlocked ? 'color:var(--gold);' : '') + '">' + VAELITHORN.n + '</div>';
+  h += '<div class="btn-hint" style="margin:10px 0;line-height:1.5;">' + VAELITHORN.desc + '</div>';
+  if (G.dragonHunt.cleared > 0) {
+    h += '<div style="font-size:12px;color:var(--gold);font-weight:600;margin-bottom:10px;">🏆 Slain ' + G.dragonHunt.cleared + ' time' + (G.dragonHunt.cleared > 1 ? 's' : '') + '</div>';
+  }
+  h += '</div>';
+
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">What to Expect</div>';
+  h += '<div class="btn-hint" style="line-height:1.6;">A single, brutally long fight — no waves, no gimmicks, just a dragon with far more HP than anything else in this game. Expect many, many rounds. It breathes fire across your whole party every 4 turns. Bring healing.</div>';
+  h += '</div>';
+
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">The Hoard</div>';
+  h += '<div class="btn-hint" style="line-height:1.6;">On victory: a massive gold windfall (15,000\u201325,000G), three guaranteed Legendary items, and a guaranteed Epic item \u2014 on top of normal XP and gold. Repeatable.</div>';
+  h += '</div>';
+
+  if (unlocked) {
+    h += '<button onclick="startDragonHunt()" class="abtn" style="width:100%;">🐉 Wake the Wyrm</button>';
+  } else {
+    h += '<div class="panel" style="text-align:center;">';
+    h += '<div class="btn-hint">🔒 Unlocks at Level ' + DRAGON_HUNT_UNLOCK_LEVEL + ' (currently Level ' + G.p.lvl + ')</div>';
+    h += '</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
 function rStrongholds() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🗼 Strongholds</div>';
@@ -10109,6 +10281,9 @@ function rMenu(){
     {i:'⚔️',l:'Raid Mode',d:'Boss gauntlets + elites',a:'raid_select'},
   ];
   const sections=[
+    { title: '🐉 Legendary Hunts', items: [
+      {i:'🐉',l:'Dragon Hunt',a:'dragon_hunt'},
+    ]},
     { title: '🏰 Guild & Stronghold', items: [
       {i:'🛡️',l:'Guild',a:'guild'},
       {i:'🗼',l:'Stronghold',a:'stronghold'},
