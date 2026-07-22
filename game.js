@@ -5977,9 +5977,9 @@ function handleVictory() {
   for (let q of G.quests) {
     if (q.done) continue;
     if (q.hidden && !q.revealed) continue;
-    if (q.t === 'reach_level' && G.p.lvl >= q.need) {
-      q.c = q.need;
-      checkQ();
+    if (q.t === 'reach_level') {
+      q.c = Math.min(G.p.lvl, q.need); // always reflect real progress, not just 0-until-complete
+      if (G.p.lvl >= q.need) checkQ();
     }
   }
 
@@ -7325,8 +7325,13 @@ function leaveAndResetGrind() {
 }
 
 function startGrindWave() {
-    // Allow starting wave even when active is false (between waves)
-  
+  // Always self-activates — any path that starts a wave (fresh start, resume after
+  // rest, resume after a defeat that cleared this flag) is unambiguously "in a grind
+  // session" the moment a wave begins. Previously this was left to the caller to set,
+  // which silently broke resuming after rest/defeat: the wave would play out fine but
+  // the victory would route to the wrong handler since 'active' was still false.
+  G.endlessGrind.active = true;
+
   G.endlessGrind.wave++;
   G.cbt.on = true;
   G.cbt.turn = 0;
@@ -7925,6 +7930,11 @@ function lvlup(){
     checkJournalLevelUnlocks();
     checkStoryUnlock();
     checkGuildUnlock();
+    for (let q of G.quests) {
+      if (!q.done && !(q.hidden && !q.revealed) && q.t === 'reach_level') {
+        q.c = Math.min(G.p.lvl, q.need);
+      }
+    }
     checkQ();
   }
   if (G.p.lvl > startLvl && typeof triggerLevelUpAnimation === 'function') {
@@ -9030,7 +9040,9 @@ function attachEvents() {
     else if(a=='skilltree')setS('skilltree');
     else if(a=='talents')setS('talents');
     else if(a=='runes')setS('runes');
-    else if(a=='journal')setS('journal');});
+    else if(a=='journal')setS('journal');
+    else if(a=='guild')setS('guild');
+    else if(a=='stronghold')setS('stronghold');});
   });
  const btnClaimLogin = document.getElementById('btn-claim-login');
 if (btnClaimLogin) {
@@ -9804,8 +9816,10 @@ function rGrindRoom() {
   h += '<div class="st" style="text-align:center;">⚔️ Endless Grind Room</div>';
   
   // Stats bar
+  const effectiveLv = Math.min(G.p.lvl, Math.floor(g.wave / 3) + 1);
   h += '<div class="pstat">';
   h += '<span class="mst">Wave: <b>' + g.wave + '</b></span>';
+  h += '<span class="mst" title="Enemies this wave are drawn from zones up to this level">Enemy Lv: <b>' + effectiveLv + '</b></span>';
   h += '<span class="mst">Kills: <b>' + g.totalKills + '</b></span>';
   h += '<span class="mst">XP: <b>' + g.totalXp + '</b></span>';
   h += '<span class="mst" style="color:var(--gold)">Gold: <b>' + g.totalGold + '</b></span>';
@@ -10206,20 +10220,55 @@ function getZoneIcon(zoneName) {
   return ZONE_ICON_SVGS[key] || ZONE_ICON_SVGS.default;
 }
 
+// Level ranges for the zone map tabs — one per Act, plus the original pre-Act content.
+const ZONE_MAP_TABS = [
+  { label: 'Main Story', min: 1, max: 29 },
+  { label: 'Act I', min: 30, max: 35 },
+  { label: 'Act II', min: 36, max: 40 },
+  { label: 'Act III', min: 41, max: 45 },
+  { label: 'Act IV', min: 46, max: 50 },
+];
+
+function setExploreMapTab(idx) {
+  G.exploreMapTab = idx;
+  render();
+}
+
 function rExp(){
   let h='<div class="explore-view"><h2 class="st">Adventure Zones</h2>';
+  h += rZoneMapTabs();
   h += rZoneMapView();
   h += '</div>';
   return h;
 }
 
+function rZoneMapTabs() {
+  if (G.exploreMapTab === undefined) G.exploreMapTab = 0;
+  let h = '<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;">';
+  for (let i = 0; i < ZONE_MAP_TABS.length; i++) {
+    const tab = ZONE_MAP_TABS[i];
+    const sel = G.exploreMapTab === i;
+    h += '<button onclick="setExploreMapTab(' + i + ')" class="tier-btn' + (sel ? ' sel' : '') + '" style="flex-shrink:0;">' + tab.label + '</button>';
+  }
+  h += '</div>';
+  return h;
+}
+
 function rZoneMapView() {
+  if (G.exploreMapTab === undefined) G.exploreMapTab = 0;
+  const range = ZONE_MAP_TABS[G.exploreMapTab] || ZONE_MAP_TABS[0];
+  // Keep each zone's TRUE index into G.zones (not the filtered array's position) —
+  // the click handler reads data-i to look up G.zones[i] directly.
+  const zonesWithIndex = G.zones
+    .map((z, i) => ({ z, i }))
+    .filter(({ z }) => z.lv >= range.min && z.lv <= range.max);
+
   const spacingY = 110;
   const centerX = 150;
   const amplitude = 100;
-  const height = G.zones.length * spacingY + 80;
+  const height = zonesWithIndex.length * spacingY + 80;
 
-  const points = G.zones.map((z, i) => ({
+  const points = zonesWithIndex.map((_, i) => ({
     x: Math.round(centerX + amplitude * Math.sin(i * 0.8)),
     y: 50 + i * spacingY
   }));
@@ -10230,8 +10279,9 @@ function rZoneMapView() {
   h += '<polyline points="' + points.map(p => p.x + ',' + p.y).join(' ') + '" fill="none" stroke="var(--border)" stroke-width="3" stroke-dasharray="6,6"/>';
   h += '</svg>';
 
-  for (let i = 0; i < G.zones.length; i++) {
-    const z = G.zones[i], lk = G.p.lvl < z.lv, p = points[i];
+  for (let idx = 0; idx < zonesWithIndex.length; idx++) {
+    const { z, i } = zonesWithIndex[idx], p = points[idx];
+    const lk = G.p.lvl < z.lv;
     const dc = z.dg=='low'?'var(--success)':z.dg=='medium'?'var(--gold)':z.dg=='high'?'var(--el-fire)':z.dg=='very high'?'var(--danger)':'var(--el-void)';
     const isBossZone = G.bosses.some(b => b.zone === z.n);
     h += '<div class="zcard map-node' + (lk ? ' locked' : '') + '" data-i="' + i + '" style="border-color:' + dc + ';background:radial-gradient(circle at 35% 30%, color-mix(in srgb, ' + dc + ' 20%, var(--bg-card)), var(--bg-card));left:' + p.x + 'px;top:' + p.y + 'px;" title="' + z.n + ' (Lv.' + z.lv + ')">';
@@ -10248,6 +10298,57 @@ function rZoneMapView() {
 }
 
 
+
+// Rest site map — same winding-path visual language as the zone map, for consistency.
+// Camps/taverns show their parent zone's own icon; temples and mana springs keep their
+// distinct icons (⛪ / 💧) since those are meaningfully different kinds of stops, not just
+// another camp in that zone.
+function rRestSitesMap(healerOk) {
+  const visibleSites = G.rest.sites.filter(s => {
+    const zoneSiblings = G.rest.sites.filter(x => x.zone === s.zone);
+    return zoneSiblings.some(x => x.unlocked);
+  });
+  if (visibleSites.length === 0) return '<div style="text-align:center;color:var(--text-dim);font-size:12px;padding:20px;">No rest sites discovered yet.</div>';
+
+  const spacingY = 100, centerX = 150, amplitude = 90;
+  const height = visibleSites.length * spacingY + 80;
+  const points = visibleSites.map((s, i) => ({
+    x: Math.round(centerX + amplitude * Math.sin(i * 0.8)),
+    y: 50 + i * spacingY
+  }));
+
+  let h = '<div style="position:relative;width:300px;max-width:100%;margin:0 auto;height:' + height + 'px;">';
+  h += '<svg viewBox="0 0 300 ' + height + '" style="position:absolute;top:0;left:0;width:100%;height:100%;" preserveAspectRatio="none">';
+  h += '<polyline points="' + points.map(p => p.x + ',' + p.y).join(' ') + '" fill="none" stroke="var(--border)" stroke-width="3" stroke-dasharray="6,6"/>';
+  h += '</svg>';
+
+  for (let i = 0; i < visibleSites.length; i++) {
+    const s = visibleSites[i], p = points[i];
+    let manaSpringRemaining = 8;
+    if (G.manaSpringUses.day === G.gameDay) manaSpringRemaining = 8 - G.manaSpringUses.count;
+    const isDepletedManaSpring = s.type === 'mana_spring' && manaSpringRemaining <= 0;
+    const locked = !s.unlocked || isDepletedManaSpring;
+    const canAfford = !s.cost || G.p.gold >= s.cost;
+
+    const icon = (s.type === 'camp' || s.type === 'tavern') ? getZoneIcon(s.zone) : s.icon;
+    const nodeColor = s.stronghold ? 'var(--gold)' : s.type === 'temple' ? 'var(--danger)' : s.type === 'mana_spring' ? 'var(--mp)' : 'var(--accent)';
+    const subLabel = locked
+      ? (isDepletedManaSpring ? manaSpringRemaining + '/8 today' : 'Lv.' + s.zoneLv)
+      : (s.cost ? s.cost + 'G' : 'Free');
+
+    h += '<div class="rs-card map-node' + (locked ? ' locked' : '') + '" data-id="' + s.id + '" style="border-color:' + nodeColor + ';background:radial-gradient(circle at 35% 30%, color-mix(in srgb, ' + nodeColor + ' 20%, var(--bg-card)), var(--bg-card));left:' + p.x + 'px;top:' + p.y + 'px;' + (!canAfford && !locked ? 'opacity:0.6;' : '') + '" title="' + s.name + ' — ' + s.desc.replace(/"/g, '&quot;') + '">';
+    h += '<span class="map-node-icon">' + icon + '</span>';
+    if (s.stronghold) h += '<div class="map-node-boss">🏰</div>';
+    if (locked) h += '<div class="map-node-lock">🔒</div>';
+    h += '</div>';
+    h += '<div class="map-node-name" style="left:' + p.x + 'px;top:' + (p.y + 34) + 'px;">' + s.name + '</div>';
+    h += '<div class="map-node-sub" style="left:' + p.x + 'px;top:' + (p.y + 46) + 'px;">' + subLabel + '</div>';
+  }
+
+  h += '</div>';
+  h += '<div style="font-size:10px;color:var(--text-dim);text-align:center;margin-top:8px;">' + (healerOk ? '💚 Healer available' : '❌ No healer in party') + ' — tap a site to rest. Hold for details.</div>';
+  return h;
+}
 
 function rCbt() {
   let h = '<div class="combat-view"><h2 class="st">' + (G.currentBoss ? '⚔️ BOSS FIGHT' : 'Combat') + '</h2>';
@@ -11130,57 +11231,7 @@ function rRest() {
     h2 += rGuildHallPanel(strongholdId);
   }
   h2 += '<div class="rest-sites">';
-  const zones = {};
-  for (let site of G.rest.sites) {
-    if (!zones[site.zone]) zones[site.zone] = [];
-    zones[site.zone].push(site);
-  }
-  for (let zoneName in zones) {
-    const sites = zones[zoneName];
-    const anyUnlocked = sites.some(s => s.unlocked);
-    if (!anyUnlocked) continue;
-    h2 += '<div style="margin-bottom:12px;">';
-    h2 += '<div style="font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">' + zoneName + '</div>';
-    for (let site of sites) {
-    let manaSpringRemaining = 8;
-    if (G.manaSpringUses.day === G.gameDay) {
-        manaSpringRemaining = 8 - G.manaSpringUses.count;
-      }
-      const isDepletedManaSpring = site.type === 'mana_spring' && manaSpringRemaining <= 0;
-
-      const locked = !site.unlocked || isDepletedManaSpring;
-
-      const canAfford = !site.cost || G.p.gold >= site.cost;
-      const canRest = (site.type === 'mana_spring' || site.type === 'temple' || healerOk) && !locked && canAfford;
-      h2 += '<div class="rs-card ' + (locked ? 'locked' : '') + '" data-id="' + site.id + '">';
-      h2 += '<div class="rs-head">';
-      h2 += '<span class="rs-name">' + site.icon + ' ' + site.name + (site.stronghold ? ' <span style="color:var(--gold);">🏰</span>' : '') + '</span>';
-      h2 += '<span class="rs-type ' + site.type + '">' + site.type.toUpperCase() + '</span>';
-      h2 += '</div>';
-      if (site.stronghold) {
-        h2 += '<div style="font-size:10px;color:var(--gold);font-weight:600;margin-bottom:4px;">🏰 YOUR STRONGHOLD — free, always open</div>';
-      }
-      h2 += '<div class="rs-desc">' + site.desc + '</div>';
-            if (locked) {
-            if (isDepletedManaSpring) {
-          h2 += '<div class="rs-req fail">💧 Daily limit reached (8/8 uses)</div>';
-
-        } else {
-          h2 += '<div class="rs-req fail">🔒 Requires Level ' + site.zoneLv + ' to discover</div>';
-        }
-      } else if (site.cost) {
-
-                const msUsesLeft = site.type === 'mana_spring' ? ' (' + manaSpringRemaining + '/8 today)' : '';
-        h2 += '<div class="rs-req ' + (canAfford ? 'ok' : 'fail') + '">' + (canAfford ? '✅' : '❌') + ' Cost: ' + site.cost + 'G' + msUsesLeft + ' · Ambush: 5% | ' + (canRest ? 'Tap to rest' : 'Cannot rest') + '</div>';
-
-
-      } else {
-        h2 += '<div class="rs-req ' + (healerOk ? 'ok' : 'fail') + '">' + (healerOk ? '✅' : '❌') + ' Free · Ambush: 15% | ' + (canRest ? 'Tap to rest' : 'Cannot rest') + '</div>';
-      }
-      h2 += '</div>';
-    }
-    h2 += '</div>';
-  }
+  h2 += rRestSitesMap(healerOk);
   h2 += '</div>';
   h2 += '<div style="font-size:11px;color:var(--text-dim);text-align:center;margin-top:8px;">Rest takes ~7.5 seconds. Party banter every tick. Taverns cost gold but are safer.</div>';
   h2 += '</div>';
