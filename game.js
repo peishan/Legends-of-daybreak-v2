@@ -117,7 +117,7 @@ const G = {
       { n: 'Iron Ore', t: 'mat', q: 3, r: 'common' },
       { n: 'Herb Bundle', t: 'mat', q: 4, r: 'common' }
     ],
-    buffs: [], kills: 0, quests: 0, fstreak: 0, bossKills: 0, crafts: 0, survivedCritical: false
+    buffs: [], ailments: [], kills: 0, quests: 0, fstreak: 0, bossKills: 0, crafts: 0, survivedCritical: false
   },
   party: [
     { n: 'Joel', t: 'The Steadfast', r: 'Tank', hp: 120, mhp: 120, atk: 6, def: 8, spd: 4, on: true, d: 'Your partner and shield. Never lets you fight alone. A steadfast man from a Philippine village, second of four, breadwinner, stray-feeder, yours. He does not ask why you are here. He asks if you will let him stand beside you while you find out.', b: '+10% Max HP', col: '#7c3aed', affinityBonuses: [], gear: null, base: { mhp: 120, atk: 6, def: 8, spd: 4 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
@@ -4158,6 +4158,70 @@ function buyGuildItem(index) {
 // snapshot of its original stats the first time), so every existing stat-reading function
 // in combat/UI picks up the change automatically with no other code needing to know the
 // forge exists.
+// === AILMENTS: DISEASE & CURSE (BG2-style) ===
+// Distinct from burn/poison/shock (which are short combat-only DoTs on enemies) — ailments
+// afflict San specifically, persist through rest (unlike G.p.buffs, which decay each
+// combat turn and are meant to be temporary), and only clear via a deliberate cure: the
+// Temple's paid service, or Eliz's high-level passive. Scoped to San only for this pass —
+// companions don't currently have an equivalent debuff channel, and retrofitting one here
+// risked destabilizing the existing per-companion growth-ability system.
+const AILMENT_TYPES = {
+  disease: { n: 'Rotting Plague', atkMult: 0.75, defMult: 0.85, dmgPerTurn: 4, icon: '🤢' },
+  curse:   { n: 'Withering Curse', atkMult: 0.80, defMult: 0.75, dmgPerTurn: 0, icon: '💀' }
+};
+const AILMENT_INFLICT_CHANCE = 0.12;
+const ELIZ_CLEANSING_UNLOCK = 40;
+const ELIZ_CLEANSING_CHANCE = 0.30;
+const TEMPLE_CURE_COST = 100;
+
+function inflictAilment(type) {
+  if (G.p.ailments.some(a => a.type === type)) return; // no stacking the same ailment
+  const def = AILMENT_TYPES[type];
+  G.p.ailments.push({ type, n: def.n });
+  lg((type === 'disease' ? '🤢' : '💀') + ' You have contracted ' + def.n + '! ATK and DEF weakened until cured \u2014 rest alone will not fix this.');
+}
+
+function cureAilments(silent) {
+  if (G.p.ailments.length === 0) return false;
+  G.p.ailments = [];
+  if (!silent) lg('✨ All afflictions cured.');
+  return true;
+}
+
+function getAilmentMult(stat) {
+  let mult = 1;
+  for (let a of G.p.ailments) {
+    const def = AILMENT_TYPES[a.type];
+    if (stat === 'atk' && def.atkMult) mult *= def.atkMult;
+    if (stat === 'def' && def.defMult) mult *= def.defMult;
+  }
+  return mult;
+}
+
+// Called once per combat round (San's turn) — disease damage tick, plus a chance for
+// Eliz's Sacred Cleansing to cure something if she's high-level, active, and alive.
+function tickAilments() {
+  if (G.p.ailments.length === 0) return;
+  let diseaseDmg = 0;
+  for (let a of G.p.ailments) {
+    const def = AILMENT_TYPES[a.type];
+    if (def.dmgPerTurn) diseaseDmg += def.dmgPerTurn;
+  }
+  if (diseaseDmg > 0) {
+    G.p.hp = Math.max(1, G.p.hp - diseaseDmg);
+    lg('🤢 The plague saps ' + diseaseDmg + ' HP.');
+  }
+
+  const eliz = G.party.find(p => p.n === 'Eliz' && p.on && p.hp > 0);
+  if (eliz && G.p.lvl >= ELIZ_CLEANSING_UNLOCK && Math.random() < ELIZ_CLEANSING_CHANCE) {
+    const cured = G.p.ailments.shift();
+    if (cured) {
+      lg('💚 Eliz reaches for the affliction like it\'s just another wound. ' + AILMENT_TYPES[cured.type].n + ' cured.');
+    }
+  }
+}
+
+
 const FORGE_UNLOCK_LEVEL = 20;
 const FORGE_MAX_LEVEL = 5;
 const FORGE_COSTS = [200, 500, 1200, 2500, 5000]; // cost to go from level index to index+1
@@ -5311,7 +5375,7 @@ function doPhysicalAttack(target) {
     bonus: (G.p.eq.weapon ? Math.floor(G.p.eq.weapon.atk / 2) : 0) + hasteBonus
   });
   
-  let finalDamage = Math.max(1, damageResult.total - Math.floor((target.def || 0) / 2));
+  let finalDamage = Math.max(1, Math.floor((damageResult.total - Math.floor((target.def || 0) / 2)) * getAilmentMult('atk')));
   target.hp -= finalDamage;
   showEnemyDamage(target, finalDamage, attackResult.isCrit);
   
@@ -5568,7 +5632,7 @@ function doEnemyAttack(enemy) {
     let finalDamage = damageResult.total;
   const zakiCourageDef = (target !== G.p && target.n === 'Zaki' && checkZakiCourage()) ? 4 : 0;
   const targetDef = target === G.p 
-    ? (G.p.eq.armor ? G.p.eq.armor.def : 0) + G.p.buffs.reduce((s, b) => s + (b.def || 0), 0)
+    ? ((G.p.eq.armor ? G.p.eq.armor.def : 0) + G.p.buffs.reduce((s, b) => s + (b.def || 0), 0)) * getAilmentMult('def')
     : (target.def || 0) + getBlessDef(target) + zakiCourageDef;
 
   finalDamage = Math.max(1, finalDamage - Math.floor(targetDef / 2));
@@ -5585,8 +5649,40 @@ function doEnemyAttack(enemy) {
   }
   
   target.hp -= finalDamage;
-  if (target === G.p) showPlayerDamage(finalDamage, attackResult.isCrit);
+
+  // HP safety runs FIRST, immediately after the decrement — before any side-effect code
+  // (ailment rolls, floating numbers, growth-ability checks) that could throw and abort
+  // the rest of this function. If that side-effect code throws, the outer auto-combat
+  // catch recovers the tick, but everything below this point would simply never run,
+  // which previously could leave HP negative and unclamped, and skip Soel's/Eliz's
+  // unkillable protection entirely if they happened to be the target at that moment.
+  let protectionMsg = null;
+  if (target.hp <= 0) {
+    if (target !== G.p && target.passive === 'guardian_spirit') {
+      target.hp = 1;
+      protectionMsg = '✨ ' + target.n + "'s Guardian Spirit shines! She endures at 1 HP!";
+    } else if (target !== G.p && target.n === 'Soel') {
+      target.hp = 1;
+      protectionMsg = '🔥 Soel flickers like a spirit flame! He cannot be killed — he reforms at 1 HP!';
+    } else if (target !== G.p && target.n === 'Joel' && hasAffinityUnlock('Joel', 'unbreakable') && !G.joelReviveUsed) {
+      G.joelReviveUsed = true;
+      target.hp = Math.floor(target.mhp * 0.5);
+      protectionMsg = '💜 UNBREAKABLE! Joel refuses to fall — he rises again at ' + target.hp + ' HP! (Once per rest)';
+    } else {
+      target.hp = 0;
+      protectionMsg = '💀 ' + (target.n || 'You') + ' fall unconscious!';
+    }
+  }
+
+  if (target === G.p) {
+    showPlayerDamage(finalDamage, attackResult.isCrit);
+    if (Math.random() < AILMENT_INFLICT_CHANCE) {
+      if (getEnemyArchetype(enemy.n) === 'undead') inflictAilment('disease');
+      else if (enemy.elem === 'void') inflictAilment('curse');
+    }
+  }
   lg('🗡️ ' + enemy.n + ' hits ' + (target.n || 'you') + ' for ' + finalDamage + critTag);
+  if (protectionMsg) lg(protectionMsg);
 
   // Eliz's The Space Between: when her own strength gives out mid-fight, she finds one
   // more reserve — a party-wide relief burst, triggered by crossing critical HP herself.
@@ -5598,23 +5694,6 @@ function doEnemyAttack(enemy) {
       if (p.on && p.hp > 0) p.hp = Math.min(p.mhp, p.hp + Math.floor(p.mhp * 0.15));
     }
     lg('   A light steadies the whole party, even as she herself is barely standing.');
-  }
-  
-  if (target.hp <= 0) {
-    if (target !== G.p && target.passive === 'guardian_spirit') {
-      target.hp = 1;
-      lg('✨ ' + target.n + "'s Guardian Spirit shines! She endures at 1 HP!");
-    } else if (target !== G.p && target.n === 'Soel') {
-      target.hp = 1;
-      lg('🔥 Soel flickers like a spirit flame! He cannot be killed — he reforms at 1 HP!');
-    } else if (target !== G.p && target.n === 'Joel' && hasAffinityUnlock('Joel', 'unbreakable') && !G.joelReviveUsed) {
-      G.joelReviveUsed = true;
-      target.hp = Math.floor(target.mhp * 0.5);
-      lg('💜 UNBREAKABLE! Joel refuses to fall — he rises again at ' + target.hp + ' HP! (Once per rest)');
-    } else {
-      target.hp = 0;
-      lg('💀 ' + (target.n || 'You') + ' fall unconscious!');
-    }
   }
 }
 
@@ -6040,11 +6119,6 @@ function finishPlayerTurn() {
   }
   
   eturn();
-  
-  if (G.p.hp <= 1 && G.p.hp > 0) {
-    G.cbt.autoFlee = true;
-  }
-
   // Soel's The Choice: if the whole party — San included — is on the brink at once,
   // and no one has fallen yet, he pulls everyone back together. Once per rest.
   if (G.p.hp > 0 && isGrowthAbilityReady('Soel')) {
@@ -6066,6 +6140,8 @@ function finishPlayerTurn() {
     return;
   }
   
+  tickAilments();
+
   if (G.p.hp <= 0) {
     handleDefeat();
     return;
@@ -6443,7 +6519,7 @@ function pa(si, ti) {
     lg('🌌 Rift surge! Damage ×' + riftDmgMult + '!');
   }
   finalDamage = applySynergyDamage(finalDamage, 'spell');
-  finalDamage = Math.max(1, finalDamage);
+  finalDamage = Math.max(1, Math.floor(finalDamage * getAilmentMult('atk')));
   tg.hp -= finalDamage;
   showEnemyDamage(tg, finalDamage, isCrit);
   
@@ -6511,7 +6587,12 @@ function eturn() {
   applyWeatherCombat(); // Weather system
 
   for (let e of G.cbt.en) {
-    doEnemyAttack(e);
+    try {
+      doEnemyAttack(e);
+    } catch (err) {
+      console.error('doEnemyAttack error for', e.n, ':', err);
+      // Don't let one enemy's malfunction cancel every other enemy's attack this tick.
+    }
   }
   
   handleBossMechanics();
@@ -6522,6 +6603,12 @@ function eturn() {
   
   for (let p of G.party) { if (p.frozen) p.frozen = false; }
   if (G.p.frozen) G.p.frozen = false;
+
+  // Final safety net: HP should never be negative by this point regardless of what ran
+  // above. Cheap insurance against the exact class of bug that caused negative HP and
+  // corrupted party state to persist and display in the Grind Room at high wave counts.
+  if (G.p.hp < 0) G.p.hp = 0;
+  for (let p of G.party) { if (p.hp < 0) p.hp = 0; }
 }
 
 function getBestSkill() {
@@ -6560,9 +6647,15 @@ function doAutoCombatTick() {
     
     if (G.p.hp <= 1) {
       G.cbt.autoCombat = false;
-      G.cbt.autoFlee = true;
       G.autoCombatHeartbeat = 0;
       lg('🤖 Auto-combat: HP critical! Forcing retreat...');
+      // Guaranteed exit, not the normal flee()'s 50-70% chance — a *forced* emergency
+      // retreat failing while already at 1 HP would defeat the entire point of it.
+      G.currentBoss = null;
+      G.cbt.on = false;
+      G.cbt.autoFlee = false;
+      G.state = 'explore';
+      render();
       return;
     }
     
@@ -8426,6 +8519,7 @@ function saveGame() {
       equipment: G.p.eq,
       inventory: G.p.inv,
       buffs: G.p.buffs,
+      ailments: G.p.ailments,
       kills: G.p.kills, quests: G.p.quests, fstreak: G.p.fstreak,
       storyJournal: { unlocked: G.storyJournal.unlocked, read: G.storyJournal.read },
 
@@ -8688,6 +8782,7 @@ function loadGame() {
     G.p.stats = data.player.stats;
     G.p.inv = (data.player.inventory || []).map(migrateLegacyItem);
     G.p.buffs = data.player.buffs || [];
+    G.p.ailments = data.player.ailments || [];
     G.p.kills = data.player.kills;
     G.p.quests = data.player.quests;
     G.p.fstreak = data.player.fstreak;
@@ -11479,8 +11574,28 @@ function rTemple() {
     }
     h2 += '</div>';
   }
+
+  if (G.p.ailments.length > 0) {
+    const canAffordCure = G.p.gold >= TEMPLE_CURE_COST;
+    h2 += '<div class="panel panel-danger" style="text-align:left;margin-top:16px;">';
+    h2 += '<div class="panel-title" style="color:var(--danger);">🤢 Afflicted</div>';
+    for (let a of G.p.ailments) {
+      h2 += '<div style="font-size:12px;color:var(--text-dim);margin:4px 0;">' + AILMENT_TYPES[a.type].icon + ' ' + a.n + ' \u2014 rest alone will not cure this</div>';
+    }
+    h2 += '<button onclick="templeCureAilments()" class="abtn' + (canAffordCure ? '' : ' dis') + '" style="width:100%;margin-top:8px;">Cure Afflictions (' + TEMPLE_CURE_COST + 'G)</button>';
+    h2 += '</div>';
+  }
+
   h2 += '</div>';
   return h2;
+}
+
+function templeCureAilments() {
+  if (G.p.gold < TEMPLE_CURE_COST) { lg('❌ Need ' + TEMPLE_CURE_COST + 'G to cure your afflictions.'); return; }
+  if (G.p.ailments.length === 0) return;
+  G.p.gold -= TEMPLE_CURE_COST;
+  cureAilments();
+  render();
 }
 
 function rSiegeBanner(strongholdId) {
