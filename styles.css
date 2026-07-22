@@ -566,6 +566,24 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 }
 .zcard.map-node:active:not(.locked) { transform: translate(-50%, -50%) scale(0.94); }
 .zcard.map-node.locked { opacity: 0.45; }
+.rs-card.map-node {
+  position: absolute;
+  width: 74px;
+  height: 74px;
+  padding: 0;
+  border-radius: 50%;
+  border-width: 2px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  margin: 0;
+  transition: transform 0.15s;
+}
+.rs-card.map-node:active:not(.locked) { transform: translate(-50%, -50%) scale(0.94); }
+.rs-card.map-node.locked { opacity: 0.45; }
+.rs-card.map-node .map-node-icon { font-size: 30px; }
 .map-node-icon { width: 40px; height: 40px; display: block; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)); }
 .map-node-icon svg { width: 100%; height: 100%; }
 .map-node-boss { position: absolute; top: -8px; right: -4px; font-size: 15px; }
@@ -635,5 +653,32 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 @keyframes toastOut {
   0% { transform: translateX(0); opacity: 1; }
   100% { transform: translateX(30px); opacity: 0; }
+}
+
+/* ============================================================
+   FLOATING DAMAGE NUMBERS
+   ============================================================ */
+.dmg-float-wrap { position: relative; }
+.dmg-float {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: #ff6b6b;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 8px rgba(255,107,107,0.5);
+  pointer-events: none;
+  z-index: 50;
+  animation: dmgFloat 0.9s ease-out forwards;
+  white-space: nowrap;
+}
+.dmg-float.crit { font-size: 21px; color: #ffd700; text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 12px rgba(255,215,0,0.7); }
+.dmg-float.heal { color: #4ade80; text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 8px rgba(74,222,128,0.5); }
+@keyframes dmgFloat {
+  0% { transform: translate(-50%, 4px) scale(0.7); opacity: 0; }
+  20% { transform: translate(-50%, -6px) scale(1.15); opacity: 1; }
+  100% { transform: translate(-50%, -38px) scale(1); opacity: 0; }
 }
 
