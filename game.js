@@ -513,7 +513,6 @@ const G = {
     { id: 2, n: 'Potion Brewer', d: 'Craft 2 potions', t: 'craft', c: 0, need: 2, rw: { xp: 30, g: 15 }, done: false },
     { id: 3, n: 'Focus Warrior', d: 'Complete any focus session (5–25 min)', t: 'focus', c: 0, need: 1, rw: { xp: 100, g: 50 }, done: false },
     { id: 4, n: "Joel's Shield Oath", d: 'Win 5 battles with Joel in your party', t: 'joel_battle', c: 0, need: 5, rw: { xp: 80, g: 40 }, done: false, chain: 'joel', reqQuest: null, reqParty: 'Joel' },
-    { id: 5, n: "Aisyah's Hidden Blade", d: 'Defeat 3 Skeletons in the Catacombs with Aisyah', t: 'aisyah_kill', c: 0, need: 3, rw: { xp: 120, g: 60 }, done: false, chain: 'aisyah', reqQuest: 4, reqParty: 'Aisyah', hidden: true, revealed: false },
     { id: 6, n: 'Rest with Eliz', d: 'Rest 3 times with Eliz in your active party before time runs out', t: 'rest_with', c: 0, need: 3, rw: { xp: 60, g: 30 }, done: false, timed: true, timer: 180, timerMax: 180, reqParty: 'Eliz' },
     { id: 7, n: "Senedra's Scout Report", d: 'Explore 3 different zones with Senedra before time runs out', t: 'explore_with', c: 0, need: 3, rw: { xp: 90, g: 45 }, done: false, timed: true, timer: 240, timerMax: 240, reqParty: 'Senedra' },
     { id: 8, n: "Aisyah's Ledger", d: 'Defeat 10 enemies in any zone with Aisyah to recover her lost trading notes', t: 'aisyah_battle', c: 0, need: 10, rw: { xp: 150, g: 100 }, done: false, hidden: true, revealed: false, chain: 'aisyah', reqQuest: 4, reqParty: 'Aisyah' },
@@ -1836,6 +1835,92 @@ storyJournal: {
           { speaker: 'San', text: 'You do not answer that, not directly. Instead you decide, together, without ever quite saying it out loud as a decision: not to decide. Not today. Not while there is still a tower to hold, a family to protect, a world still learning how to mend. The question stays open, honestly open, neither closed nor chased.' },
           { speaker: 'San', text: '"Priorities," you say, finally, sitting up, letting the morning actually start. "We focus on priorities. The rest finds us or it does not. Either way, we are still here for it."' },
           { speaker: 'Joel', text: '"Together," Joel says, like it was never actually in question. "Whatever the answer turns out to be."' }
+        ]
+      }
+
+      ,{
+        id: 'journal_044',
+        title: 'The Weight Learns to Rest',
+        chapter: 44,
+        unlockType: 'level',
+        unlockAt: 50,
+        icon: '🕯️',
+        summary: 'An echo of the Planarch explains why growing no longer has to be a sprint.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It happens the night after Daybreak, when the sky is still doing the impossible, gentle thing of just being morning. You feel it before you understand it — something in the shape of your own strength has shifted, quietly, like a held breath finally let go.' },
+          { speaker: 'Narrator', text: 'A light gathers at the edge of the camp, patient rather than urgent, and takes the shape of something you have not seen since the very beginning of all of this — not a memory, not quite a ghost. An echo of the Planarch, worn thin by time, watching you with something that might be relief.' },
+          { speaker: 'San', text: '"You\'re not really here," you say, more statement than question, staff already lowering because whatever this is, it is not a threat.' },
+          { speaker: 'Planarch (Echo)', text: '"No," the echo agrees, voice like the last note of a bell. "But some things leave a shape behind even after they stop being real. Call it an echo. Call it whatever helps you sleep. I came to explain something you already felt tonight, before you had words for it."' },
+          { speaker: 'San', text: '"The climbing," you say. "It feels different. Lighter, somehow, even though I know it is not actually easier."' },
+          { speaker: 'Planarch (Echo)', text: '"It was never really about difficulty," the echo says. "Since the day I died and the world came apart, every step you took had to outrun the damage — the Breaking never stopped accelerating, so neither could you. Each thing you learned had to be worth more than the last, just to keep pace with a world falling apart faster than you could heal it. That is why the climb kept getting steeper. Not cruelty. Arithmetic. Survival math, applied to a soul."' },
+          { speaker: 'Narrator', text: 'You think of every level before this one — how each felt harder won than the last, how you never quite had time to enjoy arriving before the next demand was already there, larger than the one before it.' },
+          { speaker: 'Planarch (Echo)', text: '"But you mended it," the echo continues, and for the first time sounds almost warm. "Not perfectly. Not all at once. But enough that the world is no longer accelerating away from you. It does not need you to outrun catastrophe anymore. It only needs you to keep walking. So the climb settles. Still real. Still yours to earn. Just no longer a sprint against a collapsing world."' },
+          { speaker: 'San', text: '"Why tell me this now?" you ask. "Why not before?"' },
+          { speaker: 'Planarch (Echo)', text: '"Because before, it would not have been true," the echo says, simply. "The math only changes once the reason for the old math is actually gone. You did that. Whatever comes next — and something always comes next — you get to meet it at a walk instead of a sprint. That is not a small thing. That might be the whole point of everything you just finished."' },
+          { speaker: 'Narrator', text: 'The light thins, unhurried, the way morning itself arrived — not vanishing so much as simply becoming part of the day. You are alone again, staff in hand, the camp quiet around you. But the weight feels different now. Not gone. Just finally allowed to rest.' },
+          { speaker: 'San', text: '"A walk, then," you say, to no one, and mean it as a promise as much as an observation.' }
+        ]
+      }
+
+      ,{
+        id: 'journal_045',
+        title: 'The Two Before Me',
+        chapter: 45,
+        unlockType: 'level',
+        unlockAt: 30,
+        icon: '🕯️',
+        summary: "San finally understands where her parents' overprotection actually came from.",
+        scenes: [
+          { speaker: 'Narrator', text: "You have spent most of your life thinking of your parents as simply traditional — conservative, careful, quick to worry, slow to loosen their grip. It is Joel, of all people, who asks the question that finally makes you say the rest of it out loud." },
+          { speaker: 'Joel', text: '"Were they always like that?" he asks. "The worry. I do not think I have ever seen a version of your family that was not bracing for something."' },
+          { speaker: 'San', text: '"Not always for the reason people assume," you say, slowly, because this is not a story you tell often. "Before me, my mother had two miscarriages. Back to back. She believed, religiously and completely, that both would have been boys. She never got to test that belief. She just carried the loss forward instead."' },
+          { speaker: 'Narrator', text: 'Joel does not fill the silence. He has learned, by now, exactly when not to.' },
+          { speaker: 'San', text: '"That is the real reason for the gap between me and my sisters," you continue. "Not planning. Grief, mostly, and fear after it. By the time I was born, my parents were not just raising a child. They were guarding one, the way you guard something you already know how to lose."' },
+          { speaker: 'San', text: '"I spent years being frustrated by how tightly they held on," you admit. "It took a long time to understand that the grip was not about control. It was about two names they never got to use, and a third child they were terrified of losing the same way."' },
+          { speaker: 'Joel', text: '"That does not make the overprotection easy to live with," Joel says, gently. "But it does make it easier to forgive."' },
+          { speaker: 'San', text: '"Both things are true," you agree. "I needed room to become myself. They needed to believe I would still be there to become it. We were both right, and it still took most of my life to stop being angry about it."' },
+          { speaker: 'Narrator', text: 'You think of your parents now — an ocean and several realities away — and for the first time in a long while, the thought does not come with resentment attached. Just two people who loved carefully because they had already learned, twice, exactly what it cost to lose someone before they even got a name.' }
+        ]
+      }
+      ,{
+        id: 'journal_046',
+        title: 'Before He Learned to Guard',
+        chapter: 46,
+        unlockType: 'level',
+        unlockAt: 33,
+        icon: '🕯️',
+        summary: "Joel tells San about his own parents' age-gap relationship, and what it cost his father.",
+        scenes: [
+          { speaker: 'Narrator', text: 'You ask Joel, one quiet evening, whether his own family ever had opinions about age gaps in relationships — half a joke, half a real question, given everything sitting between the two of you.' },
+          { speaker: 'Joel', text: '"They did, actually," Joel says, surprising you. "My parents had an age gap themselves. My father\'s parents — my grandparents — did not take it seriously at first. They assumed it would not last, that it was not a real relationship, just something to wait out."' },
+          { speaker: 'San', text: '"But it lasted," you say. "They had you."' },
+          { speaker: 'Joel', text: '"It lasted long enough," Joel says, and something in his voice shifts. "They married. Had children. But it did not survive my father\'s jealousy, in the end. They broke apart when I was in high school. Not suddenly — it had been coming for years. He was always strict, even before that. And after, he never really seemed to support any relationship I tried to have with anyone. Like he had decided, somewhere along the way, that trusting someone else with his son was not a risk worth taking."' },
+          { speaker: 'Narrator', text: "You watch him carefully, because Joel rarely talks about his father, and never for this long." },
+          { speaker: 'San', text: '"Is that part of why you asked, so plainly, whether I wanted you beside me?" you ask. "Instead of just assuming?"' },
+          { speaker: 'Joel', text: '"Probably," he admits. "I grew up watching my father guard everything so tightly that eventually there was nothing left worth guarding. I did not want to become that. I would rather ask and risk the answer than assume and lose the person."' },
+          { speaker: 'San', text: '"You did not become that," you tell him, certain of it in a way you rarely let yourself be certain of anything.' },
+          { speaker: 'Joel', text: '"Not yet," Joel says, quiet, almost a joke, almost not. "I am trying very hard to keep it that way."' }
+        ]
+      }
+      ,{
+        id: 'journal_047',
+        title: 'What Family Costs',
+        chapter: 47,
+        unlockType: 'level',
+        unlockAt: 38,
+        icon: '🕯️',
+        summary: "Joel's siblings — what his family survived, and what it is still carrying.",
+        scenes: [
+          { speaker: 'Narrator', text: 'The conversation about his parents opens a door Joel does not fully close again. A few nights later, unprompted, he tells you the rest — not all at once, but enough.' },
+          { speaker: 'Joel', text: '"My older sister had a similar story to my parents, in the beginning," he says. "An age gap, resistance from his side of the family. But hers went somewhere much worse than my parents\' ever did. Domestic violence. She had to remove herself from it — completely, no half measures. Her children, older now, live with my mother. That was not a small thing to walk away from. It was the right thing. Those are not always the same, and she did it anyway."' },
+          { speaker: 'San', text: 'You do not say anything clever. You just let him keep going, because this is clearly a story that needs to be told all the way through once it starts.' },
+          { speaker: 'Joel', text: '"I have four brothers, total, and one sister," he continues. "The brother right after me — we were estranged for a long stretch. I do not even remember exactly what started it anymore, which tells you something about how much it mattered in the end. We only really put it behind us after our father died. Grief has a way of making old arguments look very small."' },
+          { speaker: 'San', text: '"And now?" you ask.' },
+          { speaker: 'Joel', text: '"Now the trouble is my youngest brother," Joel says, and rubs a hand over his face, tired in a way that has nothing to do with combat. "The last of us. He started a family with no planning, no job to speak of. The child is with his girlfriend most of the time, but comes to my mother whenever the girlfriend is working. My mother never gets a real break from any of it — she just absorbs whatever the rest of us cannot hold."' },
+          { speaker: 'San', text: '"That sounds like a lot for one person to carry."' },
+          { speaker: 'Joel', text: '"It is," Joel agrees. "She is a beautician now — hairstyling, working alongside a few others after her own shop did not survive the pandemic. She rebuilt an entire career from nothing, on top of raising grandchildren that are not technically hers to raise. I do not think anyone in my family has ever once asked her if that was too much to ask. I try to send back what I can. It never feels like enough."' },
+          { speaker: 'San', text: '"You are allowed to worry about your family from here," you tell him. "It does not make you any less present for this one."' },
+          { speaker: 'Joel', text: '"I know," Joel says. "Knowing does not always make the worry smaller. But it helps, having somewhere to actually say it out loud instead of carrying it alone." He looks at you, steady as always. "Thank you for asking. Really asking, not just being polite about it."' }
         ]
       }
 
@@ -8383,11 +8468,16 @@ function lvlup(){
   const startLvl = G.p.lvl;
   while(G.p.xp>=G.p.xpN){
     G.p.xp-=G.p.xpN; G.p.lvl++;
-    // SOFTENED CURVE: 1.5x until Lv 15, then 1.35x for healthier late-game pacing
+    // SOFTENED CURVE: 1.5x until Lv 15, then 1.35x through 49, matching 1-50 exactly
+    // as it already plays. From 50 onward, 1.35x compounding forever is what made
+    // level 100 require quadrillions of XP — switching to a much gentler 1.06x here
+    // keeps post-50 progression proportional instead of continuing to accelerate.
     if(G.p.lvl < 15){
       G.p.xpN=Math.floor(G.p.xpN*1.5);
-    } else {
+    } else if(G.p.lvl <= 50){
       G.p.xpN=Math.floor(G.p.xpN*1.35);
+    } else {
+      G.p.xpN=Math.floor(G.p.xpN*1.06);
     }
     G.p.mhp+=10; G.p.mmp+=15; G.p.hp=G.p.mhp; G.p.mp=G.p.mmp;
     G.p.stats.int+=2; G.p.stats.con+=1;
@@ -8797,6 +8887,7 @@ function saveGame() {
     dragonHuntCleared: G.dragonHunt.cleared,
     strongholdCosmetics: G.strongholdCosmetics,
     bondingSeenScenes: G.bonding.seenScenes,
+    playerSpec: G.playerSpec,
     strongholdStipendDay: G.strongholdStipendDay,
     strongholds: G.strongholds
   };
@@ -8985,6 +9076,10 @@ function loadGame() {
     G.dragonHunt.cleared = data.dragonHuntCleared || 0;
     G.strongholdCosmetics = data.strongholdCosmetics || {};
     G.bonding.seenScenes = data.bondingSeenScenes || [];
+    if (data.playerSpec) {
+      G.playerSpec = data.playerSpec;
+      if (G.playerSpec.path && typeof applySpecEffects === 'function') applySpecEffects();
+    }
     G.strongholdStipendDay = data.strongholdStipendDay !== undefined ? data.strongholdStipendDay : -1;
 
     G.p.lvl = data.player.lvl;
