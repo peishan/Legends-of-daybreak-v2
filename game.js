@@ -7161,44 +7161,11 @@ function startRest(siteId) {
     return;
   }
   
-  // === TEMPLE: No healer required, instant service (pay and heal, no ticking ritual) ===
+  // === TEMPLE: Open the temple screen (revive / cure ailments / full heal) instead of
+  // auto-resolving instantly — see templeFullHeal() for the actual heal-and-pay action. ===
   if (site.type === 'temple') {
-    if (G.p.gold < site.cost) {
-      lg('❌ Not enough gold! Temple costs ' + site.cost + 'G.');
-      return;
-    }
-    G.p.gold -= site.cost;
     G.rest.selectedSite = site;
-    G.currentDialogue = null;
-    G.potionMenu = false;
-    G.ambushWarning = null;
-    if (G.soelBlessing) {
-      lg("🐱 Soel's blessing fades as you enter the temple.");
-      G.soelBlessing = null;
-    }
-    if (G.joelReviveUsed) {
-      G.joelReviveUsed = false;
-      lg('💜 Joel steadies his shield. Unbreakable is ready again.');
-    }
-    G.growthAbilityUsed = {};
-
-    lg('⛪ You step into the Temple of Resurrection...');
-    G.p.hp = G.p.mhp;
-    G.p.mp = G.p.mmp;
-    for (let p of G.party) {
-      if (p.on) p.hp = p.mhp;
-    }
-    G.p.buffs = G.p.buffs.filter(b => b.t > 0);
-    lg('✨ The temple\'s light washes over you. Fully healed, fully restored.');
-    for (let p of G.party) { if (p.on) updateAffinity(p.n, 2); }
-
-    // Stronghold daily stipend, same as the regular rest path
-    grantStrongholdStipend(site);
-
-    G.rest.active = false;
-    G.rest.selectedSite = null;
-    G.rest.tick = 0;
-    G.rest.ambushPending = false;
+    G.viewingTemple = true;
     render();
     return;
   }
@@ -12080,9 +12047,17 @@ function rFocus(){
 
 function rTemple() {
   const dead = getDeadParty();
+  const site = G.rest.selectedSite || G.rest.sites.find(s => s.id === 'temple');
   let h2 = '<div class="rest-view">';
   h2 += '<h2 class="st">⛪ Temple of Resurrection</h2>';
   h2 += '<div style="font-size:12px;color:var(--text-dim);margin-bottom:16px;">Ancient magic restores fallen companions. Cost: 50G each.</div>';
+
+  const canAffordHeal = site && G.p.gold >= site.cost;
+  h2 += '<div class="panel" style="text-align:left;margin-bottom:12px;">';
+  h2 += '<div class="panel-title">🙏 Full Restoration</div>';
+  h2 += '<div style="font-size:12px;color:var(--text-dim);margin:4px 0;">Fully restore HP and MP for the whole party.</div>';
+  h2 += '<button onclick="templeFullHeal()" class="abtn' + (canAffordHeal ? '' : ' dis') + '" style="width:100%;margin-top:8px;">Full Heal (' + (site ? site.cost : '?') + 'G)</button>';
+  h2 += '</div>';
   if(dead.length === 0){
     h2 += '<div style="text-align:center;padding:20px;color:var(--success);">✨ All companions are alive!</div>';
   }else{
@@ -12113,6 +12088,10 @@ function rTemple() {
     h2 += '</div>';
   }
 
+  if (G.viewingTemple) {
+    h2 += '<button onclick="leaveTemple()" class="rest-cancel" style="margin-top:16px;">Leave Temple</button>';
+  }
+
   h2 += '</div>';
   return h2;
 }
@@ -12122,6 +12101,54 @@ function templeCureAilments() {
   if (G.p.ailments.length === 0) return;
   G.p.gold -= TEMPLE_CURE_COST;
   cureAilments();
+  render();
+}
+
+// Full HP/MP restore at the temple — a separate, user-triggered action (button on the
+// temple screen) so it no longer fires automatically just from walking in, which used to
+// skip past the revive/cure-ailments choices entirely.
+function templeFullHeal() {
+  const site = G.rest.selectedSite || G.rest.sites.find(s => s.id === 'temple');
+  if (!site) return;
+  if (G.p.gold < site.cost) {
+    lg('❌ Not enough gold! Temple costs ' + site.cost + 'G.');
+    return;
+  }
+  G.p.gold -= site.cost;
+  G.currentDialogue = null;
+  G.potionMenu = false;
+  G.ambushWarning = null;
+  if (G.soelBlessing) {
+    lg("🐱 Soel's blessing fades as you enter the temple.");
+    G.soelBlessing = null;
+  }
+  if (G.joelReviveUsed) {
+    G.joelReviveUsed = false;
+    lg('💜 Joel steadies his shield. Unbreakable is ready again.');
+  }
+  G.growthAbilityUsed = {};
+
+  G.p.hp = G.p.mhp;
+  G.p.mp = G.p.mmp;
+  for (let p of G.party) {
+    if (p.on) p.hp = p.mhp;
+  }
+  G.p.buffs = G.p.buffs.filter(b => b.t > 0);
+  lg('✨ The temple\'s light washes over you. Fully healed, fully restored.');
+  for (let p of G.party) { if (p.on) updateAffinity(p.n, 2); }
+
+  // Stronghold daily stipend, same as the regular rest path
+  grantStrongholdStipend(site);
+
+  G.rest.active = false;
+  G.rest.tick = 0;
+  G.rest.ambushPending = false;
+  render();
+}
+
+function leaveTemple() {
+  G.viewingTemple = false;
+  G.rest.selectedSite = null;
   render();
 }
 
@@ -12168,6 +12195,7 @@ function rGuildHallPanel(strongholdId) {
 
 function rRest() {
   const dead = getDeadParty();
+  if (G.viewingTemple) return rTemple();
   if(dead.length > 0 && !G.rest.active) return rTemple();
 
   if (G.rest.active && G.rest.selectedSite) {
