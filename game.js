@@ -3715,6 +3715,47 @@ function sellToAmad(invIndex) {
   render();
 }
 
+// Returns { index, item, price }[] for gear sitting in the bag that's strictly not worth
+// keeping: equipment (not companion-specific gear — that's handled from the Party screen)
+// that's a Downgrade or Sidegrade versus whatever's already equipped in that slot. Used by
+// the Sell Stash button so a whole run of junk drops can be cleared in one tap.
+function getJunkStashItems() {
+  const results = [];
+  for (let i = 0; i < G.p.inv.length; i++) {
+    const item = G.p.inv[i];
+    const isEquip = item.slot && item.slot !== 'mat' && item.slot !== 'pot' && item.slot !== 'revive' && item.t !== 'food' && item.t !== 'drink';
+    if (!isEquip || item.forCompanion) continue;
+    const cmp = getEquipComparison(item);
+    if (!cmp || cmp.better) continue; // keep upgrades and anything that fills an empty slot
+    let sellPrice = 0;
+    if (item.value) sellPrice = Math.floor(item.value * 0.5);
+    else sellPrice = Math.floor((item.ilvl || 1) * 4);
+    sellPrice = Math.max(1, sellPrice);
+    results.push({ index: i, item, price: sellPrice });
+  }
+  return results;
+}
+
+function sellStashToAmad() {
+  const npc = G.npcs.find(n => n.n === 'Amad');
+  if (!npc || !npc.unlocked || npc.t !== 'trader') return;
+  const junk = getJunkStashItems();
+  if (junk.length === 0) { lg('💰 Nothing in your pack is junk right now.'); return; }
+
+  let total = 0;
+  // Remove from highest index down so earlier indices stay valid as we splice
+  const sorted = [...junk].sort((a, b) => b.index - a.index);
+  for (let entry of sorted) {
+    total += entry.price;
+    G.p.inv.splice(entry.index, 1);
+  }
+  G.p.gold += total;
+  lg('💰 Sold ' + junk.length + ' junk item' + (junk.length > 1 ? 's' : '') + ' to Amad for ' + total + 'G!');
+  lg('   "Clearing out the pack, eh? Terima kasih, San."');
+  render();
+}
+
+
 // ============================================================
 // GAME TIME & DAILY SYSTEM
 // ============================================================
@@ -9005,6 +9046,19 @@ function loadGame() {
     G.retroactiveGrowthApplied = data.retroactiveGrowthApplied || false;
     retroactivelyFixCompanionGrowth();
 
+    // Catch up any companion whose unlock level has already been reached but who never
+    // got flagged as joined — mirrors unlockRestSites() below. Without this, a companion
+    // stays permanently un-joined if their unlock level was passed before this check
+    // existed, or before they existed in an older save, since p.on is otherwise only
+    // ever set inside lvlup()'s level-up loop and never re-checked on load.
+    for (let p of G.party) {
+      if (!p.on && p.ul <= G.p.lvl) {
+        p.on = true;
+        p.hp = p.mhp;
+        lg(p.n + ' ' + p.t + ' joins!');
+      }
+    }
+
         for (let q of G.quests) {
       const saved = data.quests.find(sq => sq.id === q.id);
       if (saved) {
@@ -9049,6 +9103,9 @@ function loadGame() {
     }
     // Unlock any new rest sites added since last save (for level already achieved)
     unlockRestSites();
+    // Same catch-up for traders/allies (e.g. Mimi, Aisy) — was previously only checked
+    // inside lvlup()'s level-up loop, never re-checked on load.
+    checkNPCUnlocks();
 
 
 
@@ -9281,6 +9338,11 @@ function rNPC() {
           if (sellableItems.length > 0) {
             h += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">';
             h += '<div style="font-size:12px;font-weight:600;color:#fbbf24;margin-bottom:8px;">💰 Sell to Amad (50% value)</div>';
+            const junk = getJunkStashItems();
+            if (junk.length > 0) {
+              const junkTotal = junk.reduce((s, j) => s + j.price, 0);
+              h += '<button id="btn-sell-stash" class="abtn" style="width:100%;margin-bottom:10px;background:var(--danger);">🗑️ Sell Stash — ' + junk.length + ' junk item' + (junk.length > 1 ? 's' : '') + ' (' + junkTotal + 'G)</button>';
+            }
             h += '<div style="display:flex;flex-direction:column;gap:6px;">';
             for (let j = 0; j < G.p.inv.length; j++) {
               const item = G.p.inv[j];
@@ -9678,6 +9740,8 @@ if(btnBackJournal)btnBackJournal.addEventListener('click',()=>{ setS('journal');
       sellToAmad(parseInt(el.getAttribute('data-index')));
     });
   });
+  const btnSellStash=document.getElementById('btn-sell-stash');
+  if(btnSellStash)btnSellStash.addEventListener('click',sellStashToAmad);
   document.querySelectorAll('.tr-btn:not(.dis)').forEach(el=>{
     el.addEventListener('click',(e)=>{
       e.stopPropagation();
@@ -11712,6 +11776,17 @@ function rInv(){
     else if(it.t==='mat') matItems.push({item: it, index: i});
     else otherItems.push({item: it, index: i});
   }
+
+  // Group the Equipment section by slot (weapon, armor, head, hands, feet, rings,
+  // amulet) instead of raw pickup order, so gear of the same type sits together.
+  const gearSlotOrder = ['weapon','armor','head','hands','feet','ring','amulet'];
+  equipItems.sort((a, b) => {
+    const slotA = a.item.slot === 'ring1' || a.item.slot === 'ring2' ? 'ring' : a.item.slot;
+    const slotB = b.item.slot === 'ring1' || b.item.slot === 'ring2' ? 'ring' : b.item.slot;
+    const ia = gearSlotOrder.indexOf(slotA);
+    const ib = gearSlotOrder.indexOf(slotB);
+    return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+  });
 
   // Companion gear section — informational only; equip/unequip happens on the Party screen
   if(companionGearItems.length > 0){
