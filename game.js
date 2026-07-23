@@ -436,6 +436,13 @@ const G = {
     { n: 'The Fear After the Storm', lv: 48, elem: 'void', d: 'What happens after? San and Joel\'s youth, restored by magic that was never meant to last forever — what happens when it runs out? What happens to a family built for survival once there is finally something worth surviving for?', en: ['Question Wraith','What-If Echo','Quiet Fear'], loot: ['Unanswered Question', 'Borrowed Time', 'The Courage to Not Know'], xp: 1840, dg: 'impossible' },
     { n: 'Everyone, Together', lv: 49, elem: 'lightning', d: 'For the first time in this entire journey, every member of this family stands in the same place, at the same time, choosing the same thing. Joel. Aisyah. Mezstorm. Eliz. Senedra. Zaki. Soel. You. Whatever comes next, it will not be faced alone.', en: ['Unity Sentinel','Bonded Construct','Chorus Wisp'], loot: ['Chorus Fragment', 'The Whole Family', 'One Last Threshold'], xp: 1900, dg: 'impossible' },
     { n: 'Daybreak', lv: 50, elem: 'arcane', d: 'The sun that could not rise on a broken world finally has somewhere to land. Not an ending — a morning. The first one this family has earned the right to actually see.', en: ['Dawnlight Sentinel','Last Shadow','First Light Construct'], loot: ['First Light', 'The Morning You Earned', 'Daybreak Itself'], xp: 2200, dg: 'impossible' },
+
+    // === ACT 5: THE LONG WALK (LV 51-55) ===
+    { n: 'The Unmapped Road', lv: 51, elem: 'none', d: 'Past every border this family has ever fought to hold. Not fleeing anything, for once — just curious what is actually out there, now that staying alive does not take every hour of every day.', en: ['Threshold Warden','Roadless Wisp','Waymarker Construct'], loot: ['Unmarked Stone', 'First Step Beyond', 'A Map With No Edges'], xp: 2350, dg: 'impossible' },
+    { n: 'The Borrowed Coast', lv: 52, elem: 'water', d: 'A shoreline that never belonged to anyone long, judging by how many old names are carved into the same rocks. The sea here remembers every one of them.', en: ['Riptide Fiend','Coral Sentinel','Driftwood Horror'], loot: ['Borrowed Tide', 'Salt-Worn Coin', 'A Name Someone Else Left'], xp: 2450, dg: 'impossible' },
+    { n: 'The Salt Debt', lv: 53, elem: 'none', d: 'A trading settlement built entirely on obligation — everyone here owes someone, who owes someone else, all the way down. Aisyah recognizes the architecture of it immediately, and does not love what she recognizes.', en: ['Salt Wraith','Ledger Enforcer','Debt Collector Construct'], loot: ['Bound Ledger', 'A Debt With No Owner', 'Salt-Stained Contract'], xp: 2550, dg: 'impossible' },
+    { n: 'The Quiet Uprising', lv: 54, elem: 'void', d: "Something under the Salt Debt has been listening to every unpaid promise for a very long time, and has finally decided it is owed something too.", en: ['Undertow Whisper','Drowned Malcontent','Silent Agitator'], loot: ['Undertow Fragment', 'A Promise Kept Too Late', 'Whispered Ledger'], xp: 2650, dg: 'impossible' },
+    { n: 'Where the Walk Leads', lv: 55, elem: 'arcane', d: 'Not a destination. Just the furthest point this particular road has gone so far. There will be another one after it. That used to feel like a threat. It does not anymore.', en: ['Horizon Sentinel','Farlight Construct','Wandering Star Wisp'], loot: ['Horizon Fragment', 'The Next Step', 'Proof the Road Continues'], xp: 2900, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -561,6 +568,14 @@ const G = {
     { id: 42, n: 'The Fear After the Storm', d: 'Defeat The Question of After', t: 'boss_specific', target: 'The Question of After', c: 0, need: 1, rw: { xp: 10900, g: 8800 }, done: false, chain: 'the_mending', reqQuest: 41, hidden: true, revealed: false },
     { id: 43, n: 'Everyone, Together', d: 'Defeat The Unity Ward', t: 'boss_specific', target: 'The Unity Ward', c: 0, need: 1, rw: { xp: 11600, g: 9300 }, done: false, chain: 'the_mending', reqQuest: 42, hidden: true, revealed: false },
     { id: 44, n: 'Daybreak', d: 'Defeat Daybreak Incarnate and see the morning through', t: 'boss_specific', target: 'Daybreak Incarnate', c: 0, need: 1, rw: { xp: 16000, g: 13000 }, done: false, chain: 'the_mending', reqQuest: 43, hidden: true, revealed: false },
+
+    // === ACT 5: THE LONG WALK (LV 51-55) ===
+    { id: 45, n: 'The Long Walk', d: 'Reach Level 51 and take the first step past everything you know', t: 'reach_level', c: 0, need: 51, rw: { xp: 9500, g: 7500 }, done: false, chain: 'the_long_walk', reqQuest: 44 },
+    { id: 46, n: 'The Unmapped Road', d: 'Defeat The Wayfinder', t: 'boss_specific', target: 'The Wayfinder', c: 0, need: 1, rw: { xp: 11000, g: 8800 }, done: false, chain: 'the_long_walk', reqQuest: 45, hidden: true, revealed: false },
+    { id: 47, n: 'The Borrowed Coast', d: 'Defeat The Tidereaver', t: 'boss_specific', target: 'The Tidereaver', c: 0, need: 1, rw: { xp: 11700, g: 9300 }, done: false, chain: 'the_long_walk', reqQuest: 46, hidden: true, revealed: false },
+    { id: 48, n: 'The Salt Debt', d: 'Defeat The Ledgerbound', t: 'boss_specific', target: 'The Ledgerbound', c: 0, need: 1, rw: { xp: 12400, g: 9900 }, done: false, chain: 'the_long_walk', reqQuest: 47, hidden: true, revealed: false },
+    { id: 49, n: 'The Quiet Uprising', d: 'Defeat The Undertow', t: 'boss_specific', target: 'The Undertow', c: 0, need: 1, rw: { xp: 13100, g: 10500 }, done: false, chain: 'the_long_walk', reqQuest: 48, hidden: true, revealed: false },
+    { id: 50, n: 'Where the Walk Leads', d: 'Defeat The Horizon Keeper', t: 'boss_specific', target: 'The Horizon Keeper', c: 0, need: 1, rw: { xp: 17000, g: 14500 }, done: false, chain: 'the_long_walk', reqQuest: 49, hidden: true, revealed: false },
 
   ],
 
@@ -692,6 +707,7 @@ const G = {
     { id: 's12', n: 'The Long Silence', d: "Reach Level 40 and end Act Two at Embercat's Grave", t: 'reach_level', c: 0, need: 40, rw: { xp: 3000, g: 4500 }, done: false, unlocked: false, chapter: 12 },
     { id: 's13', n: 'The Reckoning', d: 'Reach Level 45 and end Act Three where the world first broke', t: 'reach_level', c: 0, need: 45, rw: { xp: 4200, g: 6000 }, done: false, unlocked: false, chapter: 13 },
     { id: 's14', n: 'The Mending', d: 'Reach Level 50 and see Daybreak through to the end', t: 'reach_level', c: 0, need: 50, rw: { xp: 6000, g: 8500 }, done: false, unlocked: false, chapter: 14 },
+    { id: 's15', n: 'The Long Walk', d: 'Reach Level 55 and see how far the road goes', t: 'reach_level', c: 0, need: 55, rw: { xp: 7500, g: 10000 }, done: false, unlocked: false, chapter: 15 },
   ],
   log: ['Welcome to Legends of Daybreak, San.'],
 
@@ -1036,6 +1052,18 @@ const G = {
       mechanic: 'phase', phases: 3, currentPhase: 1, phaseHp: 8333, desc: 'A trial built for a family, not a single hero — shifting through three phases that test whether you have actually learned to lean on each other, or just gotten good at surviving next to one another.' },
     { n: 'Daybreak Incarnate', zone: 'Daybreak', hp: 28000, mhp: 28000, atk: 230, def: 136, xp: 15000, g: 9000,
       mechanic: 'cosmic', desc: "The last resistance to a morning this family has spent a lifetime earning. Not a final villain in the old sense — the shape fear takes right before it finally, actually, lets go." },
+
+    // === ACT 5: THE LONG WALK (LV 51-55) ===
+    { n: 'The Wayfinder', zone: 'The Unmapped Road', hp: 29500, mhp: 29500, atk: 236, def: 140, xp: 16000, g: 9500,
+      mechanic: 'phase', phases: 3, currentPhase: 1, phaseHp: 9833, desc: 'Not hostile so much as thorough. It tests whether you are actually ready for the unknown, or just tired of the known — and it will not let you past until it is sure.' },
+    { n: 'The Tidereaver', zone: 'The Borrowed Coast', hp: 31000, mhp: 31000, atk: 242, def: 144, xp: 17000, g: 10000,
+      mechanic: 'drown', drownTurn: 4, desc: 'Every name carved into these rocks belonged to someone the tide eventually reclaimed. It is patient. It has never once needed to hurry.' },
+    { n: 'The Ledgerbound', zone: 'The Salt Debt', hp: 32500, mhp: 32500, atk: 248, def: 148, xp: 18000, g: 11000,
+      mechanic: 'crush', crushTurn: 5, desc: 'A weight made of every unpaid promise in the settlement, given a shape. It does not want your gold. It wants the debt itself, and it has been collecting a very long time.' },
+    { n: 'The Undertow', zone: 'The Quiet Uprising', hp: 34000, mhp: 34000, atk: 254, def: 152, xp: 19000, g: 12000,
+      mechanic: 'apocalypse', apocalypseTurn: 6, desc: "Everything the settlement above owed and never paid, finally surfacing at once. It is not cruelty. It is arithmetic that ran out of patience." },
+    { n: 'The Horizon Keeper', zone: 'Where the Walk Leads', hp: 36000, mhp: 36000, atk: 260, def: 156, xp: 22000, g: 14000,
+      mechanic: 'cosmic', desc: 'Not an ending. Just the edge of how far this particular road has been mapped. It guards nothing except the honest fact that there is more, always, past wherever you currently stand.' },
   ],
 
   currentBoss: null,
@@ -1924,6 +1952,94 @@ storyJournal: {
         ]
       }
 
+      ,{
+        id: 'journal_048',
+        title: 'The First Step Beyond',
+        chapter: 48,
+        unlockType: 'boss',
+        unlockAt: 'The Wayfinder',
+        icon: '🗺️',
+        summary: 'The family chooses to keep walking, for the first time not because they have to.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Unmapped Road does not announce itself as dangerous. It announces itself as unfamiliar, which after everything you have survived, feels almost stranger than danger would.' },
+          { speaker: 'Joel', text: '"We do not have to do this," Joel says, not stopping, just saying it out loud so it has been said. "The world is mended. We could just... stay. Tend the tower. Let this be enough."' },
+          { speaker: 'San', text: '"We could," you agree. "I do not want to, though. I want to know what is out here. Not because I am running from anything this time. Just because I am curious, and curious is allowed to be its own reason now."' },
+          { speaker: 'Narrator', text: 'The Wayfinder rises from the road itself, patient and enormous, and does not attack so much as it tests — three shifting trials, each asking some version of the same question: are you here because you are ready, or because you are still afraid to stop?' },
+          { speaker: 'Aisyah', text: '"Honest answer," Aisyah calls out, mid-fight, breathless. "Little of both. Is that allowed?"' },
+          { speaker: 'Narrator', text: 'The Wayfinder seems to accept that. When it finally yields, it does not vanish like an enemy defeated — it simply steps aside, the way a door opens rather than breaks.' },
+          { speaker: 'San', text: '"A walk, then," you say again, quieter this time, remembering exactly where you first said it. "Let us see how far it actually goes."' }
+        ]
+      }
+      ,{
+        id: 'journal_049',
+        title: 'Every Name the Tide Kept',
+        chapter: 49,
+        unlockType: 'boss',
+        unlockAt: 'The Tidereaver',
+        icon: '🌊',
+        summary: 'The Borrowed Coast remembers everyone who ever passed through it.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Borrowed Coast is covered in names, carved into rock by hands that stopped being able to carve anything a long time ago. Senedra reads them as you walk, quiet, methodical, the way she reads any trail.' },
+          { speaker: 'Senedra', text: '"None of these people meant to stay here," she says. "You can tell. The carving is always rushed. Always meant to be temporary. The sea just never agreed to let it stay temporary."' },
+          { speaker: 'Narrator', text: 'The Tidereaver comes for you exactly the way the coast itself works — patient, inevitable, in no hurry at all, because it has clearly done this before and will clearly do it again regardless of what you decide here.' },
+          { speaker: 'Zaki', text: '"I do not love fighting something that is not even angry at us," Zaki mutters, blocking a wave that should not have been able to hit that hard. "It is just doing its job. That is somehow worse."' },
+          { speaker: 'Narrator', text: 'When it finally recedes, the coast is quieter than before, and Senedra adds one more mark to the rocks — small, deliberate, not a name so much as a note. You were here. You left on purpose. That part matters.' },
+          { speaker: 'Senedra', text: '"First carving I have ever made that was not just marking a path," she says, almost smiling. "Feels different, doing it for its own sake."' }
+        ]
+      }
+      ,{
+        id: 'journal_050',
+        title: 'A Debt With No Owner',
+        chapter: 50,
+        unlockType: 'boss',
+        unlockAt: 'The Ledgerbound',
+        icon: '📒',
+        summary: "Aisyah recognizes the architecture of The Salt Debt immediately, and does not love what she recognizes.",
+        scenes: [
+          { speaker: 'Narrator', text: 'The Salt Debt runs on obligation the way other settlements run on trade — everyone here owes someone, who owes someone else, in a chain long enough that no one remembers where it actually started.' },
+          { speaker: 'Aisyah', text: '"I know this shape," Aisyah says, walking through it with her jaw set in a way you have learned to take seriously. "I taught math for decades before any of this, and later I learned to read a ledger properly. This is not commerce. This is a system built to make sure no one can ever actually leave."' },
+          { speaker: 'San', text: '"Can we fix it?" you ask.' },
+          { speaker: 'Aisyah', text: '"Not today," she says, honestly. "Maybe not ever, not from outside it. But we can make sure whatever is enforcing it stops being able to."' },
+          { speaker: 'Narrator', text: 'The Ledgerbound rises as a weight given shape — not malicious, exactly, just utterly indifferent to whether the debts it collects were ever fair in the first place. It crushes rather than strikes, patient the way unpaid obligations always are.' },
+          { speaker: 'Aisyah', text: '"I spent years teaching people that numbers do not lie," Aisyah says, breathing hard once it finally falls. "I did not always say the follow-up. Numbers do not lie. The people who design the system around them do, constantly."' },
+          { speaker: 'Narrator', text: 'The ledgers across the settlement go quiet, at least for now — not erased, not forgiven, just no longer being actively enforced by something that never had a stake in fairness to begin with.' }
+        ]
+      }
+      ,{
+        id: 'journal_051',
+        title: 'What Was Owed, Surfacing',
+        chapter: 51,
+        unlockType: 'boss',
+        unlockAt: 'The Undertow',
+        icon: '🌊',
+        summary: 'Everything the Salt Debt never paid finally comes due.',
+        scenes: [
+          { speaker: 'Narrator', text: "Beneath the Salt Debt, something has been listening to every broken promise for a very long time, and The Quiet Uprising is the sound of it finally deciding it is owed something too." },
+          { speaker: 'Eliz', text: '"It is not malicious," Eliz says, sensing it before anyone else does, the way she senses most things no one else can. "It is exhausted. There is a difference, even if the difference does not make it any less dangerous right now."' },
+          { speaker: 'Narrator', text: 'The Undertow does not attack so much as it demands, all at once, everything the settlement above spent generations avoiding — every unpaid debt, every broken promise, surfacing together in a single overwhelming wave.' },
+          { speaker: 'Mezstorm', text: '"I know something about promises left unpaid too long," Mezstorm says, storm answering to his call. "The debt does not care how it gets settled. It only cares that it finally does."' },
+          { speaker: 'Narrator', text: 'When it finally quiets, the silence after feels less like victory and more like relief — not a debt erased, but at least, finally, acknowledged out loud instead of buried and left to fester.' },
+          { speaker: 'San', text: '"Some debts cannot be paid," you say, quiet, thinking of far more than the settlement above. "They can only be witnessed, and carried differently after that."' }
+        ]
+      }
+      ,{
+        id: 'journal_052',
+        title: 'Proof the Road Continues',
+        chapter: 52,
+        unlockType: 'boss',
+        unlockAt: 'The Horizon Keeper',
+        icon: '🌅',
+        summary: 'Act Five ends not at a destination, but at the edge of the next question.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Where the Walk Leads is not, in the end, a destination. It is just the furthest point this particular stretch of road has been mapped — and standing at the edge of it, the whole party understands that at the same moment.' },
+          { speaker: 'Joel', text: '"There is more past this," Joel says, looking at a horizon that clearly keeps going. "There always is. That thought used to frighten me. Tonight it mostly just feels like an invitation."' },
+          { speaker: 'Narrator', text: 'The Horizon Keeper guards nothing you can name — not treasure, not a threat exactly, just the honest fact of how much further the world actually extends. It fights the way distance itself would fight, if distance could fight: vast, patient, testing whether you have the stamina for more than the destination you already reached.' },
+          { speaker: 'Soel', text: 'Soel presses against your leg as it finally yields, purring, entirely unbothered by any of it, the way he has been unbothered by every ending and every beginning since the very first day.' },
+          { speaker: 'San', text: '"A walk," you say again, looking at everyone — Joel, Aisyah, Mezstorm, Eliz, Senedra, Zaki, Soel, all of them still here, still choosing this. "Not a sprint. Just a very, very long walk. I think I can live with that."' },
+          { speaker: 'Narrator', text: 'The horizon does not close. It never really does. But for the first time, that feels less like an unfinished sentence and more like an open one — the good kind, the kind you get to keep writing instead of the kind that was forced on you.' }
+        ]
+      }
+
 
 
 
@@ -2002,6 +2118,12 @@ storyJournal: {
     { id: 'afterfear_camp', name: 'The Question Left Open', type: 'camp', zone: 'The Fear After the Storm', zoneLv: 48, desc: 'Not every question needs answering tonight.', unlocked: false, icon: '⛺', cost: 0 },
     { id: 'unity_camp', name: 'The Whole Family', type: 'camp', zone: 'Everyone, Together', zoneLv: 49, desc: 'Every bedroll here is close enough to touch the next one. No one sleeps far from anyone else tonight.', unlocked: false, icon: '⛺', cost: 0 },
     { id: 'daybreak_camp', name: 'The Last Camp Before Morning', type: 'camp', zone: 'Daybreak', zoneLv: 50, desc: 'You will not need this camp again after tonight. That is not a sad thing. That is the whole point.', unlocked: false, icon: '⛺', cost: 0 },
+    // === ACT 5: THE LONG WALK (LV 51-55) REST SITES ===
+    { id: 'road_camp', name: 'The First Waystone', type: 'camp', zone: 'The Unmapped Road', zoneLv: 51, desc: 'Someone will need to build the second one. For now, this is the only marker on the whole road.', unlocked: false, icon: '⛺', cost: 0 },
+    { id: 'coast_tavern', name: "The Borrowed Anchor", type: 'tavern', zone: 'The Borrowed Coast', zoneLv: 52, desc: 'A tavern built from three different shipwrecks. The drinks are stronger than the architecture.', unlocked: false, icon: '🍺', cost: 45 },
+    { id: 'salt_camp', name: 'The Unbound Ledger', type: 'camp', zone: 'The Salt Debt', zoneLv: 53, desc: 'The one place in the settlement where nothing you take is counted against you.', unlocked: false, icon: '⛺', cost: 0 },
+    { id: 'uprising_spring', name: 'The Surfaced Spring', type: 'mana_spring', zone: 'The Quiet Uprising', zoneLv: 54, desc: 'Whatever was owed down there, this water was not part of the debt. It came up clean anyway.', unlocked: false, icon: '💧', cost: 18 },
+    { id: 'horizon_camp', name: 'The Furthest Camp', type: 'camp', zone: 'Where the Walk Leads', zoneLv: 55, desc: 'Not the last camp. Just the last one anyone has needed so far.', unlocked: false, icon: '⛺', cost: 0 },
     // Phase 3 mana springs
     { id: 'ms_spring3', name: 'Infernal Mana Spring', type: 'mana_spring', zone: 'Infernal Crucible', zoneLv: 23, desc: 'A spring of liquid flame that burns cold. Each sip sears the mind with forbidden knowledge.', unlocked: false, icon: '💧', cost: 20 },
     { id: 'ms_spring4', name: 'Abyssal Mana Spring', type: 'mana_spring', zone: 'Tidal Abyss', zoneLv: 25, desc: 'Dark water that glows with inner light. Drinking it feels like drowning in stars.', unlocked: false, icon: '💧', cost: 25 },
@@ -2051,6 +2173,7 @@ storyJournal: {
   dragonHunt: { active: false, cleared: 0 }, // a legendary optional superboss, repeatable
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
+  grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
   mercenary: { active: false, current: null }, // current offered contract, if any
   strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
   siegeDefense: { active: false, strongholdId: null, wave: 0, maxWaves: 3 },
@@ -3197,6 +3320,23 @@ const ENEMY_REGISTRY = {
   'Masked Bandit': { template: 'balanced', elem: 'none', zoneLv: 1 },
   'Ambush Scout': { template: 'striker', elem: 'none', zoneLv: 1 },
   'Bandit Captain': { template: 'tank', elem: 'none', zoneLv: 1 },
+
+  // === ACT 5: THE LONG WALK (LV 51-55) ===
+  'Threshold Warden': { template: 'tank', elem: 'none', zoneLv: 51 },
+  'Roadless Wisp': { template: 'striker', elem: 'arcane', zoneLv: 51 },
+  'Waymarker Construct': { template: 'balanced', elem: 'none', zoneLv: 51 },
+  'Riptide Fiend': { template: 'striker', elem: 'water', zoneLv: 52 },
+  'Coral Sentinel': { template: 'tank', elem: 'water', zoneLv: 52 },
+  'Driftwood Horror': { template: 'balanced', elem: 'water', zoneLv: 52 },
+  'Salt Wraith': { template: 'striker', elem: 'none', zoneLv: 53 },
+  'Ledger Enforcer': { template: 'tank', elem: 'none', zoneLv: 53 },
+  'Debt Collector Construct': { template: 'balanced', elem: 'none', zoneLv: 53 },
+  'Undertow Whisper': { template: 'striker', elem: 'void', zoneLv: 54 },
+  'Drowned Malcontent': { template: 'balanced', elem: 'void', zoneLv: 54 },
+  'Silent Agitator': { template: 'tank', elem: 'void', zoneLv: 54 },
+  'Horizon Sentinel': { template: 'tank', elem: 'arcane', zoneLv: 55 },
+  'Farlight Construct': { template: 'balanced', elem: 'arcane', zoneLv: 55 },
+  'Wandering Star Wisp': { template: 'striker', elem: 'arcane', zoneLv: 55 },
 };
 
 
@@ -8035,6 +8175,30 @@ function toggleAutoNext() {
   render();
 }
 
+function renderAfkGrindBar() {
+  const a = document.getElementById('app'); if (!a) return;
+  const g = G.endlessGrind;
+  a.innerHTML = '<div class="afk-grind-bar">'
+    + '<span>⚔️ Grind Room — Wave ' + g.wave + '</span>'
+    + '<span>Auto-next: ' + (g.autoNext ? 'ON' : 'OFF') + '</span>'
+    + '<button onclick="stopAfkGrind()">Stop &amp; Exit</button>'
+    + '</div>';
+}
+
+function startAfkGrind() {
+  G.grindAfkMode = true;
+  render();
+}
+
+function stopAfkGrind() {
+  G.grindAfkMode = false;
+  G.cbt.autoCombat = false;
+  G.endlessGrind.active = false;
+  G.cbt.on = false;
+  G.state = 'menu';
+  render();
+}
+
 const _originalHandleVictory = handleVictory;
 handleVictory = function() {
   if (G.endlessGrind.active) handleGrindVictory();
@@ -9646,6 +9810,16 @@ function rAchievements() {
 }
 
 function render(){
+  // AFK Grind Mode — bypasses the ENTIRE normal render pipeline (header, HP/MP/XP
+  // bars, buffs row, everything) in favor of one tiny status line. Combat logic keeps
+  // ticking normally underneath (doAutoCombatTick runs purely on state, never reads
+  // the DOM), so this is safe — it just means far less gets repainted every tick,
+  // which is the actual point: less work per frame while it runs in the background.
+  if (G.grindAfkMode && G.state === 'combat' && G.endlessGrind.active) {
+    renderAfkGrindBar();
+    return;
+  }
+
   initPartyGearBonus();
 
   const a=document.getElementById('app'); if(!a)return;
@@ -10595,7 +10769,13 @@ function rGrindRoom() {
   
   // === CHAMPIONSHIP LADDER ===
   h += rGrindChampionship();
-  
+
+  // AFK Mode toggle — minimal-render view for multitasking/battery savings
+  h += '<div class="panel" style="text-align:center;">';
+  h += '<div class="btn-hint" style="margin-bottom:8px;">🔋 AFK Mode: locks the screen to a single status line while auto-combat keeps running \u2014 useful for having this open in the background while you work.</div>';
+  h += '<button onclick="startAfkGrind()" class="abtn" style="width:100%;">Enable AFK Mode</button>';
+  h += '</div>';
+
   // MAIN CONTROLS
   if (!g.active) {
     // Between waves or fresh start
