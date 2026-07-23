@@ -9554,6 +9554,7 @@ function render(){
   else if(G.state=='forge')h+=rForge();
   else if(G.state=='bonding')h+=rBonding();
   else if(G.state=='mercenary')h+=rMercenary();
+  else if(G.state=='today')h+=rToday();
   else if(G.state=='bondingscene')h+=rBondingScene();
 
   h+='</div>';
@@ -9585,7 +9586,8 @@ function attachEvents() {
     else if(a=='dragon_hunt')setS('dragon_hunt');
     else if(a=='forge')setS('forge');
     else if(a=='bonding')setS('bonding');
-    else if(a=='mercenary')setS('mercenary');});
+    else if(a=='mercenary')setS('mercenary');
+    else if(a=='today')setS('today');});
   });
  const btnClaimLogin = document.getElementById('btn-claim-login');
 if (btnClaimLogin) {
@@ -10677,6 +10679,88 @@ function rForge() {
   return h;
 }
 
+function rToday() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">📅 Today</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Everything worth a quick look, in one place \u2014 for whenever you\'ve got three minutes and nothing else to point them at.</div>';
+
+  // Active siege — most urgent, shown first if present
+  for (let id in G.strongholds) {
+    if (G.strongholds[id]) h += rSiegeBanner(id);
+  }
+
+  // Daily login
+  h += '<div class="panel' + (G.loginClaimed ? '' : ' panel-gold') + '">';
+  if (!G.loginClaimed) {
+    h += '<div class="panel-title" style="color:var(--gold);">🎁 Daily Reward Ready</div>';
+    h += '<div class="btn-hint" style="margin:6px 0 10px;">Streak: ' + (G.loginStreak || 1) + ' day' + ((G.loginStreak || 1) > 1 ? 's' : '') + '</div>';
+    h += '<button onclick="claimDailyLoginReward()" class="abtn" style="width:100%;">Claim It</button>';
+  } else {
+    h += '<div class="panel-row"><div class="panel-title">🔥 Login Streak</div><div class="btn-hint">' + (G.loginStreak || 1) + ' day' + ((G.loginStreak || 1) > 1 ? 's' : '') + '</div></div>';
+    h += '<div class="btn-hint">Already claimed today. Come back tomorrow.</div>';
+  }
+  h += '</div>';
+
+  // Quick Focus
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">🧘 Quick Focus</div>';
+  h += '<div class="btn-hint" style="margin-bottom:10px;">One task at a time. Pick a length, start immediately.</div>';
+  h += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+  const focusSessions = [{m:5,xp:20},{m:10,xp:40},{m:15,xp:60},{m:20,xp:80},{m:25,xp:100}];
+  for (let s of focusSessions) {
+    h += '<button class="focus-session-btn" data-min="' + s.m + '" style="flex:1;min-width:56px;padding:10px 4px;border-radius:10px;border:1px solid var(--accent);background:var(--bg-card);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;text-align:center;">' + s.m + 'm<br><span style="font-size:9px;color:var(--success);font-weight:400;">+' + s.xp + 'XP</span></button>';
+  }
+  h += '</div></div>';
+
+  // Mercenary contract
+  const contract = getMercenaryContract();
+  h += '<div class="panel">';
+  h += '<div class="panel-row"><div class="panel-title">📋 ' + contract.title + '</div><div class="btn-hint">' + contract.enemyCount + ' opponent' + (contract.enemyCount > 1 ? 's' : '') + '</div></div>';
+  h += '<div class="btn-hint" style="margin:6px 0 10px;">' + contract.flavor + '</div>';
+  h += '<button onclick="startMercenaryContract()" class="abtn" style="width:100%;">Take the Job</button>';
+  h += '</div>';
+
+  // Daily quests
+  if (G.dailyQuests && G.dailyQuests.length > 0) {
+    h += '<div class="panel">';
+    h += '<div class="panel-title" style="margin-bottom:8px;">📜 Daily Quests</div>';
+    for (let q of G.dailyQuests) {
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);">';
+      h += '<span style="font-size:12px;color:' + (q.done ? 'var(--success)' : 'var(--text)') + ';">' + (q.done ? '✓ ' : '') + q.n + '</span>';
+      h += '<span style="font-size:11px;color:var(--text-dim);">' + q.c + '/' + q.need + '</span>';
+      h += '</div>';
+    }
+    h += '</div>';
+  }
+
+  // Bounties summary
+  const activeBounties = G.bounties.filter(b => !b.done && G.p.lvl >= (b.minLv || 1) && G.p.lvl <= (b.maxLv || 99));
+  if (activeBounties.length > 0) {
+    h += '<div class="panel">';
+    h += '<div class="panel-row"><div class="panel-title">💰 Bounties</div><button onclick="setS(\'quest\')" class="btn-hint" style="background:none;border:none;text-decoration:underline;cursor:pointer;">View all</button></div>';
+    for (let b of activeBounties.slice(0, 3)) {
+      h += '<div style="font-size:12px;color:var(--text-dim);padding:4px 0;">' + b.n + ' \u2014 ' + b.c + '/' + b.need + '</div>';
+    }
+    h += '</div>';
+  }
+
+  // Guild contracts summary
+  if (G.guildJoined) {
+    const activeContracts = G.guildContracts.filter(c => c.refreshWeek === Math.floor(G.gameDay / 7) && !c.done);
+    if (activeContracts.length > 0) {
+      h += '<div class="panel">';
+      h += '<div class="panel-row"><div class="panel-title">🛡️ Guild Contracts</div><button onclick="setS(\'guild\')" class="btn-hint" style="background:none;border:none;text-decoration:underline;cursor:pointer;">View all</button></div>';
+      for (let c of activeContracts.slice(0, 3)) {
+        h += '<div style="font-size:12px;color:var(--text-dim);padding:4px 0;">' + c.n + ' \u2014 ' + c.c + '/' + c.need + '</div>';
+      }
+      h += '</div>';
+    }
+  }
+
+  h += '</div>';
+  return h;
+}
+
 function rMercenary() {
   const contract = getMercenaryContract();
   let h = '<div class="content">';
@@ -11132,6 +11216,7 @@ function rMenu(){
       {i:'🐉',l:'Dragon Hunt',a:'dragon_hunt'},
     ]},
     { title: '📋 Quick Work', items: [
+      {i:'📅',l:'Today',a:'today'},
       {i:'📋',l:'Mercenary',a:'mercenary'},
     ]},
     { title: '🏰 Guild & Stronghold', items: [
