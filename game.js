@@ -5414,25 +5414,39 @@ function combineRunes(runeIndices) {
   openCombineModal();
 }
 
-// Rune socketing modal state
-G.runeSocketModal = { open: false, itemIndex: null, slotIndex: null };
+// Resolves the actual item object for a socket-modal state, regardless of where it
+// lives — previously this was hardcoded to G.p.inv only, meaning equipped gear
+// (San's own or any companion's) became permanently invisible to socketing the
+// moment it was equipped, since equipping always removes an item from G.p.inv.
+function resolveSocketableItem(state) {
+  if (!state) return null;
+  if (state.source === 'playerEq') return G.p.eq[state.slot];
+  if (state.source === 'companionEq') {
+    const member = G.party.find(p => p.n === state.memberName);
+    return member ? member.eq[state.slot] : null;
+  }
+  return G.p.inv[state.itemIndex]; // default: unequipped inventory item
+}
 
-function openSocketModal(itemIndex, slotIndex) {
-  const item = G.p.inv[itemIndex];
+// Rune socketing modal state
+G.runeSocketModal = { open: false, source: 'inv', itemIndex: null, slot: null, memberName: null, slotIndex: null };
+
+function openSocketModal(sourceDescriptor, slotIndex) {
+  const item = resolveSocketableItem(sourceDescriptor);
   if (!item || !item.sockets || item.sockets[slotIndex]) return;
   if (G.runes.length === 0) { lg('❌ No runes available!'); return; }
-  G.runeSocketModal = { open: true, itemIndex, slotIndex };
+  G.runeSocketModal = { ...sourceDescriptor, open: true, slotIndex };
   render();
 }
 
 function closeSocketModal() {
-  G.runeSocketModal = { open: false, itemIndex: null, slotIndex: null };
+  G.runeSocketModal = { open: false, source: 'inv', itemIndex: null, slot: null, memberName: null, slotIndex: null };
   render();
 }
 
 function confirmSocketRune(runeIndex) {
-  const { itemIndex, slotIndex } = G.runeSocketModal;
-  const item = G.p.inv[itemIndex];
+  const { slotIndex } = G.runeSocketModal;
+  const item = resolveSocketableItem(G.runeSocketModal);
   const rune = G.runes[runeIndex];
   if (!item || !rune || item.sockets[slotIndex]) return;
 
@@ -5456,8 +5470,8 @@ function socketRune(itemIndex, slot, runeIndex) {
   openSocketModal(itemIndex, slot);
 }
 
-function unsocketRune(itemIndex, slot) {
-  const item = G.p.inv[itemIndex];
+function unsocketRune(sourceDescriptor, slot) {
+  const item = resolveSocketableItem(sourceDescriptor);
   if (!item || !item.sockets || !item.sockets[slot]) return;
   const rune = item.sockets[slot];
   G.runes.push(rune);
@@ -9322,7 +9336,7 @@ function loadGame() {
     G.currentRift = data.player.currentRift || null;
     G.riftFightsRemaining = data.player.riftFightsRemaining || 0;
     G.riftTriggerAt = data.player.riftTriggerAt || (3 + Math.floor(Math.random() * 3));
-    G.runeSocketModal = data.player.runeSocketModal || { open: false, itemIndex: null, slotIndex: null };
+    G.runeSocketModal = { open: false, source: 'inv', itemIndex: null, slot: null, memberName: null, slotIndex: null };
     G.runeCombineModal = data.player.runeCombineModal || { open: false, selected: [] };
     G.grindChampionship = data.grindChampionship || { bestWave: 0, claimedTiers: [] };
     if (data.story) {
@@ -10082,15 +10096,25 @@ if (btnClaimLogin) {
   document.querySelectorAll('.socket-btn').forEach(el=>{
     el.addEventListener('click',(e)=>{
       e.stopPropagation();
-      const itemIdx=parseInt(el.getAttribute('data-ii'));
-      const slot=parseInt(el.getAttribute('data-si'));
-      openSocketModal(itemIdx, slot);
+      const source = el.getAttribute('data-source') || 'inv';
+      const slot = parseInt(el.getAttribute('data-si'));
+      let descriptor;
+      if (source === 'playerEq') descriptor = { source: 'playerEq', slot: el.getAttribute('data-eqslot') };
+      else if (source === 'companionEq') descriptor = { source: 'companionEq', memberName: el.getAttribute('data-member'), slot: el.getAttribute('data-eqslot') };
+      else descriptor = { source: 'inv', itemIndex: parseInt(el.getAttribute('data-ii')) };
+      openSocketModal(descriptor, slot);
     });
   });
   document.querySelectorAll('.unsocket-btn').forEach(el=>{
     el.addEventListener('click',(e)=>{
       e.stopPropagation();
-      unsocketRune(parseInt(el.getAttribute('data-ii')), parseInt(el.getAttribute('data-si')));
+      const source = el.getAttribute('data-source') || 'inv';
+      const slot = parseInt(el.getAttribute('data-si'));
+      let descriptor;
+      if (source === 'playerEq') descriptor = { source: 'playerEq', slot: el.getAttribute('data-eqslot') };
+      else if (source === 'companionEq') descriptor = { source: 'companionEq', memberName: el.getAttribute('data-member'), slot: el.getAttribute('data-eqslot') };
+      else descriptor = { source: 'inv', itemIndex: parseInt(el.getAttribute('data-ii')) };
+      unsocketRune(descriptor, slot);
       render();
     });
   });
@@ -10582,66 +10606,35 @@ function rRunes(){
     h+='</button>';
   }
 
-  // Socketable gear with stat preview
+  // Socketable gear with stat preview — covers inventory AND equipped gear (San's own
+  // and every active companion's). Previously this only checked G.p.inv, so the moment
+  // any item was actually equipped it vanished from this list entirely.
   h+='<div style="font-size:12px;font-weight:600;color:var(--accent-light);margin-bottom:10px;">Socketable Gear</div>';
-  const socketable = G.p.inv.filter(it => it.sockets && it.sockets.length > 0);
-  if(socketable.length===0){
+  const invSocketable = G.p.inv.filter(it => it.sockets && it.sockets.length > 0);
+  const playerEqSocketable = Object.entries(G.p.eq).filter(([slot, it]) => it && it.sockets && it.sockets.length > 0);
+  const companionEqSocketable = [];
+  for (let p of G.party) {
+    if (!p.on || !p.eq) continue;
+    for (let [slot, it] of Object.entries(p.eq)) {
+      if (it && it.sockets && it.sockets.length > 0) companionEqSocketable.push({ member: p.n, slot, it });
+    }
+  }
+  const totalSocketable = invSocketable.length + playerEqSocketable.length + companionEqSocketable.length;
+
+  if(totalSocketable===0){
     h+='<div style="font-size:12px;color:var(--text-dim);padding:12px;background:var(--bg-card);border-radius:12px;">No socketed gear. Lv 10+ items have sockets.</div>';
   }else{
     h+='<div style="display:flex;flex-direction:column;gap:10px;">';
     for(let i=0;i<G.p.inv.length;i++){
       const it=G.p.inv[i];
       if(!it.sockets) continue;
-
-      // Calculate current socket stats
-      let currentStats = [];
-      if (it.socketStats) {
-        for (let k in it.socketStats) {
-          if (k.endsWith('Pct')) continue;
-          const label = {atk:'ATK',int:'INT',fireDmg:'🔥Fire',iceDmg:'❄️Ice',lightDmg:'⚡Light',voidDmg:'🌑Void',arcaneDmg:'✨Arcane',hpRegen:'💚HP+',mpRegen:'💧MP+'}[k] || k;
-          currentStats.push(label + '+' + it.socketStats[k]);
-        }
-      }
-
-      h+='<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:14px;transition:border-color 0.2s;" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\'">';
-      h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
-      h+='<div style="font-weight:700;font-size:14px;color:'+rc(it.r)+';">'+it.n+'</div>';
-      h+='<div style="font-size:10px;color:var(--text-dim);background:var(--bg-hover);padding:2px 8px;border-radius:8px;">iLvl '+it.ilvl+'</div>';
-      h+='</div>';
-
-      // Socket display with better visuals
-      h+='<div style="display:flex;gap:8px;margin-bottom:10px;">';
-      for(let s=0;s<it.sockets.length;s++){
-        const socket = it.sockets[s];
-        if(socket){
-          h+='<div style="flex:1;background:'+socket.color+'15;border:2px solid '+socket.color+';border-radius:10px;padding:8px;text-align:center;">';
-          h+='<div style="font-size:20px;">'+socket.icon+'</div>';
-          h+='<div style="font-size:9px;font-weight:600;color:'+socket.color+';">'+socket.name.replace('Rune of ','')+'</div>';
-          h+='</div>';
-        }else{
-          h+='<div style="flex:1;background:var(--bg-hover);border:2px dashed var(--disabled);border-radius:10px;padding:8px;text-align:center;opacity:0.6;">';
-          h+='<div style="font-size:20px;color:var(--disabled);">○</div>';
-          h+='<div style="font-size:9px;color:var(--disabled);">Empty</div>';
-          h+='</div>';
-        }
-      }
-      h+='</div>';
-
-      // Current socket stats summary
-      if(currentStats.length > 0){
-        h+='<div style="font-size:10px;color:var(--success);margin-bottom:8px;padding:6px 10px;background:#22c55e10;border-radius:8px;">✨ Socketed: '+currentStats.join(' · ')+'</div>';
-      }
-
-      // Socket action buttons
-      h+='<div style="display:flex;gap:6px;flex-wrap:wrap;">';
-      for(let s=0;s<it.sockets.length;s++){
-        if(!it.sockets[s]){
-          h+='<button class="socket-btn" data-ii="'+i+'" data-si="'+s+'" style="flex:1;padding:8px 10px;border-radius:10px;border:1px dashed var(--accent);background:transparent;color:var(--accent);font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;">💎 Socket</button>';
-        }else{
-          h+='<button class="unsocket-btn" data-ii="'+i+'" data-si="'+s+'" style="flex:1;padding:8px 10px;border-radius:10px;border:1px solid '+it.sockets[s].color+';background:'+it.sockets[s].color+'15;color:'+it.sockets[s].color+';font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;">'+it.sockets[s].icon+' Remove</button>';
-        }
-      }
-      h+='</div></div>';
+      h += renderSocketableGearCard(it, 'data-source="inv" data-ii="'+i+'"', null);
+    }
+    for (let [slot, it] of playerEqSocketable) {
+      h += renderSocketableGearCard(it, 'data-source="playerEq" data-eqslot="'+slot+'"', 'San');
+    }
+    for (let { member, slot, it } of companionEqSocketable) {
+      h += renderSocketableGearCard(it, 'data-source="companionEq" data-member="'+member+'" data-eqslot="'+slot+'"', member);
     }
     h+='</div>';
   }
@@ -10650,10 +10643,62 @@ function rRunes(){
   return h;
 }
 
+function renderSocketableGearCard(it, dataAttrs, ownerLabel) {
+  let h = '';
+  let currentStats = [];
+  if (it.socketStats) {
+    for (let k in it.socketStats) {
+      if (k.endsWith('Pct')) continue;
+      const label = {atk:'ATK',int:'INT',fireDmg:'🔥Fire',iceDmg:'❄️Ice',lightDmg:'⚡Light',voidDmg:'🌑Void',arcaneDmg:'✨Arcane',hpRegen:'💚HP+',mpRegen:'💧MP+'}[k] || k;
+      currentStats.push(label + '+' + it.socketStats[k]);
+    }
+  }
+
+  h+='<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:14px;transition:border-color 0.2s;" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\'">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
+  h+='<div><div style="font-weight:700;font-size:14px;color:'+rc(it.r)+';">'+it.n+'</div>';
+  if (ownerLabel) h+='<div style="font-size:10px;color:var(--accent-light);">Equipped \u2014 '+ownerLabel+'</div>';
+  h+='</div>';
+  h+='<div style="font-size:10px;color:var(--text-dim);background:var(--bg-hover);padding:2px 8px;border-radius:8px;">iLvl '+it.ilvl+'</div>';
+  h+='</div>';
+
+  h+='<div style="display:flex;gap:8px;margin-bottom:10px;">';
+  for(let s=0;s<it.sockets.length;s++){
+    const socket = it.sockets[s];
+    if(socket){
+      h+='<div style="flex:1;background:'+socket.color+'15;border:2px solid '+socket.color+';border-radius:10px;padding:8px;text-align:center;">';
+      h+='<div style="font-size:20px;">'+socket.icon+'</div>';
+      h+='<div style="font-size:9px;font-weight:600;color:'+socket.color+';">'+socket.name.replace('Rune of ','')+'</div>';
+      h+='</div>';
+    }else{
+      h+='<div style="flex:1;background:var(--bg-hover);border:2px dashed var(--disabled);border-radius:10px;padding:8px;text-align:center;opacity:0.6;">';
+      h+='<div style="font-size:20px;color:var(--disabled);">○</div>';
+      h+='<div style="font-size:9px;color:var(--disabled);">Empty</div>';
+      h+='</div>';
+    }
+  }
+  h+='</div>';
+
+  if(currentStats.length > 0){
+    h+='<div style="font-size:10px;color:var(--success);margin-bottom:8px;padding:6px 10px;background:#22c55e10;border-radius:8px;">✨ Socketed: '+currentStats.join(' · ')+'</div>';
+  }
+
+  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+  for(let s=0;s<it.sockets.length;s++){
+    if(!it.sockets[s]){
+      h+='<button class="socket-btn" '+dataAttrs+' data-si="'+s+'" style="flex:1;padding:8px 10px;border-radius:10px;border:1px dashed var(--accent);background:transparent;color:var(--accent);font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;">💎 Socket</button>';
+    }else{
+      h+='<button class="unsocket-btn" '+dataAttrs+' data-si="'+s+'" style="flex:1;padding:8px 10px;border-radius:10px;border:1px solid '+it.sockets[s].color+';background:'+it.sockets[s].color+'15;color:'+it.sockets[s].color+';font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;">'+it.sockets[s].icon+' Remove</button>';
+    }
+  }
+  h+='</div></div>';
+  return h;
+}
+
 // NEW: Rune Socket Selection Modal
 function rRuneSocketModal() {
-  const { itemIndex, slotIndex } = G.runeSocketModal;
-  const item = G.p.inv[itemIndex];
+  const { slotIndex } = G.runeSocketModal;
+  const item = resolveSocketableItem(G.runeSocketModal);
   if (!item) return '<div>Error</div>';
 
   let h = '<div style="padding:16px;">';
