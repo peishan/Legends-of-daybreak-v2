@@ -393,7 +393,7 @@ const G = {
         // === EXPANSION: LV 21+ ZONES ===
     { n: 'The Fractured Veil', lv: 21, elem: 'arcane', d: 'Reality tears at the seams. Fragments of dead worlds float in crystalline silence.', en: ['Veil Wraith','Shardling','Echo Walker'], loot: ['Planar Essence','Aether Shard','Reality Fragment'], xp: 550, dg: 'impossible' },
         // === PHASE 1 EXPANSION: LV 22-23 ZONES ===
-    { n: 'The Astral Maelstrom', lv: 22, elem: 'arcane', d: 'A storm of raw planar energy where dimensions collide and unravel. Reality here is a suggestion, not a rule.', en: ['Astral Construct','Void Hound','Phase Walker','Rift Rat'], loot: ['Astral Dust','Void Fragment','Planar Essence','Reality Anchor'], xp: 600, dg: 'impossible' },
+    { n: 'The Astral Maelstrom', lv: 22, elem: 'arcane', d: 'A storm of raw planar energy where dimensions collide and unravel. Reality here is a suggestion, not a rule.', en: ['Astral Construct','Void Hound','Phase Walker','Rift Rat','Reality Weaver'], loot: ['Astral Dust','Void Fragment','Planar Essence','Reality Anchor'], xp: 600, dg: 'impossible' },
         { n: 'Infernal Crucible', lv: 23, elem: 'fire', d: 'The forge where stars are born and die. Magma rivers flow upward into a sky of eternal flame.', en: ['Ember Wraith','Ash Phantom','Flame Serpent','Magma Titan'], loot: ['Inferno Gem','Ash Crystal','Ember Core','Phoenix Ash'], xp: 680, dg: 'impossible' },
 
     // === GAP FILLERS ===
@@ -3774,6 +3774,8 @@ function checkDayAdvance() {
     G.lastLoginDay = 1;
     G.loginStreak = 1;
     G.loginClaimed = false;
+    G.loginHistory = [1];
+    G.longestLoginStreak = 1;
     generateDailyQuests();
     G.manaSpringUses.day = G.gameDay;
     G.manaSpringUses.count = 0;
@@ -3801,6 +3803,10 @@ function checkDayAdvance() {
     lg('📅 New day! Streak reset (missed ' + (daysPassed - 1) + ' day' + (daysPassed > 2 ? 's' : '') + ').');
     showToast('🎁 New day! Collect your rewards', 'gold');
   }
+  if (!G.loginHistory) G.loginHistory = [];
+  G.loginHistory.push(G.gameDay);
+  if (G.loginHistory.length > 30) G.loginHistory = G.loginHistory.slice(-30);
+  G.longestLoginStreak = Math.max(G.longestLoginStreak || 0, G.loginStreak);
   
   G.lastLoginDay = G.gameDay;
   G.loginClaimed = false;
@@ -6875,10 +6881,10 @@ let restTimer = null;
 // Earns XP, gold, and materials while the game is closed
 
 const IDLE_CONFIG = {
-  maxOfflineHours: 8,           // Cap offline gains at 8 hours
-  xpPerHour: 50,                // Base XP per hour
-  goldPerHour: 15,              // Base gold per hour
-  matChancePerHour: 0.3,        // 30% chance per hour to find a material
+  maxOfflineHours: 9,           // A full night's sleep (6-8hrs) plus a little buffer
+  xpPercentPerHour: 0.0044,     // % of current level's XP requirement, per hour (~4% of a level over 9hrs)
+  goldPerHour: 40,              // Base gold per hour
+  matChancePerHour: 0.35,       // 35% chance per hour to find a material
   matPool: [
     { n: 'Herb Bundle', t: 'mat', q: 1, r: 'common' },
     { n: 'Goblin Tooth', t: 'mat', q: 1, r: 'common' },
@@ -6918,12 +6924,16 @@ function calculateIdleGains(offlineMinutes) {
   const zone = getIdleZone();
   const bonus = IDLE_CONFIG.zoneBonus[zone.n] || { xpMult: 1.0, goldMult: 1.0, mats: [] };
 
-  // Scale with level
-  const levelMult = 1 + (G.p.lvl * 0.1);
+  // XP scales as a fraction of the CURRENT level's actual XP requirement (G.p.xpN),
+  // not a flat rate — the old flat-per-hour approach fell further and further behind
+  // as levels compounded (was ~0.6% of a level-up for a full session at level 23).
+  // This targets roughly 3-4% of a level per full 9-hour night at any level, so it
+  // stays meaningful instead of becoming negligible the higher you get.
+  const goldLevelMult = 1 + (G.p.lvl * 0.15);
 
   const gains = {
-    xp: Math.floor(IDLE_CONFIG.xpPerHour * hours * bonus.xpMult * levelMult),
-    gold: Math.floor(IDLE_CONFIG.goldPerHour * hours * bonus.goldMult * levelMult),
+    xp: Math.floor(G.p.xpN * IDLE_CONFIG.xpPercentPerHour * hours * bonus.xpMult),
+    gold: Math.floor(IDLE_CONFIG.goldPerHour * hours * bonus.goldMult * goldLevelMult),
     materials: [],
     hours: Math.floor(hours * 10) / 10, // Round to 1 decimal
     zone: zone.n
@@ -8521,6 +8531,31 @@ function sf(minutes){
       const fq=G.quests.find(q=>q.t=='focus');
       if(fq&&!fq.done){fq.c++;checkQ();}
       lg('Focus complete! +' + baseXp + 'XP +' + baseGold + 'G Streak:'+G.p.fstreak);
+
+      // Focus Surge: a small chance of a bonus on top — variable reward so repeat
+      // sessions feel less like a fixed transaction and more worth doing again.
+      if (Math.random() < 0.2) {
+        const surgeOptions = ['gold', 'material'];
+        if (G.guildJoined) surgeOptions.push('rep');
+        const pick = surgeOptions[Math.floor(Math.random() * surgeOptions.length)];
+        if (pick === 'gold') {
+          const bonusGold = Math.floor(baseGold * (0.5 + Math.random() * 0.5));
+          G.p.gold += bonusGold;
+          lg('✨ FOCUS SURGE! +' + bonusGold + 'G bonus.');
+        } else if (pick === 'material') {
+          const zone = getIdleZone();
+          const bonus = IDLE_CONFIG.zoneBonus[zone.n];
+          const mats = bonus && bonus.mats && bonus.mats.length > 0 ? bonus.mats : ['Iron Ore'];
+          const mat = mats[Math.floor(Math.random() * mats.length)];
+          addI({ n: mat, t: 'mat', q: 1, r: 'common' });
+          lg('✨ FOCUS SURGE! Found ' + mat + '.');
+        } else if (pick === 'rep') {
+          G.guildRepBalance += 5;
+          G.guildRep += 5;
+          lg('✨ FOCUS SURGE! +5 Guild Reputation.');
+        }
+      }
+
       checkAchievements();
       lvlup(); G.state='menu'; render();
     }else{
@@ -8683,6 +8718,8 @@ function saveGame() {
     lastSaveTime: Date.now(),
     lastLoginDay: G.lastLoginDay || -1,
     loginStreak: G.loginStreak || 0,
+    loginHistory: G.loginHistory || [],
+    longestLoginStreak: G.longestLoginStreak || 0,
     loginClaimed: G.loginClaimed || false,
     gameDay: G.gameDay || 0,
     lastRealDay: G.lastRealDay || 0,
@@ -9223,6 +9260,8 @@ function loadGame() {
     G.potionMenu = data.potionMenu || false;
     G.lastLoginDay = data.lastLoginDay || -1;
     G.loginStreak = data.loginStreak || 0;
+    G.loginHistory = data.loginHistory || [];
+    G.longestLoginStreak = data.longestLoginStreak || 0;
     G.loginClaimed = data.loginClaimed || false;
     G.gameDay = data.gameDay || 0;
     G.lastRealDay = data.lastRealDay || 0;
@@ -10690,13 +10729,18 @@ function rToday() {
   }
 
   // Daily login
+  const streakStrip = (G.loginHistory || []).slice(-7).map(() => '🔥').join(' ') || '—';
+  const streakStripPad = 7 - (G.loginHistory || []).slice(-7).length;
+  const streakStripHTML = streakStrip + (streakStripPad > 0 ? ' ' + '⚪'.repeat(streakStripPad) : '');
   h += '<div class="panel' + (G.loginClaimed ? '' : ' panel-gold') + '">';
   if (!G.loginClaimed) {
     h += '<div class="panel-title" style="color:var(--gold);">🎁 Daily Reward Ready</div>';
-    h += '<div class="btn-hint" style="margin:6px 0 10px;">Streak: ' + (G.loginStreak || 1) + ' day' + ((G.loginStreak || 1) > 1 ? 's' : '') + '</div>';
+    h += '<div class="btn-hint" style="margin:6px 0 4px;">Streak: ' + (G.loginStreak || 1) + ' day' + ((G.loginStreak || 1) > 1 ? 's' : '') + (G.longestLoginStreak > (G.loginStreak || 1) ? ' (best: ' + G.longestLoginStreak + ')' : '') + '</div>';
+    h += '<div style="font-size:16px;letter-spacing:2px;margin-bottom:10px;">' + streakStripHTML + '</div>';
     h += '<button onclick="claimDailyLoginReward()" class="abtn" style="width:100%;">Claim It</button>';
   } else {
-    h += '<div class="panel-row"><div class="panel-title">🔥 Login Streak</div><div class="btn-hint">' + (G.loginStreak || 1) + ' day' + ((G.loginStreak || 1) > 1 ? 's' : '') + '</div></div>';
+    h += '<div class="panel-row"><div class="panel-title">🔥 Login Streak</div><div class="btn-hint">' + (G.loginStreak || 1) + ' day' + ((G.loginStreak || 1) > 1 ? 's' : '') + (G.longestLoginStreak > (G.loginStreak || 1) ? ' (best: ' + G.longestLoginStreak + ')' : '') + '</div></div>';
+    h += '<div style="font-size:16px;letter-spacing:2px;margin:6px 0;">' + streakStripHTML + '</div>';
     h += '<div class="btn-hint">Already claimed today. Come back tomorrow.</div>';
   }
   h += '</div>';
