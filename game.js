@@ -2174,6 +2174,8 @@ storyJournal: {
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
+  afkAdventure: { active: false, zoneIndices: [], startTime: 0, totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {} },
+  afkAdventurePicker: [], // temporary selection state while choosing zones, before starting
   mercenary: { active: false, current: null }, // current offered contract, if any
   strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
   siegeDefense: { active: false, strongholdId: null, wave: 0, maxWaves: 3 },
@@ -7937,7 +7939,11 @@ function startGrindWave() {
   const wave = G.endlessGrind.wave;
   const playerLv = G.p.lvl;
   const diffMult = G.endlessGrind.difficultyMult[G.endlessGrind.difficulty] || 1.0;
-  const maxZoneLv = Math.min(playerLv, Math.floor(wave / 3) + 1);
+  // The tier selector (Lv.X buttons) lets the player deliberately cap which zone
+  // enemies are drawn from — previously this value was set by the buttons but never
+  // actually read here, so selecting a tier did nothing at all.
+  const tierCap = G.endlessGrind.maxZoneLevel || playerLv;
+  const maxZoneLv = Math.min(playerLv, tierCap, Math.floor(wave / 3) + 1);
   const eligibleZones = G.zones.filter(z => z.lv <= maxZoneLv);
   const zone = eligibleZones[Math.floor(Math.random() * eligibleZones.length)] || G.zones[0];
   const baseCount = Math.floor(Math.random() * 2) + 1 + Math.floor(wave / 5);
@@ -8175,18 +8181,52 @@ function toggleAutoNext() {
   render();
 }
 
+function renderAfkAdventureBar() {
+  const a = document.getElementById('app'); if (!a) return;
+  const adv = G.afkAdventure;
+  const minutesPassed = adv.startTime ? Math.floor((Date.now() - adv.startTime) / 60000) : 0;
+  const zoneNames = adv.zoneIndices.map(i => G.zones[i]?.n).filter(Boolean).join(', ');
+  const bossEntries = Object.entries(adv.bossKills);
+  a.innerHTML = '<div class="afk-grind-bar">'
+    + '<div class="afk-grind-title">🎯 AFK Adventure</div>'
+    + '<div style="text-align:center;font-size:12px;color:var(--text-dim);margin-bottom:12px;">' + zoneNames + '</div>'
+    + '<div class="afk-grind-stats">'
+    + '<span>\u23F1\uFE0F ' + minutesPassed + 'm</span>'
+    + '<span>\u2694\uFE0F ' + adv.totalKills + '</span>'
+    + '<span>\u2728 +' + adv.totalXp.toLocaleString() + ' XP</span>'
+    + '<span style="color:var(--gold);">\uD83D\uDCB0 +' + adv.totalGold.toLocaleString() + 'G</span>'
+    + '</div>'
+    + (bossEntries.length > 0
+      ? '<div style="text-align:center;background:rgba(245,215,110,0.12);border:1px solid var(--gold);border-radius:10px;padding:8px;margin-bottom:12px;font-size:14px;font-weight:800;color:var(--gold);">👑 ' + bossEntries.map(([n, c]) => n + (c > 1 ? ' ×' + c : '')).join(' &nbsp;\u2022&nbsp; ') + '</div>'
+      : '<div style="text-align:center;font-size:12px;color:var(--text-dim);margin-bottom:12px;">No boss encounters yet</div>')
+    + '<div class="afk-grind-row" style="justify-content:center;">'
+    + '<button onclick="stopAfkAdventure()">Stop &amp; Exit</button></div>'
+    + '</div>';
+}
+
 function renderAfkGrindBar() {
   const a = document.getElementById('app'); if (!a) return;
   const g = G.endlessGrind;
+  const minutesPassed = G.grindAfkStartTime ? Math.floor((Date.now() - G.grindAfkStartTime) / 60000) : 0;
+  const xpGained = g.totalXp - (G.grindAfkStartXp || 0);
+  const goldGained = g.totalGold - (G.grindAfkStartGold || 0);
   a.innerHTML = '<div class="afk-grind-bar">'
-    + '<span>⚔️ Grind Room — Wave ' + g.wave + '</span>'
-    + '<span>Auto-next: ' + (g.autoNext ? 'ON' : 'OFF') + '</span>'
-    + '<button onclick="stopAfkGrind()">Stop &amp; Exit</button>'
+    + '<div class="afk-grind-title">⚔️ Grind Room \u2014 Wave ' + g.wave + '</div>'
+    + '<div class="afk-grind-stats">'
+    + '<span>\u23F1\uFE0F ' + minutesPassed + 'm</span>'
+    + '<span>\u2728 +' + xpGained.toLocaleString() + ' XP</span>'
+    + '<span style="color:var(--gold);">\uD83D\uDCB0 +' + goldGained.toLocaleString() + 'G</span>'
+    + '</div>'
+    + '<div class="afk-grind-row"><span>Auto-next: ' + (g.autoNext ? 'ON' : 'OFF') + '</span>'
+    + '<button onclick="stopAfkGrind()">Stop &amp; Exit</button></div>'
     + '</div>';
 }
 
 function startAfkGrind() {
   G.grindAfkMode = true;
+  G.grindAfkStartTime = Date.now();
+  G.grindAfkStartXp = G.endlessGrind.totalXp;
+  G.grindAfkStartGold = G.endlessGrind.totalGold;
   render();
 }
 
@@ -8393,22 +8433,102 @@ handleDefeat = function() {
   }
 };
 
-function sc(zi) {
+// === AFK ADVENTURE MODE ===
+// Auto-repeats real zone exploration (not procedural waves) across up to 3 chosen
+// zones — for farming a specific boss/elite a quest needs, without babysitting it.
+// Uses sc(zi, true) to skip every interactive branch (explore events, secrets,
+// mini-stories, road ambush) so the loop can never silently stall waiting on a
+// choice prompt nobody is there to answer.
+function afkAdventureNextEncounter() {
+  if (!G.afkAdventure.active) return;
+  const zi = G.afkAdventure.zoneIndices[Math.floor(Math.random() * G.afkAdventure.zoneIndices.length)];
+  sc(zi, true);
+  // sc() doesn't turn on auto-combat itself — without this the fight would just sit
+  // there waiting for a manual tap that never comes, stalling the entire AFK loop.
+  if (G.cbt.on) {
+    G.cbt.autoCombat = true;
+    G.autoCombatHeartbeat = Date.now();
+    doAutoCombatTick();
+  }
+}
+
+function startAfkAdventure(zoneIndices) {
+  if (zoneIndices.length === 0) { lg('❌ Select at least one zone first.'); return; }
+  G.afkAdventure.active = true;
+  G.afkAdventure.zoneIndices = zoneIndices;
+  G.afkAdventure.startTime = Date.now();
+  G.afkAdventure.totalXp = 0;
+  G.afkAdventure.totalGold = 0;
+  G.afkAdventure.totalKills = 0;
+  G.afkAdventure.bossKills = {};
+  G.grindAfkMode = false; // distinct render path from Grind's AFK bar
+  afkAdventureNextEncounter();
+}
+
+function stopAfkAdventure() {
+  G.afkAdventure.active = false;
+  G.afkAdventurePicker = [];
+  G.cbt.autoCombat = false;
+  G.cbt.on = false;
+  G.currentBoss = null;
+  G.state = 'menu';
+  render();
+}
+
+const _originalHandleVictoryForAfkAdv = handleVictory;
+handleVictory = function() {
+  if (G.afkAdventure.active) {
+    const wasBoss = G.currentBoss ? G.currentBoss.n : null;
+    const txp = G.cbt.en.reduce((s, e) => s + e.xp, 0);
+    const tg2 = G.cbt.en.reduce((s, e) => s + e.g, 0);
+    _originalHandleVictoryForAfkAdv();
+    G.afkAdventure.totalXp += txp;
+    G.afkAdventure.totalGold += tg2;
+    G.afkAdventure.totalKills += 1;
+    if (wasBoss) {
+      G.afkAdventure.bossKills[wasBoss] = (G.afkAdventure.bossKills[wasBoss] || 0) + 1;
+      lg('👑 AFK Adventure: ' + wasBoss + ' defeated!');
+    }
+    if (G.afkAdventure.active) setTimeout(afkAdventureNextEncounter, 1200);
+  } else {
+    _originalHandleVictoryForAfkAdv();
+  }
+};
+
+const _originalHandleDefeatForAfkAdv = handleDefeat;
+handleDefeat = function() {
+  if (G.afkAdventure.active) {
+    if (checkSecondWind()) { render(); return; }
+    lg('💀 AFK Adventure interrupted \u2014 the party could not hold.');
+    G.p.hp = 1;
+    for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
+    G.cbt.autoCombat = false;
+    G.cbt.on = false;
+    G.afkAdventure.active = false;
+    G.currentBoss = null;
+    G.state = 'menu';
+    render();
+  } else {
+    _originalHandleDefeatForAfkAdv();
+  }
+};
+
+function sc(zi, skipEvents) {
   const z=G.zones[zi];
   // 30% chance for explore event before combat
-  if(Math.random() < 0.3 && doExploreEvent()) {
+  if(!skipEvents && Math.random() < 0.3 && doExploreEvent()) {
     G.state='explore';
     render();
     return;
   }
   checkNPCUnlocks();
-  if (Math.random() < 0.15 && canDiscoverSecret(z.n)) {
+  if(!skipEvents && Math.random() < 0.15 && canDiscoverSecret(z.n)) {
     if (discoverSecret(z.n)) return;
   }
-  if (checkMiniStory(z.n)) return;
+  if(!skipEvents && checkMiniStory(z.n)) return;
   // Road ambush: a frequent chance the trip itself gets interrupted before you ever
   // reach the intended zone — a real, constant threat, not just danger once you arrive.
-  if (Math.random() < ROAD_AMBUSH_CHANCE) {
+  if(!skipEvents && Math.random() < ROAD_AMBUSH_CHANCE) {
     startRoadAmbush(z);
     return;
   }
@@ -9820,6 +9940,15 @@ function render(){
     return;
   }
 
+  // AFK Adventure Mode — same idea, but checked on activity alone rather than a
+  // specific G.state, since this mode cycles between 'explore' and 'combat' every
+  // single encounter (unlike Grind's autoNext, which stays in 'combat' throughout).
+  // Without this, the full explore screen would flash back in during every gap.
+  if (G.afkAdventure.active) {
+    renderAfkAdventureBar();
+    return;
+  }
+
   initPartyGearBonus();
 
   const a=document.getElementById('app'); if(!a)return;
@@ -9862,6 +9991,7 @@ function render(){
   else if(G.state=='forge')h+=rForge();
   else if(G.state=='bonding')h+=rBonding();
   else if(G.state=='mercenary')h+=rMercenary();
+  else if(G.state=='afk_adventure')h+=rAfkAdventurePicker();
   else if(G.state=='today')h+=rToday();
   else if(G.state=='bondingscene')h+=rBondingScene();
 
@@ -9895,7 +10025,8 @@ function attachEvents() {
     else if(a=='forge')setS('forge');
     else if(a=='bonding')setS('bonding');
     else if(a=='mercenary')setS('mercenary');
-    else if(a=='today')setS('today');});
+    else if(a=='today')setS('today');
+    else if(a=='afk_adventure')setS('afk_adventure');});
   });
  const btnClaimLogin = document.getElementById('btn-claim-login');
 if (btnClaimLogin) {
@@ -10751,7 +10882,7 @@ function rGrindRoom() {
   h += '<div class="st" style="text-align:center;">⚔️ Endless Grind Room</div>';
   
   // Stats bar
-  const effectiveLv = Math.min(G.p.lvl, Math.floor(g.wave / 3) + 1);
+  const effectiveLv = Math.min(G.p.lvl, g.maxZoneLevel || G.p.lvl, Math.floor(g.wave / 3) + 1);
   h += '<div class="pstat">';
   h += '<span class="mst">Wave: <b>' + g.wave + '</b></span>';
   h += '<span class="mst" title="Enemies this wave are drawn from zones up to this level">Enemy Lv: <b>' + effectiveLv + '</b></span>';
@@ -10787,9 +10918,9 @@ function rGrindRoom() {
       
       // Tier selector
       h += '<div style="margin-bottom:12px;">';
-      h += '<div class="btn-hint" style="margin-bottom:6px;">Max Zone Tier</div>';
+      h += '<div class="btn-hint" style="margin-bottom:6px;"><b>Max Zone Tier</b> \u2014 which zone level enemies are drawn from. Separate from Difficulty below, which scales stats/rewards on top of whatever tier is picked.</div>';
       h += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
-      const maxTier = Math.min(G.p.lvl, 35);
+      const maxTier = G.p.lvl;
       for (let t = 1; t <= maxTier; t++) {
         const z = G.zones.find(zn => zn.lv === t);
         const isSel = g.maxZoneLevel === t;
@@ -11075,6 +11206,42 @@ function rToday() {
       h += '</div>';
     }
   }
+
+  h += '</div>';
+  return h;
+}
+
+function toggleAfkAdventureZone(zi) {
+  const idx = G.afkAdventurePicker.indexOf(zi);
+  if (idx >= 0) {
+    G.afkAdventurePicker.splice(idx, 1);
+  } else {
+    if (G.afkAdventurePicker.length >= 3) { lg('❌ Up to 3 zones at a time.'); return; }
+    G.afkAdventurePicker.push(zi);
+  }
+  render();
+}
+
+function rAfkAdventurePicker() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">🎯 AFK Adventure</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Pick up to 3 unlocked zones \u2014 the party will auto-explore them on repeat, in the background, including their normal boss chance. Good for farming a specific boss or elite a quest needs.</div>';
+
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">Selected: ' + G.afkAdventurePicker.length + '/3</div>';
+  for (let i = 0; i < G.zones.length; i++) {
+    const z = G.zones[i];
+    if (G.p.lvl < z.lv) continue; // only unlocked zones
+    const selected = G.afkAdventurePicker.includes(i);
+    const boss = G.bosses.find(b => b.zone === z.n);
+    h += '<button onclick="toggleAfkAdventureZone(' + i + ')" class="btn-outline-ghost" style="width:100%;text-align:left;margin-bottom:6px;' + (selected ? 'border-color:var(--accent);background:rgba(124,58,237,0.15);' : '') + '">';
+    h += (selected ? '✓ ' : '') + z.n + ' <span style="opacity:0.6;">(Lv.' + z.lv + ')</span>';
+    if (boss) h += '<br><span style="font-size:10px;opacity:0.6;">👑 ' + boss.n + '</span>';
+    h += '</button>';
+  }
+  h += '</div>';
+
+  h += '<button onclick="startAfkAdventure(G.afkAdventurePicker)" class="abtn" style="width:100%;"' + (G.afkAdventurePicker.length === 0 ? ' disabled' : '') + '>Start AFK Adventure</button>';
 
   h += '</div>';
   return h;
@@ -11537,6 +11704,7 @@ function rMenu(){
     { title: '📋 Quick Work', items: [
       {i:'📅',l:'Today',a:'today'},
       {i:'📋',l:'Mercenary',a:'mercenary'},
+      {i:'🎯',l:'AFK Adventure',a:'afk_adventure'},
     ]},
     { title: '🏰 Guild & Stronghold', items: [
       {i:'🛡️',l:'Guild',a:'guild'},

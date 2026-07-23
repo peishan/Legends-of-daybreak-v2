@@ -700,31 +700,53 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 }
 
 /* ============================================================
-   AFK GRIND MODE — minimal bottom bar, everything else skipped
+   AFK GRIND MODE — minimal view, everything else skipped
    ============================================================ */
 .afk-grind-bar {
   position: fixed;
-  left: 0; right: 0; bottom: 0;
+  left: 12px; right: 12px; bottom: 12px;
   background: var(--bg-card);
-  border-top: 2px solid var(--accent);
-  padding: 14px 16px;
+  border: 3px solid var(--accent);
+  border-radius: 18px;
+  box-shadow: 0 10px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(124,58,237,0.2);
+  padding: 22px 18px;
+  font-family: 'Nunito', sans-serif;
+  color: var(--text);
+}
+.afk-grind-title {
+  font-family: 'Cinzel', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--accent-light);
+  margin-bottom: 14px;
+  text-align: center;
+}
+.afk-grind-stats {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.afk-grind-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 13px;
+  font-size: 17px;
   font-weight: 700;
-  color: var(--text);
-  flex-wrap: wrap;
+  padding-top: 14px;
+  border-top: 2px solid var(--border);
 }
 .afk-grind-bar button {
   background: var(--danger);
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 8px 14px;
-  font-size: 12px;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
 }
