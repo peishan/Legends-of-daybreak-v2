@@ -2176,6 +2176,7 @@ storyJournal: {
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
   afkAdventure: { active: false, zoneIndices: [], startTime: 0, totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {} },
   afkAdventurePicker: [], // temporary selection state while choosing zones, before starting
+  notificationsEnabled: false,
   mercenary: { active: false, current: null }, // current offered contract, if any
   strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
   siegeDefense: { active: false, strongholdId: null, wave: 0, maxWaves: 3 },
@@ -3749,6 +3750,16 @@ function applyAffinityUnlockFx(member, u) {
 
 function updateAffinity(partyMemberName, amount) {
   if (!G.affinity[partyMemberName]) return;
+  // Soel's Bonding Catalyst — boosts affinity GAIN itself for every other companion
+  // while he's active, matching his established "the space between people" role.
+  // Deliberately excludes himself (boosting his own affinity gain would be circular)
+  // and only applies to positive gains, not decay.
+  if (amount > 0 && partyMemberName !== 'Soel') {
+    const soelActive = G.party.some(p => p.n === 'Soel' && p.on && p.hp > 0);
+    if (soelActive && G.p.lvl >= SOEL_BONDING_CATALYST_UNLOCK) {
+      amount = Math.ceil(amount * 1.15);
+    }
+  }
   G.affinity[partyMemberName].val = Math.max(0, G.affinity[partyMemberName].val + amount);
   G.affinity[partyMemberName].lastInteract = Date.now();
   if (amount > 0) {
@@ -4516,6 +4527,202 @@ const AILMENT_INFLICT_CHANCE = 0.12;
 const ELIZ_CLEANSING_UNLOCK = 40;
 const ELIZ_CLEANSING_CHANCE = 0.30;
 const TEMPLE_CURE_COST = 100;
+
+// === ELIZ HEALER ABILITIES: SANCTUARY, BLESS, TURN UNDEAD, DEATH WARD ===
+// Standalone passive checks, same pattern as Sacred Cleansing — deliberately NOT added
+// to the existing Resurrect -> Heal -> Attack priority chain in doPartyAttack(), since
+// that chain is delicate and these are buff/utility abilities, not turn-consuming ones.
+const ELIZ_SANCTUARY_UNLOCK = 22;
+const ELIZ_BLESS_UNLOCK = 28;
+const ELIZ_TURN_UNDEAD_UNLOCK = 33;
+const ELIZ_DEATH_WARD_UNLOCK = 45;
+
+function isElizActive() {
+  return G.party.some(p => p.n === 'Eliz' && p.on && p.hp > 0);
+}
+
+// === JOEL PALADIN ABILITIES: LAY ON HANDS, DIVINE STRENGTH, PROTECTION FROM EVIL, SMITE UNDEAD ===
+// Same standalone pattern as Eliz's abilities. Protection from Evil and Smite Undead are
+// checked directly at combat damage-calc time (see doEnemyAttack/doPartyAttack) since
+// they're always-on once unlocked, not periodic procs — only Lay on Hands and Divine
+// Strength need per-round state here.
+const JOEL_LAYONHANDS_UNLOCK = 24;
+const JOEL_DIVINE_STRENGTH_UNLOCK = 30;
+const JOEL_PROTECTION_UNLOCK = 36;
+const JOEL_SMITE_UNDEAD_UNLOCK = 42;
+
+function isJoelActive() {
+  return G.party.some(p => p.n === 'Joel' && p.on && p.hp > 0);
+}
+
+function tickJoelPaladinAbilities() {
+  if (!isJoelActive()) return;
+
+  // Lay on Hands — once per rest, heals whoever is most critically wounded (San or a
+  // companion) if anyone has dropped below 40% HP. Guaranteed, not chance-based — the
+  // deliberate contrast to Eliz's frequent-but-random Gentle Pulse.
+  if (G.p.lvl >= JOEL_LAYONHANDS_UNLOCK && !G.joelLayOnHandsUsed) {
+    const allies = [{ n: 'San', hp: G.p.hp, mhp: G.p.mhp, isPlayer: true }];
+    for (let p of G.party) {
+      if (p.on && p.hp > 0 && p.n !== 'Joel') allies.push({ n: p.n, hp: p.hp, mhp: p.mhp, isPlayer: false, ref: p });
+    }
+    const critical = allies.filter(a => (a.hp / a.mhp) < 0.40);
+    if (critical.length > 0) {
+      const worst = critical.reduce((a, b) => (a.hp / a.mhp) < (b.hp / b.mhp) ? a : b);
+      const healAmt = Math.floor(worst.mhp * 0.35);
+      if (worst.isPlayer) {
+        G.p.hp = Math.min(G.p.mhp, G.p.hp + healAmt);
+      } else {
+        worst.ref.hp = Math.min(worst.ref.mhp, worst.ref.hp + healAmt);
+      }
+      G.joelLayOnHandsUsed = true;
+      lg('🙌 Joel lays hands on ' + (worst.isPlayer ? 'you' : worst.n) + '! +' + healAmt + ' HP. (Once per rest)');
+    }
+  }
+
+  // Divine Strength — temporary ATK surge for Joel himself, read at damage-calc time
+  // via G.joelDivineStrength rather than mutating his stats directly (mutating .atk
+  // would get silently overwritten the next time his equipment recalculates).
+  if (G.p.lvl >= JOEL_DIVINE_STRENGTH_UNLOCK) {
+    if (G.joelDivineStrength > 0) {
+      G.joelDivineStrength--;
+    } else if (Math.random() < 0.15) {
+      G.joelDivineStrength = 4;
+      lg('⚡ Joel calls on Divine Strength! His attacks hit harder for a few turns.');
+    }
+  }
+}
+
+// === ZAKI FIGHTER ABILITIES: EXTRA ATTACK, CLEAVE, SECOND WIND ===
+// Extra Attack and Cleave are checked directly inside doPartyAttack() (self-contained,
+// see there) since they trigger off that specific attack's outcome. Second Wind is the
+// only one needing a per-round state check, following Joel's Lay on Hands pattern —
+// once per rest, self-triggered when critical, which also happens to land well on his
+// established arc (the anxious kid finding his own resilience mid-fight).
+const ZAKI_EXTRA_ATTACK_UNLOCK = 20;
+const ZAKI_CLEAVE_UNLOCK = 27;
+const ZAKI_SECOND_WIND_UNLOCK = 34;
+
+// === SENEDRA RANGER ABILITIES: EVASION, FAVORED ENEMY, PINNING SHOT ===
+// All checked directly at combat time (doEnemyAttack/doPartyAttack) — none need a
+// per-round tick function since they're all reactive to a specific attack, not
+// periodic procs.
+const SENEDRA_EVASION_UNLOCK = 18;
+const SENEDRA_FAVORED_ENEMY_UNLOCK = 26;
+const SENEDRA_PINNING_SHOT_UNLOCK = 32;
+
+// === AISYAH ROGUE ABILITIES: SNEAK ATTACK, POISON BLADE, COUP DE GRACE ===
+// All checked directly at combat time (doPartyAttack), same as Senedra's — reactive
+// to a specific attack, no per-round tick needed.
+const AISYAH_SNEAK_ATTACK_UNLOCK = 16;
+const AISYAH_POISON_BLADE_UNLOCK = 23;
+const AISYAH_COUP_DE_GRACE_UNLOCK = 31;
+
+// === MEZSTORM STORM MAGE ABILITIES: STORM SHIELD, ARC STRIKE, STATIC FIELD ===
+// Named "Arc Strike" rather than "Chain Lightning" deliberately — San already has a
+// spell called Chain Lightning (tier 6), and reusing the name for a different
+// companion mechanic would be confusing even though they're mechanically distinct.
+const MEZSTORM_STORM_SHIELD_UNLOCK = 17;
+const MEZSTORM_ARC_STRIKE_UNLOCK = 25;
+const MEZSTORM_STATIC_FIELD_UNLOCK = 29;
+
+function tickZakiFighterAbilities() {
+  const zaki = G.party.find(p => p.n === 'Zaki' && p.on && p.hp > 0);
+  if (!zaki) return;
+  if (G.p.lvl < ZAKI_SECOND_WIND_UNLOCK || G.zakiSecondWindUsed) return;
+  if ((zaki.hp / zaki.mhp) >= 0.30) return;
+
+  const healAmt = Math.floor(zaki.mhp * 0.30);
+  zaki.hp = Math.min(zaki.mhp, zaki.hp + healAmt);
+  G.zakiSecondWindUsed = true;
+  lg('🔥 Zaki catches his Second Wind! +' + healAmt + ' HP. He is not done yet. (Once per rest)');
+}
+
+// === SOEL ABILITIES: DANGER SENSE, BONDING CATALYST, WARM PRESENCE ===
+// Danger Sense lives in doEnemyAttack (reactive, opening-round only) and Bonding
+// Catalyst lives directly in updateAffinity (see there). Warm Presence is the only one
+// needing a per-round tick — a small constant trickle, not threshold-triggered like
+// Eliz's Gentle Pulse, so the two don't step on each other.
+const SOEL_WARM_PRESENCE_UNLOCK = 14;
+const SOEL_DANGER_SENSE_UNLOCK = 20;
+const SOEL_BONDING_CATALYST_UNLOCK = 26;
+
+function tickSoelWarmPresence() {
+  const soel = G.party.find(p => p.n === 'Soel' && p.on && p.hp > 0);
+  if (!soel) return;
+  if (G.p.lvl < SOEL_WARM_PRESENCE_UNLOCK) return;
+
+  const hpAmt = Math.max(1, Math.floor(G.p.mhp * 0.03));
+  const mpAmt = Math.max(1, Math.floor(G.p.mmp * 0.03));
+  let healedAnyone = false;
+  if (G.p.hp < G.p.mhp) { G.p.hp = Math.min(G.p.mhp, G.p.hp + hpAmt); healedAnyone = true; }
+  if (G.p.mp < G.p.mmp) { G.p.mp = Math.min(G.p.mmp, G.p.mp + mpAmt); healedAnyone = true; }
+  for (let p of G.party) {
+    if (p.on && p.hp > 0 && p.n !== 'Soel' && p.hp < p.mhp) {
+      p.hp = Math.min(p.mhp, p.hp + Math.max(1, Math.floor(p.mhp * 0.03)));
+      healedAnyone = true;
+    }
+  }
+  if (healedAnyone) lg('🐱 Soel curls in close. The whole party feels a little steadier.');
+}
+
+function tickElizHealerAbilities() {
+  if (!isElizActive()) return;
+
+  // Turn Undead — chance each round to make an undead-archetype enemy cower, skipping
+  // its next turn. Reuses the exact same enemy-status skip-turn mechanism as 'shock'.
+  if (G.p.lvl >= ELIZ_TURN_UNDEAD_UNLOCK) {
+    for (let e of G.cbt.en) {
+      if (e.hp <= 0) continue;
+      if (getEnemyArchetype(e.n) !== 'undead') continue;
+      if (!e.status) e.status = [];
+      if (e.status.some(s => s.type === 'turned')) continue;
+      if (Math.random() < 0.20) {
+        e.status.push({ type: 'turned', turns: 1 });
+        lg('✨ Eliz turns ' + e.n + '! It cowers, unable to act.');
+      }
+    }
+  }
+
+  // Bless — a party-wide ATK buff, refreshed periodically once it expires.
+  if (G.p.lvl >= ELIZ_BLESS_UNLOCK) {
+    const alreadyBlessed = G.p.buffs.some(b => b.n === 'Blessed');
+    if (!alreadyBlessed && Math.random() < 0.15) {
+      G.p.buffs.push({ n: 'Blessed', t: 4, atk: Math.ceil(G.p.lvl * 0.3) });
+      lg('🙏 Eliz calls a blessing over the party. ATK increased for a few turns.');
+    }
+  }
+
+  // Sanctuary — shields the lowest-HP OTHER active ally from being targeted at all.
+  if (G.p.lvl >= ELIZ_SANCTUARY_UNLOCK) {
+    if (G.elizSanctuary && G.elizSanctuary.turns > 0) {
+      G.elizSanctuary.turns--;
+      if (G.elizSanctuary.turns <= 0) G.elizSanctuary.target = null;
+    } else if (Math.random() < 0.20) {
+      const candidates = G.party.filter(p => p.on && p.hp > 0 && p.n !== 'Eliz');
+      if (candidates.length > 0) {
+        const lowest = candidates.reduce((a, b) => (a.hp / a.mhp) < (b.hp / b.mhp) ? a : b);
+        G.elizSanctuary = { target: lowest.n, turns: 3 };
+        lg('🕊️ Eliz shields ' + lowest.n + ' in sanctuary. Cannot be targeted for 3 turns.');
+      }
+    }
+  }
+
+  // Death Ward — extends the 1-HP-floor protection to one ally (including San herself,
+  // who otherwise has no death protection anywhere in this game), one-time use,
+  // consumed the moment it actually saves someone.
+  if (G.p.lvl >= ELIZ_DEATH_WARD_UNLOCK) {
+    if (!G.elizDeathWard) {
+      const companionCandidates = G.party.filter(p => p.on && p.hp > 0 && p.n !== 'Eliz' && p.passive !== 'guardian_spirit');
+      const candidates = ['San', ...companionCandidates.map(p => p.n)];
+      if (candidates.length > 0 && Math.random() < 0.10) {
+        const targetName = candidates[Math.floor(Math.random() * candidates.length)];
+        G.elizDeathWard = targetName;
+        lg('💫 Eliz wards ' + (targetName === 'San' ? 'you' : targetName) + ' against death.');
+      }
+    }
+  }
+}
 
 function inflictAilment(type) {
   if (G.p.ailments.some(a => a.type === type)) return; // no stacking the same ailment
@@ -5849,7 +6056,7 @@ function doElizPassiveHeal(eliz) {
   updateAffinity('Eliz', 1);
   return true;
 }
-function doPartyAttack(member) {
+function doPartyAttack(member, noBonus) {
   // === ELIZ PASSIVE HEAL CHECK ===
   if (member.n === 'Eliz' && member.hp > 0) {
     // Priority 1: Resurrection (existing)
@@ -5865,7 +6072,8 @@ function doPartyAttack(member) {
   const target = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
   // member.atk/spd already include equipped gear bonuses via recalcPartyMember()
   const zakiCourageBonus = (member.n === 'Zaki' && checkZakiCourage()) ? 6 : 0;
-  const effectiveAtk = member.atk + zakiCourageBonus;
+  const joelDivineStrengthBonus = (member.n === 'Joel' && G.joelDivineStrength > 0) ? Math.ceil(G.p.lvl * 0.4) : 0;
+  const effectiveAtk = member.atk + zakiCourageBonus + joelDivineStrengthBonus;
   const effectiveSpd = member.spd;
   const abilityScore = member.r === 'Rogue' || member.r === 'Ranger' 
     ? effectiveSpd * 2 : effectiveAtk * 2;
@@ -5891,23 +6099,108 @@ function doPartyAttack(member) {
   });
   
   let finalDamage = Math.max(1, damageResult.total - Math.floor((target.def || 0) / 3));
+  const isSmiteUndead = member.n === 'Joel' && G.p.lvl >= JOEL_SMITE_UNDEAD_UNLOCK && getEnemyArchetype(target.n) === 'undead';
+  if (isSmiteUndead) finalDamage = Math.floor(finalDamage * 1.5);
+  const isFavoredEnemy = member.n === 'Senedra' && G.p.lvl >= SENEDRA_FAVORED_ENEMY_UNLOCK && getEnemyArchetype(target.n) === 'beast';
+  if (isFavoredEnemy) finalDamage = Math.floor(finalDamage * 1.4);
+
+  // Aisyah's Sneak Attack — bonus damage the first time she hits THIS specific enemy
+  // this fight. target.aisyahSneakAttacked resets naturally since enemies are fresh
+  // objects every combat, no explicit cleanup needed.
+  const isSneakAttack = member.n === 'Aisyah' && G.p.lvl >= AISYAH_SNEAK_ATTACK_UNLOCK && !target.aisyahSneakAttacked;
+  if (isSneakAttack) {
+    finalDamage = Math.floor(finalDamage * 1.6);
+    target.aisyahSneakAttacked = true;
+  }
+
+  // Aisyah's Coup de Grace — bonus damage AND bonus gold finishing off a low-HP
+  // target, tying back to her established gold-obsessed character rather than being
+  // purely combat flavor.
+  const isCoupDeGrace = member.n === 'Aisyah' && G.p.lvl >= AISYAH_COUP_DE_GRACE_UNLOCK && target.mhp > 0 && (target.hp / target.mhp) <= 0.20;
+  let coupBonusGold = 0;
+  if (isCoupDeGrace) {
+    finalDamage = Math.floor(finalDamage * 1.3);
+    coupBonusGold = 15 + Math.floor(G.p.lvl * 2);
+  }
+
   target.hp -= finalDamage;
   showEnemyDamage(target, finalDamage, attackResult.isCrit);
   
   const critTag = attackResult.isCrit ? ' 💥CRIT' : '';
-  lg('⚔️ ' + member.n + ' hits ' + target.n + ' for ' + finalDamage + critTag);
+  lg('⚔️ ' + member.n + ' hits ' + target.n + ' for ' + finalDamage + critTag + (isSmiteUndead ? ' ✝️ SMITE!' : '') + (isFavoredEnemy ? ' 🏹 FAVORED ENEMY!' : '') + (isSneakAttack ? ' 🗡️ SNEAK ATTACK!' : '') + (isCoupDeGrace ? ' 💰 COUP DE GRÂCE!' : ''));
+  if (isCoupDeGrace) {
+    G.p.gold += coupBonusGold;
+    lg('   +' + coupBonusGold + 'G skimmed in the chaos.');
+  }
+
+  // Aisyah's Poison Blade — chance to poison on hit, reuses the exact same status
+  // shape spells already use rather than inventing a parallel poison system.
+  if (member.n === 'Aisyah' && G.p.lvl >= AISYAH_POISON_BLADE_UNLOCK && target.hp > 0 && Math.random() < 0.25) {
+    if (!target.status) target.status = [];
+    if (!target.status.some(s => s.type === 'poison')) {
+      target.status.push({ type: 'poison', dmg: 4 + Math.floor(G.p.lvl * 0.15), turns: 3 });
+      lg('☠️ Aisyah\'s blade drips poison! ' + target.n + ' is poisoned.');
+    }
+  }
+
+  // Pinning Shot — on hit, chance to debuff the target's next attack rather than
+  // another flat damage bonus, keeping Senedra distinct from Zaki's pure-offense kit.
+  if (member.n === 'Senedra' && G.p.lvl >= SENEDRA_PINNING_SHOT_UNLOCK && target.hp > 0 && Math.random() < 0.25) {
+    if (!target.status) target.status = [];
+    if (!target.status.some(s => s.type === 'pinned')) {
+      target.status.push({ type: 'pinned', turns: 1 });
+      lg('🎯 Senedra pins ' + target.n + '! Its next attack lands weaker.');
+    }
+  }
+
+  // Mezstorm's Arc Strike — chance for lightning to splash to a second enemy for
+  // partial damage. Distinct from Zaki's Cleave: doesn't require a kill, always a
+  // chance-based splash rather than a kill-chain.
+  if (member.n === 'Mezstorm' && G.p.lvl >= MEZSTORM_ARC_STRIKE_UNLOCK && Math.random() < 0.20) {
+    const others = G.cbt.en.filter(e => e.hp > 0 && e !== target);
+    if (others.length > 0) {
+      const splashTarget = others[Math.floor(Math.random() * others.length)];
+      const splashDamage = Math.max(1, Math.floor(finalDamage * 0.5));
+      splashTarget.hp -= splashDamage;
+      showEnemyDamage(splashTarget, splashDamage, false);
+      lg('⚡ Lightning arcs to ' + splashTarget.n + ' for ' + splashDamage + '!');
+      if (splashTarget.hp <= 0) {
+        splashTarget.hp = 0;
+        lg('💀 ' + splashTarget.n + ' falls!');
+        checkBountyKill(splashTarget.n);
+        trackBestiary(splashTarget);
+      }
+    }
+  }
   
-  if (target.hp <= 0) {
+  const killedTarget = target.hp <= 0;
+  if (killedTarget) {
     target.hp = 0;
     lg('💀 ' + target.n + ' falls!');
     checkBountyKill(target.n);
     trackBestiary(target);
+  }
+
+  // Zaki's Extra Attack / Cleave — self-contained here so both call sites (normal
+  // round resolution and the auto-combat "no MP, party still swings" branch) benefit
+  // without duplicating logic. noBonus prevents an Extra Attack swing from itself
+  // triggering another bonus attack (would risk runaway procs); Cleave chains are
+  // naturally bounded by the shrinking number of living enemies, so no cap is needed.
+  if (member.n === 'Zaki' && !noBonus) {
+    if (killedTarget && G.p.lvl >= ZAKI_CLEAVE_UNLOCK && G.cbt.en.some(e => e.hp > 0)) {
+      lg('🗡️ Zaki cleaves through to the next enemy!');
+      doPartyAttack(member, false);
+    } else if (!killedTarget && G.p.lvl >= ZAKI_EXTRA_ATTACK_UNLOCK && Math.random() < 0.20) {
+      lg('⚔️ Zaki strikes again!');
+      doPartyAttack(member, true);
+    }
   }
 }
 
 function doEnemyAttack(enemy) {
   if (enemy.hp <= 0) return;
   
+  let wasPinned = false;
   if (enemy.status && enemy.status.length > 0) {
     for (let s of enemy.status) {
       if (s.type === 'burn' && s.dmg) {
@@ -5923,6 +6216,12 @@ function doEnemyAttack(enemy) {
       if (s.type === 'shock') {
         lg('⚡ ' + enemy.n + ' is shocked and skips this turn!');
       }
+      if (s.type === 'turned') {
+        lg('✨ ' + enemy.n + ' is still cowering from being turned!');
+      }
+      if (s.type === 'pinned') {
+        wasPinned = true;
+      }
       s.turns--;
     }
     enemy.status = enemy.status.filter(s => s.turns > 0);
@@ -5934,12 +6233,15 @@ function doEnemyAttack(enemy) {
       trackBestiary(enemy);
       return;
     }
-    if (enemy.status.find(s => s.type === 'shock')) return;
+    if (enemy.status.find(s => s.type === 'shock' || s.type === 'turned')) return;
   }
   
   let target = G.p;
   if (Math.random() > 0.5) {
-    const activeParty = G.party.filter(p => p.on && p.hp > 0);
+    let activeParty = G.party.filter(p => p.on && p.hp > 0);
+    if (G.elizSanctuary && G.elizSanctuary.target) {
+      activeParty = activeParty.filter(p => p.n !== G.elizSanctuary.target);
+    }
     if (activeParty.length > 0) {
       target = activeParty[Math.floor(Math.random() * activeParty.length)];
     }
@@ -5963,6 +6265,23 @@ function doEnemyAttack(enemy) {
     }
   }
   if (G.joelShieldCooldown > 0) G.joelShieldCooldown--;
+
+  // Senedra's Evasion — a chance to dodge the attack entirely, leveraging her already-
+  // highest SPD stat in the party. Checked before the attack roll even happens.
+  if (target !== G.p && target.n === 'Senedra' && G.p.lvl >= SENEDRA_EVASION_UNLOCK && Math.random() < 0.20) {
+    lg('💨 Senedra evades ' + enemy.n + "'s attack entirely!");
+    return;
+  }
+
+  // Soel's Danger Sense — wards against the OPENING hit of a fight specifically,
+  // whoever it's aimed at. Distinct from every other protection in the party's kit,
+  // all of which are either always-on or triggered by low HP — this one only ever
+  // matters in the first round, before anyone's actually been hurt yet.
+  const soelActive = G.party.some(p => p.n === 'Soel' && p.on && p.hp > 0);
+  if (soelActive && G.cbt.turn === 0 && G.p.lvl >= SOEL_DANGER_SENSE_UNLOCK && Math.random() < 0.25) {
+    lg('🐱 Soel senses it coming! ' + (target === G.p ? 'You step' : target.n + ' steps') + ' aside before ' + enemy.n + "'s opening strike lands.");
+    return;
+  }
     
   // target.def already includes equipped gear bonuses via recalcPartyMember()
   const targetAC = target === G.p ? getPlayerAC() : 10 + Math.floor(((target.def || 0) + getBlessDef(target)) / 2);
@@ -5995,6 +6314,41 @@ function doEnemyAttack(enemy) {
   finalDamage = Math.max(1, finalDamage - Math.floor(targetDef / 2));
   finalDamage = applySynergyDefense(finalDamage);
 
+  // Senedra's Pinning Shot: the enemy landed the hit, but weaker than it should have been.
+  if (wasPinned) {
+    finalDamage = Math.floor(finalDamage * 0.7);
+    lg('🎯 ' + enemy.n + "'s attack lands weaker \u2014 still pinned from Senedra's shot!");
+  }
+
+  // Joel's Protection from Evil: an aura, not tied to who's actually being hit — reduces
+  // damage from undead/void-coded enemies for the whole party while he's active.
+  if (isJoelActive() && G.p.lvl >= JOEL_PROTECTION_UNLOCK && (getEnemyArchetype(enemy.n) === 'undead' || enemy.elem === 'void')) {
+    finalDamage = Math.floor(finalDamage * 0.85);
+  }
+
+  // Mezstorm's Storm Shield: same aura pattern, reduces damage from lightning-elemental
+  // enemies specifically — he already knows how to survive a storm.
+  const mezActive = G.party.some(p => p.n === 'Mezstorm' && p.on && p.hp > 0);
+  if (mezActive && G.p.lvl >= MEZSTORM_STORM_SHIELD_UNLOCK && enemy.elem === 'lightning') {
+    finalDamage = Math.floor(finalDamage * 0.80);
+  }
+
+  // Mezstorm's Static Field: retaliation — the enemy takes lightning damage back for
+  // having attacked at all, while he's active.
+  if (mezActive && G.p.lvl >= MEZSTORM_STATIC_FIELD_UNLOCK && enemy.hp > 0 && Math.random() < 0.30) {
+    const staticDmg = 3 + Math.floor(G.p.lvl * 0.2);
+    enemy.hp -= staticDmg;
+    showEnemyDamage(enemy, staticDmg, false);
+    lg('⚡ Static Field crackles! ' + enemy.n + ' takes ' + staticDmg + ' retaliation damage.');
+    if (enemy.hp <= 0) {
+      enemy.hp = 0;
+      lg('💀 ' + enemy.n + ' falls to the static charge before its attack lands!');
+      checkBountyKill(enemy.n);
+      trackBestiary(enemy);
+      return; // dead enemy can't still land the attack this function is resolving
+    }
+  }
+
   // Joel's Last Stand: if this hit would actually kill San, and Joel is ready, he takes
   // it instead. Checked before damage lands so San is never even reduced below 1.
   if (target === G.p && (G.p.hp - finalDamage) <= 0 && isGrowthAbilityReady('Joel')) {
@@ -6025,6 +6379,10 @@ function doEnemyAttack(enemy) {
       G.joelReviveUsed = true;
       target.hp = Math.floor(target.mhp * 0.5);
       protectionMsg = '💜 UNBREAKABLE! Joel refuses to fall — he rises again at ' + target.hp + ' HP! (Once per rest)';
+    } else if (G.elizDeathWard && ((target === G.p && G.elizDeathWard === 'San') || (target !== G.p && target.n === G.elizDeathWard))) {
+      G.elizDeathWard = null;
+      target.hp = 1;
+      protectionMsg = '💫 Death Ward flares! ' + (target === G.p ? 'You are' : target.n + ' is') + ' pulled back from the brink!';
     } else {
       target.hp = 0;
       protectionMsg = '💀 ' + (target.n || 'You') + ' fall unconscious!';
@@ -6498,6 +6856,10 @@ function finishPlayerTurn() {
   }
   
   tickAilments();
+  tickElizHealerAbilities();
+  tickJoelPaladinAbilities();
+  tickZakiFighterAbilities();
+  tickSoelWarmPresence();
 
   if (G.p.hp <= 0) {
     handleDefeat();
@@ -7490,6 +7852,14 @@ function startRest(siteId) {
   if (G.joelReviveUsed) {
     G.joelReviveUsed = false;
     lg('💜 Joel steadies his shield. Unbreakable is ready again.');
+  }
+  if (G.joelLayOnHandsUsed) {
+    G.joelLayOnHandsUsed = false;
+    lg('🙌 Joel\'s hands are ready to heal again.');
+  }
+  if (G.zakiSecondWindUsed) {
+    G.zakiSecondWindUsed = false;
+    lg('🔥 Zaki catches his breath. Second Wind is ready again.');
   }
   G.growthAbilityUsed = {};
   const healerName = getHealerName();
@@ -8502,6 +8872,7 @@ handleVictory = function() {
     if (wasBoss) {
       G.afkAdventure.bossKills[wasBoss] = (G.afkAdventure.bossKills[wasBoss] || 0) + 1;
       lg('👑 AFK Adventure: ' + wasBoss + ' defeated!');
+      sendLocalNotification('Boss Defeated', wasBoss + ' fell while you were away.');
     }
     if (G.afkAdventure.active) setTimeout(afkAdventureNextEncounter, 1200);
   } else {
@@ -8919,6 +9290,7 @@ function sf(minutes){
       const fq=G.quests.find(q=>q.t=='focus');
       if(fq&&!fq.done){fq.c++;checkQ();}
       lg('Focus complete! +' + baseXp + 'XP +' + baseGold + 'G Streak:'+G.p.fstreak);
+      sendLocalNotification('Focus Session Complete', '+' + baseXp + ' XP, +' + baseGold + 'G. Streak: ' + G.p.fstreak + '.');
 
       // Focus Surge: a small chance of a bonus on top — variable reward so repeat
       // sessions feel less like a fixed transaction and more worth doing again.
@@ -8984,6 +9356,51 @@ function showEnemyDamage(target, amount, isCrit) {
 function showPlayerDamage(amount, isCrit) {
   const el = document.querySelector('.hdr-r .bar');
   showFloatingDamage(el, amount, { crit: isCrit });
+}
+
+// === LOCAL NOTIFICATIONS ===
+// Local only, deliberately — for things that happen while the app is open or recently
+// backgrounded (Focus session done, AFK Adventure found a boss). NOT true push: nothing
+// can wake this app from fully closed, since that requires a backend to send the push
+// in the first place, and this is a static site with none. Uses the service worker's
+// registration to fire notifications, which is more reliable than the raw Notification
+// constructor for PWAs specifically — works even when the tab is backgrounded, not
+// just fully focused.
+function requestNotificationPermission() {
+  if (!('Notification' in window)) {
+    lg('❌ This browser does not support notifications.');
+    return;
+  }
+  Notification.requestPermission().then(permission => {
+    if (permission === 'granted') {
+      G.notificationsEnabled = true;
+      lg('🔔 Notifications enabled. You\'ll get a nudge for Focus completions and AFK Adventure boss kills.');
+      sendLocalNotification('Notifications On', 'You\'ll hear from Legends of Daybreak when it matters.');
+    } else {
+      G.notificationsEnabled = false;
+      lg('🔕 Notifications not enabled.');
+    }
+    render();
+  });
+}
+
+function sendLocalNotification(title, body) {
+  if (!G.notificationsEnabled || !('Notification' in window) || Notification.permission !== 'granted') return;
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(reg => {
+      reg.showNotification(title, {
+        body: body,
+        icon: './icons/icon-192.png',
+        badge: './icons/icon-192.png',
+        tag: 'daybreak-notification' // replaces any previous notification rather than stacking
+      });
+    }).catch(() => {
+      // Fallback if the service worker isn't ready for some reason
+      try { new Notification(title, { body: body, icon: './icons/icon-192.png' }); } catch (e) {}
+    });
+  } else {
+    try { new Notification(title, { body: body, icon: './icons/icon-192.png' }); } catch (e) {}
+  }
 }
 
 function showToast(text, type) {
@@ -9186,6 +9603,7 @@ function saveGame() {
     strongholdCosmetics: G.strongholdCosmetics,
     bondingSeenScenes: G.bonding.seenScenes,
     playerSpec: G.playerSpec,
+    notificationsEnabled: G.notificationsEnabled,
     strongholdStipendDay: G.strongholdStipendDay,
     strongholds: G.strongholds
   };
@@ -9379,6 +9797,7 @@ function loadGame() {
       if (G.playerSpec.path && typeof applySpecEffects === 'function') applySpecEffects();
     }
     G.strongholdStipendDay = data.strongholdStipendDay !== undefined ? data.strongholdStipendDay : -1;
+    G.notificationsEnabled = !!(data.notificationsEnabled && 'Notification' in window && Notification.permission === 'granted');
 
     G.p.lvl = data.player.lvl;
     G.p.xp = data.player.xp;
@@ -11174,6 +11593,15 @@ function rToday() {
   h += '<div class="st" style="text-align:center;">📅 Today</div>';
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Everything worth a quick look, in one place \u2014 for whenever you\'ve got three minutes and nothing else to point them at.</div>';
 
+  // Notifications toggle — local only (Focus completions, AFK Adventure boss kills),
+  // not true push. Nothing can wake this from fully closed without a backend server.
+  if (!G.notificationsEnabled) {
+    h += '<div class="panel" style="text-align:center;">';
+    h += '<div class="btn-hint" style="margin-bottom:8px;">🔔 Get a nudge for Focus completions and AFK Adventure boss kills, even if you\'ve switched apps. Only while this stays open in the background \u2014 not a true push notification.</div>';
+    h += '<button onclick="requestNotificationPermission()" class="abtn" style="width:100%;">Enable Notifications</button>';
+    h += '</div>';
+  }
+
   // Active siege — most urgent, shown first if present
   for (let id in G.strongholds) {
     if (G.strongholds[id]) h += rSiegeBanner(id);
@@ -12817,6 +13245,14 @@ function templeFullHeal() {
   if (G.joelReviveUsed) {
     G.joelReviveUsed = false;
     lg('💜 Joel steadies his shield. Unbreakable is ready again.');
+  }
+  if (G.joelLayOnHandsUsed) {
+    G.joelLayOnHandsUsed = false;
+    lg('🙌 Joel\'s hands are ready to heal again.');
+  }
+  if (G.zakiSecondWindUsed) {
+    G.zakiSecondWindUsed = false;
+    lg('🔥 Zaki catches his breath. Second Wind is ready again.');
   }
   G.growthAbilityUsed = {};
 
