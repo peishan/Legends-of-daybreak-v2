@@ -3323,6 +3323,8 @@ const ENEMY_REGISTRY = {
   'Masked Bandit': { template: 'balanced', elem: 'none', zoneLv: 1 },
   'Ambush Scout': { template: 'striker', elem: 'none', zoneLv: 1 },
   'Bandit Captain': { template: 'tank', elem: 'none', zoneLv: 1 },
+  'Bandit Mage': { template: 'striker', elem: 'arcane', zoneLv: 1 },
+  'Bandit Cleric': { template: 'balanced', elem: 'none', zoneLv: 1 },
 
   // === ACT 5: THE LONG WALK (LV 51-55) ===
   'Threshold Warden': { template: 'tank', elem: 'none', zoneLv: 51 },
@@ -6235,7 +6237,21 @@ function doEnemyAttack(enemy) {
     }
     if (enemy.status.find(s => s.type === 'shock' || s.type === 'turned')) return;
   }
-  
+
+  // === SUPPORT ENEMY: cleric-type allies favor healing a wounded ally over attacking ===
+  // (e.g. the Bandit Cleric in a full road-ambush party — see startRoadAmbush)
+  if (enemy.healer) {
+    const wounded = G.cbt.en.filter(e => e !== enemy && e.hp > 0 && e.hp < e.mhp);
+    if (wounded.length > 0 && Math.random() < 0.5) {
+      wounded.sort((a, b) => (a.hp / a.mhp) - (b.hp / b.mhp)); // lowest % HP first
+      const healTarget = wounded[0];
+      const healAmt = Math.max(1, Math.floor(healTarget.mhp * 0.20));
+      healTarget.hp = Math.min(healTarget.mhp, healTarget.hp + healAmt);
+      lg('✨ ' + enemy.n + ' channels healing light into ' + healTarget.n + '! +' + healAmt + ' HP.');
+      return;
+    }
+  }
+
   let target = G.p;
   if (Math.random() > 0.5) {
     let activeParty = G.party.filter(p => p.on && p.hp > 0);
@@ -9748,14 +9764,17 @@ function loadGame() {
     }
 
     // Apply migrated Phase 2 data
-    G.talents = data.player.talents || [];
-    G.runes = data.player.runes || [];
-    G.riftCounter = data.player.riftCounter || 0;
-    G.currentRift = data.player.currentRift || null;
-    G.riftFightsRemaining = data.player.riftFightsRemaining || 0;
-    G.riftTriggerAt = data.player.riftTriggerAt || (3 + Math.floor(Math.random() * 3));
+    // NOTE: these are saved at the top level of the save object (see saveGame's
+    // "Phase 2 data" block), not nested under player — reading from data.player.X
+    // here silently wiped runes, talents, and rift progress on every reload.
+    G.talents = data.talents || [];
+    G.runes = data.runes || [];
+    G.riftCounter = data.riftCounter || 0;
+    G.currentRift = data.currentRift || null;
+    G.riftFightsRemaining = data.riftFightsRemaining || 0;
+    G.riftTriggerAt = data.riftTriggerAt || (3 + Math.floor(Math.random() * 3));
     G.runeSocketModal = { open: false, source: 'inv', itemIndex: null, slot: null, memberName: null, slotIndex: null };
-    G.runeCombineModal = data.player.runeCombineModal || { open: false, selected: [] };
+    G.runeCombineModal = data.runeCombineModal || { open: false, selected: [] };
     G.grindChampionship = data.grindChampionship || { bestWave: 0, claimedTiers: [] };
     if (data.story) {
       G.story = data.story;
@@ -12036,16 +12055,41 @@ function startRoadAmbush(zone) {
   rollWeather();
   applyZoneBuffs(zone.n);
 
-  const enemyCount = 2 + Math.floor(Math.random() * 2); // 2-3 bandits
-  for (let i = 0; i < enemyCount; i++) {
+  // Full-party ambush, BG2 mercenary-style: a couple of melee thieves backed by a mage
+  // and a cleric, rather than a flat random pull from one list. 1-3 melee bandits + the
+  // mage/cleric pair, capped at 5 total to match the enemy-count cap used elsewhere.
+  const meleeCount = Math.min(3, 1 + Math.floor(Math.random() * 3)); // 1-3 melee
+  let id = 0;
+
+  const mage = generateRaidEliteEnemy('Bandit Mage', zone.lv);
+  mage.id = id++;
+  mage.g = Math.floor(mage.g * 1.4);
+  G.cbt.en.push(mage);
+
+  const cleric = generateRaidEliteEnemy('Bandit Cleric', zone.lv);
+  cleric.id = id++;
+  cleric.g = Math.floor(cleric.g * 1.4);
+  cleric.healer = true;
+  G.cbt.en.push(cleric);
+
+  for (let i = 0; i < meleeCount; i++) {
     const name = ROAD_BANDITS[Math.floor(Math.random() * ROAD_BANDITS.length)];
     const e = generateRaidEliteEnemy(name, zone.lv); // reuses the elite stat template — bandits should sting a little more than common trash
-    e.id = i;
+    e.id = id++;
     // Bandits carry stolen loot — modest gold bonus over a normal encounter of the same level
     e.g = Math.floor(e.g * 1.4);
     G.cbt.en.push(e);
   }
+
+  // Coordinated full-party ambush (mage + cleric backing the thieves) is a meaningfully
+  // harder fight than random trash, so it pays out a flat bonus on top of each enemy's
+  // own XP, same spirit as the existing gold bonus above.
+  for (let e of G.cbt.en) {
+    e.xp = Math.floor(e.xp * 1.25);
+  }
+
   lg('🗡️ AMBUSH! The road to ' + zone.n + ' was not as empty as it looked.');
+  lg('   A mage and a cleric hang back while the rest close in.');
   render();
 }
 
