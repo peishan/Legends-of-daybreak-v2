@@ -2174,7 +2174,8 @@ storyJournal: {
   guildJoined: false, // The Guild — separate from any Stronghold, auto-joins at level 5
   guildRep: 0, // lifetime reputation total, determines rank, never spent
   guildRepBalance: 0, // spendable reputation currency for the Guild Shop
-  dragonHunt: { active: false, cleared: 0 }, // a legendary optional superboss, repeatable
+  dragonHunt: { active: false, currentId: null, cleared: {} }, // legendary optional superbosses, repeatable; cleared keyed by dragon id
+  bossRush: { active: false, streak: 0, bestStreak: 0 }, // chained boss fights, escalating reward + difficulty, no rest between
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
@@ -5144,57 +5145,92 @@ function doPrestige() {
 // notoriously long, grinding fights, not quick skirmishes. Vaelithorn is deliberately
 // far tougher than any story boss (including the level-50 finale) so a full, well-geared
 // party genuinely needs many rounds to bring it down. Unlocked at level 35, repeatable.
-const DRAGON_HUNT_UNLOCK_LEVEL = 35;
-const VAELITHORN = {
-  n: 'Vaelithorn, the Ancient Wyrm',
-  hp: 38000, mhp: 38000, atk: 220, def: 140, xp: 22000, g: 14000,
-  mechanic: 'rampage', rampageTurn: 4, rampageDmg: 95,
-  desc: 'Older than the Breaking itself. Its hoard is real — so is the wait to earn it. Breathes fire across the whole party every 4 turns.'
-};
+// === DRAGON HUNT ===
+// An optional, legendary superboss fight in the BG2/IWD2 tradition — dragons there are
+// notoriously long, grinding fights, not quick skirmishes. Vaelithorn is deliberately
+// far tougher than any story boss (including the level-50 finale) so a full, well-geared
+// party genuinely needs many rounds to bring it down. Unlocked at level 35, repeatable.
+// A second, higher-level wyrm unlocks later so this stays a real "big single fight" XP
+// faucet once Vaelithorn stops being a meaningful challenge, rather than flattening out.
+const DRAGONS = [
+  {
+    id: 'vaelithorn',
+    n: 'Vaelithorn, the Ancient Wyrm',
+    unlockLevel: 35,
+    hp: 38000, mhp: 38000, atk: 220, def: 140, xp: 22000, g: 14000,
+    mechanic: 'rampage', rampageTurn: 4, rampageDmg: 95,
+    desc: 'Older than the Breaking itself. Its hoard is real — so is the wait to earn it. Breathes fire across the whole party every 4 turns.',
+    hoardGoldMin: 15000, hoardGoldMax: 25000, itemLevel: 50
+  },
+  {
+    id: 'thessarune',
+    n: 'Thessarune, the Endless Maw',
+    unlockLevel: 48,
+    hp: 62000, mhp: 62000, atk: 310, def: 190, xp: 34000, g: 21000,
+    mechanic: 'rampage', rampageTurn: 3, rampageDmg: 140,
+    desc: 'What comes after the Breaking finishes breaking. It doesn\'t breathe fire so much as unmake the air where you\'re standing, every 3 turns.',
+    hoardGoldMin: 24000, hoardGoldMax: 38000, itemLevel: 55
+  }
+];
+// Kept for backward compat — old code/save fields that only knew about one dragon.
+const DRAGON_HUNT_UNLOCK_LEVEL = DRAGONS[0].unlockLevel;
+const VAELITHORN = DRAGONS[0];
 
-function isDragonHuntUnlocked() {
-  return G.p.lvl >= DRAGON_HUNT_UNLOCK_LEVEL;
+function getDragonById(id) {
+  return DRAGONS.find(d => d.id === id);
 }
 
-function startDragonHunt() {
-  if (!isDragonHuntUnlocked()) {
-    lg('🔒 Vaelithorn only stirs for those Level ' + DRAGON_HUNT_UNLOCK_LEVEL + ' and above.');
+function isDragonUnlocked(dragon) {
+  return G.p.lvl >= dragon.unlockLevel;
+}
+
+function isDragonHuntUnlocked() {
+  return isDragonUnlocked(DRAGONS[0]); // whether ANY dragon hunt is available at all
+}
+
+function startDragonHunt(dragonId) {
+  const dragon = getDragonById(dragonId) || DRAGONS[0];
+  if (!isDragonUnlocked(dragon)) {
+    lg('🔒 ' + dragon.n + ' only stirs for those Level ' + dragon.unlockLevel + ' and above.');
     return;
   }
   G.dragonHunt.active = true;
+  G.dragonHunt.currentId = dragon.id;
   G.cbt.on = true;
   G.cbt.turn = 0;
   G.cbt.en = [];
   G.state = 'combat';
-  G.currentBoss = JSON.parse(JSON.stringify(VAELITHORN));
+  G.currentBoss = JSON.parse(JSON.stringify(dragon));
   G.currentBoss.id = 98;
   G.cbt.en.push(G.currentBoss);
-  lg('🐉 Vaelithorn, the Ancient Wyrm, opens one eye. This will take everything you have.');
-  lg('   ' + VAELITHORN.desc);
+  lg('🐉 ' + dragon.n + ' opens one eye. This will take everything you have.');
+  lg('   ' + dragon.desc);
   render();
 }
 
 function handleDragonHuntVictory() {
+  const dragon = getDragonById(G.dragonHunt.currentId) || DRAGONS[0];
   const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult());
   const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * getPrestigeGoldMult());
   G.p.xp += txp;
   G.p.gold += tg2;
   G.p.bossKills = (G.p.bossKills || 0) + 1;
-  G.dragonHunt.cleared++;
+  G.dragonHunt.cleared = G.dragonHunt.cleared || {};
+  G.dragonHunt.cleared[dragon.id] = (G.dragonHunt.cleared[dragon.id] || 0) + 1;
   checkAchievements();
 
-  lg('🎉 VAELITHORN FALLS! +' + txp + ' XP, +' + tg2 + 'G');
+  lg('🎉 ' + dragon.n.toUpperCase() + ' FALLS! +' + txp + ' XP, +' + tg2 + 'G');
   lg('🐉 The hoard is yours.');
 
   // The massive hoard — a large flat gold bonus plus guaranteed high-rarity loot,
   // separate from and on top of the normal combat rewards above.
-  const hoardGold = 15000 + Math.floor(Math.random() * 10000);
+  const hoardGold = dragon.hoardGoldMin + Math.floor(Math.random() * (dragon.hoardGoldMax - dragon.hoardGoldMin));
   G.p.gold += hoardGold;
   lg('💰 HOARD: +' + hoardGold + 'G');
 
   const hoardSlots = ['weapon', 'armor', 'amulet'];
   for (let slot of hoardSlots) {
-    const item = generateItem(slot, 50, 'legendary');
+    const item = generateItem(slot, dragon.itemLevel, 'legendary');
     if (item) {
       addI(item);
       lg('✨ HOARD: ' + item.n + ' (Legendary)');
@@ -5202,7 +5238,7 @@ function handleDragonHuntVictory() {
   }
   const epicSlots = ['ring', 'head', 'hands'];
   const epicSlot = epicSlots[Math.floor(Math.random() * epicSlots.length)];
-  const epicItem = generateItem(epicSlot, 50, 'epic');
+  const epicItem = generateItem(epicSlot, dragon.itemLevel, 'epic');
   if (epicItem) {
     addI(epicItem);
     lg('✨ HOARD: ' + epicItem.n + ' (Epic)');
@@ -5212,6 +5248,7 @@ function handleDragonHuntVictory() {
   G.cbt.autoCombat = false;
   G.cbt.on = false;
   G.dragonHunt.active = false;
+  G.dragonHunt.currentId = null;
   G.state = 'menu';
   lvlup();
   render();
@@ -5259,6 +5296,83 @@ function refreshStrongholdTasks() {
 }
 
 const RAID_STAGE_RECOVERY_PCT = 0.20;
+
+// === BOSS RUSH ===
+// Distinct from the fixed, one-time RAIDS gauntlets above: this is a repeatable,
+// endless chain of random late-game bosses with NO elite packs between fights and only
+// a partial recovery — the point is sustained risk. Each consecutive kill (the "streak")
+// stacks both the difficulty (boss stats scale up) and the reward (XP/gold scale up
+// faster than the difficulty does), so pushing further is a real, escalating bet against
+// your own attrition rather than a fixed script to clear once. Ends on defeat or a
+// voluntary retreat; either way everything already banked per-kill stays banked.
+const BOSS_RUSH_UNLOCK_LEVEL = 30;
+const BOSS_RUSH_RECOVERY_PCT = 0.15;
+const BOSS_RUSH_STAT_MULT_PER_KILL = 0.06;
+const BOSS_RUSH_REWARD_MULT_PER_KILL = 0.15;
+const BOSS_RUSH_REWARD_MULT_CAP = 3.0; // +200% ceiling so a very long streak doesn't run away entirely
+
+function isBossRushUnlocked() {
+  return G.p.lvl >= BOSS_RUSH_UNLOCK_LEVEL;
+}
+
+function getBossRushPool() {
+  // Bosses whose home zone sits in a band around the player's current level — close
+  // enough to feel like "your" late-game content, wide enough that the pool doesn't run dry.
+  let pool = G.bosses.filter(b => {
+    const z = G.zones.find(z => z.n === b.zone);
+    return z && z.lv <= G.p.lvl + 8 && z.lv >= Math.max(1, G.p.lvl - 12);
+  });
+  if (pool.length === 0) pool = G.bosses.filter(b => {
+    const z = G.zones.find(z => z.n === b.zone);
+    return z && z.lv <= G.p.lvl + 8;
+  });
+  if (pool.length === 0) pool = G.bosses; // last-resort fallback, shouldn't normally hit
+  return pool;
+}
+
+function startBossRush() {
+  if (!isBossRushUnlocked()) { lg('🔒 Boss Rush unlocks at Level ' + BOSS_RUSH_UNLOCK_LEVEL + '.'); return; }
+  G.bossRush.active = true;
+  G.bossRush.streak = 0;
+  spawnBossRushEncounter();
+}
+
+function spawnBossRushEncounter() {
+  const pool = getBossRushPool();
+  const bossDef = pool[Math.floor(Math.random() * pool.length)];
+  const streak = G.bossRush.streak;
+  const statMult = (1 + streak * BOSS_RUSH_STAT_MULT_PER_KILL);
+
+  G.cbt.on = true;
+  G.cbt.turn = 0;
+  G.cbt.en = [];
+  G.state = 'combat';
+
+  const boss = JSON.parse(JSON.stringify(bossDef));
+  boss.id = 99;
+  boss.hp = Math.floor(boss.hp * RAID_BOSS_BUFF.hpMult * statMult);
+  boss.mhp = boss.hp;
+  boss.atk = Math.floor(boss.atk * RAID_BOSS_BUFF.atkMult * statMult);
+  boss.def = Math.floor(boss.def * RAID_BOSS_BUFF.defMult * statMult);
+  G.currentBoss = boss;
+  G.cbt.en.push(boss);
+
+  lg('⚔️ Boss Rush [Streak ' + streak + ']: ' + boss.n + ' appears!' + (streak > 0 ? ' (+' + Math.floor(streak * BOSS_RUSH_STAT_MULT_PER_KILL * 100) + '% tougher)' : ''));
+  render();
+}
+
+function continueBossRush() {
+  if (!G.bossRush.active) return;
+  spawnBossRushEncounter();
+}
+
+function retreatBossRush() {
+  lg('🏳️ Retreat — the rush ends at a streak of ' + G.bossRush.streak + '. Everything earned is kept.');
+  G.bossRush.active = false;
+  G.currentBoss = null;
+  G.state = 'menu';
+  render();
+}
 
 const RAIDS = [
   { id: 'trial_of_fangs', name: 'Trial of Fangs', unlockLevel: 15, icon: '🐺',
@@ -8797,12 +8911,14 @@ const _originalHandleDefeatForDragon = handleDefeat;
 handleDefeat = function() {
   if (G.dragonHunt.active) {
     if (checkSecondWind()) { render(); return; }
-    lg('💀 Vaelithorn proves too much this time. The wyrm sleeps on, hoard untouched.');
+    const dragon = getDragonById(G.dragonHunt.currentId) || DRAGONS[0];
+    lg('💀 ' + dragon.n + ' proves too much this time. The wyrm sleeps on, hoard untouched.');
     G.p.hp = 1;
     for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
     G.cbt.autoCombat = false;
     G.cbt.on = false;
     G.dragonHunt.active = false;
+    G.dragonHunt.currentId = null;
     G.state = 'menu';
     render();
   } else {
@@ -9094,6 +9210,56 @@ handleDefeat = function() {
   }
 };
 
+const _originalHandleVictoryForBossRush = handleVictory;
+handleVictory = function() {
+  if (G.bossRush.active) {
+    const defeatedName = G.currentBoss ? G.currentBoss.n : 'The boss';
+    const rewardMult = Math.min(BOSS_RUSH_REWARD_MULT_CAP, 1 + G.bossRush.streak * BOSS_RUSH_REWARD_MULT_PER_KILL);
+    const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * rewardMult * getPrestigeXpMult());
+    const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * rewardMult * getPrestigeGoldMult());
+    G.p.xp += txp;
+    G.p.gold += tg2;
+    G.p.bossKills = (G.p.bossKills || 0) + 1;
+    G.bossRush.streak++;
+    if (G.bossRush.streak > (G.bossRush.bestStreak || 0)) G.bossRush.bestStreak = G.bossRush.streak;
+    checkAchievements();
+    lg('🎉 ' + defeatedName + ' falls! +' + txp + ' XP, +' + tg2 + 'G (streak bonus: +' + Math.floor((rewardMult - 1) * 100) + '%)');
+
+    G.currentBoss = null;
+    G.cbt.autoCombat = false;
+    G.cbt.on = false;
+
+    // Partial recovery, same spirit as raid stages — enough to keep going, not a reset.
+    G.p.hp = Math.min(G.p.mhp, G.p.hp + Math.floor(G.p.mhp * BOSS_RUSH_RECOVERY_PCT));
+    G.p.mp = Math.min(G.p.mmp, G.p.mp + Math.floor(G.p.mmp * BOSS_RUSH_RECOVERY_PCT));
+    for (let p of G.party) {
+      if (p.on && p.hp > 0) p.hp = Math.min(p.mhp, p.hp + Math.floor(p.mhp * BOSS_RUSH_RECOVERY_PCT));
+    }
+    G.state = 'boss_rush_room';
+    render();
+  } else {
+    _originalHandleVictoryForBossRush();
+  }
+};
+
+const _originalHandleDefeatForBossRush = handleDefeat;
+handleDefeat = function() {
+  if (G.bossRush.active) {
+    if (checkSecondWind()) { render(); return; }
+    lg('💀 The rush ends here \u2014 final streak: ' + G.bossRush.streak + '. Everything earned along the way is kept.');
+    G.p.hp = 1;
+    for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
+    G.cbt.autoCombat = false;
+    G.cbt.on = false;
+    G.bossRush.active = false;
+    G.currentBoss = null;
+    G.state = 'menu';
+    render();
+  } else {
+    _originalHandleDefeatForBossRush();
+  }
+};
+
 function sc(zi, skipEvents) {
   const z=G.zones[zi];
   // 30% chance for explore event before combat
@@ -9329,6 +9495,51 @@ function retroactivelyFixCompanionGrowth() {
   lg('📈 Companion growth recalculated for the new per-character stat system.');
 }
 
+// === AUDIO ===
+// Lightweight synth-based sound effects via the Web Audio API — no asset files to source
+// or host, keeps the game a single JS file. The AudioContext is created lazily on first
+// actual sound request rather than at page load, since browsers block audio until a real
+// user gesture; by the time a level-up can happen the player has already tapped plenty of
+// buttons, so this never actually gets blocked in practice. Built as a small reusable
+// foundation (getAudioCtx/playTone) rather than a one-off hack, so future sound effects
+// (combat hits, quest complete, etc.) can reuse the same two functions.
+let _audioCtx = null;
+function getAudioCtx() {
+  if (_audioCtx) return _audioCtx;
+  try {
+    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return _audioCtx;
+  } catch (e) {
+    return null; // Web Audio unsupported/blocked — sound effects just silently no-op
+  }
+}
+
+function playTone(freq, startOffset, duration, type, peakGain) {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type || 'triangle';
+  osc.frequency.value = freq;
+  const t0 = ctx.currentTime + (startOffset || 0);
+  gain.gain.setValueAtTime(0, t0);
+  gain.gain.linearRampToValueAtTime(peakGain || 0.25, t0 + 0.015); // quick attack, avoids a click
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + duration);    // smooth decay
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(t0);
+  osc.stop(t0 + duration + 0.05);
+}
+
+function playLevelUpSound() {
+  // Triumphant ascending arpeggio — C5, E5, G5, C6 — with the final note held a beat
+  // longer so the jingle doesn't feel like it cuts off short.
+  playTone(523.25, 0.00, 0.14, 'triangle', 0.22); // C5
+  playTone(659.25, 0.12, 0.14, 'triangle', 0.22); // E5
+  playTone(783.99, 0.24, 0.14, 'triangle', 0.22); // G5
+  playTone(1046.5, 0.36, 0.30, 'triangle', 0.26); // C6
+}
+
 function lvlup(){
   const startLvl = G.p.lvl;
   while(G.p.xp>=G.p.xpN){
@@ -9387,6 +9598,14 @@ function lvlup(){
   }
   if (G.p.lvl > startLvl && typeof triggerLevelUpAnimation === 'function') {
     triggerLevelUpAnimation(G.p.lvl);
+  }
+  if (G.p.lvl > startLvl && typeof navigator !== 'undefined' && navigator.vibrate) {
+    // Short-long-short pattern reads as more celebratory than a single buzz, and is
+    // distinguishable from other haptic feedback (if any gets added later) at a glance.
+    navigator.vibrate([40, 60, 40, 60, 80]);
+  }
+  if (G.p.lvl > startLvl) {
+    playLevelUpSound();
   }
 }
 function checkQ(){
@@ -9797,11 +10016,12 @@ function saveGame() {
     guildRepBalance: G.guildRepBalance,
     guildContracts: G.guildContracts.map(c => ({ id: c.id, c: c.c, done: c.done, refreshWeek: c.refreshWeek })),
     strongholdSiege: G.strongholdSiege,
-    dragonHuntCleared: G.dragonHunt.cleared,
+    dragonHuntClearedMap: G.dragonHunt.cleared || {},
     mercenaryCompleted: G.mercenary.completed || 0,
     prestigeCount: G.prestige.count || 0,
     prestigeXpBonusPct: G.prestige.xpBonusPct || 0,
     prestigeGoldBonusPct: G.prestige.goldBonusPct || 0,
+    bossRushBestStreak: G.bossRush.bestStreak || 0,
     strongholdCosmetics: G.strongholdCosmetics,
     bondingSeenScenes: G.bonding.seenScenes,
     playerSpec: G.playerSpec,
@@ -9994,11 +10214,15 @@ function loadGame() {
       }
     }
     G.strongholdSiege = data.strongholdSiege || {};
-    G.dragonHunt.cleared = data.dragonHuntCleared || 0;
+    G.dragonHunt.cleared = data.dragonHuntClearedMap || {};
+    if (data.dragonHuntCleared && !G.dragonHunt.cleared.vaelithorn) {
+      G.dragonHunt.cleared.vaelithorn = data.dragonHuntCleared; // migrate pre-tier saves (single counter, Vaelithorn only)
+    }
     G.mercenary.completed = data.mercenaryCompleted || 0;
     G.prestige.count = data.prestigeCount || 0;
     G.prestige.xpBonusPct = data.prestigeXpBonusPct || 0;
     G.prestige.goldBonusPct = data.prestigeGoldBonusPct || 0;
+    G.bossRush.bestStreak = data.bossRushBestStreak || 0;
     G.strongholdCosmetics = data.strongholdCosmetics || {};
     G.bonding.seenScenes = data.bondingSeenScenes || [];
     if (data.playerSpec) {
@@ -10633,6 +10857,8 @@ function render(){
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='dragon_hunt')h+=rDragonHunt();
   else if(G.state=='prestige')h+=rPrestige();
+  else if(G.state=='boss_rush')h+=rBossRush();
+  else if(G.state=='boss_rush_room')h+=rBossRushRoom();
   else if(G.state=='forge')h+=rForge();
   else if(G.state=='bonding')h+=rBonding();
   else if(G.state=='mercenary')h+=rMercenary();
@@ -10668,6 +10894,7 @@ function attachEvents() {
     else if(a=='stronghold')setS('stronghold');
     else if(a=='dragon_hunt')setS('dragon_hunt');
     else if(a=='prestige')setS('prestige');
+    else if(a=='boss_rush')setS('boss_rush');
     else if(a=='forge')setS('forge');
     else if(a=='bonding')setS('bonding');
     else if(a=='mercenary')setS('mercenary');
@@ -12009,32 +12236,25 @@ function rMercenary() {
 function rDragonHunt() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🐉 Dragon Hunt</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Optional, legendary superbosses \u2014 no waves, no gimmicks, just a dragon with far more HP than anything else in the game. Repeatable.</div>';
 
-  const unlocked = isDragonHuntUnlocked();
+  for (let dragon of DRAGONS) {
+    const unlocked = isDragonUnlocked(dragon);
+    const clearedCount = (G.dragonHunt.cleared && G.dragonHunt.cleared[dragon.id]) || 0;
 
-  h += '<div class="panel' + (unlocked ? ' panel-gold' : '') + '" style="text-align:center;">';
-  h += '<div class="panel-title" style="' + (unlocked ? 'color:var(--gold);' : '') + '">' + VAELITHORN.n + '</div>';
-  h += '<div class="btn-hint" style="margin:10px 0;line-height:1.5;">' + VAELITHORN.desc + '</div>';
-  if (G.dragonHunt.cleared > 0) {
-    h += '<div style="font-size:12px;color:var(--gold);font-weight:600;margin-bottom:10px;">🏆 Slain ' + G.dragonHunt.cleared + ' time' + (G.dragonHunt.cleared > 1 ? 's' : '') + '</div>';
-  }
-  h += '</div>';
+    h += '<div class="panel' + (unlocked ? ' panel-gold' : '') + '" style="text-align:center;">';
+    h += '<div class="panel-title" style="' + (unlocked ? 'color:var(--gold);' : '') + '">' + dragon.n + '</div>';
+    h += '<div class="btn-hint" style="margin:10px 0;line-height:1.5;">' + dragon.desc + '</div>';
+    if (clearedCount > 0) {
+      h += '<div style="font-size:12px;color:var(--gold);font-weight:600;margin-bottom:10px;">🏆 Slain ' + clearedCount + ' time' + (clearedCount > 1 ? 's' : '') + '</div>';
+    }
+    h += '<div class="btn-hint" style="margin-bottom:10px;">Breathes elemental devastation across the whole party every ' + dragon.rampageTurn + ' turns. Hoard on victory: ' + dragon.hoardGoldMin.toLocaleString() + '\u2013' + dragon.hoardGoldMax.toLocaleString() + 'G, 3 guaranteed Legendaries, 1 guaranteed Epic \u2014 on top of normal XP/gold.</div>';
 
-  h += '<div class="panel">';
-  h += '<div class="panel-title" style="margin-bottom:8px;">What to Expect</div>';
-  h += '<div class="btn-hint" style="line-height:1.6;">A single, brutally long fight — no waves, no gimmicks, just a dragon with far more HP than anything else in this game. Expect many, many rounds. It breathes fire across your whole party every 4 turns. Bring healing.</div>';
-  h += '</div>';
-
-  h += '<div class="panel">';
-  h += '<div class="panel-title" style="margin-bottom:8px;">The Hoard</div>';
-  h += '<div class="btn-hint" style="line-height:1.6;">On victory: a massive gold windfall (15,000\u201325,000G), three guaranteed Legendary items, and a guaranteed Epic item \u2014 on top of normal XP and gold. Repeatable.</div>';
-  h += '</div>';
-
-  if (unlocked) {
-    h += '<button onclick="startDragonHunt()" class="abtn" style="width:100%;">🐉 Wake the Wyrm</button>';
-  } else {
-    h += '<div class="panel" style="text-align:center;">';
-    h += '<div class="btn-hint">🔒 Unlocks at Level ' + DRAGON_HUNT_UNLOCK_LEVEL + ' (currently Level ' + G.p.lvl + ')</div>';
+    if (unlocked) {
+      h += '<button onclick="startDragonHunt(\'' + dragon.id + '\')" class="abtn" style="width:100%;">🐉 Wake the Wyrm</button>';
+    } else {
+      h += '<div class="btn-hint">🔒 Unlocks at Level ' + dragon.unlockLevel + ' (currently Level ' + G.p.lvl + ')</div>';
+    }
     h += '</div>';
   }
 
@@ -12083,6 +12303,53 @@ function confirmPrestige() {
   if (confirm('Reset to Level 1 and bank the permanent bonus? Gear, gold, and story progress are kept \u2014 only level/XP/stats reset. This can\'t be undone.')) {
     doPrestige();
   }
+}
+
+function rBossRush() {
+  const unlocked = isBossRushUnlocked();
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">💀 Boss Rush</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Random late-game bosses, back to back, no elite packs between \u2014 just a brief recovery. Every consecutive kill makes the next one tougher, but pays out better too. Push until you fall, or walk away with what you\'ve banked.</div>';
+
+  h += '<div class="panel panel-gold" style="text-align:center;">';
+  h += '<div class="panel-title" style="color:var(--gold);">Best Streak</div>';
+  h += '<div style="font-size:24px;font-weight:700;margin:8px 0;color:var(--gold);">' + (G.bossRush.bestStreak || 0) + '</div>';
+  h += '</div>';
+
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">Per Kill</div>';
+  h += '<div class="btn-hint" style="line-height:1.6;">+' + Math.floor(BOSS_RUSH_STAT_MULT_PER_KILL * 100) + '% boss stats \u00b7 +' + Math.floor(BOSS_RUSH_REWARD_MULT_PER_KILL * 100) + '% XP/gold (caps at +' + Math.floor((BOSS_RUSH_REWARD_MULT_CAP - 1) * 100) + '%)<br>' + Math.floor(BOSS_RUSH_RECOVERY_PCT * 100) + '% HP/MP recovery between fights \u2014 no full heals.</div>';
+  h += '</div>';
+
+  if (unlocked) {
+    h += '<button onclick="startBossRush()" class="abtn" style="width:100%;background:var(--danger);">💀 Start the Rush</button>';
+  } else {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🔒 Unlocks at Level ' + BOSS_RUSH_UNLOCK_LEVEL + ' (currently Level ' + G.p.lvl + ')</div></div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function rBossRushRoom() {
+  const streak = G.bossRush.streak;
+  const nextRewardMult = Math.min(BOSS_RUSH_REWARD_MULT_CAP, 1 + streak * BOSS_RUSH_REWARD_MULT_PER_KILL);
+  const nextStatMult = 1 + streak * BOSS_RUSH_STAT_MULT_PER_KILL;
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">💀 Boss Rush</div>';
+
+  h += '<div class="panel panel-gold" style="text-align:center;">';
+  h += '<div class="panel-title" style="color:var(--gold);">Streak: ' + streak + '</div>';
+  h += '<div class="btn-hint">Next fight: +' + Math.floor((nextStatMult - 1) * 100) + '% tougher \u00b7 +' + Math.floor((nextRewardMult - 1) * 100) + '% XP/gold</div>';
+  h += '</div>';
+
+  h += '<div class="btn-hint" style="text-align:center;margin:10px 0 16px;">The party got a brief recovery, not a full rest. Keep pushing, or bank what you\'ve got.</div>';
+
+  h += '<button onclick="continueBossRush()" class="abtn" style="width:100%;margin-bottom:10px;">⚔️ Continue the Rush</button>';
+  h += '<button onclick="retreatBossRush()" class="btn-outline-ghost" style="width:100%;">🏳️ Retreat (keep everything earned)</button>';
+
+  h += '</div>';
+  return h;
 }
 
 function rStrongholdCosmeticsShop() {
@@ -12533,6 +12800,7 @@ function rMenu(){
   const sections=[
     { title: '🐉 Legendary Hunts', items: [
       {i:'🐉',l:'Dragon Hunt',a:'dragon_hunt'},
+      {i:'💀',l:'Boss Rush',a:'boss_rush'},
       {i:'🌟',l:'Prestige',a:'prestige'},
     ]},
     { title: '📋 Quick Work', items: [
