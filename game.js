@@ -2169,6 +2169,8 @@ storyJournal: {
   raidProgress: {
     cleared: [] // ids of RAIDS fully cleared at least once
   },
+  chainQuests: {}, // per-chain progress: { [chainId]: { stageIndex, active, cleared } }, lazily created
+  activeChainQuestId: null,
   strongholds: {}, // claimed strongholds, keyed by STRONGHOLDS id — set true once claimed
   guildHallLevel: {}, // Guild Hall level per stronghold id (1 = just claimed, up to 5)
   guildJoined: false, // The Guild — separate from any Stronghold, auto-joins at level 5
@@ -5371,6 +5373,146 @@ function retreatBossRush() {
   G.bossRush.active = false;
   G.currentBoss = null;
   G.state = 'menu';
+  render();
+}
+
+// === CHAIN QUESTS ===
+// A one-time, non-repeatable story descent rather than a repeatable raid or grind —
+// structurally in the BG2/IWD2 tradition of an optional deep vault (Watcher's Keep-style):
+// floor by floor, escalating guardians, a full recovery between floors since this is
+// meant to be a deliberate, prepared descent rather than an endurance test like Boss
+// Rush, and a final confrontation that pays out far more than any single fight in the
+// game. Progress is saved per floor, so leaving and coming back resumes where you left
+// off rather than restarting the whole chain.
+const CHAIN_QUESTS = [
+  {
+    id: 'sunken_archive',
+    name: 'The Sunken Archive',
+    icon: '📜',
+    unlockLevel: 35,
+    intro: 'A vault sealed since before the Breaking, guarded floor by floor by things that never stopped waiting for someone to come back. Nobody who works the roads will talk about what\'s at the bottom.',
+    stages: [
+      { title: 'The First Ward', type: 'elite', zoneLv: 40, enemies: ['Void Beast', 'Shadow Demon', 'Rift Stalker'],
+        flavor: 'The outer ward hasn\'t felt a living footstep in longer than anyone alive can say. It still remembers how to respond to one.',
+        rw: { xp: 8000, g: 5000 } },
+      { title: 'The Warden\'s Trial', type: 'boss', name: 'The Splinter Court',
+        flavor: 'The first true guardian remembers exactly why it was left here \u2014 and exactly what it\'s supposed to do about visitors.',
+        rw: { xp: 14000, g: 9000 } },
+      { title: 'The Second Ward', type: 'elite', zoneLv: 45, enemies: ['Nexus Guardian', 'Planar Titan', 'Convergence Avatar'],
+        flavor: 'Deeper in, the wards stop reacting to intruders in general and start reacting to you specifically.',
+        rw: { xp: 18000, g: 12000 } },
+      { title: 'The Keeper\'s Reckoning', type: 'boss', name: 'Daybreak Incarnate',
+        flavor: 'Whatever this vault was built to protect, the Keeper still believes it\'s worth dying for again.',
+        rw: { xp: 26000, g: 17000 } },
+      { title: 'What Was Sealed', type: 'boss', name: 'The Horizon Keeper',
+        flavor: 'The last door. Whatever\'s behind it, the rest of this vault was built just to keep it there.',
+        rw: { xp: 60000, g: 38000 } }
+    ]
+  }
+];
+
+function getChainQuestById(id) {
+  return CHAIN_QUESTS.find(c => c.id === id);
+}
+
+function getChainProgress(chainId) {
+  if (!G.chainQuests[chainId]) G.chainQuests[chainId] = { stageIndex: 0, active: false, cleared: false };
+  return G.chainQuests[chainId];
+}
+
+function isChainQuestUnlocked(chain) {
+  return G.p.lvl >= chain.unlockLevel;
+}
+
+function startChainQuest(chainId) {
+  const chain = getChainQuestById(chainId);
+  if (!chain) return;
+  if (!isChainQuestUnlocked(chain)) { lg('🔒 ' + chain.name + ' unlocks at Level ' + chain.unlockLevel + '.'); return; }
+  const prog = getChainProgress(chainId);
+  if (prog.cleared) { lg('✅ ' + chain.name + ' is already complete.'); return; }
+  prog.active = true;
+  G.activeChainQuestId = chainId;
+  spawnChainQuestStage();
+}
+
+function spawnChainQuestStage() {
+  const chain = getChainQuestById(G.activeChainQuestId);
+  const prog = getChainProgress(G.activeChainQuestId);
+  const stage = chain.stages[prog.stageIndex];
+  if (!stage) { lg('⚠️ Chain quest data error. Ending.'); prog.active = false; G.state = 'menu'; render(); return; }
+
+  G.cbt.on = true;
+  G.cbt.turn = 0;
+  G.cbt.en = [];
+  G.state = 'combat';
+
+  if (stage.type === 'boss') {
+    const bossDef = G.bosses.find(b => b.n === stage.name);
+    if (!bossDef) { lg('⚠️ Chain quest data error: boss "' + stage.name + '" not found.'); prog.active = false; G.state = 'menu'; render(); return; }
+    G.currentBoss = JSON.parse(JSON.stringify(bossDef));
+    G.currentBoss.id = 97;
+    // Chain quest bosses hit as hard as raid bosses — same "hardened" precedent.
+    G.currentBoss.hp = Math.floor(G.currentBoss.hp * RAID_BOSS_BUFF.hpMult);
+    G.currentBoss.mhp = G.currentBoss.hp;
+    G.currentBoss.atk = Math.floor(G.currentBoss.atk * RAID_BOSS_BUFF.atkMult);
+    G.currentBoss.def = Math.floor(G.currentBoss.def * RAID_BOSS_BUFF.defMult);
+    G.cbt.en.push(G.currentBoss);
+  } else {
+    G.currentBoss = null;
+    for (let i = 0; i < stage.enemies.length; i++) {
+      const e = generateRaidEliteEnemy(stage.enemies[i], stage.zoneLv);
+      e.id = i;
+      G.cbt.en.push(e);
+    }
+  }
+
+  lg('📜 Floor ' + (prog.stageIndex + 1) + '/' + chain.stages.length + ': ' + stage.title);
+  lg('   ' + stage.flavor);
+  render();
+}
+
+function continueChainQuest() {
+  if (!G.activeChainQuestId) return;
+  spawnChainQuestStage();
+}
+
+function handleChainQuestVictory() {
+  const chain = getChainQuestById(G.activeChainQuestId);
+  const prog = getChainProgress(G.activeChainQuestId);
+  const stage = chain.stages[prog.stageIndex];
+
+  const txp = Math.floor(stage.rw.xp * getPrestigeXpMult());
+  const tg2 = Math.floor(stage.rw.g * getPrestigeGoldMult());
+  G.p.xp += txp;
+  G.p.gold += tg2;
+  if (stage.type === 'boss') G.p.bossKills = (G.p.bossKills || 0) + 1;
+  checkAchievements();
+  lg('🎉 ' + stage.title + ' cleared! +' + txp + ' XP, +' + tg2 + 'G');
+
+  prog.stageIndex++;
+  G.currentBoss = null;
+  G.cbt.autoCombat = false;
+  G.cbt.on = false;
+
+  if (prog.stageIndex >= chain.stages.length) {
+    prog.cleared = true;
+    prog.active = false;
+    G.activeChainQuestId = null;
+    lg('🏆 ' + chain.name.toUpperCase() + ' COMPLETE! The vault is yours \u2014 for whatever that\'s worth now.');
+    G.state = 'menu';
+    lvlup();
+    render();
+    return;
+  }
+
+  // A full recovery between floors — this is a deliberate descent, not an endurance
+  // test, so the tension is in what's on the next floor, not in how worn down you are.
+  G.p.hp = G.p.mhp;
+  G.p.mp = G.p.mmp;
+  for (let p of G.party) { if (p.on && p.hp > 0) p.hp = p.mhp; }
+  saveGame();
+  G.state = 'chain_quest';
+  lvlup();
   render();
 }
 
@@ -9236,6 +9378,7 @@ handleVictory = function() {
       if (p.on && p.hp > 0) p.hp = Math.min(p.mhp, p.hp + Math.floor(p.mhp * BOSS_RUSH_RECOVERY_PCT));
     }
     G.state = 'boss_rush_room';
+    lvlup();
     render();
   } else {
     _originalHandleVictoryForBossRush();
@@ -9257,6 +9400,33 @@ handleDefeat = function() {
     render();
   } else {
     _originalHandleDefeatForBossRush();
+  }
+};
+
+const _originalHandleVictoryForChainQuest = handleVictory;
+handleVictory = function() {
+  if (G.activeChainQuestId && getChainProgress(G.activeChainQuestId).active) handleChainQuestVictory();
+  else _originalHandleVictoryForChainQuest();
+};
+
+const _originalHandleDefeatForChainQuest = handleDefeat;
+handleDefeat = function() {
+  if (G.activeChainQuestId && getChainProgress(G.activeChainQuestId).active) {
+    if (checkSecondWind()) { render(); return; }
+    const chain = getChainQuestById(G.activeChainQuestId);
+    const prog = getChainProgress(G.activeChainQuestId);
+    lg('💀 The descent stops here for now \u2014 Floor ' + (prog.stageIndex + 1) + ' still stands. Progress through Floor ' + prog.stageIndex + ' is saved.');
+    G.p.hp = 1;
+    for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
+    G.cbt.autoCombat = false;
+    G.cbt.on = false;
+    prog.active = false;
+    G.activeChainQuestId = null;
+    G.currentBoss = null;
+    G.state = 'menu';
+    render();
+  } else {
+    _originalHandleDefeatForChainQuest();
   }
 };
 
@@ -10022,6 +10192,7 @@ function saveGame() {
     prestigeXpBonusPct: G.prestige.xpBonusPct || 0,
     prestigeGoldBonusPct: G.prestige.goldBonusPct || 0,
     bossRushBestStreak: G.bossRush.bestStreak || 0,
+    chainQuests: G.chainQuests || {},
     strongholdCosmetics: G.strongholdCosmetics,
     bondingSeenScenes: G.bonding.seenScenes,
     playerSpec: G.playerSpec,
@@ -10223,6 +10394,11 @@ function loadGame() {
     G.prestige.xpBonusPct = data.prestigeXpBonusPct || 0;
     G.prestige.goldBonusPct = data.prestigeGoldBonusPct || 0;
     G.bossRush.bestStreak = data.bossRushBestStreak || 0;
+    G.chainQuests = data.chainQuests || {};
+    // Any chain that was mid-fight when the save happened resumes from its saved floor,
+    // not stuck mid-combat — active gets cleared, stageIndex (the real progress) doesn't.
+    for (let cid in G.chainQuests) { G.chainQuests[cid].active = false; }
+    G.activeChainQuestId = null;
     G.strongholdCosmetics = data.strongholdCosmetics || {};
     G.bonding.seenScenes = data.bondingSeenScenes || [];
     if (data.playerSpec) {
@@ -10525,6 +10701,7 @@ G.currentWeather = data.currentWeather || 'clear';
     for (let name in G.affinity) checkAffinityUnlocks(name);
     for (let s of G.p.skills) { if (!s.on && s.ul <= G.p.lvl) s.on = true; }
         checkDayAdvance(); // Advance game day if real day changed, then generate quests
+    if (G.p.xp >= G.p.xpN) lvlup(); // catches any save where XP crossed the threshold but a level-up was missed (e.g. the Boss Rush bug)
 
 
     lg('Game loaded!');
@@ -10859,6 +11036,7 @@ function render(){
   else if(G.state=='prestige')h+=rPrestige();
   else if(G.state=='boss_rush')h+=rBossRush();
   else if(G.state=='boss_rush_room')h+=rBossRushRoom();
+  else if(G.state=='chain_quest')h+=rChainQuest();
   else if(G.state=='forge')h+=rForge();
   else if(G.state=='bonding')h+=rBonding();
   else if(G.state=='mercenary')h+=rMercenary();
@@ -10895,6 +11073,7 @@ function attachEvents() {
     else if(a=='dragon_hunt')setS('dragon_hunt');
     else if(a=='prestige')setS('prestige');
     else if(a=='boss_rush')setS('boss_rush');
+    else if(a=='chain_quest')setS('chain_quest');
     else if(a=='forge')setS('forge');
     else if(a=='bonding')setS('bonding');
     else if(a=='mercenary')setS('mercenary');
@@ -12233,6 +12412,49 @@ function rMercenary() {
   return h;
 }
 
+function rChainQuest() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">📜 Chain Quests</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">One-time descents, not repeatable grinds \u2014 floor by floor, full recovery between each, ending in a payout bigger than anything else in the game. Leave and come back anytime; your floor is saved.</div>';
+
+  for (let chain of CHAIN_QUESTS) {
+    const unlocked = isChainQuestUnlocked(chain);
+    const prog = getChainProgress(chain.id);
+    const totalXp = chain.stages.reduce((s, st) => s + st.rw.xp, 0);
+    const totalGold = chain.stages.reduce((s, st) => s + st.rw.g, 0);
+
+    h += '<div class="panel' + (unlocked ? ' panel-gold' : '') + '">';
+    h += '<div class="panel-title" style="' + (unlocked ? 'color:var(--gold);' : '') + '">' + chain.icon + ' ' + chain.name + '</div>';
+
+    if (!unlocked) {
+      h += '<div class="btn-hint" style="margin:8px 0;">🔒 Unlocks at Level ' + chain.unlockLevel + ' (currently Level ' + G.p.lvl + ')</div>';
+      h += '</div>';
+      continue;
+    }
+
+    if (prog.cleared) {
+      h += '<div style="font-size:12px;color:var(--gold);font-weight:600;margin:8px 0;">🏆 Complete</div>';
+      h += '<div class="btn-hint">' + chain.intro + '</div>';
+      h += '</div>';
+      continue;
+    }
+
+    h += '<div class="btn-hint" style="margin:8px 0;line-height:1.5;">' + chain.intro + '</div>';
+    h += '<div class="qp" style="margin:10px 0;"><div class="pbar"><div class="pfill" style="width:' + Math.floor((prog.stageIndex / chain.stages.length) * 100) + '%"></div></div><span class="ptxt">Floor ' + prog.stageIndex + '/' + chain.stages.length + '</span></div>';
+
+    if (prog.stageIndex > 0) {
+      h += '<div class="btn-hint" style="margin-bottom:6px;">Next: ' + chain.stages[prog.stageIndex].title + '</div>';
+    }
+    h += '<div class="btn-hint" style="margin-bottom:10px;">Total chain payout: ' + totalXp.toLocaleString() + ' XP, ' + totalGold.toLocaleString() + 'G across ' + chain.stages.length + ' floors.</div>';
+
+    h += '<button onclick="startChainQuest(\'' + chain.id + '\')" class="abtn" style="width:100%;">' + (prog.stageIndex > 0 ? '📜 Continue the Descent' : '📜 Begin the Descent') + '</button>';
+    h += '</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
 function rDragonHunt() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🐉 Dragon Hunt</div>';
@@ -12801,6 +13023,7 @@ function rMenu(){
     { title: '🐉 Legendary Hunts', items: [
       {i:'🐉',l:'Dragon Hunt',a:'dragon_hunt'},
       {i:'💀',l:'Boss Rush',a:'boss_rush'},
+      {i:'📜',l:'The Sunken Archive',a:'chain_quest'},
       {i:'🌟',l:'Prestige',a:'prestige'},
     ]},
     { title: '📋 Quick Work', items: [
