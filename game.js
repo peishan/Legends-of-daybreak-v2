@@ -117,7 +117,7 @@ const G = {
       { n: 'Iron Ore', t: 'mat', q: 3, r: 'common' },
       { n: 'Herb Bundle', t: 'mat', q: 4, r: 'common' }
     ],
-    buffs: [], ailments: [], kills: 0, quests: 0, fstreak: 0, bossKills: 0, crafts: 0, survivedCritical: false
+    buffs: [], ailments: [], kills: 0, quests: 0, fstreak: 0, bossKills: 0, crafts: 0, survivedCritical: false, focusMinutesToday: 0
   },
   party: [
     { n: 'Joel', t: 'The Steadfast', r: 'Tank', hp: 120, mhp: 120, atk: 6, def: 8, spd: 4, on: true, d: 'Your partner and shield. Never lets you fight alone. A steadfast man from a Philippine village, second of four, breadwinner, stray-feeder, yours. He does not ask why you are here. He asks if you will let him stand beside you while you find out.', b: '+10% Max HP', col: '#7c3aed', affinityBonuses: [], gear: null, base: { mhp: 120, atk: 6, def: 8, spd: 4 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
@@ -4016,6 +4016,7 @@ function checkDayAdvance() {
     G.loginClaimed = false;
     G.loginHistory = [1];
     G.longestLoginStreak = 1;
+    G.p.focusMinutesToday = 0;
     generateDailyQuests();
     G.manaSpringUses.day = G.gameDay;
     G.manaSpringUses.count = 0;
@@ -4050,6 +4051,7 @@ function checkDayAdvance() {
   
   G.lastLoginDay = G.gameDay;
   G.loginClaimed = false;
+  G.p.focusMinutesToday = 0;
   generateDailyQuests();
   saveGame();
 }
@@ -9369,7 +9371,8 @@ function sf(minutes){
       clearInterval(ft);
       const baseXp = G.focusDuration * 4;
       const baseGold = G.focusDuration * 2;
-      G.p.fstreak++;  checkDailyQuests('focus', 1); 
+      G.p.fstreak++;  checkDailyQuests('focus', 1);
+      G.p.focusMinutesToday = (G.p.focusMinutesToday || 0) + G.focusDuration;
       G.p.xp+=baseXp; G.p.gold+=baseGold;
       const fq=G.quests.find(q=>q.t=='focus');
       if(fq&&!fq.done){fq.c++;checkQ();}
@@ -9623,7 +9626,7 @@ function saveGame() {
       inventory: G.p.inv,
       buffs: G.p.buffs,
       ailments: G.p.ailments,
-      kills: G.p.kills, quests: G.p.quests, fstreak: G.p.fstreak,
+      kills: G.p.kills, quests: G.p.quests, fstreak: G.p.fstreak, focusMinutesToday: G.p.focusMinutesToday || 0,
       storyJournal: { unlocked: G.storyJournal.unlocked, read: G.storyJournal.read },
 
       // Add these inside the saveData object, alongside other fields:
@@ -9901,6 +9904,7 @@ function loadGame() {
     G.p.kills = data.player.kills;
     G.p.quests = data.player.quests;
     G.p.fstreak = data.player.fstreak;
+    G.p.focusMinutesToday = data.player.focusMinutesToday || 0;
           // Load journal progress
     if (data.player.storyJournal) {
       G.storyJournal.unlocked = data.player.storyJournal.unlocked || [];
@@ -12320,7 +12324,24 @@ function rMenu(){
     ]},
   ];
 
-  let h='<div class="grid2">';
+  let h='';
+
+  // Today at a Glance — the day's shape in three numbers, no navigating required.
+  // Pure readout of state that already exists elsewhere (focus minutes, daily quest
+  // progress, login streak) — this panel doesn't compute anything new, just surfaces it.
+  const dq = G.dailyQuests || [];
+  const dqDone = dq.filter(q => q.done).length;
+  const focusMin = G.p.focusMinutesToday || 0;
+  const dayStreak = G.loginStreak || 1;
+  h += '<div class="panel" data-a="today" onclick="setS(\'today\')" style="cursor:pointer;">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">📅 Today at a Glance</div>';
+  h += '<div style="display:flex;justify-content:space-between;text-align:center;gap:4px;">';
+  h += '<div style="flex:1;"><div style="font-size:20px;font-weight:700;color:var(--accent);">' + focusMin + 'm</div><div style="font-size:11px;color:var(--text-dim);">Focus Today</div></div>';
+  h += '<div style="flex:1;border-left:1px solid var(--border);border-right:1px solid var(--border);"><div style="font-size:20px;font-weight:700;color:var(--gold);">' + dqDone + '/' + dq.length + '</div><div style="font-size:11px;color:var(--text-dim);">Daily Quests</div></div>';
+  h += '<div style="flex:1;"><div style="font-size:20px;font-weight:700;color:var(--success);">🔥' + dayStreak + '</div><div style="font-size:11px;color:var(--text-dim);">Day Streak</div></div>';
+  h += '</div></div>';
+
+  h+='<div class="grid2">';
   for(let m of primary)h+='<div class="card" data-a="'+m.a+'"><div class="cicon">'+m.i+'</div><div class="clabel">'+m.l+'</div><div class="cdesc">'+m.d+'</div></div>';
   h+='</div>';
 
