@@ -653,6 +653,10 @@ const G = {
     { id: 'gc10', n: 'Contract: The Fracture', d: 'Defeat The Fracture for the Guild', t: 'boss_specific', target: 'The Fracture', c: 0, need: 1, rw: { xp: 3800, g: 2600 }, rep: 270, done: false, refreshWeek: -1, minLv: 34, maxLv: 40 },
     { id: 'gc11', n: 'Road Wraith Contract', d: 'Defeat 5 Road Wraiths for the Guild', t: 'kill_specific', target: 'Road Wraith', c: 0, need: 5, rw: { xp: 4500, g: 3100 }, rep: 310, done: false, refreshWeek: -1, minLv: 36, maxLv: 42 },
     { id: 'gc12', n: 'Contract: Echo of Joel', d: 'Defeat Echo of Joel for the Guild', t: 'boss_specific', target: 'Echo of Joel', c: 0, need: 1, rw: { xp: 5500, g: 3800 }, rep: 360, done: false, refreshWeek: -1, minLv: 38, maxLv: 44 },
+    { id: 'gc13', n: 'Contract: The Splinter Court', d: 'Defeat The Splinter Court for the Guild', t: 'boss_specific', target: 'The Splinter Court', c: 0, need: 1, rw: { xp: 6800, g: 4600 }, rep: 410, done: false, refreshWeek: -1, minLv: 40, maxLv: 46 },
+    { id: 'gc14', n: 'Remnant Guard Contract', d: 'Defeat 5 Remnant Guards for the Guild', t: 'kill_specific', target: 'Remnant Guard', c: 0, need: 5, rw: { xp: 8200, g: 5600 }, rep: 470, done: false, refreshWeek: -1, minLv: 44, maxLv: 50 },
+    { id: 'gc15', n: 'Contract: Daybreak Incarnate', d: 'Defeat Daybreak Incarnate for the Guild', t: 'boss_specific', target: 'Daybreak Incarnate', c: 0, need: 1, rw: { xp: 10000, g: 7000 }, rep: 540, done: false, refreshWeek: -1, minLv: 48, maxLv: 53 },
+    { id: 'gc16', n: 'Contract: The Horizon Keeper', d: 'Defeat The Horizon Keeper for the Guild', t: 'boss_specific', target: 'The Horizon Keeper', c: 0, need: 1, rw: { xp: 12500, g: 9000 }, rep: 620, done: false, refreshWeek: -1, minLv: 52, maxLv: 58 },
   ],
 
 
