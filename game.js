@@ -4030,6 +4030,17 @@ function checkDayAdvance() {
   // New real day detected — advance game day
   const daysPassed = realToday - G.lastRealDay;
   G.lastRealDay = realToday;
+
+  // Bank the day that just ended into the weekly focus heatmap before we move on.
+  // If more than one real day passed (missed days), those in-between days get a
+  // 0-minute entry so the heatmap stays honest about gaps rather than skipping them.
+  G.focusHistory = G.focusHistory || [];
+  G.focusHistory.push({ day: G.gameDay, minutes: G.p.focusMinutesToday || 0 });
+  for (let i = 1; i < daysPassed; i++) {
+    G.focusHistory.push({ day: G.gameDay + i, minutes: 0 });
+  }
+  if (G.focusHistory.length > 30) G.focusHistory = G.focusHistory.slice(-30);
+
   G.gameDay += daysPassed;
   
   // Handle streak
@@ -8780,13 +8791,16 @@ function startMercenaryContract() {
 
   rollWeather();
 
-  for (let i = 0; i < contract.enemyCount; i++) {
-    const name = ROAD_BANDITS[Math.floor(Math.random() * ROAD_BANDITS.length)];
-    const e = generateRaidEliteEnemy(name, zoneLv);
-    e.id = i;
-    G.cbt.en.push(e);
-  }
+  // Mercenary work now fields the same coordinated bandit formation as road ambushes —
+  // a mage and cleric backing the melee — instead of a flat pull of plain bandits.
+  // Melee count mirrors the contract's original enemyCount (1-3) so contracts keep their
+  // relative difficulty ordering; the mage/cleric pair is the constant that makes every
+  // contract meaningfully harder than before.
+  const meleeCount = Math.max(1, Math.min(3, contract.enemyCount));
+  spawnBanditAmbushPack(zoneLv, meleeCount);
+
   lg('📋 Contract accepted: ' + contract.title);
+  lg('   This one brought friends — a mage and a cleric are backing them up.');
   render();
 }
 
@@ -9611,6 +9625,7 @@ function saveGame() {
     lastLoginDay: G.lastLoginDay || -1,
     loginStreak: G.loginStreak || 0,
     loginHistory: G.loginHistory || [],
+    focusHistory: G.focusHistory || [],
     longestLoginStreak: G.longestLoginStreak || 0,
     loginClaimed: G.loginClaimed || false,
     gameDay: G.gameDay || 0,
@@ -10164,6 +10179,7 @@ function loadGame() {
     G.lastLoginDay = data.lastLoginDay || -1;
     G.loginStreak = data.loginStreak || 0;
     G.loginHistory = data.loginHistory || [];
+    G.focusHistory = data.focusHistory || [];
     G.longestLoginStreak = data.longestLoginStreak || 0;
     G.loginClaimed = data.loginClaimed || false;
     G.gameDay = data.gameDay || 0;
@@ -11679,6 +11695,31 @@ function rForge() {
   return h;
 }
 
+function rWeeklyFocusHeatmap() {
+  const hist = (G.focusHistory || []).slice(-6);
+  let cells = hist.concat([{ day: G.gameDay, minutes: G.p.focusMinutesToday || 0 }]).slice(-7);
+  while (cells.length < 7) cells.unshift({ day: null, minutes: -1 }); // -1 = before the game existed
+
+  const intensity = (m) => {
+    if (m < 0) return 'transparent';
+    if (m === 0) return 'var(--bg-hover)';
+    if (m < 15) return 'rgba(124,58,237,0.35)';
+    if (m < 30) return 'rgba(124,58,237,0.6)';
+    if (m < 60) return 'rgba(124,58,237,0.85)';
+    return 'var(--accent)';
+  };
+  const totalMin = cells.reduce((s, c) => s + Math.max(c.minutes, 0), 0);
+
+  let h = '<div class="panel">';
+  h += '<div class="panel-row"><div class="panel-title">📊 Weekly Focus</div><div class="btn-hint">' + totalMin + 'm this week</div></div>';
+  h += '<div style="display:flex;gap:4px;margin-top:8px;">';
+  for (let c of cells) {
+    h += '<div style="flex:1;height:28px;border-radius:6px;background:' + intensity(c.minutes) + ';display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text);font-weight:700;">' + (c.minutes > 0 ? c.minutes : '') + '</div>';
+  }
+  h += '</div></div>';
+  return h;
+}
+
 function rToday() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">📅 Today</div>';
@@ -11726,10 +11767,16 @@ function rToday() {
   }
   h += '</div></div>';
 
+  // Weekly Focus heatmap — last 7 days at a glance, using the same daily record the
+  // Today at a Glance panel reads from. Left-padded with blank cells if the game is
+  // younger than a week, so the strip always shows 7 slots.
+  h += rWeeklyFocusHeatmap();
+
   // Mercenary contract
   const contract = getMercenaryContract();
+  const contractOpponents = Math.max(1, Math.min(3, contract.enemyCount)) + 2;
   h += '<div class="panel">';
-  h += '<div class="panel-row"><div class="panel-title">📋 ' + contract.title + '</div><div class="btn-hint">' + contract.enemyCount + ' opponent' + (contract.enemyCount > 1 ? 's' : '') + '</div></div>';
+  h += '<div class="panel-row"><div class="panel-title">📋 ' + contract.title + '</div><div class="btn-hint">' + contractOpponents + ' opponents (mage + cleric backed)</div></div>';
   h += '<div class="btn-hint" style="margin:6px 0 10px;">' + contract.flavor + '</div>';
   h += '<button onclick="startMercenaryContract()" class="abtn" style="width:100%;">Take the Job</button>';
   h += '</div>';
@@ -11820,7 +11867,7 @@ function rMercenary() {
   h += '<div class="panel panel-gold">';
   h += '<div class="panel-title" style="color:var(--gold);">' + contract.title + '</div>';
   h += '<div class="btn-hint" style="margin:10px 0;line-height:1.6;">' + contract.flavor + '</div>';
-  h += '<div class="btn-hint" style="margin-bottom:10px;">' + contract.enemyCount + ' opponent' + (contract.enemyCount > 1 ? 's' : '') + ' \u2014 a short, single fight.</div>';
+  h += '<div class="btn-hint" style="margin-bottom:10px;">' + (Math.max(1, Math.min(3, contract.enemyCount)) + 2) + ' opponents, mage + cleric backed \u2014 a short, sharp fight.</div>';
   h += '<button onclick="startMercenaryContract()" class="abtn" style="width:100%;">Take the Job</button>';
   h += '</div>';
 
@@ -12117,6 +12164,45 @@ function visitBondingLocation(locationId) {
 const ROAD_AMBUSH_CHANCE = 0.25;
 const ROAD_BANDITS = ['Highwayman', 'Roadside Thug', 'Masked Bandit', 'Ambush Scout', 'Bandit Captain'];
 
+// === SHARED BANDIT AMBUSH PACK ===
+// Full-party ambush formation, BG2 mercenary-style: melee bandits backed by a mage and
+// a cleric (cleric.healer=true triggers the heal-branch in doEnemyAttack), rather than
+// a flat random pull from one list. Shared by road ambushes and mercenary contracts so
+// both get the same "coordinated enemy party" feel instead of duplicating the spawn
+// logic. Pushes directly into G.cbt.en; caller is responsible for the rest of combat
+// setup (G.cbt.on, G.state, etc).
+function spawnBanditAmbushPack(zoneLv, meleeCount, goldMult, xpMult) {
+  goldMult = goldMult || 1.4;
+  xpMult = xpMult || 1.25;
+  let id = G.cbt.en.length;
+
+  const mage = generateRaidEliteEnemy('Bandit Mage', zoneLv);
+  mage.id = id++;
+  mage.g = Math.floor(mage.g * goldMult);
+  G.cbt.en.push(mage);
+
+  const cleric = generateRaidEliteEnemy('Bandit Cleric', zoneLv);
+  cleric.id = id++;
+  cleric.g = Math.floor(cleric.g * goldMult);
+  cleric.healer = true;
+  G.cbt.en.push(cleric);
+
+  for (let i = 0; i < meleeCount; i++) {
+    const name = ROAD_BANDITS[Math.floor(Math.random() * ROAD_BANDITS.length)];
+    const e = generateRaidEliteEnemy(name, zoneLv); // reuses the elite stat template — bandits should sting a little more than common trash
+    e.id = id++;
+    e.g = Math.floor(e.g * goldMult); // bandits carry stolen loot — modest gold bonus over a normal encounter
+    G.cbt.en.push(e);
+  }
+
+  // Coordinated full-party ambush (mage + cleric backing the thieves) is a meaningfully
+  // harder fight than random trash, so it pays out a flat XP bonus on top of each
+  // enemy's own XP, same spirit as the gold bonus above.
+  for (let e of G.cbt.en) {
+    e.xp = Math.floor(e.xp * xpMult);
+  }
+}
+
 function startRoadAmbush(zone) {
   G.cbt.on = true;
   G.cbt.turn = 0;
@@ -12127,38 +12213,10 @@ function startRoadAmbush(zone) {
   rollWeather();
   applyZoneBuffs(zone.n);
 
-  // Full-party ambush, BG2 mercenary-style: a couple of melee thieves backed by a mage
-  // and a cleric, rather than a flat random pull from one list. 1-3 melee bandits + the
-  // mage/cleric pair, capped at 5 total to match the enemy-count cap used elsewhere.
+  // 1-3 melee bandits + the mage/cleric pair, capped at 5 total to match the
+  // enemy-count cap used elsewhere.
   const meleeCount = Math.min(3, 1 + Math.floor(Math.random() * 3)); // 1-3 melee
-  let id = 0;
-
-  const mage = generateRaidEliteEnemy('Bandit Mage', zone.lv);
-  mage.id = id++;
-  mage.g = Math.floor(mage.g * 1.4);
-  G.cbt.en.push(mage);
-
-  const cleric = generateRaidEliteEnemy('Bandit Cleric', zone.lv);
-  cleric.id = id++;
-  cleric.g = Math.floor(cleric.g * 1.4);
-  cleric.healer = true;
-  G.cbt.en.push(cleric);
-
-  for (let i = 0; i < meleeCount; i++) {
-    const name = ROAD_BANDITS[Math.floor(Math.random() * ROAD_BANDITS.length)];
-    const e = generateRaidEliteEnemy(name, zone.lv); // reuses the elite stat template — bandits should sting a little more than common trash
-    e.id = id++;
-    // Bandits carry stolen loot — modest gold bonus over a normal encounter of the same level
-    e.g = Math.floor(e.g * 1.4);
-    G.cbt.en.push(e);
-  }
-
-  // Coordinated full-party ambush (mage + cleric backing the thieves) is a meaningfully
-  // harder fight than random trash, so it pays out a flat bonus on top of each enemy's
-  // own XP, same spirit as the existing gold bonus above.
-  for (let e of G.cbt.en) {
-    e.xp = Math.floor(e.xp * 1.25);
-  }
+  spawnBanditAmbushPack(zone.lv, meleeCount);
 
   lg('🗡️ AMBUSH! The road to ' + zone.n + ' was not as empty as it looked.');
   lg('   A mage and a cleric hang back while the rest close in.');
