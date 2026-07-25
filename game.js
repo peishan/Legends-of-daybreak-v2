@@ -2183,6 +2183,7 @@ storyJournal: {
   afkAdventureEliteToggle: false, // temporary picker-screen toggle, before starting
   notificationsEnabled: false,
   mercenary: { active: false, current: null, completed: 0 }, // current offered contract, if any; completed drives tier scaling
+  prestige: { count: 0, xpBonusPct: 0, goldBonusPct: 0 }, // permanent bonuses banked from past resets
   strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
   siegeDefense: { active: false, strongholdId: null, wave: 0, maxWaves: 3 },
   strongholdTasks: [], // populated from STRONGHOLDS[id].tasks once a stronghold is claimed
@@ -5088,6 +5089,56 @@ function exitSiegeDefense() {
   render();
 }
 
+// === PRESTIGE / REBIRTH ===
+// The answer to "the xpN curve outgrows normal play at high level" — instead of trying
+// to keep base zone/enemy XP scaling forever, let the player cash in accumulated levels
+// for a small PERMANENT xp/gold multiplier, then reset level/xp back to the start. Zones
+// re-lock automatically since zone access is just a live G.p.lvl check (nothing special
+// to unwind there) — the player re-climbs through the same content, just faster each
+// time thanks to the stacked bonus. Gold, gear, inventory, companions, story progress,
+// quests, achievements, guild rep, mercenary tier, and dragon hunt clears are untouched;
+// this only resets the level/xp/base-stat track, since that's the part the curve problem
+// actually lives in.
+const PRESTIGE_MIN_LEVEL = 30;
+const PRESTIGE_XP_PCT_PER_LEVEL = 0.4;   // % permanent XP bonus banked per level at reset
+const PRESTIGE_GOLD_PCT_PER_LEVEL = 0.3; // % permanent gold bonus banked per level at reset
+const PRESTIGE_BONUS_CAP = 200;          // sanity ceiling so repeated resets can't run away
+
+function getPrestigeXpMult() { return 1 + (G.prestige.xpBonusPct || 0) / 100; }
+function getPrestigeGoldMult() { return 1 + (G.prestige.goldBonusPct || 0) / 100; }
+
+function isPrestigeUnlocked() {
+  return G.p.lvl >= PRESTIGE_MIN_LEVEL;
+}
+
+function doPrestige() {
+  if (!isPrestigeUnlocked()) {
+    lg('🔒 Prestige unlocks at Level ' + PRESTIGE_MIN_LEVEL + '.');
+    return;
+  }
+  const xpGain = +(G.p.lvl * PRESTIGE_XP_PCT_PER_LEVEL).toFixed(1);
+  const goldGain = +(G.p.lvl * PRESTIGE_GOLD_PCT_PER_LEVEL).toFixed(1);
+  const oldLvl = G.p.lvl;
+
+  G.prestige.xpBonusPct = Math.min(PRESTIGE_BONUS_CAP, (G.prestige.xpBonusPct || 0) + xpGain);
+  G.prestige.goldBonusPct = Math.min(PRESTIGE_BONUS_CAP, (G.prestige.goldBonusPct || 0) + goldGain);
+  G.prestige.count = (G.prestige.count || 0) + 1;
+
+  // Reset the level/xp/base-stat track back to the start of the game.
+  G.p.lvl = 1;
+  G.p.xp = 0;
+  G.p.xpN = 100;
+  G.p.hp = 80; G.p.mhp = 80;
+  G.p.mp = 120; G.p.mmp = 120;
+  G.p.stats = { str: 4, dex: 6, con: 5, int: 12, wis: 10, cha: 8 };
+
+  lg('🌟 PRESTIGE! Level ' + oldLvl + ' banked into a permanent +' + xpGain + '% XP / +' + goldGain + '% gold.');
+  lg('   Total bonus now: +' + G.prestige.xpBonusPct.toFixed(1) + '% XP, +' + G.prestige.goldBonusPct.toFixed(1) + '% gold.');
+  lg('   Level reset to 1 — everything else (gear, gold, story, achievements) stays.');
+  saveGame();
+  render();
+}
+
 // === DRAGON HUNT ===
 // An optional, legendary superboss fight in the BG2/IWD2 tradition — dragons there are
 // notoriously long, grinding fights, not quick skirmishes. Vaelithorn is deliberately
@@ -5124,8 +5175,8 @@ function startDragonHunt() {
 }
 
 function handleDragonHuntVictory() {
-  const txp = G.cbt.en.reduce((s, e) => s + e.xp, 0);
-  const tg2 = G.cbt.en.reduce((s, e) => s + e.g, 0);
+  const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult());
+  const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * getPrestigeGoldMult());
   G.p.xp += txp;
   G.p.gold += tg2;
   G.p.bossKills = (G.p.bossKills || 0) + 1;
@@ -6920,6 +6971,8 @@ function handleVictory() {
   const guildGoldBonus = getTotalGuildHallGoldBonus() + getGuildBonus('goldBonus');
   if (guildXpBonus > 0) txp = Math.floor(txp * (1 + guildXpBonus));
   if (guildGoldBonus > 0) tg2 = Math.floor(tg2 * (1 + guildGoldBonus));
+  txp = Math.floor(txp * getPrestigeXpMult());
+  tg2 = Math.floor(tg2 * getPrestigeGoldMult());
   
   G.p.xp += txp;
   G.p.gold += tg2;
@@ -8827,8 +8880,8 @@ function startMercenaryContract() {
 
 function handleMercenaryVictory() {
   const contract = G.mercenary.current;
-  const txp = G.cbt.en.reduce((s, e) => s + e.xp, 0);
-  const tg2 = G.cbt.en.reduce((s, e) => s + e.g, 0);
+  const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult());
+  const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * getPrestigeGoldMult());
   G.p.xp += txp;
   G.p.gold += tg2;
   G.mercenary.completed = (G.mercenary.completed || 0) + 1;
@@ -9746,6 +9799,9 @@ function saveGame() {
     strongholdSiege: G.strongholdSiege,
     dragonHuntCleared: G.dragonHunt.cleared,
     mercenaryCompleted: G.mercenary.completed || 0,
+    prestigeCount: G.prestige.count || 0,
+    prestigeXpBonusPct: G.prestige.xpBonusPct || 0,
+    prestigeGoldBonusPct: G.prestige.goldBonusPct || 0,
     strongholdCosmetics: G.strongholdCosmetics,
     bondingSeenScenes: G.bonding.seenScenes,
     playerSpec: G.playerSpec,
@@ -9940,6 +9996,9 @@ function loadGame() {
     G.strongholdSiege = data.strongholdSiege || {};
     G.dragonHunt.cleared = data.dragonHuntCleared || 0;
     G.mercenary.completed = data.mercenaryCompleted || 0;
+    G.prestige.count = data.prestigeCount || 0;
+    G.prestige.xpBonusPct = data.prestigeXpBonusPct || 0;
+    G.prestige.goldBonusPct = data.prestigeGoldBonusPct || 0;
     G.strongholdCosmetics = data.strongholdCosmetics || {};
     G.bonding.seenScenes = data.bondingSeenScenes || [];
     if (data.playerSpec) {
@@ -10573,6 +10632,7 @@ function render(){
   else if(G.state=='guild')h+=rGuild();
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='dragon_hunt')h+=rDragonHunt();
+  else if(G.state=='prestige')h+=rPrestige();
   else if(G.state=='forge')h+=rForge();
   else if(G.state=='bonding')h+=rBonding();
   else if(G.state=='mercenary')h+=rMercenary();
@@ -10607,6 +10667,7 @@ function attachEvents() {
     else if(a=='guild')setS('guild');
     else if(a=='stronghold')setS('stronghold');
     else if(a=='dragon_hunt')setS('dragon_hunt');
+    else if(a=='prestige')setS('prestige');
     else if(a=='forge')setS('forge');
     else if(a=='bonding')setS('bonding');
     else if(a=='mercenary')setS('mercenary');
@@ -11981,6 +12042,49 @@ function rDragonHunt() {
   return h;
 }
 
+function rPrestige() {
+  const unlocked = isPrestigeUnlocked();
+  const projXp = +(G.p.lvl * PRESTIGE_XP_PCT_PER_LEVEL).toFixed(1);
+  const projGold = +(G.p.lvl * PRESTIGE_GOLD_PCT_PER_LEVEL).toFixed(1);
+
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">🌟 Prestige</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Bank your level into a permanent bonus, then start the climb again \u2014 faster this time.</div>';
+
+  h += '<div class="panel panel-gold" style="text-align:center;">';
+  h += '<div class="panel-title" style="color:var(--gold);">Current Permanent Bonus</div>';
+  h += '<div style="font-size:24px;font-weight:700;margin:8px 0;color:var(--gold);">+' + (G.prestige.xpBonusPct || 0).toFixed(1) + '% XP &nbsp;\u00b7&nbsp; +' + (G.prestige.goldBonusPct || 0).toFixed(1) + '% Gold</div>';
+  h += '<div class="btn-hint">' + (G.prestige.count || 0) + ' prestige' + ((G.prestige.count || 0) === 1 ? '' : 's') + ' so far</div>';
+  h += '</div>';
+
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">What Happens</div>';
+  h += '<div class="btn-hint" style="line-height:1.6;">Resets to Level 1: character level, XP, HP/MP pools, and base stats.<br><br>Untouched: gold, gear, inventory, companions, story progress, quests, achievements, guild reputation, mercenary tier, and Dragon Hunt clears.<br><br>Zones re-lock naturally since access is just your current level \u2014 you\'ll climb back through them, but every fight now pays out the bonus above, permanently, on top of whatever you bank today.</div>';
+  h += '</div>';
+
+  if (unlocked) {
+    h += '<div class="panel" style="text-align:center;">';
+    h += '<div class="btn-hint">Prestiging now at Level ' + G.p.lvl + ' banks:</div>';
+    h += '<div style="font-size:18px;font-weight:700;margin:6px 0;color:var(--accent);">+' + projXp + '% XP &nbsp;\u00b7&nbsp; +' + projGold + '% Gold</div>';
+    h += '</div>';
+    h += '<button onclick="confirmPrestige()" class="abtn" style="width:100%;background:var(--danger);">🌟 Prestige Now (Level Resets to 1)</button>';
+  } else {
+    h += '<div class="panel" style="text-align:center;">';
+    h += '<div class="btn-hint">🔒 Unlocks at Level ' + PRESTIGE_MIN_LEVEL + ' (currently Level ' + G.p.lvl + ')</div>';
+    h += '</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function confirmPrestige() {
+  if (!isPrestigeUnlocked()) { doPrestige(); return; } // will just show the lock message
+  if (confirm('Reset to Level 1 and bank the permanent bonus? Gear, gold, and story progress are kept \u2014 only level/XP/stats reset. This can\'t be undone.')) {
+    doPrestige();
+  }
+}
+
 function rStrongholdCosmeticsShop() {
   const prestige = getStrongholdPrestige();
   let h = '<div class="panel panel-gold">';
@@ -12429,6 +12533,7 @@ function rMenu(){
   const sections=[
     { title: '🐉 Legendary Hunts', items: [
       {i:'🐉',l:'Dragon Hunt',a:'dragon_hunt'},
+      {i:'🌟',l:'Prestige',a:'prestige'},
     ]},
     { title: '📋 Quick Work', items: [
       {i:'📅',l:'Today',a:'today'},
