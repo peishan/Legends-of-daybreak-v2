@@ -2177,7 +2177,7 @@ storyJournal: {
   afkAdventure: { active: false, zoneIndices: [], startTime: 0, totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null },
   afkAdventurePicker: [], // temporary selection state while choosing zones, before starting
   notificationsEnabled: false,
-  mercenary: { active: false, current: null }, // current offered contract, if any
+  mercenary: { active: false, current: null, completed: 0 }, // current offered contract, if any; completed drives tier scaling
   strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
   siegeDefense: { active: false, strongholdId: null, wave: 0, maxWaves: 3 },
   strongholdTasks: [], // populated from STRONGHOLDS[id].tasks once a stronghold is claimed
@@ -8778,9 +8778,20 @@ function getMercenaryContract() {
   return G.mercenary.current;
 }
 
+// Mercenary tiers escalate with completed contracts rather than staying flat forever —
+// every MERCENARY_CONTRACTS_PER_TIER wins bumps the tier, which scales up enemy stats,
+// adds extra melee bandits (capped), and pays out proportionally more. This is the
+// mercenary track's answer to "the work never stays this easy" — it's meant to keep
+// pace as you outgrow the base contract difficulty, not to be a checklist grind.
+const MERCENARY_CONTRACTS_PER_TIER = 5;
+function getMercenaryTier() {
+  return Math.floor((G.mercenary.completed || 0) / MERCENARY_CONTRACTS_PER_TIER);
+}
+
 function startMercenaryContract() {
   const contract = getMercenaryContract();
   const zoneLv = Math.max(1, Math.min(G.p.lvl, 50));
+  const tier = getMercenaryTier();
 
   G.mercenary.active = true;
   G.cbt.on = true;
@@ -8794,12 +8805,17 @@ function startMercenaryContract() {
   // Mercenary work now fields the same coordinated bandit formation as road ambushes —
   // a mage and cleric backing the melee — instead of a flat pull of plain bandits.
   // Melee count mirrors the contract's original enemyCount (1-3) so contracts keep their
-  // relative difficulty ordering; the mage/cleric pair is the constant that makes every
-  // contract meaningfully harder than before.
-  const meleeCount = Math.max(1, Math.min(3, contract.enemyCount));
-  spawnBanditAmbushPack(zoneLv, meleeCount);
+  // relative difficulty ordering; tier adds up to 3 more melee on top of that as you
+  // rack up completions, and every enemy's stats scale up with tier as well.
+  const baseMelee = Math.max(1, Math.min(3, contract.enemyCount));
+  const tierMelee = Math.min(3, Math.floor(tier / 2)); // +1 melee every 2 tiers, capped at +3
+  const meleeCount = baseMelee + tierMelee;
+  const statMult = 1 + tier * 0.06;
+  const goldMult = 1.4 + tier * 0.05;
+  const xpMult = 1.25 + tier * 0.07;
+  spawnBanditAmbushPack(zoneLv, meleeCount, goldMult, xpMult, statMult);
 
-  lg('📋 Contract accepted: ' + contract.title);
+  lg('📋 Contract accepted: ' + contract.title + (tier > 0 ? ' [Tier ' + (tier + 1) + ']' : ''));
   lg('   This one brought friends — a mage and a cleric are backing them up.');
   render();
 }
@@ -8810,6 +8826,7 @@ function handleMercenaryVictory() {
   const tg2 = G.cbt.en.reduce((s, e) => s + e.g, 0);
   G.p.xp += txp;
   G.p.gold += tg2;
+  G.mercenary.completed = (G.mercenary.completed || 0) + 1;
   checkAchievements();
 
   lg('🎉 ' + (contract ? contract.title : 'Contract') + ' complete! +' + txp + ' XP, +' + tg2 + 'G');
@@ -9702,6 +9719,7 @@ function saveGame() {
     guildContracts: G.guildContracts.map(c => ({ id: c.id, c: c.c, done: c.done, refreshWeek: c.refreshWeek })),
     strongholdSiege: G.strongholdSiege,
     dragonHuntCleared: G.dragonHunt.cleared,
+    mercenaryCompleted: G.mercenary.completed || 0,
     strongholdCosmetics: G.strongholdCosmetics,
     bondingSeenScenes: G.bonding.seenScenes,
     playerSpec: G.playerSpec,
@@ -9895,6 +9913,7 @@ function loadGame() {
     }
     G.strongholdSiege = data.strongholdSiege || {};
     G.dragonHunt.cleared = data.dragonHuntCleared || 0;
+    G.mercenary.completed = data.mercenaryCompleted || 0;
     G.strongholdCosmetics = data.strongholdCosmetics || {};
     G.bonding.seenScenes = data.bondingSeenScenes || [];
     if (data.playerSpec) {
@@ -11774,9 +11793,10 @@ function rToday() {
 
   // Mercenary contract
   const contract = getMercenaryContract();
-  const contractOpponents = Math.max(1, Math.min(3, contract.enemyCount)) + 2;
+  const mercTier = getMercenaryTier();
+  const contractOpponents = Math.max(1, Math.min(3, contract.enemyCount)) + Math.min(3, Math.floor(mercTier / 2)) + 2;
   h += '<div class="panel">';
-  h += '<div class="panel-row"><div class="panel-title">📋 ' + contract.title + '</div><div class="btn-hint">' + contractOpponents + ' opponents (mage + cleric backed)</div></div>';
+  h += '<div class="panel-row"><div class="panel-title">📋 ' + contract.title + (mercTier > 0 ? ' <span style="color:var(--gold);">[Tier ' + (mercTier + 1) + ']</span>' : '') + '</div><div class="btn-hint">' + contractOpponents + ' opponents (mage + cleric backed)</div></div>';
   h += '<div class="btn-hint" style="margin:6px 0 10px;">' + contract.flavor + '</div>';
   h += '<button onclick="startMercenaryContract()" class="abtn" style="width:100%;">Take the Job</button>';
   h += '</div>';
@@ -11860,14 +11880,24 @@ function rAfkAdventurePicker() {
 
 function rMercenary() {
   const contract = getMercenaryContract();
+  const mercTier = getMercenaryTier();
+  const completed = G.mercenary.completed || 0;
+  const intoTier = completed % MERCENARY_CONTRACTS_PER_TIER;
+  const tierOpponents = Math.max(1, Math.min(3, contract.enemyCount)) + Math.min(3, Math.floor(mercTier / 2)) + 2;
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">📋 Mercenary Work</div>';
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Freelance work never really stopped, apparently \u2014 just the medium changed. Words to swords. Always something available, no setup required.</div>';
 
+  // Tier progress — contracts get harder (and pay better) the more you've cleared.
+  h += '<div class="panel">';
+  h += '<div class="panel-row"><div class="panel-title">' + (mercTier > 0 ? '🏅 Tier ' + (mercTier + 1) : 'Tier 1') + '</div><div class="btn-hint">' + completed + ' contracts completed</div></div>';
+  h += '<div class="qp"><div class="pbar"><div class="pfill" style="width:' + Math.floor((intoTier / MERCENARY_CONTRACTS_PER_TIER) * 100) + '%"></div></div><span class="ptxt">' + intoTier + '/' + MERCENARY_CONTRACTS_PER_TIER + ' to Tier ' + (mercTier + 2) + '</span></div>';
+  h += '</div>';
+
   h += '<div class="panel panel-gold">';
-  h += '<div class="panel-title" style="color:var(--gold);">' + contract.title + '</div>';
+  h += '<div class="panel-title" style="color:var(--gold);">' + contract.title + (mercTier > 0 ? ' [Tier ' + (mercTier + 1) + ']' : '') + '</div>';
   h += '<div class="btn-hint" style="margin:10px 0;line-height:1.6;">' + contract.flavor + '</div>';
-  h += '<div class="btn-hint" style="margin-bottom:10px;">' + (Math.max(1, Math.min(3, contract.enemyCount)) + 2) + ' opponents, mage + cleric backed \u2014 a short, sharp fight.</div>';
+  h += '<div class="btn-hint" style="margin-bottom:10px;">' + tierOpponents + ' opponents, mage + cleric backed \u2014 a short, sharp fight.</div>';
   h += '<button onclick="startMercenaryContract()" class="abtn" style="width:100%;">Take the Job</button>';
   h += '</div>';
 
@@ -12171,20 +12201,31 @@ const ROAD_BANDITS = ['Highwayman', 'Roadside Thug', 'Masked Bandit', 'Ambush Sc
 // both get the same "coordinated enemy party" feel instead of duplicating the spawn
 // logic. Pushes directly into G.cbt.en; caller is responsible for the rest of combat
 // setup (G.cbt.on, G.state, etc).
-function spawnBanditAmbushPack(zoneLv, meleeCount, goldMult, xpMult) {
+function spawnBanditAmbushPack(zoneLv, meleeCount, goldMult, xpMult, statMult) {
   goldMult = goldMult || 1.4;
   xpMult = xpMult || 1.25;
+  statMult = statMult || 1;
   let id = G.cbt.en.length;
+
+  const scaleStats = (e) => {
+    if (statMult === 1) return;
+    e.hp = Math.floor(e.hp * statMult);
+    e.mhp = Math.floor(e.mhp * statMult);
+    e.atk = Math.floor(e.atk * statMult);
+    e.def = Math.floor(e.def * statMult);
+  };
 
   const mage = generateRaidEliteEnemy('Bandit Mage', zoneLv);
   mage.id = id++;
   mage.g = Math.floor(mage.g * goldMult);
+  scaleStats(mage);
   G.cbt.en.push(mage);
 
   const cleric = generateRaidEliteEnemy('Bandit Cleric', zoneLv);
   cleric.id = id++;
   cleric.g = Math.floor(cleric.g * goldMult);
   cleric.healer = true;
+  scaleStats(cleric);
   G.cbt.en.push(cleric);
 
   for (let i = 0; i < meleeCount; i++) {
@@ -12192,6 +12233,7 @@ function spawnBanditAmbushPack(zoneLv, meleeCount, goldMult, xpMult) {
     const e = generateRaidEliteEnemy(name, zoneLv); // reuses the elite stat template — bandits should sting a little more than common trash
     e.id = id++;
     e.g = Math.floor(e.g * goldMult); // bandits carry stolen loot — modest gold bonus over a normal encounter
+    scaleStats(e);
     G.cbt.en.push(e);
   }
 
@@ -13156,6 +13198,23 @@ function toggleQuestCollapse(key){
   render();
 }
 
+// Looks up which zone a quest/bounty target monster is found in — checks regular zone
+// enemy pools first, then falls back to the boss registry (which already tracks its own
+// zone). Used to surface a "📍 Found in: X (Lv.N)" hint on quest cards so hunting down a
+// specific target doesn't mean cross-referencing the bestiary by hand.
+function findMonsterZone(monsterName) {
+  if (!monsterName) return null;
+  for (let z of G.zones) {
+    if (z.en && z.en.includes(monsterName)) return z;
+  }
+  const b = (G.bosses || []).find(b => b.n === monsterName);
+  if (b) {
+    const z = G.zones.find(z => z.n === b.zone);
+    return z || { n: b.zone, lv: null };
+  }
+  return null;
+}
+
 function rQuest(){
   let h='<div class="quest-view">';
     // === DAILY LOGIN REWARDS ===
@@ -13243,6 +13302,10 @@ function rQuest(){
       h+='<div style="font-size:10px;color:var(--text-dim);font-style:italic;margin-bottom:4px;">🔒 Requires: '+(req?req.n:'Unknown')+'</div>';
     }
     h+='<div class="qd">'+q.d+'</div>';
+    if(q.target && !q.done){
+      const tz = findMonsterZone(q.target);
+      if(tz) h+='<div style="font-size:10px;color:var(--accent-light);margin-bottom:4px;">📍 Found in: '+tz.n+(tz.lv?' (Lv.'+tz.lv+')':'')+'</div>';
+    }
     if(timerStatus){
       h+='<div class="timer-bar"><div class="timer-fill '+timerStatus.cls+'" style="width:'+timerStatus.pct+'%"></div></div>';
       h+='<div class="timer-label">⏰ '+timerStatus.label+'</div>';
@@ -13273,7 +13336,12 @@ function rQuest(){
       for(let b of activeBounties){
         const pc=Math.min(100,(b.c/b.need)*100);
         h+='<div class="qc"><div class="qh"><span class="qn">'+b.n+'</span><span class="qr">'+b.rw.xp+' XP | '+b.rw.g+' G</span></div>';
-        h+='<div class="qd">'+b.d+'</div><div class="qp"><div class="pbar"><div class="pfill" style="width:'+pc+'%"></div></div><span class="ptxt">'+b.c+'/'+b.need+'</span></div></div>';
+        h+='<div class="qd">'+b.d+'</div>';
+        if(b.target){
+          const btz = findMonsterZone(b.target);
+          if(btz) h+='<div style="font-size:10px;color:var(--accent-light);margin-bottom:4px;">📍 Found in: '+btz.n+(btz.lv?' (Lv.'+btz.lv+')':'')+'</div>';
+        }
+        h+='<div class="qp"><div class="pbar"><div class="pfill" style="width:'+pc+'%"></div></div><span class="ptxt">'+b.c+'/'+b.need+'</span></div></div>';
       }
       h+='</div>';
     }
