@@ -2174,7 +2174,7 @@ storyJournal: {
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
-  afkAdventure: { active: false, zoneIndices: [], startTime: 0, totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {} },
+  afkAdventure: { active: false, zoneIndices: [], startTime: 0, totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null },
   afkAdventurePicker: [], // temporary selection state while choosing zones, before starting
   notificationsEnabled: false,
   mercenary: { active: false, current: null }, // current offered contract, if any
@@ -8861,12 +8861,16 @@ function startAfkAdventure(zoneIndices) {
   G.afkAdventure.totalGold = 0;
   G.afkAdventure.totalKills = 0;
   G.afkAdventure.bossKills = {};
+  G.afkAdventure.activeMs = 0;
+  G.afkAdventure.lastResumeTime = Date.now();
+  G.afkAdventure.backgroundedAt = null;
   G.grindAfkMode = false; // distinct render path from Grind's AFK bar
   afkAdventureNextEncounter();
 }
 
 function stopAfkAdventure() {
   G.afkAdventure.active = false;
+  G.afkAdventure.backgroundedAt = null;
   G.afkAdventurePicker = [];
   G.cbt.autoCombat = false;
   G.cbt.on = false;
@@ -8874,6 +8878,70 @@ function stopAfkAdventure() {
   G.state = 'menu';
   render();
 }
+
+// === AFK ADVENTURE BACKGROUND CATCH-UP ===
+// The live tick loop (afkAdventureNextEncounter -> setTimeout chain) can't survive the
+// screen locking or the app backgrounding — mobile OSes suspend JS timers, so the loop
+// (and its own watchdog) just freezes. Previously this meant the on-screen timer kept
+// counting real elapsed time while almost nothing was actually earned during any locked
+// stretch, making results wildly inconsistent depending on how much of a session was
+// spent with the screen on. Fix: detect the background gap and grant a retroactive
+// lump-sum for it, using the session's OWN observed live rate (not a static table) so it
+// scales correctly with whatever zones were picked and the player's current level.
+const AFK_BG_CATCHUP_CAP_MINUTES = 9 * 60; // same "one full night" cap as the idle system
+const AFK_BG_CATCHUP_EFFICIENCY = 0.75;    // slightly below live-watched rate on purpose
+
+function applyAfkBackgroundCatchup(bgMs) {
+  const adv = G.afkAdventure;
+  const activeMinutes = adv.activeMs / 60000;
+  // Need at least a minute of real live data to extrapolate a trustworthy rate — if the
+  // screen was locked almost immediately after starting, just skip catch-up this time
+  // rather than guessing from near-zero data.
+  if (activeMinutes < 1) return;
+
+  const bgMinutes = Math.min(bgMs / 60000, AFK_BG_CATCHUP_CAP_MINUTES);
+  if (bgMinutes < 1) return;
+
+  const xpPerMin = adv.totalXp / activeMinutes;
+  const goldPerMin = adv.totalGold / activeMinutes;
+  const killsPerMin = adv.totalKills / activeMinutes;
+
+  const gainedXp = Math.floor(xpPerMin * bgMinutes * AFK_BG_CATCHUP_EFFICIENCY);
+  const gainedGold = Math.floor(goldPerMin * bgMinutes * AFK_BG_CATCHUP_EFFICIENCY);
+  const gainedKills = Math.floor(killsPerMin * bgMinutes * AFK_BG_CATCHUP_EFFICIENCY);
+
+  if (gainedXp <= 0 && gainedGold <= 0) return;
+
+  G.p.xp += gainedXp;
+  G.p.gold += gainedGold;
+  lvlup();
+
+  // Counted separately from the live per-kill totals above — bosses are intentionally
+  // NOT rolled retroactively (see note below), only the ordinary kill/xp/gold rate.
+  adv.totalXp += gainedXp;
+  adv.totalGold += gainedGold;
+  adv.totalKills += gainedKills;
+
+  lg('📴 AFK Adventure kept going while your screen was locked: +' + gainedXp + ' XP, +' + gainedGold + 'G, ~' + gainedKills + ' kills caught up.');
+  lg('   (Boss encounters only happen live — none were rolled for the locked time.)');
+  render();
+}
+
+document.addEventListener('visibilitychange', () => {
+  const adv = G.afkAdventure;
+  if (!adv.active) return;
+  if (document.hidden) {
+    // Bank whatever foreground time just elapsed into activeMs before the gap starts,
+    // so the rate used for catch-up only ever reflects genuinely-live minutes.
+    adv.activeMs += Date.now() - adv.lastResumeTime;
+    adv.backgroundedAt = Date.now();
+  } else if (adv.backgroundedAt) {
+    const bgMs = Date.now() - adv.backgroundedAt;
+    applyAfkBackgroundCatchup(bgMs);
+    adv.backgroundedAt = null;
+    adv.lastResumeTime = Date.now();
+  }
+});
 
 const _originalHandleVictoryForAfkAdv = handleVictory;
 handleVictory = function() {
