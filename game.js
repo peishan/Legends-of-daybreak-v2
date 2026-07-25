@@ -2174,8 +2174,9 @@ storyJournal: {
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
-  afkAdventure: { active: false, zoneIndices: [], startTime: 0, totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null },
+  afkAdventure: { active: false, zoneIndices: [], startTime: 0, totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null, eliteMode: false },
   afkAdventurePicker: [], // temporary selection state while choosing zones, before starting
+  afkAdventureEliteToggle: false, // temporary picker-screen toggle, before starting
   notificationsEnabled: false,
   mercenary: { active: false, current: null, completed: 0 }, // current offered contract, if any; completed drives tier scaling
   strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
@@ -8872,10 +8873,29 @@ handleDefeat = function() {
 // Uses sc(zi, true) to skip every interactive branch (explore events, secrets,
 // mini-stories, road ambush) so the loop can never silently stall waiting on a
 // choice prompt nobody is there to answer.
+// Elite AFK Mode: unlocks at ELITE_AFK_UNLOCK_LEVEL. Same zones, same loop, but every
+// encounter gets scaled up in stats and rewards — a way for AFK Adventure to keep pace
+// with the xpN curve at higher levels instead of the base zone XP falling further behind
+// the level up ahead as you climb. Applied post-hoc to whatever sc() generates, so it
+// doesn't touch normal (non-AFK) exploring at all.
+const ELITE_AFK_UNLOCK_LEVEL = 25;
+const ELITE_AFK_STAT_MULT = 1.35;
+const ELITE_AFK_REWARD_MULT = 1.5;
+
 function afkAdventureNextEncounter() {
   if (!G.afkAdventure.active) return;
   const zi = G.afkAdventure.zoneIndices[Math.floor(Math.random() * G.afkAdventure.zoneIndices.length)];
   sc(zi, true);
+  if (G.afkAdventure.eliteMode && G.cbt.on && G.cbt.en.length > 0) {
+    for (let e of G.cbt.en) {
+      e.hp = Math.floor(e.hp * ELITE_AFK_STAT_MULT);
+      e.mhp = Math.floor(e.mhp * ELITE_AFK_STAT_MULT);
+      e.atk = Math.floor(e.atk * ELITE_AFK_STAT_MULT);
+      e.def = Math.floor(e.def * ELITE_AFK_STAT_MULT);
+      e.xp = Math.floor(e.xp * ELITE_AFK_REWARD_MULT);
+      e.g = Math.floor(e.g * ELITE_AFK_REWARD_MULT);
+    }
+  }
   // sc() doesn't turn on auto-combat itself — without this the fight would just sit
   // there waiting for a manual tap that never comes, stalling the entire AFK loop.
   if (G.cbt.on) {
@@ -8885,7 +8905,7 @@ function afkAdventureNextEncounter() {
   }
 }
 
-function startAfkAdventure(zoneIndices) {
+function startAfkAdventure(zoneIndices, eliteMode) {
   if (zoneIndices.length === 0) { lg('❌ Select at least one zone first.'); return; }
   G.afkAdventure.active = true;
   G.afkAdventure.zoneIndices = zoneIndices;
@@ -8897,7 +8917,9 @@ function startAfkAdventure(zoneIndices) {
   G.afkAdventure.activeMs = 0;
   G.afkAdventure.lastResumeTime = Date.now();
   G.afkAdventure.backgroundedAt = null;
+  G.afkAdventure.eliteMode = !!eliteMode && G.p.lvl >= ELITE_AFK_UNLOCK_LEVEL;
   G.grindAfkMode = false; // distinct render path from Grind's AFK bar
+  if (G.afkAdventure.eliteMode) lg('⚡ Elite Mode engaged — tougher fights, bigger payouts.');
   afkAdventureNextEncounter();
 }
 
@@ -11853,6 +11875,11 @@ function toggleAfkAdventureZone(zi) {
   render();
 }
 
+function toggleAfkAdventureElite() {
+  G.afkAdventureEliteToggle = !G.afkAdventureEliteToggle;
+  render();
+}
+
 function rAfkAdventurePicker() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🎯 AFK Adventure</div>';
@@ -11872,7 +11899,16 @@ function rAfkAdventurePicker() {
   }
   h += '</div>';
 
-  h += '<button onclick="startAfkAdventure(G.afkAdventurePicker)" class="abtn" style="width:100%;"' + (G.afkAdventurePicker.length === 0 ? ' disabled' : '') + '>Start AFK Adventure</button>';
+  if (G.p.lvl >= ELITE_AFK_UNLOCK_LEVEL) {
+    const eliteOn = G.afkAdventureEliteToggle;
+    h += '<button onclick="toggleAfkAdventureElite()" class="btn-outline-ghost" style="width:100%;text-align:left;margin-bottom:12px;' + (eliteOn ? 'border-color:var(--gold);background:rgba(251,191,36,0.12);' : '') + '">';
+    h += (eliteOn ? '⚡ Elite Mode: ON' : '⚡ Elite Mode: OFF') + '<br><span style="font-size:10px;opacity:0.7;">Tougher enemies (+35% stats), bigger payouts (+50% XP/gold)</span>';
+    h += '</button>';
+  } else {
+    h += '<div class="btn-hint" style="margin-bottom:12px;">🔒 Elite Mode unlocks at Level ' + ELITE_AFK_UNLOCK_LEVEL + '.</div>';
+  }
+
+  h += '<button onclick="startAfkAdventure(G.afkAdventurePicker, G.afkAdventureEliteToggle)" class="abtn" style="width:100%;"' + (G.afkAdventurePicker.length === 0 ? ' disabled' : '') + '>Start AFK Adventure</button>';
 
   h += '</div>';
   return h;
