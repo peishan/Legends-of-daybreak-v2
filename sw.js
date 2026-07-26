@@ -3,7 +3,7 @@
 // players get the update instead of a stale cached copy. NOTE: this is a fallback safety
 // net only — the fetch strategy below is network-first for the app shell specifically so
 // updates land automatically without needing to remember to bump this every time.
-const CACHE_VERSION = 'daybreak-v2';
+const CACHE_VERSION = 'daybreak-v3';
 
 // Core app shell — changes often during active development. Network-first: always try
 // to get the latest version when online, only falling back to cache when offline.
