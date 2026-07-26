@@ -2182,7 +2182,7 @@ storyJournal: {
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
-  afkAdventure: { active: false, zoneIndices: [], startTime: 0, totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null, eliteMode: false },
+  afkAdventure: { active: false, zoneIndices: [], startTime: 0, totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null, eliteMode: false, visible: false },
   afkAdventurePicker: [], // temporary selection state while choosing zones, before starting
   afkAdventureEliteToggle: false, // temporary picker-screen toggle, before starting
   notificationsEnabled: false,
@@ -9484,7 +9484,7 @@ function afkAdventureNextEncounter() {
   }
 }
 
-function startAfkAdventure(zoneIndices, eliteMode) {
+function startAfkAdventure(zoneIndices, eliteMode, visible) {
   if (zoneIndices.length === 0) { lg('❌ Select at least one zone first.'); return; }
   G.afkAdventure.active = true;
   G.afkAdventure.zoneIndices = zoneIndices;
@@ -9497,8 +9497,10 @@ function startAfkAdventure(zoneIndices, eliteMode) {
   G.afkAdventure.lastResumeTime = Date.now();
   G.afkAdventure.backgroundedAt = null;
   G.afkAdventure.eliteMode = !!eliteMode && G.p.lvl >= ELITE_AFK_UNLOCK_LEVEL;
+  G.afkAdventure.visible = !!visible;
   G.grindAfkMode = false; // distinct render path from Grind's AFK bar
   if (G.afkAdventure.eliteMode) lg('⚡ Elite Mode engaged — tougher fights, bigger payouts.');
+  if (G.afkAdventure.visible) lg('👁️ Visible mode — combat stays on screen across all ' + zoneIndices.length + ' zones.');
   afkAdventureNextEncounter();
 }
 
@@ -11453,7 +11455,9 @@ function render(){
   // specific G.state, since this mode cycles between 'explore' and 'combat' every
   // single encounter (unlike Grind's autoNext, which stays in 'combat' throughout).
   // Without this, the full explore screen would flash back in during every gap.
-  if (G.afkAdventure.active) {
+  // Skipped entirely in "visible" mode — full combat stays on screen the whole time,
+  // for actively watching fights rather than a background/AFK loop.
+  if (G.afkAdventure.active && !G.afkAdventure.visible) {
     renderAfkAdventureBar();
     return;
   }
@@ -11469,6 +11473,12 @@ function render(){
   h+='<div class="gold">GOLD: '+G.p.gold+'</div></div></div>';
   if(G.p.buffs.length>0)h+='<div class="buffs">'+G.p.buffs.map(b=>'<span class="bp">'+b.n+' ('+b.t+')</span>').join('')+'</div>';
   if(G.p.ailments.length>0)h+='<div class="buffs">'+G.p.ailments.map(a=>'<span class="bp" style="background:var(--danger);">'+AILMENT_TYPES[a.type].icon+' '+a.n+'</span>').join('')+'</div>';
+  if(G.afkAdventure.active && G.afkAdventure.visible){
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;background:rgba(124,58,237,0.15);border-bottom:1px solid var(--accent);font-size:11px;">';
+    h+='<span>👁️ Farming ' + G.afkAdventure.zoneIndices.length + ' zone' + (G.afkAdventure.zoneIndices.length > 1 ? 's' : '') + ' \u2014 ' + G.afkAdventure.totalKills + ' kills, +' + G.afkAdventure.totalGold.toLocaleString() + 'G</span>';
+    h+='<button onclick="stopAfkAdventure()" style="background:var(--danger);color:white;border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;">Stop</button>';
+    h+='</div>';
+  }
   h+='<div class="content">';
   if(G.state=='menu')h+=rMenu();
   else if(G.state=='achievements')h+=rAchievements();
@@ -12809,10 +12819,11 @@ function rToday() {
 
 function toggleAfkAdventureZone(zi) {
   const idx = G.afkAdventurePicker.indexOf(zi);
+  const cap = G.afkAdventureVisibleToggle ? 6 : 3;
   if (idx >= 0) {
     G.afkAdventurePicker.splice(idx, 1);
   } else {
-    if (G.afkAdventurePicker.length >= 3) { lg('❌ Up to 3 zones at a time.'); return; }
+    if (G.afkAdventurePicker.length >= cap) { lg('❌ Up to ' + cap + ' zones at a time.'); return; }
     G.afkAdventurePicker.push(zi);
   }
   render();
@@ -12823,13 +12834,31 @@ function toggleAfkAdventureElite() {
   render();
 }
 
+function toggleAfkAdventureVisible() {
+  G.afkAdventureVisibleToggle = !G.afkAdventureVisibleToggle;
+  // Switching modes changes the zone cap (3 background / 6 visible) — trim the
+  // selection down if it's now over the new cap rather than leaving it in a state
+  // the picker itself wouldn't have allowed.
+  const cap = G.afkAdventureVisibleToggle ? 6 : 3;
+  if (G.afkAdventurePicker.length > cap) G.afkAdventurePicker = G.afkAdventurePicker.slice(0, cap);
+  render();
+}
+
 function rAfkAdventurePicker() {
+  const visibleMode = G.afkAdventureVisibleToggle;
+  const zoneCap = visibleMode ? 6 : 3;
   let h = '<div class="content">';
-  h += '<div class="st" style="text-align:center;">🎯 AFK Adventure</div>';
-  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Pick up to 3 unlocked zones \u2014 the party will auto-explore them on repeat, in the background, including their normal boss chance. Good for farming a specific boss or elite a quest needs.</div>';
+  h += '<div class="st" style="text-align:center;">🎯 Adventure Farming</div>';
+
+  h += '<button onclick="toggleAfkAdventureVisible()" class="btn-outline-ghost" style="width:100%;text-align:left;margin-bottom:12px;' + (visibleMode ? 'border-color:var(--accent);background:rgba(124,58,237,0.15);' : '') + '">';
+  h += (visibleMode ? '👁️ Visible Mode' : '🔋 AFK Mode (Background)');
+  h += '<br><span style="font-size:10px;opacity:0.7;">' + (visibleMode ? 'Combat stays on screen the whole time \u2014 up to 6 zones, for actively farming while your phone is in hand.' : 'Minimal screen, saves battery, up to 3 zones \u2014 for while you\'re away or busy.') + '</span>';
+  h += '</button>';
+
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Pick up to ' + zoneCap + ' unlocked zones \u2014 the party will auto-explore them on repeat, including their normal boss chance. Good for farming a specific boss or elite a quest needs.</div>';
 
   h += '<div class="panel">';
-  h += '<div class="panel-title" style="margin-bottom:8px;">Selected: ' + G.afkAdventurePicker.length + '/3</div>';
+  h += '<div class="panel-title" style="margin-bottom:8px;">Selected: ' + G.afkAdventurePicker.length + '/' + zoneCap + '</div>';
   for (let i = 0; i < G.zones.length; i++) {
     const z = G.zones[i];
     if (G.p.lvl < z.lv) continue; // only unlocked zones
@@ -12851,7 +12880,7 @@ function rAfkAdventurePicker() {
     h += '<div class="btn-hint" style="margin-bottom:12px;">🔒 Elite Mode unlocks at Level ' + ELITE_AFK_UNLOCK_LEVEL + '.</div>';
   }
 
-  h += '<button onclick="startAfkAdventure(G.afkAdventurePicker, G.afkAdventureEliteToggle)" class="abtn" style="width:100%;"' + (G.afkAdventurePicker.length === 0 ? ' disabled' : '') + '>Start AFK Adventure</button>';
+  h += '<button onclick="startAfkAdventure(G.afkAdventurePicker, G.afkAdventureEliteToggle, G.afkAdventureVisibleToggle)" class="abtn" style="width:100%;"' + (G.afkAdventurePicker.length === 0 ? ' disabled' : '') + '>' + (visibleMode ? 'Start Farming' : 'Start AFK Adventure') + '</button>';
 
   h += '</div>';
   return h;
@@ -13604,7 +13633,7 @@ function rMenu(){
     { title: '📋 Quick Work', items: [
       {i:'📅',l:'Today',a:'today'},
       {i:'📋',l:'Mercenary',a:'mercenary'},
-      {i:'🎯',l:'AFK Adventure',a:'afk_adventure'},
+      {i:'🎯',l:'Adventure Farming',a:'afk_adventure'},
     ]},
     { title: '🏰 Guild & Stronghold', items: [
       {i:'🛡️',l:'Guild',a:'guild'},
