@@ -663,6 +663,7 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 }
 .toast-gold { border-color: var(--gold); }
 .toast-success { border-color: var(--success); }
+.toast-danger { border-color: var(--danger); }
 @keyframes toastIn {
   0% { transform: translateX(30px); opacity: 0; }
   100% { transform: translateX(0); opacity: 1; }

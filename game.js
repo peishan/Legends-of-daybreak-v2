@@ -4110,6 +4110,7 @@ function checkDayAdvance() {
   G.loginHistory.push(G.gameDay);
   if (G.loginHistory.length > 30) G.loginHistory = G.loginHistory.slice(-30);
   G.longestLoginStreak = Math.max(G.longestLoginStreak || 0, G.loginStreak);
+  sendLocalNotification('New Day', 'Your daily reward is ready to collect. Streak: ' + G.loginStreak + '.');
   
   G.lastLoginDay = G.gameDay;
   G.loginClaimed = false;
@@ -5263,6 +5264,7 @@ function checkStrongholdSiege() {
     if (!siege.active && Math.random() < SIEGE_CHANCE) {
       siege.active = true;
       lg('⚔️ ' + def.name + ' is under siege! Defend it for a bonus reward.');
+      sendLocalNotification('Stronghold Under Siege', def.name + ' is under attack \u2014 defend it for a bonus reward.');
     }
   }
 }
@@ -11002,10 +11004,47 @@ const SYNC_GIST_FILENAME = 'legends_of_daybreak_save.json';
 function getSyncToken() { return localStorage.getItem(SYNC_TOKEN_KEY) || ''; }
 function getSyncGistId() { return localStorage.getItem(SYNC_GIST_ID_KEY) || ''; }
 
-function saveSyncToken() {
+async function saveSyncToken() {
   const val = (document.getElementById('sync-token-input') || {}).value || '';
-  localStorage.setItem(SYNC_TOKEN_KEY, val.trim());
-  lg(val.trim() ? '🔑 Token saved on this device.' : '🔑 Token cleared.');
+  const trimmed = val.trim();
+  localStorage.setItem(SYNC_TOKEN_KEY, trimmed);
+
+  if (!trimmed) {
+    lg('🔑 Token cleared.');
+    showToast('🔑 Token cleared', 'gold');
+    render();
+    return;
+  }
+
+  // Verify immediately against the exact permission the token needs (Gist access) —
+  // previously this just saved the raw string with no check at all, so a bad or
+  // wrongly-scoped token would only surface as a confusing failure later, at push/pull
+  // time, with no clear signal of what went wrong.
+  showToast('🔑 Checking token…', 'gold');
+  G.syncBusy = 'Verifying token…';
+  render();
+  try {
+    const resp = await fetch('https://api.github.com/gists', {
+      headers: { 'Authorization': 'token ' + trimmed, 'Accept': 'application/vnd.github+json' }
+    });
+    if (resp.ok) {
+      lg('🔑 Token saved and verified \u2014 Gist access confirmed.');
+      showToast('✅ Token verified! Gist access confirmed.', 'success');
+    } else if (resp.status === 401) {
+      lg('🔑 Token saved, but GitHub rejected it as invalid (401). Double-check you copied the whole token.');
+      showToast('❌ Invalid token (401) \u2014 check you copied it fully', 'danger');
+    } else if (resp.status === 403) {
+      lg('🔑 Token saved, but GitHub denied Gist access (403). Check the token has "Gists: Read and write" permission set.');
+      showToast('❌ Token lacks Gist permission (403)', 'danger');
+    } else {
+      lg('🔑 Token saved, but verification got an unexpected response: ' + resp.status);
+      showToast('❌ Unexpected response (' + resp.status + ') \u2014 saved anyway', 'danger');
+    }
+  } catch (e) {
+    lg('🔑 Token saved, but could not reach GitHub to verify: ' + e.message);
+    showToast('❌ Could not reach GitHub to verify', 'danger');
+  }
+  G.syncBusy = null;
   render();
 }
 
@@ -11049,8 +11088,10 @@ async function pushToCloud() {
     if (!gistId) localStorage.setItem(SYNC_GIST_ID_KEY, data.id);
     localStorage.setItem('ldb_sync_last_push', Date.now().toString());
     lg('☁️ Pushed to cloud \u2014 this is now the latest save.');
+    showToast('☁️ Pushed to cloud successfully', 'success');
   } catch (e) {
     lg('❌ Push failed: ' + e.message);
+    showToast('❌ Push failed: ' + e.message, 'danger');
   }
   G.syncBusy = null;
   render();
@@ -11076,9 +11117,11 @@ async function pullFromCloud() {
     localStorage.setItem('ldb_sync_last_pull', Date.now().toString());
     loadGame();
     lg('☁️ Pulled from cloud \u2014 local save replaced.');
+    showToast('☁️ Pulled from cloud successfully', 'success');
     G.state = 'menu';
   } catch (e) {
     lg('❌ Pull failed: ' + e.message);
+    showToast('❌ Pull failed: ' + e.message, 'danger');
   }
   G.syncBusy = null;
   render();
