@@ -5308,6 +5308,7 @@ function handleSiegeVictory() {
   const tg2 = G.cbt.en.reduce((s, e) => s + e.g, 0);
   G.p.xp += txp;
   G.p.gold += tg2;
+  showBattleRewardPopup(txp, tg2, def.name + ' Wave ' + (G.siegeDefense.wave + 1));
   lg('🎉 Wave repelled! +' + txp + ' XP, +' + tg2 + 'G');
 
   G.siegeDefense.wave++;
@@ -5495,6 +5496,7 @@ function handleDragonHuntVictory() {
   lg('💰 HOARD: +' + hoardGold + 'G');
 
   const hoardSlots = ['weapon', 'armor', 'amulet'];
+  showBattleRewardPopup(txp, tg2 + hoardGold, '🐉 ' + dragon.n + ' \u2014 Hoard claimed!');
   for (let slot of hoardSlots) {
     const item = generateItem(slot, dragon.itemLevel, 'legendary');
     if (item) {
@@ -5952,6 +5954,7 @@ function handleRaidVictory() {
   if (stage && stage.type === 'boss') G.p.bossKills = (G.p.bossKills || 0) + 1;
   checkAchievements();
   const clearedName = stage && stage.type === 'boss' ? stage.name : 'the elite pack';
+  showBattleRewardPopup(txp, tg2, clearedName);
   lg('🎉 ' + clearedName + ' defeated! +' + txp + ' XP, +' + tg2 + 'G');
 
   G.raid.stageIndex++;
@@ -6115,6 +6118,7 @@ const RUNE_TYPES = {
 };
 
 function getSocketCount(ilvl) {
+  if (ilvl >= 40) return 4;
   if (ilvl >= 20) return 3;
   if (ilvl >= 15) return 2;
   if (ilvl >= 10) return 1;
@@ -7496,6 +7500,7 @@ function handleVictory() {
   
   G.p.xp += txp;
   G.p.gold += tg2;
+  showBattleRewardPopup(txp, tg2, G.currentBoss ? '👑 ' + G.currentBoss.n : null);
    checkDailyQuests('earn_gold', tg2); 
   G.p.kills += G.cbt.en.length;
    checkDailyQuests('kill', G.cbt.en.length); 
@@ -9086,6 +9091,7 @@ function handleGrindVictory() {
   
   G.p.xp += txp;
   G.p.gold += tg2;
+  showBattleRewardPopup(txp, tg2, 'Wave ' + G.endlessGrind.wave);
   checkDailyQuests('earn_gold', tg2);
   G.p.kills += G.cbt.en.length;
   checkDailyQuests('kill', G.cbt.en.length);
@@ -9406,6 +9412,7 @@ function handleMercenaryVictory() {
   const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * getPrestigeGoldMult());
   G.p.xp += txp;
   G.p.gold += tg2;
+  showBattleRewardPopup(txp, tg2, contract ? contract.title : null);
   G.mercenary.completed = (G.mercenary.completed || 0) + 1;
   checkAchievements();
 
@@ -10256,6 +10263,21 @@ function sendLocalNotification(title, body) {
   }
 }
 
+// Battle reward popup — deliberately distinct from the toast system (which is tuned for
+// quick 3.3s confirmations). This lingers for 15s specifically so a glance is enough,
+// without needing to scroll the activity log to see what a fight actually paid out.
+function showBattleRewardPopup(xp, gold, extra) {
+  const existing = document.querySelector('.battle-reward-popup');
+  if (existing) existing.remove(); // replace rather than stack — one summary at a time
+  const el = document.createElement('div');
+  el.className = 'battle-reward-popup';
+  el.innerHTML = '<span class="brp-xp">✨ +' + xp.toLocaleString() + ' XP</span><span class="brp-gold">💰 +' + gold.toLocaleString() + 'G</span>'
+    + (extra ? '<div class="brp-extra">' + extra + '</div>' : '');
+  document.body.appendChild(el);
+  if (navigator.vibrate) navigator.vibrate(25); // a light single pulse, not the level-up pattern
+  setTimeout(() => { el.classList.add('brp-fade'); setTimeout(() => el.remove(), 400); }, 15000);
+}
+
 function showToast(text, type) {
   let stack = document.querySelector('.toast-stack');
   if (!stack) {
@@ -10577,13 +10599,19 @@ function loadGame() {
     if (data.player.riftFightsRemaining === undefined) data.player.riftFightsRemaining = 0;
     if (data.player.riftTriggerAt === undefined) data.player.riftTriggerAt = 3 + Math.floor(Math.random() * 3);
 
-    // Migrate old equipment: add sockets to Lv 10+ items
+    // Migrate equipment sockets: add sockets to items that have none, AND upgrade
+    // items whose ilvl now qualifies for more sockets than they currently have (e.g.
+    // existing ilvl 40+ gear stuck at 3 sockets from before the 4th tier existed).
+    // Growing the array preserves already-socketed runes — new slots just append empty.
     function migrateItemSockets(item) {
-      if (!item || item.sockets) return;
+      if (!item) return;
       const ilvl = item.ilvl || 1;
-      if (ilvl >= 10) {
-        const count = ilvl >= 20 ? 3 : ilvl >= 15 ? 2 : 1;
-        item.sockets = new Array(count).fill(null);
+      const targetCount = getSocketCount(ilvl);
+      if (targetCount === 0) return;
+      if (!item.sockets) {
+        item.sockets = new Array(targetCount).fill(null);
+      } else if (item.sockets.length < targetCount) {
+        while (item.sockets.length < targetCount) item.sockets.push(null);
       }
     }
     if (data.player.equipment) {
@@ -10594,6 +10622,15 @@ function loadGame() {
     if (data.player.inventory) {
       for (let item of data.player.inventory) {
         migrateItemSockets(item);
+      }
+    }
+    if (data.party) {
+      for (let member of data.party) {
+        if (member.eq) {
+          for (let slot in member.eq) {
+            migrateItemSockets(member.eq[slot]);
+          }
+        }
       }
     }
 
