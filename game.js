@@ -2705,12 +2705,35 @@ function getTotalAC() {
     baseAC = 10 + Math.min(dexMod, 2) + (G.p.eq.armor.def || 0);
   }
   baseAC += eqStats.def;
-  const shieldBonus = G.p.buffs.reduce((s, b) => s + (b.def || 0), 0);
+  const shieldBonus = G.p.buffs.reduce((s, b) => s + (b.def || 0), 0) + getFocusedDefBonus();
   return baseAC + shieldBonus;
 }
 
+// === FOCUSED BUFF ===
+// Ties Focus Mode directly into combat instead of the two systems just running in
+// parallel — each completed focus session TODAY adds a small permanent-for-the-day
+// ATK/DEF bonus, capped at 5 sessions' worth. Scales with level (like the existing
+// Blessed/Guildmaster buffs) so it stays meaningful instead of becoming a flat +1 that
+// fades into irrelevance at higher levels. Resets to 0 at the same daily rollover as
+// focusMinutesToday.
+const FOCUSED_BUFF_MAX_SESSIONS = 5;
+const FOCUSED_BUFF_ATK_PER_SESSION = 0.15; // × player level, per session today (capped)
+const FOCUSED_BUFF_DEF_PER_SESSION = 0.08;
+
+function getFocusedSessionCount() {
+  return Math.min(FOCUSED_BUFF_MAX_SESSIONS, G.p.focusSessionsToday || 0);
+}
+function getFocusedAtkBonus() {
+  const n = getFocusedSessionCount();
+  return n > 0 ? Math.ceil(n * FOCUSED_BUFF_ATK_PER_SESSION * G.p.lvl) : 0;
+}
+function getFocusedDefBonus() {
+  const n = getFocusedSessionCount();
+  return n > 0 ? Math.ceil(n * FOCUSED_BUFF_DEF_PER_SESSION * G.p.lvl) : 0;
+}
+
 function getPlayerAtkBuff() {
-  return G.p.buffs.reduce((s, b) => s + (b.atk || 0), 0);
+  return G.p.buffs.reduce((s, b) => s + (b.atk || 0), 0) + getFocusedAtkBonus();
 }
 
 // Migrates a single inventory item from the old t:'wep'/'arm'/'acc'/'pgear' schema to the
@@ -4013,6 +4036,8 @@ function getRealDay() {
   return Math.floor(Date.now() / (1000 * 60 * 60 * 24));
 }
 
+const MAX_STREAK_FREEZES = 3; // stockpile cap — earned automatically, never bought
+
 function checkDayAdvance() {
   const realToday = getRealDay();
   
@@ -4026,7 +4051,9 @@ function checkDayAdvance() {
     G.loginHistory = [1];
     G.longestLoginStreak = 1;
     G.p.focusMinutesToday = 0;
+    G.p.focusSessionsToday = 0;
     generateDailyQuests();
+    generateDailyEventDeck();
     G.manaSpringUses.day = G.gameDay;
     G.manaSpringUses.count = 0;
     saveGame();
@@ -4053,15 +4080,29 @@ function checkDayAdvance() {
   G.gameDay += daysPassed;
   
   // Handle streak
-  if (daysPassed === 1) {
+  const missedDays = daysPassed - 1;
+  if (missedDays === 0) {
     // Consecutive day
     G.loginStreak = (G.loginStreak || 0) + 1;
     lg('📅 New day! Login streak: ' + G.loginStreak);
     showToast('🎁 New day! Collect your rewards', 'gold');
+    // Earn a freeze every 7-day milestone, capped — a small, automatic reward for
+    // consistency that also insures the streak against the occasional bad day.
+    if (G.loginStreak % 7 === 0 && (G.streakFreezes || 0) < MAX_STREAK_FREEZES) {
+      G.streakFreezes = (G.streakFreezes || 0) + 1;
+      lg('🧊 Streak Freeze earned! (' + G.streakFreezes + '/' + MAX_STREAK_FREEZES + ')');
+      showToast('🧊 Streak Freeze earned!', 'gold');
+    }
+  } else if ((G.streakFreezes || 0) >= missedDays) {
+    // Enough banked freezes to fully cover the gap — streak survives, freezes spent.
+    G.streakFreezes -= missedDays;
+    G.loginStreak = (G.loginStreak || 0) + 1;
+    lg('🧊 Streak Freeze protected you \u2014 ' + missedDays + ' missed day' + (missedDays > 1 ? 's' : '') + ' covered. Streak continues: ' + G.loginStreak + '. (' + G.streakFreezes + ' freeze' + (G.streakFreezes === 1 ? '' : 's') + ' left)');
+    showToast('🧊 Streak Freeze used \u2014 streak saved!', 'gold');
   } else {
-    // Missed one or more days
+    // Missed one or more days, not enough freezes banked to cover it
     G.loginStreak = 1;
-    lg('📅 New day! Streak reset (missed ' + (daysPassed - 1) + ' day' + (daysPassed > 2 ? 's' : '') + ').');
+    lg('📅 New day! Streak reset (missed ' + missedDays + ' day' + (missedDays > 1 ? 's' : '') + ').');
     showToast('🎁 New day! Collect your rewards', 'gold');
   }
   if (!G.loginHistory) G.loginHistory = [];
@@ -4072,7 +4113,9 @@ function checkDayAdvance() {
   G.lastLoginDay = G.gameDay;
   G.loginClaimed = false;
   G.p.focusMinutesToday = 0;
+    G.p.focusSessionsToday = 0;
   generateDailyQuests();
+  generateDailyEventDeck();
   saveGame();
 }
 
@@ -4115,6 +4158,142 @@ function claimDailyLoginReward() {
   lvlup();
   render();
 }
+
+// === DAILY EVENT DECK ===
+// The deliberate opposite of everything else built recently — no combat loop, no
+// auto-anything, no "keep going or stop" tension. A handful of short, one-tap vignettes
+// refreshed daily: read a couple sentences, pick an option, get an immediate result.
+// Every choice pays out something (the "safe" option always, the "risky" option's stat
+// check only changes the SIZE of the reward, never turns it into a loss) — the point is
+// a complete, low-stakes, few-minutes visit, not a grind with something to lose.
+const DAILY_EVENT_DECK_SIZE = 4;
+
+const EVENT_DECK = [
+  { id: 'peddlers_wager', title: "The Peddler's Wager",
+    flavor: "A peddler at the crossroads shuffles three cups with a coin under one. \"Double or nothing, stranger?\" he grins, though his hands move a little too fast for comfort.",
+    choiceA: { label: 'Just buy the trinket instead', baseXp: 150, baseG: 200 },
+    choiceB: { label: 'Take the bet', stat: 'int', dc: 13, baseXp: 150, baseG: 100, bonusXp: 250, bonusG: 400,
+      successText: 'You watch his wrists, not the cups \u2014 and call it before he finishes the shuffle. He pays up, muttering about people who actually pay attention.',
+      failText: "You guess wrong \u2014 the game was rigged from the start, honestly. He's still a little impressed you tried, and tosses you a trinket for the effort." } },
+  { id: 'stray_letter', title: 'A Stray Letter',
+    flavor: "A courier's satchel must have spilled somewhere along the road \u2014 you find one soaked letter, the address smudged past reading. Someone out there is still waiting on it.",
+    choiceA: { label: 'Leave it at the next waystation', baseXp: 120, baseG: 150 },
+    choiceB: { label: 'Try to track down who sent it', stat: 'wis', dc: 13, baseXp: 120, baseG: 80, bonusXp: 280, bonusG: 250,
+      successText: "The handwriting matches a name in a trader's ledger a few towns back. You deliver it in person; the relief on their face is worth more than the reward.",
+      failText: 'The trail goes cold at a burned-out relay station. You leave the letter with the local scribe and hope it finds its way eventually.' } },
+  { id: 'sparring_challenge', title: 'A Sparring Challenge',
+    flavor: 'A local guard captain, half-bored on a slow watch shift, nods at your gear. "You look like you know which end of that to hold. Care to prove it?"',
+    choiceA: { label: 'Politely decline, keep walking', baseXp: 150, baseG: 180 },
+    choiceB: { label: 'Spar with her', stat: 'str', dc: 13, baseXp: 150, baseG: 100, bonusXp: 300, bonusG: 200,
+      successText: "You put her on the ground twice before she calls it. She pays the bet fair and square, and means it when she says \"don't be a stranger.\"",
+      failText: "She's better than she let on \u2014 you end up flat on your back, laughing about it. She buys you a drink for the entertainment anyway." } },
+  { id: 'locked_chest', title: 'The Locked Chest',
+    flavor: "Half-buried in silt at the river's edge: an old traveling chest, its lock long since rusted shut. Could be treasure. Could be someone's forgotten laundry.",
+    choiceA: { label: 'Pry it open by hand', baseXp: 130, baseG: 170 },
+    choiceB: { label: 'Pick the lock properly', stat: 'dex', dc: 13, baseXp: 130, baseG: 100, bonusXp: 260, bonusG: 300,
+      successText: "The mechanism gives with a satisfying click instead of a snap \u2014 whatever's inside stays intact instead of getting crushed.",
+      failText: 'You mangle the lock and the hinges both, but the chest pops open anyway. Contents are a little worse for wear, but still worth something.' } },
+  { id: 'campfire_stranger', title: "A Stranger's Fire",
+    flavor: "Someone's already made camp at the usual spot, kettle on. They wave you over without much ceremony \u2014 travelers share fires out here, no questions needed.",
+    choiceA: { label: 'Share a quiet meal, keep to yourself', baseXp: 140, baseG: 120 },
+    choiceB: { label: 'Trade stories long into the night', stat: 'cha', dc: 13, baseXp: 140, baseG: 60, bonusXp: 320, bonusG: 150,
+      successText: "Turns out they've got good gossip about a shortcut two valleys over \u2014 and a genuinely sharp sense of humor. You leave with directions and a new acquaintance.",
+      failText: "Conversation stays polite but stilted; you're both clearly more tired than talkative tonight. Still a warm fire and a full stomach, which isn't nothing." } },
+  { id: 'wounded_traveler', title: 'A Wounded Traveler',
+    flavor: "Someone's slumped against a milestone, a nasty gash along one arm, wincing every time they shift. They wave off help before you even offer \u2014 pride, probably.",
+    choiceA: { label: 'Hand over a healing potion and move on', baseXp: 160, baseG: 100 },
+    choiceB: { label: 'Actually treat the wound properly', stat: 'wis', dc: 13, baseXp: 160, baseG: 60, bonusXp: 300, bonusG: 200,
+      successText: "Clean bandaging, the right herbs, no infection left to chance. They're stubborn about thanks but insist you take something for the trouble anyway.",
+      failText: "Your field dressing is serviceable, if a little clumsy. They'll live, and they're grateful regardless of your technique." } },
+  { id: 'merchant_dispute', title: "A Merchant's Dispute",
+    flavor: 'Two traders are locked in a shouting match over a scale that "definitely reads heavy, everyone knows it reads heavy." A small crowd has gathered, mostly for the show.',
+    choiceA: { label: "Walk past, not your problem", baseXp: 130, baseG: 140 },
+    choiceB: { label: 'Actually check the scale', stat: 'int', dc: 13, baseXp: 130, baseG: 80, bonusXp: 270, bonusG: 220,
+      successText: 'You spot the tampered counterweight in about ten seconds. The wronged trader is delighted; the other one suddenly remembers urgent business elsewhere.',
+      failText: "You can't find anything obviously wrong with it, and the argument resumes right where it left off. One trader tips you for at least trying." } },
+  { id: 'narrow_bridge', title: 'The Narrow Bridge',
+    flavor: "The old rope bridge across the ravine has seen better decades. It'll hold \u2014 probably \u2014 but there's a longer, sturdier route if you're willing to lose the daylight.",
+    choiceA: { label: 'Take the long way around', baseXp: 140, baseG: 130 },
+    choiceB: { label: 'Cross the old bridge', stat: 'dex', dc: 13, baseXp: 140, baseG: 90, bonusXp: 260, bonusG: 180,
+      successText: "Every plank groans like it's personally offended, but you're across before it can make up its mind about collapsing. Saved hours, decent view too.",
+      failText: 'A plank gives way halfway across and you scramble the rest on nerve alone. You make it, heart pounding, minus a little dignity.' } },
+  { id: 'orphaned_pup', title: 'An Orphaned Pup',
+    flavor: 'A scrawny stray dog trails you for nearly a mile, keeping just out of reach, clearly hoping you\'ll notice it\'s hungry.',
+    choiceA: { label: 'Toss it some rations and keep moving', baseXp: 120, baseG: 100 },
+    choiceB: { label: 'Try to actually earn its trust', stat: 'cha', dc: 13, baseXp: 120, baseG: 60, bonusXp: 250, bonusG: 140,
+      successText: "Patience wins out \u2014 it finally lets you close, tail going, and you find a small cache of coins buried near where it was denning. A finder's fee, sort of.",
+      failText: 'It takes the food and bolts anyway, still not ready to trust anyone. You hope it finds somewhere safe.' } },
+  { id: 'riddle_door', title: 'A Door With a Riddle',
+    flavor: 'An old shrine door, sealed, with a riddle carved in weathered script above it. Might open something interesting. Might just be decorative and pointless.',
+    choiceA: { label: "Skip it, probably nothing", baseXp: 150, baseG: 160 },
+    choiceB: { label: 'Actually solve the riddle', stat: 'int', dc: 13, baseXp: 150, baseG: 90, bonusXp: 310, bonusG: 280,
+      successText: 'The answer clicks into place and the door grinds open on a small, long-sealed offering room \u2014 mostly dust, but not entirely.',
+      failText: "You give it your best shot but the door stays stubbornly shut. Either the riddle's wrong, or you are. You chalk it up to experience." } },
+  { id: 'stuck_cart', title: 'A Stuck Cart',
+    flavor: "A cart's wheel is buried axle-deep in mud, and the driver's already resigned to waiting for a tow. A little muscle might solve this faster than patience will.",
+    choiceA: { label: 'Wish them luck, move on', baseXp: 120, baseG: 110 },
+    choiceB: { label: 'Put your back into it', stat: 'con', dc: 13, baseXp: 120, baseG: 70, bonusXp: 260, bonusG: 200,
+      successText: "One good heave and the wheel pops free. The driver's stunned, then extremely grateful, then insists on paying you properly for it.",
+      failText: "You strain hard enough to feel it tomorrow and the cart doesn't budge. The driver appreciates the effort and shares what little coin they have anyway." } }
+];
+
+function generateDailyEventDeck() {
+  if (G.eventDeckSeed === G.gameDay && G.dailyEventDeck && G.dailyEventDeck.length > 0) return; // already generated today
+  G.eventDeckSeed = G.gameDay;
+  const pool = [...EVENT_DECK];
+  G.dailyEventDeck = [];
+  for (let i = 0; i < DAILY_EVENT_DECK_SIZE && pool.length > 0; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    G.dailyEventDeck.push(pool.splice(idx, 1)[0].id);
+  }
+  G.eventDeckProgress = {};
+  G.activeEventId = null;
+}
+
+function openEvent(eventId) {
+  G.activeEventId = eventId;
+  render();
+}
+
+function backToEventDeck() {
+  G.activeEventId = null;
+  render();
+}
+
+function resolveEventChoice(eventId, choiceKey) {
+  const eventDef = EVENT_DECK.find(e => e.id === eventId);
+  if (!eventDef || (G.eventDeckProgress && G.eventDeckProgress[eventId])) return; // already resolved
+  const choice = choiceKey === 'A' ? eventDef.choiceA : eventDef.choiceB;
+
+  let success = true;
+  let resultText, xp, g;
+
+  if (choiceKey === 'A') {
+    resultText = null; // safe choice has no branching narration, just the flat reward
+    xp = choice.baseXp;
+    g = choice.baseG;
+  } else {
+    const eqStats = getEquippedStats();
+    const roll = DICE.d(20) + DICE.abilityMod(G.p.stats[choice.stat] + (eqStats[choice.stat] || 0));
+    success = roll >= choice.dc;
+    resultText = success ? choice.successText : choice.failText;
+    xp = choice.baseXp + (success ? choice.bonusXp : 0);
+    g = choice.baseG + (success ? choice.bonusG : 0);
+  }
+
+  xp = Math.floor(xp * getPrestigeXpMult());
+  g = Math.floor(g * getPrestigeGoldMult());
+  G.p.xp += xp;
+  G.p.gold += g;
+
+  G.eventDeckProgress = G.eventDeckProgress || {};
+  G.eventDeckProgress[eventId] = { choiceLabel: choice.label, success, resultText, xp, g };
+  lg('📖 ' + eventDef.title + ': +' + xp + ' XP, +' + g + 'G');
+  lvlup();
+  saveGame();
+  render();
+}
+
 
 function generateDailyQuests() {
   // Only regenerate if it's a new game day
@@ -9872,6 +10051,7 @@ function sf(minutes){
       const baseGold = G.focusDuration * 2;
       G.p.fstreak++;  checkDailyQuests('focus', 1);
       G.p.focusMinutesToday = (G.p.focusMinutesToday || 0) + G.focusDuration;
+      G.p.focusSessionsToday = (G.p.focusSessionsToday || 0) + 1;
       G.p.xp+=baseXp; G.p.gold+=baseGold;
       const fq=G.quests.find(q=>q.t=='focus');
       if(fq&&!fq.done){fq.c++;checkQ();}
@@ -10109,6 +10289,7 @@ function saveGame() {
     lastSaveTime: Date.now(),
     lastLoginDay: G.lastLoginDay || -1,
     loginStreak: G.loginStreak || 0,
+    streakFreezes: G.streakFreezes || 0,
     loginHistory: G.loginHistory || [],
     focusHistory: G.focusHistory || [],
     longestLoginStreak: G.longestLoginStreak || 0,
@@ -10117,6 +10298,9 @@ function saveGame() {
     lastRealDay: G.lastRealDay || 0,
     dailyQuests: G.dailyQuests || [],
     dailyQuestSeed: G.dailyQuestSeed || 0,
+    dailyEventDeck: G.dailyEventDeck || [],
+    eventDeckSeed: G.eventDeckSeed || 0,
+    eventDeckProgress: G.eventDeckProgress || {},
     player: {
       name: G.p.name, cls: G.p.cls, lvl: G.p.lvl, xp: G.p.xp, xpN: G.p.xpN,
       hp: G.p.hp, mhp: G.p.mhp, mp: G.p.mp, mmp: G.p.mmp, gold: G.p.gold,
@@ -10126,7 +10310,7 @@ function saveGame() {
       inventory: G.p.inv,
       buffs: G.p.buffs,
       ailments: G.p.ailments,
-      kills: G.p.kills, quests: G.p.quests, fstreak: G.p.fstreak, focusMinutesToday: G.p.focusMinutesToday || 0,
+      kills: G.p.kills, quests: G.p.quests, fstreak: G.p.fstreak, focusMinutesToday: G.p.focusMinutesToday || 0, focusSessionsToday: G.p.focusSessionsToday || 0,
       storyJournal: { unlocked: G.storyJournal.unlocked, read: G.storyJournal.read },
 
       // Add these inside the saveData object, alongside other fields:
@@ -10424,6 +10608,7 @@ function loadGame() {
     G.p.quests = data.player.quests;
     G.p.fstreak = data.player.fstreak;
     G.p.focusMinutesToday = data.player.focusMinutesToday || 0;
+    G.p.focusSessionsToday = data.player.focusSessionsToday || 0;
           // Load journal progress
     if (data.player.storyJournal) {
       G.storyJournal.unlocked = data.player.storyJournal.unlocked || [];
@@ -10682,6 +10867,7 @@ function loadGame() {
     G.potionMenu = data.potionMenu || false;
     G.lastLoginDay = data.lastLoginDay || -1;
     G.loginStreak = data.loginStreak || 0;
+    G.streakFreezes = data.streakFreezes || 0;
     G.loginHistory = data.loginHistory || [];
     G.focusHistory = data.focusHistory || [];
     G.longestLoginStreak = data.longestLoginStreak || 0;
@@ -10690,6 +10876,10 @@ function loadGame() {
     G.lastRealDay = data.lastRealDay || 0;
     G.dailyQuests = data.dailyQuests || [];
     G.dailyQuestSeed = data.dailyQuestSeed || 0;
+    G.dailyEventDeck = data.dailyEventDeck || [];
+    G.eventDeckSeed = data.eventDeckSeed || 0;
+    G.eventDeckProgress = data.eventDeckProgress || {};
+    G.activeEventId = null;
 
     G.soelFortuneCooldown = data.soelFortuneCooldown || 0;
 G.joelShieldCooldown = data.joelShieldCooldown || 0;
@@ -10701,6 +10891,7 @@ G.currentWeather = data.currentWeather || 'clear';
     for (let name in G.affinity) checkAffinityUnlocks(name);
     for (let s of G.p.skills) { if (!s.on && s.ul <= G.p.lvl) s.on = true; }
         checkDayAdvance(); // Advance game day if real day changed, then generate quests
+        generateDailyEventDeck(); // no-op if today's deck already exists; backfills older saves
     if (G.p.xp >= G.p.xpN) lvlup(); // catches any save where XP crossed the threshold but a level-up was missed (e.g. the Boss Rush bug)
 
 
@@ -11037,6 +11228,7 @@ function render(){
   else if(G.state=='boss_rush')h+=rBossRush();
   else if(G.state=='boss_rush_room')h+=rBossRushRoom();
   else if(G.state=='chain_quest')h+=rChainQuest();
+  else if(G.state=='event_deck')h+=rEventDeck();
   else if(G.state=='forge')h+=rForge();
   else if(G.state=='bonding')h+=rBonding();
   else if(G.state=='mercenary')h+=rMercenary();
@@ -11074,6 +11266,7 @@ function attachEvents() {
     else if(a=='prestige')setS('prestige');
     else if(a=='boss_rush')setS('boss_rush');
     else if(a=='chain_quest')setS('chain_quest');
+    else if(a=='event_deck')setS('event_deck');
     else if(a=='forge')setS('forge');
     else if(a=='bonding')setS('bonding');
     else if(a=='mercenary')setS('mercenary');
@@ -12260,10 +12453,12 @@ function rToday() {
     h += '<div class="panel-title" style="color:var(--gold);">🎁 Daily Reward Ready</div>';
     h += '<div class="btn-hint" style="margin:6px 0 4px;">Streak: ' + (G.loginStreak || 1) + ' day' + ((G.loginStreak || 1) > 1 ? 's' : '') + (G.longestLoginStreak > (G.loginStreak || 1) ? ' (best: ' + G.longestLoginStreak + ')' : '') + '</div>';
     h += '<div style="font-size:16px;letter-spacing:2px;margin-bottom:10px;">' + streakStripHTML + '</div>';
+    h += '<div class="btn-hint" style="margin-bottom:10px;">🧊 ' + (G.streakFreezes || 0) + '/' + MAX_STREAK_FREEZES + ' Streak Freezes banked \u2014 auto-earned every 7-day streak, auto-used to cover a missed day.</div>';
     h += '<button onclick="claimDailyLoginReward()" class="abtn" style="width:100%;">Claim It</button>';
   } else {
     h += '<div class="panel-row"><div class="panel-title">🔥 Login Streak</div><div class="btn-hint">' + (G.loginStreak || 1) + ' day' + ((G.loginStreak || 1) > 1 ? 's' : '') + (G.longestLoginStreak > (G.loginStreak || 1) ? ' (best: ' + G.longestLoginStreak + ')' : '') + '</div></div>';
     h += '<div style="font-size:16px;letter-spacing:2px;margin:6px 0;">' + streakStripHTML + '</div>';
+    h += '<div class="btn-hint" style="margin-bottom:6px;">🧊 ' + (G.streakFreezes || 0) + '/' + MAX_STREAK_FREEZES + ' Streak Freezes banked</div>';
     h += '<div class="btn-hint">Already claimed today. Come back tomorrow.</div>';
   }
   h += '</div>';
@@ -12449,6 +12644,59 @@ function rChainQuest() {
 
     h += '<button onclick="startChainQuest(\'' + chain.id + '\')" class="abtn" style="width:100%;">' + (prog.stageIndex > 0 ? '📜 Continue the Descent' : '📜 Begin the Descent') + '</button>';
     h += '</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function rEventDeck() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">📖 Daily Events</div>';
+
+  // Detail/result view for one event
+  if (G.activeEventId) {
+    const eventDef = EVENT_DECK.find(e => e.id === G.activeEventId);
+    const prog = (G.eventDeckProgress || {})[G.activeEventId];
+
+    h += '<div class="panel panel-gold">';
+    h += '<div class="panel-title" style="color:var(--gold);">' + eventDef.title + '</div>';
+    h += '<div class="btn-hint" style="margin:10px 0;line-height:1.6;">' + eventDef.flavor + '</div>';
+
+    if (prog) {
+      h += '<div class="btn-hint" style="margin-bottom:6px;"><b>' + prog.choiceLabel + '</b></div>';
+      if (prog.resultText) h += '<div class="btn-hint" style="margin-bottom:10px;line-height:1.6;">' + prog.resultText + '</div>';
+      h += '<div style="font-size:16px;font-weight:700;color:var(--gold);margin-bottom:14px;">+' + prog.xp + ' XP, +' + prog.g + 'G</div>';
+      h += '<button onclick="backToEventDeck()" class="abtn" style="width:100%;">Back to Today\'s Events</button>';
+    } else {
+      h += '<button onclick="resolveEventChoice(\'' + eventDef.id + '\', \'A\')" class="btn-outline-ghost" style="width:100%;text-align:left;margin-bottom:8px;">';
+      h += eventDef.choiceA.label + '<br><span style="font-size:10px;opacity:0.7;">Guaranteed: +' + eventDef.choiceA.baseXp + ' XP, +' + eventDef.choiceA.baseG + 'G</span>';
+      h += '</button>';
+      h += '<button onclick="resolveEventChoice(\'' + eventDef.id + '\', \'B\')" class="btn-outline-ghost" style="width:100%;text-align:left;">';
+      h += eventDef.choiceB.label + '<br><span style="font-size:10px;opacity:0.7;">' + eventDef.choiceB.stat.toUpperCase() + ' check \u2014 at least +' + eventDef.choiceB.baseXp + ' XP, +' + eventDef.choiceB.baseG + 'G, up to +' + (eventDef.choiceB.baseXp + eventDef.choiceB.bonusXp) + ' XP, +' + (eventDef.choiceB.baseG + eventDef.choiceB.bonusG) + 'G on success</span>';
+      h += '</button>';
+    }
+    h += '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  // List view
+  const doneCount = (G.dailyEventDeck || []).filter(id => G.eventDeckProgress && G.eventDeckProgress[id]).length;
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">A few short encounters, refreshed daily. Read, pick, done \u2014 no combat loop, nothing to grind. ' + doneCount + '/' + (G.dailyEventDeck || []).length + ' today.</div>';
+
+  for (let eventId of (G.dailyEventDeck || [])) {
+    const eventDef = EVENT_DECK.find(e => e.id === eventId);
+    if (!eventDef) continue;
+    const prog = (G.eventDeckProgress || {})[eventId];
+    h += '<div class="card card-compact" onclick="openEvent(\'' + eventId + '\')" style="margin-bottom:10px;">';
+    h += '<div class="panel-row"><div class="panel-title">' + eventDef.title + '</div>';
+    if (prog) {
+      h += '<div class="btn-hint" style="color:var(--gold);">✅ +' + prog.xp + ' XP</div>';
+    } else {
+      h += '<div class="btn-hint">Tap to begin \u2192</div>';
+    }
+    h += '</div></div>';
   }
 
   h += '</div>';
@@ -13014,6 +13262,7 @@ function rGuild() {
 
 function rMenu(){
   const primary=[
+    {i:'📖',l:'Daily Events',d:'A few short encounters, done in minutes',a:'event_deck'},
     {i:'⚔️',l:'Adventure',d:'Explore zones and fight',a:'explore'},
     {i:'👥',l:'Party',d:'Manage companions',a:'party'},
     {i:'🌀',l:'Grind Room',d:'Endless wave battles',a:'grind_room'},
@@ -13072,10 +13321,14 @@ function rMenu(){
   h += '<div class="panel" data-a="today" onclick="setS(\'today\')" style="cursor:pointer;">';
   h += '<div class="panel-title" style="margin-bottom:8px;">📅 Today at a Glance</div>';
   h += '<div style="display:flex;justify-content:space-between;text-align:center;gap:4px;">';
-  h += '<div style="flex:1;"><div style="font-size:20px;font-weight:700;color:var(--accent);">' + focusMin + 'm</div><div style="font-size:11px;color:var(--text-dim);">Focus Today</div></div>';
+  h += '<div style="flex:1;"><div style="font-size:20px;font-weight:700;color:var(--accent);">' + focusMin + 'm</div><div style="font-size:11px;color:var(--text-dim);">Focus Today' + (getFocusedSessionCount() > 0 ? ' \u00b7 \u26a1+' + getFocusedAtkBonus() : '') + '</div></div>';
   h += '<div style="flex:1;border-left:1px solid var(--border);border-right:1px solid var(--border);"><div style="font-size:20px;font-weight:700;color:var(--gold);">' + dqDone + '/' + dq.length + '</div><div style="font-size:11px;color:var(--text-dim);">Daily Quests</div></div>';
-  h += '<div style="flex:1;"><div style="font-size:20px;font-weight:700;color:var(--success);">🔥' + dayStreak + '</div><div style="font-size:11px;color:var(--text-dim);">Day Streak</div></div>';
-  h += '</div></div>';
+  h += '<div style="flex:1;"><div style="font-size:20px;font-weight:700;color:var(--success);">🔥' + dayStreak + '</div><div style="font-size:11px;color:var(--text-dim);">Day Streak' + ((G.streakFreezes || 0) > 0 ? ' \u00b7 🧊' + (G.streakFreezes || 0) : '') + '</div></div>';
+  h += '</div>';
+  const edDone = (G.dailyEventDeck || []).filter(id => G.eventDeckProgress && G.eventDeckProgress[id]).length;
+  const edTotal = (G.dailyEventDeck || []).length;
+  if (edTotal > 0) h += '<div style="text-align:center;font-size:11px;color:var(--text-dim);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">📖 Daily Events: ' + edDone + '/' + edTotal + (edDone < edTotal ? ' \u2014 a few minutes, tap Daily Events below' : ' \u2014 done for today') + '</div>';
+  h += '</div>';
 
   h+='<div class="grid2">';
   for(let m of primary)h+='<div class="card" data-a="'+m.a+'"><div class="cicon">'+m.i+'</div><div class="clabel">'+m.l+'</div><div class="cdesc">'+m.d+'</div></div>';
