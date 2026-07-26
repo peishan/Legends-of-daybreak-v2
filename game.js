@@ -11073,7 +11073,7 @@ async function saveSyncToken() {
       lg('🔑 Token saved, but GitHub rejected it as invalid (401). Double-check you copied the whole token.');
       showToast('❌ Invalid token (401) \u2014 check you copied it fully', 'danger');
     } else if (resp.status === 403) {
-      lg('🔑 Token saved, but GitHub denied Gist access (403). Check the token has "Gists: Read and write" permission set.');
+      lg('🔑 Token saved, but GitHub denied Gist access (403). Make sure it\'s a classic token with the "gist" scope checked \u2014 fine-grained tokens cannot access Gists at all.');
       showToast('❌ Token lacks Gist permission (403)', 'danger');
     } else {
       lg('🔑 Token saved, but verification got an unexpected response: ' + resp.status);
@@ -11227,7 +11227,7 @@ function rSyncScreen() {
 
   h += '<div class="panel">';
   h += '<div class="panel-title" style="margin-bottom:8px;">1. GitHub Token (this device only)</div>';
-  h += '<div class="btn-hint" style="margin-bottom:10px;line-height:1.6;">Create a <b>fine-grained</b> token scoped ONLY to Gists (not a classic all-access token): github.com \u2192 Settings \u2192 Developer settings \u2192 Fine-grained tokens \u2192 New token \u2192 under Permissions, set "Gists" to Read and write, leave everything else untouched. Paste it below \u2014 it\'s saved only in this browser, never in your save file.</div>';
+  h += '<div class="btn-hint" style="margin-bottom:10px;line-height:1.6;">Create a <b>classic</b> token with ONLY the <b>gist</b> scope checked (fine-grained tokens do not support Gist access at all \u2014 this is a GitHub limitation, not a configuration choice): github.com \u2192 Settings \u2192 Developer settings \u2192 Tokens (classic) \u2192 Generate new token (classic) \u2192 check only "gist", leave every other scope unchecked. There is no repository-selection step for classic tokens. Paste it below \u2014 it\'s saved only in this browser, never in your save file.</div>';
   h += '<input id="sync-token-input" type="password" placeholder="Paste GitHub token" value="' + (token ? token.replace(/./g, '\u2022').slice(0, 20) : '') + '" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-hover);color:var(--text);margin-bottom:8px;box-sizing:border-box;" onfocus="this.value=\'\';this.type=\'text\';">';
   h += '<button onclick="saveSyncToken()" class="btn-outline-ghost" style="width:100%;">' + (token ? 'Update Token' : 'Save Token') + '</button>';
   h += '</div>';
