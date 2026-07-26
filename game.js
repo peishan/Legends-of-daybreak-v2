@@ -11101,6 +11101,38 @@ function linkSyncGistId() {
   render();
 }
 
+function copyGistId() {
+  const gistId = localStorage.getItem(SYNC_GIST_ID_KEY) || '';
+  if (!gistId) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(gistId).then(() => {
+      showToast('📋 Gist ID copied', 'success');
+    }).catch(() => {
+      showToast('❌ Could not copy \u2014 long-press the ID to select it manually', 'danger');
+    });
+  } else {
+    showToast('❌ Clipboard not available \u2014 long-press the ID to select it manually', 'danger');
+  }
+}
+
+function pasteGistId() {
+  const input = document.getElementById('sync-gistid-input');
+  if (!input) return;
+  if (navigator.clipboard && navigator.clipboard.readText) {
+    navigator.clipboard.readText().then(text => {
+      input.value = text.trim();
+      showToast('📋 Pasted', 'success');
+    }).catch(() => {
+      // Some mobile browsers block programmatic clipboard reads outside a direct user
+      // gesture context, or require a permission prompt the user may have dismissed.
+      // Long-press-to-paste on the field itself still works as a fallback either way.
+      showToast('❌ Could not read clipboard \u2014 try long-pressing the field to paste', 'danger');
+    });
+  } else {
+    showToast('❌ Clipboard read not supported here \u2014 long-press the field to paste', 'danger');
+  }
+}
+
 async function pushToCloud() {
   const token = getSyncToken();
   if (!token) { lg('❌ Paste your GitHub token first.'); return; }
@@ -11181,7 +11213,8 @@ function exportSave() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'legends-daybreak-save.json';
+  const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  a.download = 'legends-daybreak-save-' + ts + '.json';
   a.click();
   URL.revokeObjectURL(url);
   lg('Save exported!');
@@ -11235,11 +11268,15 @@ function rSyncScreen() {
   h += '<div class="panel">';
   h += '<div class="panel-title" style="margin-bottom:8px;">2. Linked Cloud Save</div>';
   if (gistId) {
-    h += '<div class="btn-hint" style="margin-bottom:10px;">Linked to gist: <code>' + gistId + '</code>' + (lastPush ? '<br>Last pushed: ' + new Date(parseInt(lastPush)).toLocaleString() : '') + (lastPull ? '<br>Last pulled: ' + new Date(parseInt(lastPull)).toLocaleString() : '') + '</div>';
+    h += '<div class="btn-hint" style="margin-bottom:10px;">Linked to gist: <code id="gist-id-display">' + gistId + '</code>' + (lastPush ? '<br>Last pushed: ' + new Date(parseInt(lastPush)).toLocaleString() : '') + (lastPull ? '<br>Last pulled: ' + new Date(parseInt(lastPull)).toLocaleString() : '') + '</div>';
+    h += '<button onclick="copyGistId()" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">📋 Copy Gist ID (to link another device)</button>';
     h += '<button onclick="clearSyncGistId()" class="btn-outline-ghost" style="width:100%;">Unlink This Device</button>';
   } else {
     h += '<div class="btn-hint" style="margin-bottom:10px;line-height:1.6;">No cloud save linked yet on this device. Either push below to create one (first device), or if you already pushed from another device, paste that gist\'s ID here to link this device to it.</div>';
-    h += '<input id="sync-gistid-input" type="text" placeholder="Paste gist ID from your other device" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-hover);color:var(--text);margin-bottom:8px;box-sizing:border-box;">';
+    h += '<div style="display:flex;gap:8px;margin-bottom:8px;">';
+    h += '<input id="sync-gistid-input" type="text" placeholder="Paste gist ID from your other device" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-hover);color:var(--text);box-sizing:border-box;">';
+    h += '<button onclick="pasteGistId()" style="padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg-hover);color:var(--text);cursor:pointer;flex-shrink:0;">📋 Paste</button>';
+    h += '</div>';
     h += '<button onclick="linkSyncGistId()" class="btn-outline-ghost" style="width:100%;">Link to Existing Cloud Save</button>';
   }
   h += '</div>';
