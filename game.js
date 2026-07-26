@@ -11080,8 +11080,8 @@ async function saveSyncToken() {
       showToast('❌ Unexpected response (' + resp.status + ') \u2014 saved anyway', 'danger');
     }
   } catch (e) {
-    lg('🔑 Token saved, but could not reach GitHub to verify: ' + e.message);
-    showToast('❌ Could not reach GitHub to verify', 'danger');
+    lg('🔑 Token saved, but could not reach GitHub to verify (' + (e.name || 'Error') + ': ' + e.message + '). This usually means something between your device and GitHub is blocking the request \u2014 a VPN, a "Private DNS" setting, an ad-blocker, or your mobile network itself. Try switching networks (WiFi \u2194 mobile data) or opening https://api.github.com/gists directly in your browser to see if it loads at all.');
+    showToast('❌ Could not reach GitHub \u2014 see log for troubleshooting', 'danger');
   }
   G.syncBusy = null;
   render();
