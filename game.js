@@ -2170,6 +2170,7 @@ storyJournal: {
     cleared: [] // ids of RAIDS fully cleared at least once
   },
   chainQuests: {}, // per-chain progress: { [chainId]: { stageIndex, active, cleared } }, lazily created
+  runeVault: { lastPlayedDay: -1, cards: [], flippedIndices: [], moves: 0, active: false, completed: false, resultTier: null, resultXp: 0, resultG: 0 },
   activeChainQuestId: null,
   strongholds: {}, // claimed strongholds, keyed by STRONGHOLDS id — set true once claimed
   guildHallLevel: {}, // Guild Hall level per stronghold id (1 = just claimed, up to 5)
@@ -4289,6 +4290,88 @@ function resolveEventChoice(eventId, choiceKey) {
   G.eventDeckProgress = G.eventDeckProgress || {};
   G.eventDeckProgress[eventId] = { choiceLabel: choice.label, success, resultText, xp, g };
   lg('📖 ' + eventDef.title + ': +' + xp + ' XP, +' + g + 'G');
+  lvlup();
+  saveGame();
+  render();
+}
+
+// === RUNE VAULT ===
+// A genuinely different interaction, not another menu of buttons or a stat check — an
+// actual short memory-match minigame. One free play per day, resolves in well under a
+// minute, reward tier is entirely skill-based (fewer moves = better tier), nothing to
+// grind since there's only one attempt available per day.
+const RUNE_SYMBOLS = ['🔥', '💧', '🌪️', '⚡', '🌙', '✨'];
+const RUNE_VAULT_TIERS = [
+  { maxMoves: 8, tier: 'Gold', xp: 400, g: 250 },
+  { maxMoves: 11, tier: 'Silver', xp: 250, g: 150 },
+  { maxMoves: Infinity, tier: 'Bronze', xp: 130, g: 80 }
+];
+
+function isRuneVaultAvailableToday() {
+  return (G.runeVault.lastPlayedDay || -1) !== G.gameDay;
+}
+
+function startRuneVault() {
+  if (!isRuneVaultAvailableToday()) { lg('🔒 Already played the Rune Vault today \u2014 back tomorrow.'); return; }
+  const deck = [...RUNE_SYMBOLS, ...RUNE_SYMBOLS]
+    .map(symbol => ({ symbol, flipped: false, matched: false }))
+    .sort(() => Math.random() - 0.5);
+  G.runeVault.cards = deck;
+  G.runeVault.flippedIndices = [];
+  G.runeVault.moves = 0;
+  G.runeVault.active = true;
+  G.runeVault.completed = false;
+  G.state = 'rune_vault';
+  render();
+}
+
+function flipRuneCard(idx) {
+  const rv = G.runeVault;
+  if (!rv.active || rv.flippedIndices.length >= 2) return;
+  const card = rv.cards[idx];
+  if (!card || card.flipped || card.matched) return;
+
+  card.flipped = true;
+  rv.flippedIndices.push(idx);
+  render();
+
+  if (rv.flippedIndices.length === 2) {
+    rv.moves++;
+    const [i1, i2] = rv.flippedIndices;
+    if (rv.cards[i1].symbol === rv.cards[i2].symbol) {
+      rv.cards[i1].matched = true;
+      rv.cards[i2].matched = true;
+      rv.flippedIndices = [];
+      if (rv.cards.every(c => c.matched)) {
+        finishRuneVault();
+      } else {
+        render();
+      }
+    } else {
+      setTimeout(() => {
+        rv.cards[i1].flipped = false;
+        rv.cards[i2].flipped = false;
+        rv.flippedIndices = [];
+        render();
+      }, 700);
+    }
+  }
+}
+
+function finishRuneVault() {
+  const rv = G.runeVault;
+  const result = RUNE_VAULT_TIERS.find(t => rv.moves <= t.maxMoves);
+  const xp = Math.floor(result.xp * getPrestigeXpMult());
+  const g = Math.floor(result.g * getPrestigeGoldMult());
+  G.p.xp += xp;
+  G.p.gold += g;
+  rv.active = false;
+  rv.completed = true;
+  rv.resultTier = result.tier;
+  rv.resultXp = xp;
+  rv.resultG = g;
+  rv.lastPlayedDay = G.gameDay;
+  lg('🔮 Rune Vault cleared in ' + rv.moves + ' moves \u2014 ' + result.tier + '! +' + xp + ' XP, +' + g + 'G');
   lvlup();
   saveGame();
   render();
@@ -10301,6 +10384,7 @@ function saveGame() {
     dailyEventDeck: G.dailyEventDeck || [],
     eventDeckSeed: G.eventDeckSeed || 0,
     eventDeckProgress: G.eventDeckProgress || {},
+    runeVaultLastPlayedDay: G.runeVault.lastPlayedDay || -1,
     player: {
       name: G.p.name, cls: G.p.cls, lvl: G.p.lvl, xp: G.p.xp, xpN: G.p.xpN,
       hp: G.p.hp, mhp: G.p.mhp, mp: G.p.mp, mmp: G.p.mmp, gold: G.p.gold,
@@ -10879,6 +10963,7 @@ function loadGame() {
     G.dailyEventDeck = data.dailyEventDeck || [];
     G.eventDeckSeed = data.eventDeckSeed || 0;
     G.eventDeckProgress = data.eventDeckProgress || {};
+    G.runeVault.lastPlayedDay = data.runeVaultLastPlayedDay !== undefined ? data.runeVaultLastPlayedDay : -1;
     G.activeEventId = null;
 
     G.soelFortuneCooldown = data.soelFortuneCooldown || 0;
@@ -10901,6 +10986,102 @@ G.currentWeather = data.currentWeather || 'clear';
     console.error('Load failed:', e);
     return false;
   }
+}
+
+// === CLOUD SYNC (GitHub Gist) ===
+// Manual push/pull, deliberately not automatic — auto-sync risks a stale pull or a
+// stray push silently clobbering progress from the OTHER device. This mirrors how
+// game.js itself already gets moved between accounts: a deliberate action, not
+// something that happens invisibly in the background. The token lives only in this
+// browser's localStorage, never inside the save data itself, so it never gets swept up
+// in exports/backups.
+const SYNC_TOKEN_KEY = 'ldb_sync_pat';
+const SYNC_GIST_ID_KEY = 'ldb_sync_gist_id';
+const SYNC_GIST_FILENAME = 'legends_of_daybreak_save.json';
+
+function getSyncToken() { return localStorage.getItem(SYNC_TOKEN_KEY) || ''; }
+function getSyncGistId() { return localStorage.getItem(SYNC_GIST_ID_KEY) || ''; }
+
+function saveSyncToken() {
+  const val = (document.getElementById('sync-token-input') || {}).value || '';
+  localStorage.setItem(SYNC_TOKEN_KEY, val.trim());
+  lg(val.trim() ? '🔑 Token saved on this device.' : '🔑 Token cleared.');
+  render();
+}
+
+function clearSyncGistId() {
+  if (!confirm('Forget the linked cloud save on this device? (The gist itself is not deleted \u2014 you can relink to it later by pasting its ID, or push again to create a new one.)')) return;
+  localStorage.removeItem(SYNC_GIST_ID_KEY);
+  render();
+}
+
+function linkSyncGistId() {
+  const val = (document.getElementById('sync-gistid-input') || {}).value || '';
+  if (!val.trim()) return;
+  localStorage.setItem(SYNC_GIST_ID_KEY, val.trim());
+  lg('🔗 Linked to existing cloud save.');
+  render();
+}
+
+async function pushToCloud() {
+  const token = getSyncToken();
+  if (!token) { lg('❌ Paste your GitHub token first.'); return; }
+  saveGame(); // ensure what gets uploaded is fully current
+  const saveJson = localStorage.getItem(SAVE_KEY);
+  if (!saveJson) { lg('❌ No local save found to push.'); return; }
+
+  const gistId = getSyncGistId();
+  const body = JSON.stringify({
+    description: 'Legends of Daybreak \u2014 Save Sync (do not edit manually)',
+    public: false,
+    files: { [SYNC_GIST_FILENAME]: { content: saveJson } }
+  });
+
+  G.syncBusy = 'Pushing to cloud\u2026'; render();
+  try {
+    const resp = await fetch('https://api.github.com/gists' + (gistId ? '/' + gistId : ''), {
+      method: gistId ? 'PATCH' : 'POST',
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github+json' },
+      body
+    });
+    if (!resp.ok) throw new Error('GitHub responded ' + resp.status + ' \u2014 check your token has Gist access.');
+    const data = await resp.json();
+    if (!gistId) localStorage.setItem(SYNC_GIST_ID_KEY, data.id);
+    localStorage.setItem('ldb_sync_last_push', Date.now().toString());
+    lg('☁️ Pushed to cloud \u2014 this is now the latest save.');
+  } catch (e) {
+    lg('❌ Push failed: ' + e.message);
+  }
+  G.syncBusy = null;
+  render();
+}
+
+async function pullFromCloud() {
+  const token = getSyncToken();
+  const gistId = getSyncGistId();
+  if (!token) { lg('❌ Paste your GitHub token first.'); return; }
+  if (!gistId) { lg('❌ No cloud save linked yet \u2014 push from your other device first, then paste its gist ID here.'); return; }
+  if (!confirm('This overwrites your LOCAL save with the cloud version. Only do this if you pushed from your other device first. Continue?')) return;
+
+  G.syncBusy = 'Pulling from cloud\u2026'; render();
+  try {
+    const resp = await fetch('https://api.github.com/gists/' + gistId, {
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github+json' }
+    });
+    if (!resp.ok) throw new Error('GitHub responded ' + resp.status + ' \u2014 check your token and gist ID.');
+    const data = await resp.json();
+    const file = data.files && data.files[SYNC_GIST_FILENAME];
+    if (!file || !file.content) throw new Error('No save data found in that gist.');
+    localStorage.setItem(SAVE_KEY, file.content);
+    localStorage.setItem('ldb_sync_last_pull', Date.now().toString());
+    loadGame();
+    lg('☁️ Pulled from cloud \u2014 local save replaced.');
+    G.state = 'menu';
+  } catch (e) {
+    lg('❌ Pull failed: ' + e.message);
+  }
+  G.syncBusy = null;
+  render();
 }
 
 function resetGame() {
@@ -10946,6 +11127,55 @@ function importSave() {
     reader.readAsText(file);
   };
   input.click();
+}
+
+function rSyncScreen() {
+  const token = getSyncToken();
+  const gistId = getSyncGistId();
+  const lastPush = localStorage.getItem('ldb_sync_last_push');
+  const lastPull = localStorage.getItem('ldb_sync_last_pull');
+
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">💾 Save & Sync</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Move your save between devices \u2014 phone, tablet, wherever. Manual push/pull only: nothing syncs automatically, so one device can never silently overwrite the other.</div>';
+
+  if (G.syncBusy) {
+    h += '<div class="panel panel-gold" style="text-align:center;"><div class="btn-hint">' + G.syncBusy + '</div></div>';
+  }
+
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">1. GitHub Token (this device only)</div>';
+  h += '<div class="btn-hint" style="margin-bottom:10px;line-height:1.6;">Create a <b>fine-grained</b> token scoped ONLY to Gists (not a classic all-access token): github.com \u2192 Settings \u2192 Developer settings \u2192 Fine-grained tokens \u2192 New token \u2192 under Permissions, set "Gists" to Read and write, leave everything else untouched. Paste it below \u2014 it\'s saved only in this browser, never in your save file.</div>';
+  h += '<input id="sync-token-input" type="password" placeholder="Paste GitHub token" value="' + (token ? token.replace(/./g, '\u2022').slice(0, 20) : '') + '" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-hover);color:var(--text);margin-bottom:8px;box-sizing:border-box;" onfocus="this.value=\'\';this.type=\'text\';">';
+  h += '<button onclick="saveSyncToken()" class="btn-outline-ghost" style="width:100%;">' + (token ? 'Update Token' : 'Save Token') + '</button>';
+  h += '</div>';
+
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">2. Linked Cloud Save</div>';
+  if (gistId) {
+    h += '<div class="btn-hint" style="margin-bottom:10px;">Linked to gist: <code>' + gistId + '</code>' + (lastPush ? '<br>Last pushed: ' + new Date(parseInt(lastPush)).toLocaleString() : '') + (lastPull ? '<br>Last pulled: ' + new Date(parseInt(lastPull)).toLocaleString() : '') + '</div>';
+    h += '<button onclick="clearSyncGistId()" class="btn-outline-ghost" style="width:100%;">Unlink This Device</button>';
+  } else {
+    h += '<div class="btn-hint" style="margin-bottom:10px;line-height:1.6;">No cloud save linked yet on this device. Either push below to create one (first device), or if you already pushed from another device, paste that gist\'s ID here to link this device to it.</div>';
+    h += '<input id="sync-gistid-input" type="text" placeholder="Paste gist ID from your other device" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-hover);color:var(--text);margin-bottom:8px;box-sizing:border-box;">';
+    h += '<button onclick="linkSyncGistId()" class="btn-outline-ghost" style="width:100%;">Link to Existing Cloud Save</button>';
+  }
+  h += '</div>';
+
+  h += '<button onclick="pushToCloud()" class="abtn" style="width:100%;margin-bottom:10px;" ' + (G.syncBusy ? 'disabled' : '') + '>☁️ Push to Cloud (upload this device\'s save)</button>';
+  h += '<button onclick="pullFromCloud()" class="btn-outline-ghost" style="width:100%;margin-bottom:20px;" ' + (G.syncBusy ? 'disabled' : '') + '>☁️ Pull from Cloud (overwrite this device)</button>';
+
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">Local Backup</div>';
+  h += '<div class="btn-hint" style="margin-bottom:10px;">A plain file backup, separate from cloud sync \u2014 useful before trying something risky, or as an offline copy.</div>';
+  h += '<button onclick="exportSave()" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">Export Save to File</button>';
+  h += '<button onclick="importSave()" class="btn-outline-ghost" style="width:100%;">Import Save from File</button>';
+  h += '</div>';
+
+  h += '<button onclick="resetGame()" class="abtn" style="width:100%;background:var(--danger);">Reset All Progress</button>';
+
+  h += '</div>';
+  return h;
 }
 
 setInterval(saveGame, 30000);
@@ -11229,6 +11459,8 @@ function render(){
   else if(G.state=='boss_rush_room')h+=rBossRushRoom();
   else if(G.state=='chain_quest')h+=rChainQuest();
   else if(G.state=='event_deck')h+=rEventDeck();
+  else if(G.state=='sync')h+=rSyncScreen();
+  else if(G.state=='rune_vault')h+=rRuneVault();
   else if(G.state=='forge')h+=rForge();
   else if(G.state=='bonding')h+=rBonding();
   else if(G.state=='mercenary')h+=rMercenary();
@@ -11267,6 +11499,8 @@ function attachEvents() {
     else if(a=='boss_rush')setS('boss_rush');
     else if(a=='chain_quest')setS('chain_quest');
     else if(a=='event_deck')setS('event_deck');
+    else if(a=='sync')setS('sync');
+    else if(a=='rune_vault')setS('rune_vault');
     else if(a=='forge')setS('forge');
     else if(a=='bonding')setS('bonding');
     else if(a=='mercenary')setS('mercenary');
@@ -12703,6 +12937,54 @@ function rEventDeck() {
   return h;
 }
 
+function rRuneVault() {
+  const rv = G.runeVault;
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">🔮 Rune Vault</div>';
+
+  if (rv.completed) {
+    h += '<div class="panel panel-gold" style="text-align:center;">';
+    h += '<div class="panel-title" style="color:var(--gold);">' + rv.resultTier + '!</div>';
+    h += '<div class="btn-hint" style="margin:8px 0;">Cleared in ' + rv.moves + ' moves</div>';
+    h += '<div style="font-size:18px;font-weight:700;color:var(--gold);">+' + rv.resultXp + ' XP, +' + rv.resultG + 'G</div>';
+    h += '</div>';
+    h += '<div class="btn-hint" style="text-align:center;">One play per day \u2014 the vault reseals until tomorrow.</div>';
+    h += '</div>';
+    return h;
+  }
+
+  if (!rv.active) {
+    const available = isRuneVaultAvailableToday();
+    h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Match all 6 rune pairs in as few moves as possible. Purely skill \u2014 fewer moves, better reward. One free play per day.</div>';
+    h += '<div class="panel">';
+    h += '<div class="panel-title" style="margin-bottom:8px;">Reward Tiers</div>';
+    h += '<div class="btn-hint" style="line-height:1.8;">🥇 Gold (\u226408 moves): 400 XP, 250G<br>🥈 Silver (\u226411 moves): 250 XP, 150G<br>🥉 Bronze (12+ moves): 130 XP, 80G</div>';
+    h += '</div>';
+    if (available) {
+      h += '<button onclick="startRuneVault()" class="abtn" style="width:100%;">🔮 Open the Vault</button>';
+    } else {
+      h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🔒 Already played today \u2014 come back tomorrow.</div></div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  // Active game — the grid
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:12px;">Moves: ' + rv.moves + '</div>';
+  h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:340px;margin:0 auto;">';
+  for (let i = 0; i < rv.cards.length; i++) {
+    const card = rv.cards[i];
+    const revealed = card.flipped || card.matched;
+    h += '<div onclick="flipRuneCard(' + i + ')" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;border-radius:10px;cursor:pointer;background:' + (card.matched ? 'rgba(251,191,36,0.15)' : 'var(--bg-hover)') + ';border:1px solid ' + (card.matched ? 'var(--gold)' : 'var(--border)') + ';user-select:none;">';
+    h += revealed ? card.symbol : '❓';
+    h += '</div>';
+  }
+  h += '</div>';
+
+  h += '</div>';
+  return h;
+}
+
 function rDragonHunt() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🐉 Dragon Hunt</div>';
@@ -13263,6 +13545,7 @@ function rGuild() {
 function rMenu(){
   const primary=[
     {i:'📖',l:'Daily Events',d:'A few short encounters, done in minutes',a:'event_deck'},
+    {i:'🔮',l:'Rune Vault',d:'Quick memory match, one play a day',a:'rune_vault'},
     {i:'⚔️',l:'Adventure',d:'Explore zones and fight',a:'explore'},
     {i:'👥',l:'Party',d:'Manage companions',a:'party'},
     {i:'🌀',l:'Grind Room',d:'Endless wave battles',a:'grind_room'},
@@ -13306,6 +13589,9 @@ function rMenu(){
     { title: '🕯️ Other', items: [
       {i:'🧘',l:'Focus',a:'focus'},
       {i:'💤',l:'Rest',a:'rest'},
+    ]},
+    { title: '⚙️ Settings', items: [
+      {i:'💾',l:'Save & Sync',a:'sync'},
     ]},
   ];
 
