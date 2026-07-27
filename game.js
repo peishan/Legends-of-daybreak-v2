@@ -10824,10 +10824,63 @@ function showToast(text, type) {
   while (stack.children.length > 4) stack.removeChild(stack.firstChild);
 }
 
+// Patterns that mark a log line as "the thing that mattered" for the highlight banner.
+// Deliberately pattern-based rather than touching any of the ~500 existing lg() call
+// sites — scans the text itself for markers that already exist in those messages.
+const LOG_HIGHLIGHT_PATTERNS = [
+  /💥\s*CRIT/i, /💀/, /LEVEL UP/i, /GODSPEED/i, /PHOENIX RISING/i, /JUDGMENT/i,
+  /Righteous Fury/i, /Thunderlord/i, /🌟/, /🏆/, /Defeated/i, /is destroyed/i,
+  /falls!/i, /UNLOCKED/i, /Quest: /, /BOSS APPEARS/i, /SMITE/i
+];
+
+function getLogHighlight() {
+  for (let i = G.log.length - 1; i >= 0; i--) {
+    if (LOG_HIGHLIGHT_PATTERNS.some(p => p.test(G.log[i]))) return G.log[i];
+  }
+  return G.log[G.log.length - 1] || 'Welcome to Legends of Daybreak, San.';
+}
+
+// Wraps standalone numbers in <b> so the ticker gets the same "bold is the only
+// emphasis tool" treatment as the mockup, without needing per-message markup.
+function boldNumbers(msg) {
+  return msg.replace(/\b\d[\d,]*\b/g, '<b>$&</b>');
+}
+
+// Detects element from the emoji already consistently used throughout every lg() call
+// this whole project (🔥 fire, ❄️ ice, ⚡ lightning, ☠️ poison, 🌑 void, 🙏 holy) — a
+// pure display-layer heuristic, so it needed zero changes to any of the 500+ existing
+// lg() call sites.
+const LOG_ELEMENT_PATTERNS = [
+  { rx: /🔥/, cls: 'elem-fire' },
+  { rx: /❄️/, cls: 'elem-ice' },
+  { rx: /⚡/, cls: 'elem-lightning' },
+  { rx: /☠️/, cls: 'elem-poison' },
+  { rx: /🌑|void/i, cls: 'elem-void' },
+  { rx: /🙏|✝️|⚖️/, cls: 'elem-holy' }
+];
+function getLogElementClass(msg) {
+  const found = LOG_ELEMENT_PATTERNS.find(p => p.rx.test(msg));
+  return found ? found.cls : '';
+}
+
+function renderLogPanel() {
+  const highlight = getLogHighlight();
+  const tickerLines = G.log.slice(-12).reverse();
+  let h = '<div class="log-highlight ' + getLogElementClass(highlight) + '"><div class="lh-text">' + boldNumbers(highlight) + '</div></div>';
+  h += '<div class="log-ticker" id="log">';
+  h += tickerLines.map(m => '<div class="le ' + getLogElementClass(m) + '">' + boldNumbers(m) + '</div>').join('');
+  h += '</div>';
+  return h;
+}
+
 function lg(msg){
   G.log.push(msg); if(G.log.length>50)G.log.shift();
-  const el=document.getElementById('log');
-  if(el){el.innerHTML=G.log.map(m=>'<div class="le">'+m+'</div>').join('');el.scrollTop=el.scrollHeight;}
+  const highlightEl = document.querySelector('.log-highlight .lh-text');
+  const highlightWrap = document.querySelector('.log-highlight');
+  const tickerEl = document.getElementById('log');
+  if (highlightEl) highlightEl.innerHTML = boldNumbers(getLogHighlight());
+  if (highlightWrap) highlightWrap.className = 'log-highlight ' + getLogElementClass(getLogHighlight());
+  if (tickerEl) tickerEl.innerHTML = G.log.slice(-12).reverse().map(m => '<div class="le ' + getLogElementClass(m) + '">' + boldNumbers(m) + '</div>').join('');
 }
 
 function setS(s){
@@ -12128,7 +12181,7 @@ function render(){
   else if(G.state=='bondingscene')h+=rBondingScene();
 
   h+='</div>';
-  h+='<div class="log" id="log">'+G.log.map(m=>'<div class="le">'+m+'</div>').join('')+'</div>';
+  h+='<div class="log-panel">'+renderLogPanel()+'</div>';
   h+='<div class="nav"><button class="nb '+(G.state=='menu'?'on':'')+'" data-t="home" data-a="menu">Home</button>';
   h+='<button class="nb '+(G.state=='explore'?'on':'')+'" data-t="exp" data-a="explore">Explore</button>';
   h+='<button class="nb '+(G.state=='party'?'on':'')+'" data-t="party" data-a="party">Party</button>';
