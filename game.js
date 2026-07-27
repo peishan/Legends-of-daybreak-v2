@@ -1,4 +1,9 @@
 
+// Build timestamp — update this string on every deploy. Shown at the bottom of the
+// Home screen so it's possible to confirm at a glance whether a refresh actually
+// picked up the latest version, rather than a stuck cache silently serving the old one.
+const APP_VERSION = '2026-07-27 14:30';
+
 // PWA Install Prompt Handler
 let deferredPrompt = null;
 const installBtn = document.createElement('button');
@@ -13983,6 +13988,7 @@ function rMenu(){
   h+='</div>';
   h+='<div style="margin-top:8px;font-size:11px;color:var(--text-dim);">Auto-saves every 30 seconds</div>';
   h+='</div>';
+  h+='<div style="text-align:center;padding:16px 0 8px;font-size:10px;color:var(--text-dim);opacity:0.6;">Build ' + APP_VERSION + '</div>';
   return h;
 }
 
