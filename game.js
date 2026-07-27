@@ -2837,6 +2837,16 @@ function migrateLegacyItem(item) {
   return item;
 }
 
+// Shared by equipItem/unequipItem and lvlup() — the single canonical formula for San's
+// Max HP/MP, so equipment con/int bonuses and Temple Blessed's rank bonus apply
+// consistently everywhere, rather than lvlup()'s own +10/level increment silently
+// drifting out of sync with the full formula used elsewhere.
+function recalcMaxHpMp() {
+  const eqStats = getEquippedStats();
+  G.p.mhp = Math.floor((80 + (G.p.lvl - 1) * 10 + (eqStats.con * 2)) * (1 + getTempleHpPctBonus()));
+  G.p.mmp = 120 + (G.p.lvl - 1) * 15 + (eqStats.int * 2);
+}
+
 function equipItem(invIndex) {
   const item = G.p.inv[invIndex];
   if (!item || !item.slot) return;
@@ -2857,9 +2867,7 @@ function equipItem(invIndex) {
   lg('Equipped: ' + item.n + ' (' + ITEM_RARITY[item.r].name + ')');
 
   // Recalculate derived stats
-  const eqStats = getEquippedStats();
-  G.p.mhp = 80 + (G.p.lvl - 1) * 10 + (eqStats.con * 2);
-  G.p.mmp = 120 + (G.p.lvl - 1) * 15 + (eqStats.int * 2);
+  recalcMaxHpMp();
   G.p.hp = Math.min(G.p.hp, G.p.mhp);
   G.p.mp = Math.min(G.p.mp, G.p.mmp);
  checkDailyQuests('cast_spells', 1); 
@@ -2874,9 +2882,7 @@ function unequipItem(slot) {
   G.p.eq[slot] = null;
 
   // Recalculate
-  const eqStats = getEquippedStats();
-  G.p.mhp = 80 + (G.p.lvl - 1) * 10 + (eqStats.con * 2);
-  G.p.mmp = 120 + (G.p.lvl - 1) * 15 + (eqStats.int * 2);
+  recalcMaxHpMp();
   G.p.hp = Math.min(G.p.hp, G.p.mhp);
   G.p.mp = Math.min(G.p.mp, G.p.mmp);
 
@@ -4765,7 +4771,11 @@ const GUILD_RANKS = [
   { rank: 3, name: 'Guild Adventurer', repReq: 500, desc: '+5% XP from every victory.', xpBonus: 0.05 },
   { rank: 4, name: 'Guild Veteran', repReq: 1200, desc: 'Another +5% gold and +5% XP.', goldBonus: 0.05, xpBonus: 0.05 },
   { rank: 5, name: 'Guild Champion', repReq: 2500, desc: '+5% crit chance in combat.', critBonus: 0.05 },
-  { rank: 6, name: 'Guildmaster', repReq: 5000, desc: 'Another +10% gold and +10% XP, and the full Guild Shop opens to you.', goldBonus: 0.10, xpBonus: 0.10 }
+  { rank: 6, name: 'Guildmaster', repReq: 5000, desc: 'Another +10% gold and +10% XP, and the full Guild Shop opens to you.', goldBonus: 0.10, xpBonus: 0.10 },
+  { rank: 7, name: 'Guild Legend', repReq: 10000, desc: "The kind of reputation that outlasts the person who earned it. Another +10% gold, and the Legend's Wing of the shop opens.", goldBonus: 0.10 },
+  { rank: 8, name: 'Guild Paragon', repReq: 20000, desc: 'Another +10% XP and +5% crit chance (10% total).', xpBonus: 0.10, critBonus: 0.05 },
+  { rank: 9, name: 'Guild Mythic', repReq: 40000, desc: 'Another +15% gold and +15% XP. Very few contracts are left that actually challenge you at this point.', goldBonus: 0.15, xpBonus: 0.15 },
+  { rank: 10, name: 'Guild Eternal', repReq: 75000, desc: 'The Guild has nothing left to teach you. Another +5% crit chance, and the Eternal Vault \u2014 the last tier of the shop \u2014 finally opens.', critBonus: 0.05 }
 ];
 
 const GUILD_SHOP = [
@@ -4773,7 +4783,14 @@ const GUILD_SHOP = [
   { n: 'Guildmark Blade', slot: 'weapon', minRank: 3, cost: 250, atk: 12, int: 3, r: 'rare', d: 'Forged for Guild Adventurers who\'ve proven themselves.' },
   { n: "Veteran's Plate", slot: 'armor', minRank: 4, cost: 400, def: 14, con: 3, r: 'epic', d: 'Armor reserved for Guild Veterans.' },
   { n: "Champion's Ring", slot: 'ring', minRank: 5, cost: 600, atk: 6, def: 6, critChance: 0.03, r: 'epic', d: 'Worn by those the Guild calls Champion.' },
-  { n: "Guildmaster's Seal", slot: 'amulet', minRank: 6, cost: 1000, atk: 10, def: 10, int: 6, wis: 6, r: 'legendary', d: 'There is only one of these per Guildmaster. Yours, now.' }
+  { n: "Guildmaster's Seal", slot: 'amulet', minRank: 6, cost: 1000, atk: 10, def: 10, int: 6, wis: 6, r: 'legendary', d: 'There is only one of these per Guildmaster. Yours, now.' },
+  // === LEGEND'S WING (rank 7+) — priced for the actual endgame economy, not the
+  // early-game one the original 5 items were designed around ===
+  { n: "Legend's Warblade", slot: 'weapon', minRank: 7, cost: 8000, atk: 28, int: 8, critChance: 0.04, r: 'legendary', d: 'A weapon that outlived three Guildmasters before it, waiting for someone who could actually carry its history.' },
+  { n: "Paragon's Bulwark", slot: 'armor', minRank: 8, cost: 15000, def: 32, con: 10, hpRegen: 8, r: 'legendary', d: 'Armor built for someone the Guild expects to still be standing long after everyone else has gone home.' },
+  { n: "Mythic Signet", slot: 'ring', minRank: 9, cost: 25000, atk: 14, def: 14, critChance: 0.08, r: 'legendary', d: 'Very few of these were ever made. Fewer still were ever earned rather than bought.' },
+  // === ETERNAL VAULT (rank 10) — the actual capstone item ===
+  { n: "The Eternal Seal", slot: 'amulet', minRank: 10, cost: 45000, atk: 20, def: 20, int: 10, wis: 10, con: 10, critChance: 0.05, hpRegen: 12, r: 'legendary', d: 'The Guild keeps exactly one of these in reserve, for whoever eventually proves there is nothing left to prove. It is yours now. There will not be another for a very long time.' }
 ];
 
 const TEMPLE_RANKS = [
@@ -4847,6 +4864,12 @@ function getTempleDiscount() {
   const rank = getTempleRank();
   let total = 0;
   for (let r of TEMPLE_RANKS) { if (r.rank <= rank && r.discountPct) total += r.discountPct; }
+  return total;
+}
+function getTempleHpPctBonus() {
+  const rank = getTempleRank();
+  let total = 0;
+  for (let r of TEMPLE_RANKS) { if (r.rank <= rank && r.hpPct) total += r.hpPct; }
   return total;
 }
 function getTempleCost(baseCost) {
@@ -5407,6 +5430,20 @@ const STRONGHOLD_COSMETICS = [
   { id: 'mon_steadfast', category: 'Monuments', name: 'Statue of the Steadfast', cost: 7000, desc: 'Joel, shield raised, cast in bronze. He said it was unnecessary. He also visits it more than anyone.' },
   { id: 'mon_wall', category: 'Monuments', name: 'Memorial Wall', cost: 10000, desc: 'Names of everyone lost along the way, so the tower remembers what it cost to get here.' },
   { id: 'mon_beacon', category: 'Monuments', name: 'The Eternal Beacon', cost: 25000, desc: "A light at the top of the tower that never goes out. Visible from every zone you've ever walked through, if you know where to look." },
+
+  // === TIER 2 — priced for the endgame economy Dragon Hunt/Elite AFK/Guild rank
+  // income actually produces, not the early-mid game the originals were built for ===
+  { id: 'banner_dawn', category: 'Banners', name: "Daybreak's Own Standard", cost: 42000, desc: "Doesn't just show San's colors anymore \u2014 it's woven from thread dyed the exact shade the sky turned, that morning. Nobody's ever quite agreed on how to reproduce it since." },
+
+  { id: 'grounds_orchard', category: 'Grounds', name: "The Long Walk Orchard", cost: 38000, desc: "Every tree planted from a seed carried back from somewhere the party actually walked to. Senedra keeps a private map of which tree is which road." },
+  { id: 'grounds_starfield', category: 'Grounds', name: 'The Starfield Terrace', cost: 65000, desc: "An open terrace built for exactly one purpose: everyone sitting outside at night, not doing anything in particular. Mezstorm was the one who insisted it needed to exist." },
+
+  { id: 'arch_atrium', category: 'Architecture', name: 'The Sunlit Atrium', cost: 55000, desc: 'A whole wing rebuilt around letting the actual sky in. The tower stopped needing to brace against anything a long time ago \u2014 this is what it looks like when a building finally believes that.' },
+  { id: 'arch_bridge', category: 'Architecture', name: "The Bridge Between", cost: 90000, desc: 'Connects the tower to the settlement below by something other than a walk down a hill. Named, not very subtly, after what Eliz has always called San and Joel together.' },
+  { id: 'arch_crown', category: 'Architecture', name: 'The Crowned Spire', cost: 140000, desc: 'The tallest point the tower has ever had, capped in something that catches every color of every hour of the day. There is nothing higher to build after this. That was the point.' },
+
+  { id: 'mon_family', category: 'Monuments', name: 'The Chosen Family Garden', cost: 100000, desc: "A quiet stone circle, one seat carved for every member of the party \u2014 Soel's is low to the ground, on purpose. Nobody remembers whose idea that detail was, but nobody would change it either." },
+  { id: 'mon_dawn', category: 'Monuments', name: 'The Daybreak Monument', cost: 130000, desc: 'The single largest thing ever built on the grounds \u2014 not a statue of any one person, just the exact moment the sky changed, rendered in stone that somehow still looks warm.' },
 ];
 
 function getStrongholdPrestige() {
@@ -6481,25 +6518,52 @@ function addRuneLoot(zoneName) {
 }
 
 // Rune combine modal state
-G.runeCombineModal = { open: false, selected: [] };
+G.runeCombineModal = { open: false, selected: [], batchSize: 3 };
+
+const RUNE_COMBINE_BATCH_SIZES = [3, 5, 8, 10];
+const RUNE_RARITY_ORDER = ['common', 'uncommon', 'rare', 'epic'];
+
+// Larger batches jump more rarity tiers and apply a bigger stat multiplier on top of
+// the existing rarity-based one — a real incentive to save up and combine in bulk,
+// not just a UI convenience for avoiding repeated 3-at-a-time clicks.
+function getCombineTierJump(batchSize) {
+  if (batchSize >= 8) return 2;
+  return 1;
+}
+function getCombineBatchMult(batchSize) {
+  if (batchSize >= 10) return 2.0;
+  if (batchSize >= 8) return 1.6;
+  if (batchSize >= 5) return 1.3;
+  return 1.0; // batch of 3 — identical to the original behavior
+}
 
 function openCombineModal() {
-  G.runeCombineModal = { open: true, selected: [] };
+  G.runeCombineModal = { open: true, selected: [], batchSize: 3 };
   render();
 }
 
 function closeCombineModal() {
-  G.runeCombineModal = { open: false, selected: [] };
+  G.runeCombineModal = { open: false, selected: [], batchSize: 3 };
+  render();
+}
+
+function setCombineBatchSize(size) {
+  G.runeCombineModal.batchSize = size;
+  // Trim selection down if it's now over the new (possibly smaller) batch size.
+  if (G.runeCombineModal.selected.length > size) {
+    G.runeCombineModal.selected = G.runeCombineModal.selected.slice(0, size);
+  }
   render();
 }
 
 function toggleCombineRune(runeIndex) {
   const idx = G.runeCombineModal.selected.indexOf(runeIndex);
+  const cap = G.runeCombineModal.batchSize || 3;
   if (idx > -1) {
     G.runeCombineModal.selected.splice(idx, 1);
   } else {
-    if (G.runeCombineModal.selected.length >= 3) {
-      lg('❌ Max 3 runes selected!');
+    if (G.runeCombineModal.selected.length >= cap) {
+      lg('❌ Max ' + cap + ' runes selected!');
       return;
     }
     G.runeCombineModal.selected.push(runeIndex);
@@ -6508,13 +6572,17 @@ function toggleCombineRune(runeIndex) {
 }
 
 function getCombinePreview() {
+  const batchSize = G.runeCombineModal.batchSize || 3;
   const selected = G.runeCombineModal.selected.map(i => G.runes[i]).filter(r => r);
-  if (selected.length !== 3) return null;
+  if (selected.length !== batchSize) return null;
   const types = [...new Set(selected.map(r => r.type))];
-  if (types.length !== 1) return { error: 'All 3 must be same type!' };
+  if (types.length !== 1) return { error: 'All ' + batchSize + ' must be same type!' };
   const base = RUNE_TYPES[types[0]];
-  const upgradeRarity = base.r === 'common' ? 'uncommon' : base.r === 'uncommon' ? 'rare' : 'epic';
-  const mult = base.r === 'common' ? 1.5 : 2;
+  const tierJump = getCombineTierJump(batchSize);
+  const currentTierIdx = RUNE_RARITY_ORDER.indexOf(base.r);
+  const upgradeRarity = RUNE_RARITY_ORDER[Math.min(RUNE_RARITY_ORDER.length - 1, currentTierIdx + tierJump)];
+  const baseMult = base.r === 'common' ? 1.5 : 2;
+  const mult = baseMult * getCombineBatchMult(batchSize);
   return {
     name: base.name + ' +',
     icon: base.icon,
@@ -6522,14 +6590,14 @@ function getCombinePreview() {
     val: Math.floor(base.val * mult),
     r: upgradeRarity,
     color: base.color,
-    pct: base.pct ? Math.min(0.30, base.pct * mult) : null
+    pct: base.pct ? Math.min(0.40, base.pct * mult) : null
   };
 }
 
 function doCombineRunes() {
   const preview = getCombinePreview();
   if (!preview || preview.error) {
-    lg(preview?.error || '❌ Select 3 matching runes!');
+    lg(preview?.error || '❌ Select ' + (G.runeCombineModal.batchSize || 3) + ' matching runes!');
     return;
   }
   const selected = [...G.runeCombineModal.selected].sort((a,b) => b-a);
@@ -8237,6 +8305,25 @@ function pa(si, ti, isFreeCast) {
     lg('⚡ Thunderlord strikes! ' + sk.n + ' critically connects!');
   }
 
+  // Guild Champion's crit bonus — also previously defined but never checked anywhere.
+  if (!isCrit && getGuildBonus('critBonus') > 0 && Math.random() < getGuildBonus('critBonus')) {
+    isCrit = true;
+    lg('🛡️ Guild-honed instincts! ' + sk.n + ' strikes true!');
+  }
+
+  // DEX / proficiency / equipment crit chance — getTotalCritChance() was previously
+  // only ever read for the HUD display text, never actually applied to a real roll.
+  // The base 5% is already covered by the natural-20 mechanism in attackRoll(), and
+  // synergy/Thunderlord/Guild are already handled above, so only the remainder
+  // (DEX + proficiency + equipment) needs its own upgrade check here.
+  if (!isCrit) {
+    const eqCrit = (G.p.eq.ring1?.critChance || 0) + (G.p.eq.ring2?.critChance || 0) + (G.p.eq.amulet?.critChance || 0) + (G.p.eq.weapon?.critChance || 0);
+    const dexProfCrit = (G.p.stats.dex * 0.02) + (DICE.proficiencyBonus(G.p.lvl) * 0.01);
+    if (Math.random() < (eqCrit + dexProfCrit)) {
+      isCrit = true;
+    }
+  }
+
   // Senedra's Storm's Mark: consume an existing mark on this target for a guaranteed crit.
   let senedraMarkConsumed = false;
   if (tg.senedraMarked) {
@@ -8449,12 +8536,21 @@ function eturn() {
       doEnemyAttack(e);
     } catch (err) {
       console.error('doEnemyAttack error for', e.n, ':', err);
+      lg('🤖 (' + e.n + '\'s turn skipped after an internal error: ' + (err && err.message ? err.message : 'unknown') + ')');
       // Don't let one enemy's malfunction cancel every other enemy's attack this tick.
     }
   }
   
-  handleBossMechanics();
-  handleZoneHazards();
+  try {
+    handleBossMechanics();
+  } catch (err) {
+    console.error('handleBossMechanics error:', err);
+  }
+  try {
+    handleZoneHazards();
+  } catch (err) {
+    console.error('handleZoneHazards error:', err);
+  }
   
   for (let b of G.p.buffs) b.t--;
   G.p.buffs = G.p.buffs.filter(b => b.t > 0);
@@ -8562,7 +8658,7 @@ function doAutoCombatTick() {
     // die silently and never recover on its own — this is what caused auto-combat
     // to freeze on harder fights until manually toggled off/on.
     console.error('Auto-combat tick error:', err);
-    lg('🤖 Auto-combat: Recovered from an error mid-turn. Continuing...');
+    lg('🤖 Auto-combat: Recovered from an error mid-turn (' + (err && err.message ? err.message : 'unknown') + '). Continuing...');
     if (G.cbt.on && G.cbt.autoCombat) {
       setTimeout(doAutoCombatTick, 1200);
     } else {
@@ -10567,6 +10663,15 @@ function lvlup(){
     }
     checkQ();
   }
+  if (G.p.lvl > startLvl) {
+    // The loop above tracked mhp/mmp with a simple +10/+15-per-level increment for
+    // speed, but that never accounted for equipment con/int bonuses or Temple
+    // Blessed's rank bonus. Recalculating once here (not on every iteration) corrects
+    // to the same canonical formula equip/unequip use, then full-heals to the result.
+    recalcMaxHpMp();
+    G.p.hp = G.p.mhp;
+    G.p.mp = G.p.mmp;
+  }
   if (G.p.lvl > startLvl && typeof triggerLevelUpAnimation === 'function') {
     triggerLevelUpAnimation(G.p.lvl);
   }
@@ -11243,7 +11348,7 @@ function loadGame() {
     G.riftFightsRemaining = data.riftFightsRemaining || 0;
     G.riftTriggerAt = data.riftTriggerAt || (3 + Math.floor(Math.random() * 3));
     G.runeSocketModal = { open: false, source: 'inv', itemIndex: null, slot: null, memberName: null, slotIndex: null };
-    G.runeCombineModal = data.runeCombineModal || { open: false, selected: [] };
+    G.runeCombineModal = data.runeCombineModal || { open: false, selected: [], batchSize: 3 };
     G.grindChampionship = data.grindChampionship || { bestWave: 0, claimedTiers: [] };
     if (data.story) {
       G.story = data.story;
@@ -12947,6 +13052,7 @@ function rRuneSocketModal() {
 
 // NEW: Rune Combine Modal
 function rRuneCombineModal() {
+  const batchSize = G.runeCombineModal.batchSize || 3;
   const selected = G.runeCombineModal.selected;
   const preview = getCombinePreview();
 
@@ -12956,21 +13062,29 @@ function rRuneCombineModal() {
   h += '<h2 class="st" style="margin:0;">🔮 Combine Runes</h2>';
   h += '</div>';
 
-  h += '<div style="font-size:12px;color:var(--text-dim);margin-bottom:16px;">Select 3 runes of the same type to combine into a stronger version.</div>';
+  h += '<div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Select matching runes to combine into a stronger version. Bigger batches jump more rarity tiers and give a bigger bonus.</div>';
+
+  // Batch size selector
+  h += '<div style="display:flex;gap:6px;margin-bottom:16px;">';
+  for (let size of RUNE_COMBINE_BATCH_SIZES) {
+    const isSel = batchSize === size;
+    h += '<button onclick="setCombineBatchSize(' + size + ')" class="tier-btn' + (isSel ? ' sel' : '') + '" style="flex:1;">' + size + '</button>';
+  }
+  h += '</div>';
 
   // Selected runes display
-  h += '<div style="display:flex;gap:8px;margin-bottom:16px;">';
-  for(let i=0;i<3;i++){
+  h += '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">';
+  for(let i=0;i<batchSize;i++){
     if(selected[i] !== undefined && G.runes[selected[i]]){
       const r = G.runes[selected[i]];
-      h += '<div style="flex:1;background:'+r.color+'15;border:2px solid '+r.color+';border-radius:12px;padding:12px;text-align:center;">';
-      h += '<div style="font-size:28px;">'+r.icon+'</div>';
-      h += '<div style="font-size:10px;font-weight:600;color:'+r.color+';">'+r.name+'</div>';
+      h += '<div style="flex:1;min-width:60px;background:'+r.color+'15;border:2px solid '+r.color+';border-radius:12px;padding:10px;text-align:center;">';
+      h += '<div style="font-size:22px;">'+r.icon+'</div>';
+      h += '<div style="font-size:9px;font-weight:600;color:'+r.color+';">'+r.name+'</div>';
       h += '</div>';
     }else{
-      h += '<div style="flex:1;background:var(--bg-hover);border:2px dashed var(--disabled);border-radius:12px;padding:12px;text-align:center;opacity:0.5;">';
-      h += '<div style="font-size:28px;color:var(--disabled);">?</div>';
-      h += '<div style="font-size:10px;color:var(--disabled);">Slot '+(i+1)+'</div>';
+      h += '<div style="flex:1;min-width:60px;background:var(--bg-hover);border:2px dashed var(--disabled);border-radius:12px;padding:10px;text-align:center;opacity:0.5;">';
+      h += '<div style="font-size:22px;color:var(--disabled);">?</div>';
+      h += '<div style="font-size:9px;color:var(--disabled);">Slot '+(i+1)+'</div>';
       h += '</div>';
     }
   }
@@ -12994,7 +13108,7 @@ function rRuneCombineModal() {
   }else if(preview && preview.error){
     h += '<div style="background:#ef444415;border:1px solid var(--danger);border-radius:12px;padding:12px;margin-bottom:16px;text-align:center;color:var(--danger);font-size:13px;">'+preview.error+'</div>';
   }else{
-    h += '<div style="background:var(--bg-hover);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:16px;text-align:center;color:var(--text-dim);font-size:13px;">Select 3 matching runes to see the result</div>';
+    h += '<div style="background:var(--bg-hover);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:16px;text-align:center;color:var(--text-dim);font-size:13px;">Select '+batchSize+' matching runes to see the result</div>';
   }
 
   // Rune grid for selection
