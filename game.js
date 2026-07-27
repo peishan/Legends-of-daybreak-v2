@@ -577,6 +577,19 @@ const G = {
     { id: 49, n: 'The Quiet Uprising', d: 'Defeat The Undertow', t: 'boss_specific', target: 'The Undertow', c: 0, need: 1, rw: { xp: 13100, g: 10500 }, done: false, chain: 'the_long_walk', reqQuest: 48, hidden: true, revealed: false },
     { id: 50, n: 'Where the Walk Leads', d: 'Defeat The Horizon Keeper', t: 'boss_specific', target: 'The Horizon Keeper', c: 0, need: 1, rw: { xp: 17000, g: 14500 }, done: false, chain: 'the_long_walk', reqQuest: 49, hidden: true, revealed: false },
 
+    // === TEMPLE QUESTS: THE CULT OF THE CLOSED EYE ===
+    { id: 51, n: 'Whispers of the Closed Eye', d: 'Reach Level 19 and hear the temple\'s warning', t: 'reach_level', c: 0, need: 19, rw: { xp: 1400, g: 900, templeRep: 30 }, done: false, chain: 'closed_eye' },
+    { id: 52, n: 'Brother Vess, the First Blind', d: 'Hunt down Brother Vess, the First Blind', t: 'boss_specific', target: 'Brother Vess, the First Blind', c: 0, need: 1, rw: { xp: 2600, g: 1500, templeRep: 60 }, done: false, chain: 'closed_eye', reqQuest: 51, hidden: true, revealed: false },
+    { id: 53, n: 'Sister Maren, Keeper of Silence', d: 'Hunt down Sister Maren, Keeper of Silence', t: 'boss_specific', target: 'Sister Maren, Keeper of Silence', c: 0, need: 1, rw: { xp: 4000, g: 2300, templeRep: 90 }, done: false, chain: 'closed_eye', reqQuest: 52, hidden: true, revealed: false },
+    { id: 54, n: 'The Closed Choir', d: 'Hunt down The Closed Choir', t: 'boss_specific', target: 'The Closed Choir', c: 0, need: 1, rw: { xp: 6000, g: 3400, templeRep: 130 }, done: false, chain: 'closed_eye', reqQuest: 53, hidden: true, revealed: false },
+    { id: 55, n: 'The Hollow Prophet', d: 'Hunt down The Hollow Prophet and end the cult\'s grief-cult for good', t: 'boss_specific', target: 'The Hollow Prophet', c: 0, need: 1, rw: { xp: 12500, g: 7600, templeRep: 220 }, done: false, chain: 'closed_eye', reqQuest: 54, hidden: true, revealed: false },
+
+    // === TEMPLE QUESTS: SER ALDRIC'S DISAPPEARANCE ===
+    { id: 56, n: 'The Missing Knight', d: 'Reach Level 22 and take on the temple\'s investigation', t: 'reach_level', c: 0, need: 22, rw: { xp: 1800, g: 1100, templeRep: 40 }, done: false, chain: 'ser_aldric' },
+    { id: 57, n: 'Following the Trail', d: 'Defeat 15 enemies while searching for signs of Ser Aldric', t: 'kill', c: 0, need: 15, rw: { xp: 2200, g: 1300, templeRep: 50 }, done: false, chain: 'ser_aldric', reqQuest: 56, hidden: true, revealed: false },
+    { id: 58, n: "The Closed Eye's Hand", d: 'What Sister Maren knew, she cannot tell you anymore \u2014 but her Zealots left records', t: 'kill', c: 0, need: 10, rw: { xp: 3200, g: 1900, templeRep: 70 }, done: false, chain: 'ser_aldric', reqQuest: 57, hidden: true, revealed: false },
+    { id: 59, n: 'What the Choir Knows', d: 'The Closed Choir has the last of the answers. Finish what the investigation started', t: 'reach_level', c: 0, need: 34, rw: { xp: 5500, g: 3200, templeRep: 120 }, done: false, chain: 'ser_aldric', reqQuest: 58, hidden: true, revealed: false },
+
   ],
 
    bounties: [
@@ -1068,6 +1081,19 @@ const G = {
       mechanic: 'apocalypse', apocalypseTurn: 6, desc: "Everything the settlement above owed and never paid, finally surfacing at once. It is not cruelty. It is arithmetic that ran out of patience." },
     { n: 'The Horizon Keeper', zone: 'Where the Walk Leads', hp: 36000, mhp: 36000, atk: 260, def: 156, xp: 22000, g: 14000,
       mechanic: 'cosmic', desc: 'Not an ending. Just the edge of how far this particular road has been mapped. It guards nothing except the honest fact that there is more, always, past wherever you currently stand.' },
+
+    // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
+    // These are dedicated Temple-quest hunt targets, not tied to any zone's normal
+    // chance-encounter boss — the zone field is deliberately non-matching so they never
+    // compete with or replace a real zone's own boss.
+    { n: 'Brother Vess, the First Blind', zone: 'Temple Hunt: The Convergence', hp: 4800, mhp: 4800, atk: 96, def: 58, xp: 2800, g: 1600,
+      mechanic: 'blind', desc: 'He put out his own eyes the night the world mended, calling it the last honest act left to a believer. He does not fear pain. He fears, more than anything, having to see what the world became without him.' },
+    { n: 'Sister Maren, Keeper of Silence', zone: 'Temple Hunt: The Hollow Throne', hp: 7600, mhp: 7600, atk: 128, def: 76, xp: 4200, g: 2400,
+      mechanic: 'silence', desc: 'She has not spoken since Daybreak, by choice, as penance for a world she believes should have stayed broken. Her silence is not passive. It is a verdict, delivered on everyone who kept living.' },
+    { n: 'The Closed Choir', zone: 'Temple Hunt: Rustbound Docks', hp: 12200, mhp: 12200, atk: 158, def: 96, xp: 6200, g: 3600,
+      mechanic: 'apocalypse', apocalypseTurn: 5, desc: 'Not one voice but many, singing the same hymn to the Breaking in perfect, practiced unison. They believe the mended world is the lie. They may be the only people left who miss the catastrophe.' },
+    { n: 'The Hollow Prophet', zone: 'Temple Hunt: Where the Break Began', hp: 23500, mhp: 23500, atk: 268, def: 160, xp: 13000, g: 8000,
+      mechanic: 'cosmic', desc: "Their leader, and the only one among them who never actually believed the doctrine \u2014 just found it useful. Grief is easy to weaponize. The Hollow Prophet has been doing exactly that since the day the world dared to heal." },
   ],
 
   currentBoss: null,
@@ -2044,6 +2070,40 @@ storyJournal: {
         ]
       }
 
+      ,{
+        id: 'journal_053',
+        title: 'What the Hollow Prophet Believed',
+        chapter: 53,
+        unlockType: 'boss',
+        unlockAt: 'The Hollow Prophet',
+        icon: '👁️',
+        summary: 'The Cult of the Closed Eye ends not with a monster, but with a grieving man who found it useful to lie.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Hollow Prophet does not fight like a fanatic. Fanatics fight like they believe they cannot lose. This one fights like someone who has already lost everything worth losing, and is simply making the ending cost as much as possible.' },
+          { speaker: 'San', text: '"Did you ever actually believe it?" you ask, once it is over, before the light finally leaves his eyes. "That the Breaking should have stayed?"' },
+          { speaker: 'Hollow Prophet', text: '"No," he admits, and there is no triumph left in his voice, only exhaustion. "But grief needed somewhere to go. I gave it a doctrine instead of a grave. People will follow almost anything, if it lets them keep being angry instead of finally being sad."' },
+          { speaker: 'Eliz', text: '"That is the saddest reason for any of this I have ever heard," Eliz says quietly, and means it as a diagnosis, not an accusation.' },
+          { speaker: 'Narrator', text: 'The Cult of the Closed Eye ends there — not with a monster defeated, but with a grieving man finally out of reasons to keep lying to the people who trusted him with their pain. The temple will call it a victory. It feels, mostly, like a very long, very late funeral.' }
+        ]
+      }
+      ,{
+        id: 'journal_054',
+        title: 'The Knight Who Came Back Different',
+        chapter: 54,
+        unlockType: 'level',
+        unlockAt: 34,
+        icon: '🗡️',
+        summary: 'Ser Aldric is found alive. Not unchanged — alive.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Closed Choir\'s last hymn, sung under duress, gives up what the temple has been afraid to ask outright: Ser Aldric did not die investigating the cult. He is alive, held less as a prisoner than as a project — someone they were patiently trying to convince.' },
+          { speaker: 'Narrator', text: 'When you find him, he does not look like the knight the temple\'s records describe. Thinner. Quieter. Uncertain in a way that reads as newly learned rather than natural.' },
+          { speaker: 'Ser Aldric', text: '"I want to tell you they never got to me," he says, not quite meeting your eyes. "I cannot tell you that honestly. Some of it made a terrible kind of sense, some nights. I am not proud of how long some nights lasted."' },
+          { speaker: 'San', text: '"You are allowed to have been shaken," you tell him. "That is not the same as having fallen."' },
+          { speaker: 'Ser Aldric', text: '"I know the difference, intellectually," he says. "Give me time to know it the rest of the way too."' },
+          { speaker: 'Narrator', text: 'You bring him back to the temple less like a rescued hostage and more like someone returning from a long illness — alive, which was never guaranteed, and changed, which was never going to be avoidable either. The temple marks the investigation closed. Ser Aldric, privately, does not consider himself finished with it at all.' }
+        ]
+      }
+
 
 
 
@@ -2176,6 +2236,8 @@ storyJournal: {
   guildHallLevel: {}, // Guild Hall level per stronghold id (1 = just claimed, up to 5)
   guildJoined: false, // The Guild — separate from any Stronghold, auto-joins at level 5
   guildRep: 0, // lifetime reputation total, determines rank, never spent
+  templeRep: 0, // lifetime temple reputation, mirrors guildRep pattern
+  templeHunt: { active: false, currentBossName: null },
   guildRepBalance: 0, // spendable reputation currency for the Guild Shop
   dragonHunt: { active: false, currentId: null, cleared: {} }, // legendary optional superbosses, repeatable; cleared keyed by dragon id
   bossRush: { active: false, streak: 0, bestStreak: 0 }, // chained boss fights, escalating reward + difficulty, no rest between
@@ -3375,6 +3437,11 @@ const ENEMY_REGISTRY = {
   'Horizon Sentinel': { template: 'tank', elem: 'arcane', zoneLv: 55 },
   'Farlight Construct': { template: 'balanced', elem: 'arcane', zoneLv: 55 },
   'Wandering Star Wisp': { template: 'striker', elem: 'arcane', zoneLv: 55 },
+
+  // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
+  'Closed Eye Acolyte': { template: 'striker', elem: 'void', zoneLv: 19 },
+  'Closed Eye Zealot': { template: 'balanced', elem: 'void', zoneLv: 27 },
+  'Closed Eye Warden': { template: 'tank', elem: 'void', zoneLv: 34 },
 };
 
 
@@ -4690,6 +4757,26 @@ const GUILD_SHOP = [
   { n: "Guildmaster's Seal", slot: 'amulet', minRank: 6, cost: 1000, atk: 10, def: 10, int: 6, wis: 6, r: 'legendary', d: 'There is only one of these per Guildmaster. Yours, now.' }
 ];
 
+const TEMPLE_RANKS = [
+  { rank: 1, name: 'Temple Supplicant', repReq: 0, desc: 'Welcomed at the temple. Basic services available.' },
+  { rank: 2, name: 'Temple Devotee', repReq: 100, desc: '10% off all temple services.', discountPct: 0.10 },
+  { rank: 3, name: 'Temple Confessor', repReq: 300, desc: 'Another 10% off (20% total), and the Trinket shelf opens.', discountPct: 0.10 },
+  { rank: 4, name: 'Temple Blessed', repReq: 700, desc: 'A lasting blessing: +8% Max HP.', hpPct: 0.08 },
+  { rank: 5, name: 'Temple Chosen', repReq: 1500, desc: 'Another 15% off (35% total), and the full Temple Shop opens \u2014 including Disease Cure Potions.', discountPct: 0.15 }
+];
+
+const TEMPLE_TRINKETS = [
+  { n: 'Blessed Charm', slot: 'ring', minRank: 3, cost: 120, def: 4, hpRegen: 2, r: 'rare', d: 'A small warmth against the cold. Nothing dramatic. Just steady.' },
+  { n: 'Ashes of the First Light', slot: 'amulet', minRank: 3, cost: 180, hpRegen: 5, r: 'rare', d: 'Kept from the morning the world mended. Warm to the touch, even now.' },
+  { n: 'Woven Ward', slot: 'ring', minRank: 4, cost: 260, def: 9, r: 'epic', d: 'Blessed thread, woven by hands that have buried too many people to be careless about the living.' },
+  { n: 'Sunmote Pendant', slot: 'amulet', minRank: 5, cost: 380, int: 8, mpRegen: 4, r: 'epic', d: 'A fragment of Daybreak itself, or so the temple claims. It does glow, at least.' }
+];
+
+const TEMPLE_CONSUMABLES = [
+  { n: 'Vial of Cleansing', t: 'pot', eff: 'cure_ailment', minRank: 1, cost: 60, r: 'uncommon', d: 'A portable version of the temple\'s own cure \u2014 no need to travel back for a single affliction.' },
+  { n: 'Draught of Steady Hands', t: 'pot', eff: 'bless', minRank: 5, cost: 140, r: 'rare', d: 'Temple Chosen only. A blessing you can carry into the field instead of waiting for one.' }
+];
+
 function getGuildRank() {
   let rank = 0;
   for (let r of GUILD_RANKS) { if (G.guildRep >= r.repReq) rank = r.rank; }
@@ -4712,6 +4799,29 @@ function checkGuildUnlock() {
     lg('🛡️ You\'ve joined the Adventurers\' Guild! The Contract Board is open — check it for bigger jobs than the usual bounties.');
     refreshGuildContracts();
   }
+}
+
+function getTempleRank() {
+  let rank = 0;
+  for (let r of TEMPLE_RANKS) { if (G.templeRep >= r.repReq) rank = r.rank; }
+  return rank;
+}
+function getTempleRankDef() {
+  const rank = getTempleRank();
+  return TEMPLE_RANKS.find(r => r.rank === rank) || null;
+}
+function getTempleDiscount() {
+  const rank = getTempleRank();
+  let total = 0;
+  for (let r of TEMPLE_RANKS) { if (r.rank <= rank && r.discountPct) total += r.discountPct; }
+  return total;
+}
+function getTempleCost(baseCost) {
+  return Math.max(1, Math.floor(baseCost * (1 - getTempleDiscount())));
+}
+function addTempleRep(amount) {
+  G.templeRep += amount;
+  lg('🙏 Temple standing +' + amount + ' (' + G.templeRep + ')');
 }
 
 function checkGuildRankUp(previousRank) {
@@ -4773,6 +4883,34 @@ function completeGuildContract(c) {
   lg('🛡️ Guild Contract complete: ' + c.n + '! +' + c.rw.xp + 'XP +' + c.rw.g + 'G +' + c.rep + ' Guild Rep');
   checkGuildRankUp(previousRank);
   lvlup();
+}
+
+function buyTempleTrinket(index) {
+  const item = TEMPLE_TRINKETS[index];
+  if (!item) return;
+  const rank = getTempleRank();
+  if (rank < item.minRank) { lg('❌ Requires ' + TEMPLE_RANKS.find(r => r.rank === item.minRank).name + '.'); return; }
+  const cost = getTempleCost(item.cost);
+  if (G.p.gold < cost) { lg('❌ Need ' + cost + 'G (have ' + G.p.gold + ').'); return; }
+  G.p.gold -= cost;
+  const { minRank, cost: _c, ...itemData } = item;
+  addI({ ...itemData });
+  lg('⛪ Temple Shop: acquired ' + item.n + ' for ' + cost + 'G.');
+  render();
+}
+
+function buyTempleConsumable(index) {
+  const item = TEMPLE_CONSUMABLES[index];
+  if (!item) return;
+  const rank = getTempleRank();
+  if (rank < item.minRank) { lg('❌ Requires ' + TEMPLE_RANKS.find(r => r.rank === item.minRank).name + '.'); return; }
+  const cost = getTempleCost(item.cost);
+  if (G.p.gold < cost) { lg('❌ Need ' + cost + 'G (have ' + G.p.gold + ').'); return; }
+  G.p.gold -= cost;
+  const { minRank, cost: _c, ...itemData } = item;
+  addI({ ...itemData, q: 1 });
+  lg('⛪ Temple Shop: acquired ' + item.n + ' for ' + cost + 'G.');
+  render();
 }
 
 function buyGuildItem(index) {
@@ -5519,6 +5657,49 @@ function handleDragonHuntVictory() {
   G.dragonHunt.currentId = null;
   G.state = 'menu';
   lvlup();
+  render();
+}
+
+// Which quest (if any) is asking the player to hunt this specific Cult boss right now —
+// used both to gate the Hunt button and to label it correctly.
+function getTempleHuntQuest(bossName) {
+  return G.quests.find(q => q.t === 'boss_specific' && q.target === bossName && !q.done && (!q.hidden || q.revealed));
+}
+
+// Maps each named Cult boss to the mook type and count that accompanies them into the
+// fight — makes each hunt feel like confronting an organization, not an isolated target.
+const TEMPLE_HUNT_ESCORTS = {
+  'Brother Vess, the First Blind': { mook: 'Closed Eye Acolyte', count: 2, zoneLv: 19 },
+  'Sister Maren, Keeper of Silence': { mook: 'Closed Eye Zealot', count: 2, zoneLv: 27 },
+  'The Closed Choir': { mook: 'Closed Eye Warden', count: 2, zoneLv: 34 },
+  'The Hollow Prophet': { mook: 'Closed Eye Warden', count: 3, zoneLv: 45 }
+};
+
+function startTempleHunt(bossName) {
+  const quest = getTempleHuntQuest(bossName);
+  if (!quest) { lg('❌ The temple has no open request for that hunt right now.'); return; }
+  const boss = G.bosses.find(b => b.n === bossName);
+  if (!boss) return;
+  G.cbt.on = true;
+  G.cbt.turn = 0;
+  G.cbt.en = [];
+  G.state = 'combat';
+  // No custom victory handler needed here, unlike Dragon Hunt — boss_specific quest
+  // tracking and templeRep rewards both already work generically off G.currentBoss
+  // inside the unmodified base handleVictory()/checkQ() pipeline.
+  G.currentBoss = JSON.parse(JSON.stringify(boss));
+  G.currentBoss.id = 97;
+  G.cbt.en.push(G.currentBoss);
+  const escort = TEMPLE_HUNT_ESCORTS[bossName];
+  if (escort) {
+    const reg = ENEMY_REGISTRY[escort.mook];
+    for (let i = 0; i < escort.count; i++) {
+      const stats = generateEnemyStats(escort.zoneLv, reg ? reg.template : 'balanced', reg ? reg.elem : 'void');
+      G.cbt.en.push({ ...stats, n: escort.mook, id: i + 1, status: [] });
+    }
+  }
+  lg('⚔️ TEMPLE HUNT: ' + boss.n + '!');
+  lg('   ' + boss.desc);
   render();
 }
 
@@ -10061,7 +10242,7 @@ function checkQ(){
     if(q.t=='boss_specific'&&q.c>=q.need)q.c=q.need;
     if(q.t=='aisyah_battle'&&q.c>=q.need)q.c=q.need;
     if(q.t=='joel_battle'&&q.c>=q.need)q.c=q.need;
-    if(q.c>=q.need){q.done=true;G.p.xp+=q.rw.xp;G.p.gold+=q.rw.g;G.p.quests++;lg('Quest: '+q.n+'! +'+q.rw.xp+'XP +'+q.rw.g+'G');if(q.stronghold)claimStronghold(q.stronghold);checkQuestChains();checkAchievements();lvlup();}
+    if(q.c>=q.need){q.done=true;G.p.xp+=q.rw.xp;G.p.gold+=q.rw.g;G.p.quests++;lg('Quest: '+q.n+'! +'+q.rw.xp+'XP +'+q.rw.g+'G');if(q.rw.templeRep){G.templeRep+=q.rw.templeRep;lg('🙏 Temple standing +'+q.rw.templeRep+' ('+G.templeRep+')');}if(q.stronghold)claimStronghold(q.stronghold);checkQuestChains();checkAchievements();lvlup();}
   }
 }
 
@@ -10477,6 +10658,7 @@ function saveGame() {
     retroactiveGrowthApplied: G.retroactiveGrowthApplied,
     guildJoined: G.guildJoined,
     guildRep: G.guildRep,
+    templeRep: G.templeRep,
     guildRepBalance: G.guildRepBalance,
     guildContracts: G.guildContracts.map(c => ({ id: c.id, c: c.c, done: c.done, refreshWeek: c.refreshWeek })),
     strongholdSiege: G.strongholdSiege,
@@ -10682,6 +10864,7 @@ function loadGame() {
     G.guildHallLevel = data.guildHallLevel || {};
     G.guildJoined = data.guildJoined || false;
     G.guildRep = data.guildRep || 0;
+    G.templeRep = data.templeRep || 0;
     G.guildRepBalance = data.guildRepBalance !== undefined ? data.guildRepBalance : 0;
     if (data.guildContracts) {
       for (let c of G.guildContracts) {
@@ -14748,15 +14931,32 @@ function rFocus(){
 function rTemple() {
   const dead = getDeadParty();
   const site = G.rest.selectedSite || G.rest.sites.find(s => s.id === 'temple');
+  const rankDef = getTempleRankDef();
+  const nextRank = TEMPLE_RANKS.find(r => r.rank === (rankDef ? rankDef.rank + 1 : 1));
   let h2 = '<div class="rest-view">';
   h2 += '<h2 class="st">⛪ Temple of Resurrection</h2>';
   h2 += '<div style="font-size:12px;color:var(--text-dim);margin-bottom:16px;">Ancient magic restores fallen companions. Cost: 50G each.</div>';
 
-  const canAffordHeal = site && G.p.gold >= site.cost;
+  // Reputation / rank panel
+  h2 += '<div class="panel" style="text-align:left;margin-bottom:12px;">';
+  h2 += '<div class="panel-row"><div class="panel-title panel-title-gold">🙏 ' + (rankDef ? rankDef.name : 'Unranked') + '</div><div class="btn-hint">' + G.templeRep + ' Rep total</div></div>';
+  if (nextRank) {
+    const pct = Math.min(100, Math.floor(((G.templeRep - (rankDef ? rankDef.repReq : 0)) / (nextRank.repReq - (rankDef ? rankDef.repReq : 0))) * 100));
+    h2 += '<div style="font-size:11px;color:var(--text-dim);margin:4px 0;">' + (nextRank.repReq - G.templeRep) + ' Rep to ' + nextRank.name + '</div>';
+    h2 += '<div style="background:var(--bg-hover);border-radius:6px;height:6px;overflow:hidden;"><div style="background:var(--gold);height:100%;width:' + pct + '%;"></div></div>';
+  } else {
+    h2 += '<div style="font-size:11px;color:var(--gold);margin:4px 0;">Highest standing reached.</div>';
+  }
+  if (rankDef) h2 += '<div style="font-size:11px;color:var(--text-dim);margin-top:6px;">' + rankDef.desc + '</div>';
+  h2 += '</div>';
+
+  const cureCost = getTempleCost(TEMPLE_CURE_COST);
+  const healCost = getTempleCost(site ? site.cost : 0);
+  const canAffordHeal = site && G.p.gold >= healCost;
   h2 += '<div class="panel" style="text-align:left;margin-bottom:12px;">';
   h2 += '<div class="panel-title">🙏 Full Restoration</div>';
   h2 += '<div style="font-size:12px;color:var(--text-dim);margin:4px 0;">Fully restore HP and MP for the whole party.</div>';
-  h2 += '<button onclick="templeFullHeal()" class="abtn' + (canAffordHeal ? '' : ' dis') + '" style="width:100%;margin-top:8px;">Full Heal (' + (site ? site.cost : '?') + 'G)</button>';
+  h2 += '<button onclick="templeFullHeal()" class="abtn' + (canAffordHeal ? '' : ' dis') + '" style="width:100%;margin-top:8px;">Full Heal (' + healCost + 'G)</button>';
   h2 += '</div>';
   if(dead.length === 0){
     h2 += '<div style="text-align:center;padding:20px;color:var(--success);">✨ All companions are alive!</div>';
@@ -14778,15 +14978,66 @@ function rTemple() {
   }
 
   if (G.p.ailments.length > 0) {
-    const canAffordCure = G.p.gold >= TEMPLE_CURE_COST;
+    const canAffordCure = G.p.gold >= cureCost;
     h2 += '<div class="panel panel-danger" style="text-align:left;margin-top:16px;">';
     h2 += '<div class="panel-title" style="color:var(--danger);">🤢 Afflicted</div>';
     for (let a of G.p.ailments) {
       h2 += '<div style="font-size:12px;color:var(--text-dim);margin:4px 0;">' + AILMENT_TYPES[a.type].icon + ' ' + a.n + ' \u2014 rest alone will not cure this</div>';
     }
-    h2 += '<button onclick="templeCureAilments()" class="abtn' + (canAffordCure ? '' : ' dis') + '" style="width:100%;margin-top:8px;">Cure Afflictions (' + TEMPLE_CURE_COST + 'G)</button>';
+    h2 += '<button onclick="templeCureAilments()" class="abtn' + (canAffordCure ? '' : ' dis') + '" style="width:100%;margin-top:8px;">Cure Afflictions (' + cureCost + 'G)</button>';
     h2 += '</div>';
   }
+
+  // Cult of the Closed Eye hunts — only shown for whichever target the temple is
+  // currently asking you to hunt, via the underlying quest chain.
+  const cultBosses = ['Brother Vess, the First Blind', 'Sister Maren, Keeper of Silence', 'The Closed Choir', 'The Hollow Prophet'];
+  const activeHunts = cultBosses.map(n => ({ name: n, quest: getTempleHuntQuest(n) })).filter(h => h.quest);
+  if (activeHunts.length > 0) {
+    h2 += '<div class="panel" style="text-align:left;margin-top:16px;border-color:var(--danger);">';
+    h2 += '<div class="panel-title" style="color:var(--danger);">👁️ The Cult of the Closed Eye</div>';
+    h2 += '<div style="font-size:11px;color:var(--text-dim);margin:4px 0 10px;">The temple has asked you to hunt down those spreading this grief-cult\'s doctrine.</div>';
+    for (let hunt of activeHunts) {
+      const boss = G.bosses.find(b => b.n === hunt.name);
+      h2 += '<div style="background:var(--bg-card);border:1px solid var(--danger);border-radius:10px;padding:10px;margin-bottom:8px;">';
+      h2 += '<div style="font-weight:700;font-size:13px;margin-bottom:2px;">' + hunt.name + '</div>';
+      h2 += '<div style="font-size:10px;color:var(--text-dim);margin-bottom:8px;">' + (boss ? boss.desc : '') + '</div>';
+      h2 += '<button onclick="startTempleHunt(\'' + hunt.name.replace(/'/g, "\\'") + '\')" class="abtn" style="width:100%;">⚔️ Begin the Hunt</button>';
+      h2 += '</div>';
+    }
+    h2 += '</div>';
+  }
+
+  // Trinket shelf — Temple Confessor (rank 3) and above
+  if (getTempleRank() >= 3) {
+    h2 += '<div class="panel" style="text-align:left;margin-top:16px;">';
+    h2 += '<div class="panel-title">💍 Trinket Shelf</div>';
+    for (let i = 0; i < TEMPLE_TRINKETS.length; i++) {
+      const item = TEMPLE_TRINKETS[i];
+      const rank = getTempleRank();
+      const locked = rank < item.minRank;
+      const cost = getTempleCost(item.cost);
+      h2 += '<div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg-card);border-radius:10px;padding:10px;margin-bottom:6px;' + (locked ? 'opacity:0.5;' : '') + '">';
+      h2 += '<div><div style="font-weight:700;font-size:13px;">' + item.n + '</div><div style="font-size:10px;color:var(--text-dim);">' + item.d + '</div></div>';
+      h2 += '<button onclick="buyTempleTrinket(' + i + ')" class="btn-outline-ghost" style="flex-shrink:0;padding:6px 12px;font-size:11px;"' + (locked ? ' disabled' : '') + '>' + (locked ? '🔒' : cost + 'G') + '</button>';
+      h2 += '</div>';
+    }
+    h2 += '</div>';
+  }
+
+  // Consumables — Vial of Cleansing always visible, Draught locked to rank 5
+  h2 += '<div class="panel" style="text-align:left;margin-top:16px;">';
+  h2 += '<div class="panel-title">🧪 Temple Consumables</div>';
+  for (let i = 0; i < TEMPLE_CONSUMABLES.length; i++) {
+    const item = TEMPLE_CONSUMABLES[i];
+    const rank = getTempleRank();
+    const locked = rank < item.minRank;
+    const cost = getTempleCost(item.cost);
+    h2 += '<div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg-card);border-radius:10px;padding:10px;margin-bottom:6px;' + (locked ? 'opacity:0.5;' : '') + '">';
+    h2 += '<div><div style="font-weight:700;font-size:13px;">' + item.n + '</div><div style="font-size:10px;color:var(--text-dim);">' + item.d + '</div></div>';
+    h2 += '<button onclick="buyTempleConsumable(' + i + ')" class="btn-outline-ghost" style="flex-shrink:0;padding:6px 12px;font-size:11px;"' + (locked ? ' disabled' : '') + '>' + (locked ? '🔒' : cost + 'G') + '</button>';
+    h2 += '</div>';
+  }
+  h2 += '</div>';
 
   if (G.viewingTemple) {
     h2 += '<button onclick="leaveTemple()" class="rest-cancel" style="margin-top:16px;">Leave Temple</button>';
@@ -14797,9 +15048,10 @@ function rTemple() {
 }
 
 function templeCureAilments() {
-  if (G.p.gold < TEMPLE_CURE_COST) { lg('❌ Need ' + TEMPLE_CURE_COST + 'G to cure your afflictions.'); return; }
+  const cost = getTempleCost(TEMPLE_CURE_COST);
+  if (G.p.gold < cost) { lg('❌ Need ' + cost + 'G to cure your afflictions.'); return; }
   if (G.p.ailments.length === 0) return;
-  G.p.gold -= TEMPLE_CURE_COST;
+  G.p.gold -= cost;
   cureAilments();
   render();
 }
@@ -14810,11 +15062,12 @@ function templeCureAilments() {
 function templeFullHeal() {
   const site = G.rest.selectedSite || G.rest.sites.find(s => s.id === 'temple');
   if (!site) return;
-  if (G.p.gold < site.cost) {
-    lg('❌ Not enough gold! Temple costs ' + site.cost + 'G.');
+  const cost = getTempleCost(site.cost);
+  if (G.p.gold < cost) {
+    lg('❌ Not enough gold! Temple costs ' + cost + 'G.');
     return;
   }
-  G.p.gold -= site.cost;
+  G.p.gold -= cost;
   G.currentDialogue = null;
   G.potionMenu = false;
   G.ambushWarning = null;
@@ -15068,6 +15321,15 @@ function usePotionInCombat(invIndex) {
     G.p.mp = Math.min(G.p.mmp, G.p.mp + it.v);
     const restored = G.p.mp - oldMp;
     lg('💧 Used ' + it.n + '! +' + restored + ' MP (' + G.p.mp + '/' + G.p.mmp + ')');
+  } else if (it.eff === 'cure_ailment') {
+    if (G.p.ailments.length === 0) { lg('❌ No afflictions to cure.'); G.potionMenu = false; render(); return; }
+    cureAilments();
+    lg('✨ Used ' + it.n + '! Afflictions cleared.');
+  } else if (it.eff === 'bless') {
+    const alreadyBlessed = G.p.buffs.some(b => b.n === 'Blessed');
+    if (alreadyBlessed) { lg('❌ Already blessed.'); G.potionMenu = false; render(); return; }
+    G.p.buffs.push({ n: 'Blessed', t: 4, atk: Math.ceil(G.p.lvl * 0.3) });
+    lg('🙏 Used ' + it.n + '! ATK increased for a few turns.');
   }
 
   it.q--;
@@ -15082,7 +15344,7 @@ function usePotionInCombat(invIndex) {
 function getCombatPotions() {
   return G.p.inv.filter(it => 
     (it.t === 'pot' || it.t === 'food' || it.t === 'drink') &&
-    (it.eff === 'heal' || it.eff === 'mana') ||
+    (it.eff === 'heal' || it.eff === 'mana' || it.eff === 'cure_ailment' || it.eff === 'bless') ||
     it.t === 'revive'
   );
 }
