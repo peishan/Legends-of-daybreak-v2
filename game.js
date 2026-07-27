@@ -272,7 +272,8 @@ const G = {
       tiers: [
         { level: 3, name: 'Inferno Touch', desc: 'Fireball cost -5 MP. Burn chance +20%.', effects: { fireballCostReduction: 5, burnChanceBonus: 0.20 } },
         { level: 5, name: 'Wildfire', desc: 'Fire spells have 25% chance to chain to adjacent enemy.', effects: { wildfireChance: 0.25, wildfireDmg: 0.5 } },
-        { level: 8, name: 'Phoenix Rising', desc: 'When HP drops below 20%, auto-cast Meteor Swarm once per combat.', effects: { phoenixRising: true, phoenixHpThreshold: 0.20 } }
+        { level: 8, name: 'Phoenix Rising', desc: 'When HP drops below 20%, auto-cast Meteor Swarm once per combat.', effects: { phoenixRising: true, phoenixHpThreshold: 0.20 } },
+        { level: 50, name: 'Phoenix Ascendant', desc: 'Phoenix Rising can trigger twice per combat instead of once. Each trigger wreathes San in embers: 30% damage reduction for 2 turns.', effects: { phoenixExtraTrigger: true, phoenixShieldReduction: 0.30, phoenixShieldTurns: 2 } }
       ]
     },
     cryomancer: {
@@ -283,7 +284,8 @@ const G = {
       tiers: [
         { level: 3, name: 'Frozen Core', desc: 'Frost Shield duration +2 turns. +3 DEF while active.', effects: { frostShieldDuration: 2, frostShieldDefBonus: 3 } },
         { level: 5, name: 'Absolute Zero', desc: 'Ice spells have 30% chance to freeze enemy (skip 2 turns).', effects: { freezeChance: 0.30, freezeTurns: 2 } },
-        { level: 8, name: 'Glacial Aegis', desc: 'When hit, 20% chance to auto-cast Frost Shield (free, once per 3 turns).', effects: { glacialAegisChance: 0.20, glacialAegisCooldown: 3 } }
+        { level: 8, name: 'Glacial Aegis', desc: 'When hit, 20% chance to auto-cast Frost Shield (free, once per 3 turns).', effects: { glacialAegisChance: 0.20, glacialAegisCooldown: 3 } },
+        { level: 50, name: 'Eternal Winter', desc: 'San\'s attacks deal 25% bonus damage to frozen enemies \u2014 the cold does not just stop them, it makes them brittle.', effects: { shatterDmgBonus: 0.25 } }
       ]
     },
     stormcaller: {
@@ -294,7 +296,8 @@ const G = {
       tiers: [
         { level: 3, name: 'Static Charge', desc: 'Lightning Strike cost -8 MP. Shock duration +1 turn.', effects: { lightningCostReduction: 8, shockDurationBonus: 1 } },
         { level: 5, name: 'Chain Lightning', desc: 'Lightning spells hit 2 enemies (50% dmg to second).', effects: { chainLightning: true, chainLightningDmg: 0.5 } },
-        { level: 8, name: 'Thunderlord', desc: 'Crit chance +15%. Crits with lightning refund 50% MP.', effects: { thunderlordCritBonus: 0.15, thunderlordMpRefund: 0.5 } }
+        { level: 8, name: 'Thunderlord', desc: 'Crit chance +15%. Crits with lightning refund 50% MP.', effects: { thunderlordCritBonus: 0.15, thunderlordMpRefund: 0.5 } },
+        { level: 50, name: 'Godspeed', desc: 'Lightning spells have a 25% chance not to end your turn \u2014 the same spell fires again immediately, free.', effects: { godspeedChance: 0.25 } }
       ]
     }
   },
@@ -2253,6 +2256,7 @@ storyJournal: {
   afkAdventurePicker: [], // temporary selection state while choosing zones, before starting
   afkAdventureEliteToggle: false, // temporary picker-screen toggle, before starting
   notificationsEnabled: false,
+  companionPrestige: {}, // { CompanionName: 'pathKey' } once chosen, absent until then
   mercenary: { active: false, current: null, completed: 0 }, // current offered contract, if any; completed drives tier scaling
   prestige: { count: 0, xpBonusPct: 0, goldBonusPct: 0 }, // permanent bonuses banked from past resets
   strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
@@ -3864,7 +3868,8 @@ function updateAffinity(partyMemberName, amount) {
   if (amount > 0 && partyMemberName !== 'Soel') {
     const soelActive = G.party.some(p => p.n === 'Soel' && p.on && p.hp > 0);
     if (soelActive && G.p.lvl >= SOEL_BONDING_CATALYST_UNLOCK) {
-      amount = Math.ceil(amount * 1.15);
+      // The Chosen Family (capstone, auto-granted at 50): the bond deepens further.
+      amount = Math.ceil(amount * (G.p.lvl >= COMPANION_PRESTIGE_UNLOCK ? 1.30 : 1.15));
     }
   }
   G.affinity[partyMemberName].val = Math.max(0, G.affinity[partyMemberName].val + amount);
@@ -4990,6 +4995,106 @@ const JOEL_DIVINE_STRENGTH_UNLOCK = 30;
 const JOEL_PROTECTION_UNLOCK = 36;
 const JOEL_SMITE_UNDEAD_UNLOCK = 42;
 
+// === COMPANION PRESTIGE ===
+// Level 50+ specialization, one irreversible choice between two paths per companion —
+// matches San's own Tier 4 capstone timing. Joel is built first to establish the
+// pattern: each path amplifies part of the companion's existing kit rather than
+// replacing it, so the choice deepens an established identity instead of contradicting
+// six-plus levels of built-up character.
+const COMPANION_PRESTIGE_UNLOCK = 50;
+
+const COMPANION_PRESTIGE = {
+  Joel: {
+    champion: {
+      name: 'Champion of the Mended',
+      desc: 'Offense. Divine Strength surges harder and more often, and every hit carries a chance to land as a Judgment strike \u2014 not just against the undead anymore, against anything.',
+      flavor: "He spent so long being the wall everyone stood behind. Somewhere past level 50, he stops asking permission to also be the sword."
+    },
+    guardian: {
+      name: 'Eternal Guardian',
+      desc: "Defense. Protection from Evil deepens and extends to every enemy, not just the undead-coded ones. And when he's hurting worst, the whole party stands a little steadier because of it.",
+      flavor: "Some people guard one thing. Joel found out, somewhere past level 50, that he had room to guard all of them at once."
+    }
+  },
+  Eliz: {
+    vessel: {
+      name: 'Sanctified Vessel',
+      desc: "Pure healing, deepened further. Breath of Life revives at far more HP and recovers faster, and Gentle Pulse's regular healing runs stronger.",
+      flavor: "She never wanted to be a weapon. Past level 50, she finally gets to just be entirely what she already was \u2014 only more so."
+    },
+    battle_cleric: {
+      name: 'Battle Cleric',
+      desc: "Healing with teeth. Turn Undead becomes an actual smite dealing real damage, and when the party is hurting worst, her own strikes hit harder \u2014 grief turned into force.",
+      flavor: "Somewhere past level 50, Eliz stops being only the one who patches everyone back together, and becomes someone who can also make an enemy regret the damage in the first place."
+    }
+  },
+  Zaki: {
+    weapon_master: {
+      name: 'Weapon Master',
+      desc: 'Precision. Extra Attack triggers far more often, and every hit carries a flat damage bonus \u2014 mastery over the panic that used to define him.',
+      flavor: "He used to check his pack seventeen times before every fight. Somewhere past level 50, he stops needing to \u2014 his hands already know exactly what they're doing."
+    },
+    berserker: {
+      name: 'Berserker',
+      desc: 'Recklessness, rewarded. Deals significantly more damage \u2014 but takes more too. A real tradeoff, not a pure upgrade.',
+      flavor: "Nervous Courage was never really about not being afraid. Berserker is what happens when he stops trying to manage the fear at all, and just lets it move his sword arm instead."
+    }
+  },
+  Senedra: {
+    shadow_stalker: {
+      name: 'Shadow Stalker',
+      desc: 'Evasion deepens further, and every hit lands with added precision \u2014 harder to hit, harder hitting.',
+      flavor: "She always found the paths other people couldn't see. Past level 50, she starts finding the openings other people can't see too."
+    },
+    beastmaster: {
+      name: 'Beastmaster',
+      desc: 'Favored Enemy extends to flying creatures too, at a much higher bonus, and Pinning Shot leaves enemies even weaker.',
+      flavor: "The real money was always in dried goods \u2014 they travel, they last. Somewhere past level 50, she applies the same patience to knowing exactly which enemy to take apart first."
+    }
+  },
+  Aisyah: {
+    assassin: {
+      name: 'Assassin',
+      desc: "Sneak Attack's opening strike lands devastatingly harder \u2014 the first hit on any target becomes the one that matters most.",
+      flavor: "She taught San to fight with knives a long time ago. Somewhere past level 50, it becomes clear she never stopped teaching herself too."
+    },
+    trickster: {
+      name: 'Trickster',
+      desc: 'Coup de Grace works on a much wider HP window, hits far harder, and pays out significantly more gold. Poison Blade also lands more often and bites deeper.',
+      flavor: "Family with knives is complicated and useful, she always said. Past level 50, the knives get considerably more useful."
+    }
+  },
+  Mezstorm: {
+    stormlord: {
+      name: 'Stormlord',
+      desc: 'Arc Strike triggers far more often and carries much more of the original damage to the second target.',
+      flavor: "The magic rendered him male, once, like a mistake with no undo. Somewhere past level 50, he stops treating his own power like an accident and starts treating it like a gift he finally chose to keep."
+    },
+    tempest_warden: {
+      name: 'Tempest Warden',
+      desc: 'Storm Shield extends to protect against every enemy, not just lightning-elemental ones, and reduces more. Static Field also triggers more often.',
+      flavor: "He spent so long estranged from everyone, a storm looking for somewhere to land. Past level 50, the storm finally figures out what it wants to protect."
+    }
+  }
+};
+
+function getCompanionPrestige(name) {
+  return G.companionPrestige[name] || null;
+}
+function hasCompanionPrestige(name, pathKey) {
+  return G.companionPrestige[name] === pathKey;
+}
+function chooseCompanionPrestige(name, pathKey) {
+  if (G.companionPrestige[name]) return; // irreversible — already chosen
+  if (G.p.lvl < COMPANION_PRESTIGE_UNLOCK) return;
+  const path = COMPANION_PRESTIGE[name] && COMPANION_PRESTIGE[name][pathKey];
+  if (!path) return;
+  G.companionPrestige[name] = pathKey;
+  lg('🌟 ' + name + ' has chosen their path: ' + path.name + '!');
+  showToast('🌟 ' + name + ': ' + path.name, 'gold');
+  render();
+}
+
 function isJoelActive() {
   return G.party.some(p => p.n === 'Joel' && p.on && p.hp > 0);
 }
@@ -5022,11 +5127,13 @@ function tickJoelPaladinAbilities() {
   // Divine Strength — temporary ATK surge for Joel himself, read at damage-calc time
   // via G.joelDivineStrength rather than mutating his stats directly (mutating .atk
   // would get silently overwritten the next time his equipment recalculates).
+  // Champion of the Mended raises both the trigger chance and how long it lasts.
   if (G.p.lvl >= JOEL_DIVINE_STRENGTH_UNLOCK) {
+    const isChampion = hasCompanionPrestige('Joel', 'champion');
     if (G.joelDivineStrength > 0) {
       G.joelDivineStrength--;
-    } else if (Math.random() < 0.15) {
-      G.joelDivineStrength = 4;
+    } else if (Math.random() < (isChampion ? 0.25 : 0.15)) {
+      G.joelDivineStrength = isChampion ? 6 : 4;
       lg('⚡ Joel calls on Divine Strength! His attacks hit harder for a few turns.');
     }
   }
@@ -5091,14 +5198,16 @@ function tickSoelWarmPresence() {
   if (!soel) return;
   if (G.p.lvl < SOEL_WARM_PRESENCE_UNLOCK) return;
 
-  const hpAmt = Math.max(1, Math.floor(G.p.mhp * 0.03));
-  const mpAmt = Math.max(1, Math.floor(G.p.mmp * 0.03));
+  // The Chosen Family (capstone, auto-granted at 50): the trickle runs deeper.
+  const pct = G.p.lvl >= COMPANION_PRESTIGE_UNLOCK ? 0.05 : 0.03;
+  const hpAmt = Math.max(1, Math.floor(G.p.mhp * pct));
+  const mpAmt = Math.max(1, Math.floor(G.p.mmp * pct));
   let healedAnyone = false;
   if (G.p.hp < G.p.mhp) { G.p.hp = Math.min(G.p.mhp, G.p.hp + hpAmt); healedAnyone = true; }
   if (G.p.mp < G.p.mmp) { G.p.mp = Math.min(G.p.mmp, G.p.mp + mpAmt); healedAnyone = true; }
   for (let p of G.party) {
     if (p.on && p.hp > 0 && p.n !== 'Soel' && p.hp < p.mhp) {
-      p.hp = Math.min(p.mhp, p.hp + Math.max(1, Math.floor(p.mhp * 0.03)));
+      p.hp = Math.min(p.mhp, p.hp + Math.max(1, Math.floor(p.mhp * pct)));
       healedAnyone = true;
     }
   }
@@ -5110,15 +5219,26 @@ function tickElizHealerAbilities() {
 
   // Turn Undead — chance each round to make an undead-archetype enemy cower, skipping
   // its next turn. Reuses the exact same enemy-status skip-turn mechanism as 'shock'.
+  // Battle Cleric turns this into an actual smite: real damage on top of the turn,
+  // and a higher chance to trigger at all.
   if (G.p.lvl >= ELIZ_TURN_UNDEAD_UNLOCK) {
+    const isBattleCleric = hasCompanionPrestige('Eliz', 'battle_cleric');
     for (let e of G.cbt.en) {
       if (e.hp <= 0) continue;
       if (getEnemyArchetype(e.n) !== 'undead') continue;
       if (!e.status) e.status = [];
       if (e.status.some(s => s.type === 'turned')) continue;
-      if (Math.random() < 0.20) {
+      if (Math.random() < (isBattleCleric ? 0.35 : 0.20)) {
         e.status.push({ type: 'turned', turns: 1 });
-        lg('✨ Eliz turns ' + e.n + '! It cowers, unable to act.');
+        if (isBattleCleric) {
+          const smiteDmg = Math.max(3, Math.floor(e.mhp * 0.08));
+          e.hp -= smiteDmg;
+          showEnemyDamage(e, smiteDmg, false);
+          lg('✨⚔️ Eliz smites ' + e.n + ' for ' + smiteDmg + '! It cowers, unable to act.');
+          if (e.hp <= 0) { e.hp = 0; lg('💀 ' + e.n + ' is destroyed by holy light!'); checkBountyKill(e.n); trackBestiary(e); }
+        } else {
+          lg('✨ Eliz turns ' + e.n + '! It cowers, unable to act.');
+        }
       }
     }
   }
@@ -6771,9 +6891,11 @@ function doElizResurrect(member) {
   if (!target) target = deadMembers[0];
 
   // Perform resurrection
-  const healAmount = Math.floor(target.mhp * member.resurrect.healPct);
+  const isVessel = hasCompanionPrestige('Eliz', 'vessel');
+  const healPct = isVessel ? Math.min(0.85, member.resurrect.healPct + 0.20) : member.resurrect.healPct;
+  const healAmount = Math.floor(target.mhp * healPct);
   target.hp = Math.max(1, healAmount);
-  member.resurrect.cooldown = member.resurrect.maxCooldown;
+  member.resurrect.cooldown = isVessel ? Math.max(1, member.resurrect.maxCooldown - 2) : member.resurrect.maxCooldown;
 
   lg('💚 ' + member.n + ' casts ' + member.resurrect.name + '!');
   lg('✨ ' + (target.n === 'San' ? 'You' : target.n) + ' are revived with ' + target.hp + ' HP!');
@@ -6808,12 +6930,13 @@ function doElizPassiveHeal(eliz) {
   if (wounded.length === 0 && !sanNeedsMp) return false;
   
   const synergyBonus = getSynergyHealBonus();
+  const vesselHealBonus = hasCompanionPrestige('Eliz', 'vessel') ? 0.06 : 0;
   let didSomething = false;
   
   // === HP HEAL: ALL WOUNDED ALLIES ===
   if (wounded.length > 0) {
     for (let ally of wounded) {
-      let healBase = Math.floor(ally.mhp * 0.10); // 10% per ally (reduced from 15% for balance)
+      let healBase = Math.floor(ally.mhp * (0.10 + vesselHealBonus)); // 10% per ally, +6% with Sanctified Vessel
       let healAmount = Math.floor(healBase * (1 + synergyBonus));
       
       if (ally.isPlayer) {
@@ -6865,7 +6988,7 @@ function doPartyAttack(member, noBonus) {
   const target = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
   // member.atk/spd already include equipped gear bonuses via recalcPartyMember()
   const zakiCourageBonus = (member.n === 'Zaki' && checkZakiCourage()) ? 6 : 0;
-  const joelDivineStrengthBonus = (member.n === 'Joel' && G.joelDivineStrength > 0) ? Math.ceil(G.p.lvl * 0.4) : 0;
+  const joelDivineStrengthBonus = (member.n === 'Joel' && G.joelDivineStrength > 0) ? Math.ceil(G.p.lvl * (hasCompanionPrestige('Joel', 'champion') ? 0.7 : 0.4)) : 0;
   const effectiveAtk = member.atk + zakiCourageBonus + joelDivineStrengthBonus;
   const effectiveSpd = member.spd;
   const abilityScore = member.r === 'Rogue' || member.r === 'Ranger' 
@@ -6892,35 +7015,67 @@ function doPartyAttack(member, noBonus) {
   });
   
   let finalDamage = Math.max(1, damageResult.total - Math.floor((target.def || 0) / 3));
-  const isSmiteUndead = member.n === 'Joel' && G.p.lvl >= JOEL_SMITE_UNDEAD_UNLOCK && getEnemyArchetype(target.n) === 'undead';
+  const isChampion = member.n === 'Joel' && hasCompanionPrestige('Joel', 'champion');
+  const isSmiteUndead = member.n === 'Joel' && G.p.lvl >= JOEL_SMITE_UNDEAD_UNLOCK && !isChampion && getEnemyArchetype(target.n) === 'undead';
+  const isJudgment = isChampion && G.p.lvl >= JOEL_SMITE_UNDEAD_UNLOCK;
   if (isSmiteUndead) finalDamage = Math.floor(finalDamage * 1.5);
-  const isFavoredEnemy = member.n === 'Senedra' && G.p.lvl >= SENEDRA_FAVORED_ENEMY_UNLOCK && getEnemyArchetype(target.n) === 'beast';
-  if (isFavoredEnemy) finalDamage = Math.floor(finalDamage * 1.4);
+  if (isJudgment) finalDamage = Math.floor(finalDamage * 1.8);
+  const isBeastmaster = member.n === 'Senedra' && hasCompanionPrestige('Senedra', 'beastmaster');
+  const targetArchetype = getEnemyArchetype(target.n);
+  const isFavoredEnemy = member.n === 'Senedra' && G.p.lvl >= SENEDRA_FAVORED_ENEMY_UNLOCK
+    && (targetArchetype === 'beast' || (isBeastmaster && targetArchetype === 'flying'));
+  if (isFavoredEnemy) finalDamage = Math.floor(finalDamage * (isBeastmaster ? 1.7 : 1.4));
+
+  // Shadow Stalker: precision damage bonus on every attack, complementing her deepened
+  // Evasion — the stealth-and-crit path rather than the nature-and-beasts one.
+  if (member.n === 'Senedra' && hasCompanionPrestige('Senedra', 'shadow_stalker')) {
+    finalDamage = Math.floor(finalDamage * 1.30);
+  }
+
+  // Battle Cleric's Righteous Fury: when the party is hurting badly, Eliz's own attacks
+  // (whenever her heal/resurrect priorities don't already claim her turn) hit harder.
+  if (member.n === 'Eliz' && hasCompanionPrestige('Eliz', 'battle_cleric')) {
+    const partyLow = (G.p.hp / G.p.mhp) < 0.40 || G.party.some(p => p.on && p.hp > 0 && (p.hp / p.mhp) < 0.40);
+    if (partyLow) {
+      finalDamage = Math.floor(finalDamage * 1.5);
+      lg('✨ Righteous Fury! Eliz\'s desperation becomes strength!');
+    }
+  }
+
+  // Weapon Master: flat precision damage bonus on every attack. Berserker: bigger
+  // damage bonus, but the matching downside lives in doEnemyAttack (extra damage taken).
+  if (member.n === 'Zaki' && hasCompanionPrestige('Zaki', 'weapon_master')) {
+    finalDamage = Math.floor(finalDamage * 1.25);
+  } else if (member.n === 'Zaki' && hasCompanionPrestige('Zaki', 'berserker')) {
+    finalDamage = Math.floor(finalDamage * 1.40);
+  }
 
   // Aisyah's Sneak Attack — bonus damage the first time she hits THIS specific enemy
   // this fight. target.aisyahSneakAttacked resets naturally since enemies are fresh
   // objects every combat, no explicit cleanup needed.
   const isSneakAttack = member.n === 'Aisyah' && G.p.lvl >= AISYAH_SNEAK_ATTACK_UNLOCK && !target.aisyahSneakAttacked;
   if (isSneakAttack) {
-    finalDamage = Math.floor(finalDamage * 1.6);
+    finalDamage = Math.floor(finalDamage * (hasCompanionPrestige('Aisyah', 'assassin') ? 2.3 : 1.6));
     target.aisyahSneakAttacked = true;
   }
 
   // Aisyah's Coup de Grace — bonus damage AND bonus gold finishing off a low-HP
   // target, tying back to her established gold-obsessed character rather than being
-  // purely combat flavor.
-  const isCoupDeGrace = member.n === 'Aisyah' && G.p.lvl >= AISYAH_COUP_DE_GRACE_UNLOCK && target.mhp > 0 && (target.hp / target.mhp) <= 0.20;
+  // purely combat flavor. Trickster widens the HP window and deepens both bonuses.
+  const isTrickster = member.n === 'Aisyah' && hasCompanionPrestige('Aisyah', 'trickster');
+  const coupThreshold = isTrickster ? 0.35 : 0.20;
+  const isCoupDeGrace = member.n === 'Aisyah' && G.p.lvl >= AISYAH_COUP_DE_GRACE_UNLOCK && target.mhp > 0 && (target.hp / target.mhp) <= coupThreshold;
   let coupBonusGold = 0;
   if (isCoupDeGrace) {
-    finalDamage = Math.floor(finalDamage * 1.3);
-    coupBonusGold = 15 + Math.floor(G.p.lvl * 2);
+    finalDamage = Math.floor(finalDamage * (isTrickster ? 1.6 : 1.3));
+    coupBonusGold = (isTrickster ? 30 : 15) + Math.floor(G.p.lvl * (isTrickster ? 3.5 : 2));
   }
 
   target.hp -= finalDamage;
   showEnemyDamage(target, finalDamage, attackResult.isCrit);
   
   const critTag = attackResult.isCrit ? ' 💥CRIT' : '';
-  lg('⚔️ ' + member.n + ' hits ' + target.n + ' for ' + finalDamage + critTag + (isSmiteUndead ? ' ✝️ SMITE!' : '') + (isFavoredEnemy ? ' 🏹 FAVORED ENEMY!' : '') + (isSneakAttack ? ' 🗡️ SNEAK ATTACK!' : '') + (isCoupDeGrace ? ' 💰 COUP DE GRÂCE!' : ''));
+  lg('⚔️ ' + member.n + ' hits ' + target.n + ' for ' + finalDamage + critTag + (isSmiteUndead ? ' ✝️ SMITE!' : '') + (isJudgment ? ' ⚖️ JUDGMENT!' : '') + (isFavoredEnemy ? ' 🏹 FAVORED ENEMY!' : '') + (isSneakAttack ? ' 🗡️ SNEAK ATTACK!' : '') + (isCoupDeGrace ? ' 💰 COUP DE GRÂCE!' : ''));
   if (isCoupDeGrace) {
     G.p.gold += coupBonusGold;
     lg('   +' + coupBonusGold + 'G skimmed in the chaos.');
@@ -6928,10 +7083,11 @@ function doPartyAttack(member, noBonus) {
 
   // Aisyah's Poison Blade — chance to poison on hit, reuses the exact same status
   // shape spells already use rather than inventing a parallel poison system.
-  if (member.n === 'Aisyah' && G.p.lvl >= AISYAH_POISON_BLADE_UNLOCK && target.hp > 0 && Math.random() < 0.25) {
+  // Trickster deepens both the chance and the potency.
+  if (member.n === 'Aisyah' && G.p.lvl >= AISYAH_POISON_BLADE_UNLOCK && target.hp > 0 && Math.random() < (isTrickster ? 0.45 : 0.25)) {
     if (!target.status) target.status = [];
     if (!target.status.some(s => s.type === 'poison')) {
-      target.status.push({ type: 'poison', dmg: 4 + Math.floor(G.p.lvl * 0.15), turns: 3 });
+      target.status.push({ type: 'poison', dmg: (isTrickster ? 8 : 4) + Math.floor(G.p.lvl * 0.15), turns: 3 });
       lg('☠️ Aisyah\'s blade drips poison! ' + target.n + ' is poisoned.');
     }
   }
@@ -6948,12 +7104,14 @@ function doPartyAttack(member, noBonus) {
 
   // Mezstorm's Arc Strike — chance for lightning to splash to a second enemy for
   // partial damage. Distinct from Zaki's Cleave: doesn't require a kill, always a
-  // chance-based splash rather than a kill-chain.
-  if (member.n === 'Mezstorm' && G.p.lvl >= MEZSTORM_ARC_STRIKE_UNLOCK && Math.random() < 0.20) {
+  // chance-based splash rather than a kill-chain. Stormlord amplifies both the chance
+  // and how much of the original damage carries over.
+  const isStormlord = member.n === 'Mezstorm' && hasCompanionPrestige('Mezstorm', 'stormlord');
+  if (member.n === 'Mezstorm' && G.p.lvl >= MEZSTORM_ARC_STRIKE_UNLOCK && Math.random() < (isStormlord ? 0.35 : 0.20)) {
     const others = G.cbt.en.filter(e => e.hp > 0 && e !== target);
     if (others.length > 0) {
       const splashTarget = others[Math.floor(Math.random() * others.length)];
-      const splashDamage = Math.max(1, Math.floor(finalDamage * 0.5));
+      const splashDamage = Math.max(1, Math.floor(finalDamage * (isStormlord ? 0.75 : 0.5)));
       splashTarget.hp -= splashDamage;
       showEnemyDamage(splashTarget, splashDamage, false);
       lg('⚡ Lightning arcs to ' + splashTarget.n + ' for ' + splashDamage + '!');
@@ -6983,7 +7141,7 @@ function doPartyAttack(member, noBonus) {
     if (killedTarget && G.p.lvl >= ZAKI_CLEAVE_UNLOCK && G.cbt.en.some(e => e.hp > 0)) {
       lg('🗡️ Zaki cleaves through to the next enemy!');
       doPartyAttack(member, false);
-    } else if (!killedTarget && G.p.lvl >= ZAKI_EXTRA_ATTACK_UNLOCK && Math.random() < 0.20) {
+    } else if (!killedTarget && G.p.lvl >= ZAKI_EXTRA_ATTACK_UNLOCK && Math.random() < (hasCompanionPrestige('Zaki', 'weapon_master') ? 0.35 : 0.20)) {
       lg('⚔️ Zaki strikes again!');
       doPartyAttack(member, true);
     }
@@ -7072,10 +7230,11 @@ function doEnemyAttack(enemy) {
     }
   }
   if (G.joelShieldCooldown > 0) G.joelShieldCooldown--;
+  if (G.glacialAegisCooldown > 0) G.glacialAegisCooldown--;
 
   // Senedra's Evasion — a chance to dodge the attack entirely, leveraging her already-
   // highest SPD stat in the party. Checked before the attack roll even happens.
-  if (target !== G.p && target.n === 'Senedra' && G.p.lvl >= SENEDRA_EVASION_UNLOCK && Math.random() < 0.20) {
+  if (target !== G.p && target.n === 'Senedra' && G.p.lvl >= SENEDRA_EVASION_UNLOCK && Math.random() < (hasCompanionPrestige('Senedra', 'shadow_stalker') ? 0.35 : 0.20)) {
     lg('💨 Senedra evades ' + enemy.n + "'s attack entirely!");
     return;
   }
@@ -7085,7 +7244,7 @@ function doEnemyAttack(enemy) {
   // all of which are either always-on or triggered by low HP — this one only ever
   // matters in the first round, before anyone's actually been hurt yet.
   const soelActive = G.party.some(p => p.n === 'Soel' && p.on && p.hp > 0);
-  if (soelActive && G.cbt.turn === 0 && G.p.lvl >= SOEL_DANGER_SENSE_UNLOCK && Math.random() < 0.25) {
+  if (soelActive && G.cbt.turn === 0 && G.p.lvl >= SOEL_DANGER_SENSE_UNLOCK && Math.random() < (G.p.lvl >= COMPANION_PRESTIGE_UNLOCK ? 0.40 : 0.25)) {
     lg('🐱 Soel senses it coming! ' + (target === G.p ? 'You step' : target.n + ' steps') + ' aside before ' + enemy.n + "'s opening strike lands.");
     return;
   }
@@ -7121,28 +7280,66 @@ function doEnemyAttack(enemy) {
   finalDamage = Math.max(1, finalDamage - Math.floor(targetDef / 2));
   finalDamage = applySynergyDefense(finalDamage);
 
+  // Berserker's cost: takes 25% more damage himself, in exchange for the bigger
+  // outgoing damage bonus applied in doPartyAttack. A real tradeoff, not a pure upgrade.
+  if (target !== G.p && target.n === 'Zaki' && hasCompanionPrestige('Zaki', 'berserker')) {
+    finalDamage = Math.floor(finalDamage * 1.25);
+  }
+
+  // Phoenix Ascendant's Ember Shield — flat damage reduction while active.
+  if (target === G.p) {
+    const emberShield = G.p.buffs.find(b => b.n === 'Ember Shield');
+    if (emberShield && emberShield.dmgReduction) {
+      finalDamage = Math.max(1, Math.floor(finalDamage * (1 - emberShield.dmgReduction)));
+    }
+  }
+
   // Senedra's Pinning Shot: the enemy landed the hit, but weaker than it should have been.
+  // Beastmaster deepens the reduction further.
   if (wasPinned) {
-    finalDamage = Math.floor(finalDamage * 0.7);
+    finalDamage = Math.floor(finalDamage * (hasCompanionPrestige('Senedra', 'beastmaster') ? 0.5 : 0.7));
     lg('🎯 ' + enemy.n + "'s attack lands weaker \u2014 still pinned from Senedra's shot!");
   }
 
   // Joel's Protection from Evil: an aura, not tied to who's actually being hit — reduces
   // damage from undead/void-coded enemies for the whole party while he's active.
-  if (isJoelActive() && G.p.lvl >= JOEL_PROTECTION_UNLOCK && (getEnemyArchetype(enemy.n) === 'undead' || enemy.elem === 'void')) {
-    finalDamage = Math.floor(finalDamage * 0.85);
+  // Eternal Guardian deepens the reduction and extends it to every enemy, not just
+  // undead/void-coded ones.
+  const isGuardian = hasCompanionPrestige('Joel', 'guardian');
+  if (isJoelActive() && G.p.lvl >= JOEL_PROTECTION_UNLOCK) {
+    if (isGuardian) {
+      finalDamage = Math.floor(finalDamage * 0.72);
+    } else if (getEnemyArchetype(enemy.n) === 'undead' || enemy.elem === 'void') {
+      finalDamage = Math.floor(finalDamage * 0.85);
+    }
+  }
+
+  // Eternal Guardian's Bulwark: when Joel himself is below half HP, the whole party
+  // takes less damage — a true guardian's stand protects everyone around him, not
+  // just himself.
+  if (isGuardian) {
+    const joelMember = G.party.find(p => p.n === 'Joel' && p.on && p.hp > 0);
+    if (joelMember && (joelMember.hp / joelMember.mhp) < 0.50) {
+      finalDamage = Math.floor(finalDamage * 0.85);
+    }
   }
 
   // Mezstorm's Storm Shield: same aura pattern, reduces damage from lightning-elemental
-  // enemies specifically — he already knows how to survive a storm.
+  // enemies specifically — he already knows how to survive a storm. Tempest Warden
+  // extends the shield to every enemy, not just lightning-elemental ones, and deepens it.
   const mezActive = G.party.some(p => p.n === 'Mezstorm' && p.on && p.hp > 0);
-  if (mezActive && G.p.lvl >= MEZSTORM_STORM_SHIELD_UNLOCK && enemy.elem === 'lightning') {
-    finalDamage = Math.floor(finalDamage * 0.80);
+  const isTempestWarden = hasCompanionPrestige('Mezstorm', 'tempest_warden');
+  if (mezActive && G.p.lvl >= MEZSTORM_STORM_SHIELD_UNLOCK) {
+    if (isTempestWarden) {
+      finalDamage = Math.floor(finalDamage * 0.70);
+    } else if (enemy.elem === 'lightning') {
+      finalDamage = Math.floor(finalDamage * 0.80);
+    }
   }
 
   // Mezstorm's Static Field: retaliation — the enemy takes lightning damage back for
-  // having attacked at all, while he's active.
-  if (mezActive && G.p.lvl >= MEZSTORM_STATIC_FIELD_UNLOCK && enemy.hp > 0 && Math.random() < 0.30) {
+  // having attacked at all, while he's active. Tempest Warden raises the trigger chance.
+  if (mezActive && G.p.lvl >= MEZSTORM_STATIC_FIELD_UNLOCK && enemy.hp > 0 && Math.random() < (isTempestWarden ? 0.45 : 0.30)) {
     const staticDmg = 3 + Math.floor(G.p.lvl * 0.2);
     enemy.hp -= staticDmg;
     showEnemyDamage(enemy, staticDmg, false);
@@ -7167,6 +7364,44 @@ function doEnemyAttack(enemy) {
   }
   
   target.hp -= finalDamage;
+
+  // Cryomancer's Glacial Aegis: chance to auto-cast Fireshield (Blue) for free when San
+  // is hit, respecting Frozen Core's bonus too if that's also unlocked. Cooldown-gated
+  // rather than once-per-combat, matching the tier's own description.
+  if (target === G.p && hasSpecEffect('glacialAegisChance') && (G.glacialAegisCooldown || 0) <= 0 && Math.random() < getSpecEffect('glacialAegisChance')) {
+    const frozenCoreDuration = hasSpecEffect('frostShieldDuration') ? getSpecEffect('frostShieldDuration') : 0;
+    const frozenCoreDef = hasSpecEffect('frostShieldDefBonus') ? getSpecEffect('frostShieldDefBonus') : 0;
+    G.p.buffs.push({ n: 'Fireshield (Blue)', t: 3 + frozenCoreDuration, def: 5 + frozenCoreDef });
+    G.glacialAegisCooldown = getSpecEffect('glacialAegisCooldown') || 3;
+    lg('❄️ Glacial Aegis triggers! Fireshield (Blue) cast for free.');
+  }
+
+  // Pyromancer's Phoenix Rising: auto-cast Meteor Swarm the moment San's HP crosses
+  // below the threshold — checked after damage lands, using the HP value post-hit (and
+  // post-protection, since the safety block below can still adjust it, but this
+  // specifically cares about San dropping low, not dying). Phoenix Ascendant (Tier 4)
+  // raises the per-combat trigger cap from 1 to 2, and adds a brief damage-reduction
+  // shield on each trigger.
+  const phoenixMaxTriggers = hasSpecEffect('phoenixExtraTrigger') ? 2 : 1;
+  if (target === G.p && hasSpecEffect('phoenixRising') && (G.phoenixRisingTriggerCount || 0) < phoenixMaxTriggers
+      && G.p.hp > 0 && (G.p.hp / G.p.mhp) < (getSpecEffect('phoenixHpThreshold') || 0.20)) {
+    G.phoenixRisingTriggerCount = (G.phoenixRisingTriggerCount || 0) + 1;
+    const alive = G.cbt.en.filter(e => e.hp > 0);
+    if (alive.length > 0) {
+      lg('🔥🐦 PHOENIX RISING! Meteor Swarm answers your desperation, free of cost!');
+      for (let e of alive) {
+        const dmgResult = DICE.damageRoll({ diceExpr: '4d10', abilityScore: G.p.stats.int, isCrit: false });
+        const dmg = Math.max(1, Math.floor(dmgResult.total * getWeaknessMultiplier('fire', e.elem)));
+        e.hp -= dmg;
+        showEnemyDamage(e, dmg, false);
+        if (e.hp <= 0) { e.hp = 0; lg('💀 ' + e.n + ' is consumed by the meteor swarm!'); checkBountyKill(e.n); trackBestiary(e); }
+      }
+    }
+    if (hasSpecEffect('phoenixExtraTrigger')) {
+      G.p.buffs.push({ n: 'Ember Shield', t: getSpecEffect('phoenixShieldTurns') || 2, dmgReduction: getSpecEffect('phoenixShieldReduction') || 0.30 });
+      lg('🔥 An ember shield wreathes San \u2014 damage taken reduced for a few turns.');
+    }
+  }
 
   // HP safety runs FIRST, immediately after the decrement — before any side-effect code
   // (ailment rolls, floating numbers, growth-ability checks) that could throw and abort
@@ -7679,6 +7914,7 @@ function finishPlayerTurn() {
 
 function handleVictory() {
   clearZoneBuffs(); // STAGE 3: Clear zone buffs on victory
+  G.phoenixRisingTriggerCount = 0; // ready again for the next fight
 
   let txp = G.cbt.en.reduce((s, e) => s + e.xp, 0);
   let tg2 = G.cbt.en.reduce((s, e) => s + e.g, 0);
@@ -7819,6 +8055,7 @@ function handleVictory() {
 
 function handleDefeat() {
   clearZoneBuffs(); // STAGE 3: Clear zone buffs on defeat
+  G.phoenixRisingTriggerCount = 0; // ready again for the next fight
 
   if (checkSecondWind()) { render(); return; }
   lg('💀 You have fallen! Rolling death saves...');
@@ -7865,7 +8102,7 @@ function handleDefeat() {
   render();
 }
 
-function pa(si, ti) {
+function pa(si, ti, isFreeCast) {
   const isBasicAttack = si === -1;
   const sk = isBasicAttack 
     ? { n: 'Staff Swing', c: 0, dmg: '1d4', elem: 'none', buff: false } 
@@ -7876,7 +8113,7 @@ function pa(si, ti) {
   
   const riftMpMult = (G.currentRift === 'time') ? 2 : 1;
   const talentMpMult = getTalentMultiplier('mpCost');
-  let actualCost = Math.floor(sk.c * riftMpMult * talentMpMult);
+  let actualCost = isFreeCast ? 0 : Math.floor(sk.c * riftMpMult * talentMpMult);
 
   // Mezstorm's Stormcaller's Gambit: when San's MP is critically low, the storm
   // sometimes answers anyway — the spell costs nothing this cast.
@@ -7886,7 +8123,7 @@ function pa(si, ti) {
     actualCost = 0;
   }
 
-  if (G.p.mp < actualCost) {
+  if (!isFreeCast && G.p.mp < actualCost) {
     lg('💨 Not enough MP! San swings their staff instead!');
     doPhysicalAttack(tg);
     finishPlayerTurn();
@@ -7898,8 +8135,10 @@ function pa(si, ti) {
   if (sk.buff) {
     switch (sk.buffType) {
       case 'defense':
-        G.p.buffs.push({ n: sk.n, t: sk.buffTurns || 3, def: sk.buffVal || 4 });
-        lg('🛡️ ' + sk.n + '! AC +' + (sk.buffVal || 4) + ' for ' + (sk.buffTurns || 3) + ' turns.');
+        const frozenCoreDuration = (sk.elem === 'ice' && hasSpecEffect('frostShieldDuration')) ? getSpecEffect('frostShieldDuration') : 0;
+        const frozenCoreDef = (sk.elem === 'ice' && hasSpecEffect('frostShieldDefBonus')) ? getSpecEffect('frostShieldDefBonus') : 0;
+        G.p.buffs.push({ n: sk.n, t: (sk.buffTurns || 3) + frozenCoreDuration, def: (sk.buffVal || 4) + frozenCoreDef });
+        lg('🛡️ ' + sk.n + '! AC +' + ((sk.buffVal || 4) + frozenCoreDef) + ' for ' + ((sk.buffTurns || 3) + frozenCoreDuration) + ' turns.' + (frozenCoreDuration || frozenCoreDef ? ' (Frozen Core empowered)' : ''));
         break;
       case 'haste':
         G.p.buffs.push({ n: sk.n, t: sk.buffTurns || 3, atk: sk.buffVal || 5 });
@@ -7977,6 +8216,13 @@ function pa(si, ti) {
     lg('✨ Synergy critical! ' + sk.n + ' strikes true!');
   }
 
+  // Stormcaller's Thunderlord: +15% crit chance on top of everything else, and lightning
+  // crits refund MP. Previously defined but never checked anywhere in combat.
+  if (!isCrit && hasSpecEffect('thunderlordCritBonus') && Math.random() < getSpecEffect('thunderlordCritBonus')) {
+    isCrit = true;
+    lg('⚡ Thunderlord strikes! ' + sk.n + ' critically connects!');
+  }
+
   // Senedra's Storm's Mark: consume an existing mark on this target for a guaranteed crit.
   let senedraMarkConsumed = false;
   if (tg.senedraMarked) {
@@ -8049,6 +8295,15 @@ function pa(si, ti) {
   }
   finalDamage = applySynergyDamage(finalDamage, 'spell');
   finalDamage = Math.max(1, Math.floor(finalDamage * getAilmentMult('atk')));
+
+  // Cryomancer's Eternal Winter: bonus damage against frozen enemies, checking the
+  // same 'shock' status Absolute Zero's freeze applies (frozen enemies skip a turn
+  // via 'shock' — this rewards attacking them while they're locked down).
+  if (hasSpecEffect('shatterDmgBonus') && tg.status && tg.status.some(s => s.type === 'shock')) {
+    finalDamage = Math.floor(finalDamage * (1 + getSpecEffect('shatterDmgBonus')));
+    lg('❄️ Eternal Winter! The frozen ' + tg.n + ' shatters under the blow!');
+  }
+
   tg.hp -= finalDamage;
   showEnemyDamage(tg, finalDamage, isCrit);
   
@@ -8057,6 +8312,16 @@ function pa(si, ti) {
   
   if (isCrit) {
     lg('   🎲 ' + damageResult.breakdown);
+  }
+
+  // Thunderlord's MP refund — lightning crits specifically, matching the original
+  // tier description exactly.
+  if (isCrit && sk.elem === 'lightning' && hasSpecEffect('thunderlordMpRefund') && actualCost > 0) {
+    const refund = Math.floor(actualCost * getSpecEffect('thunderlordMpRefund'));
+    if (refund > 0) {
+      G.p.mp = Math.min(G.p.mmp, G.p.mp + refund);
+      lg('⚡ Thunderlord refunds ' + refund + ' MP!');
+    }
   }
   
   if (sk.status && tg.hp > 0) {
@@ -8069,12 +8334,62 @@ function pa(si, ti) {
       }
     }
   }
+
+  // Pyromancer's Wildfire / Stormcaller's Chain Lightning: fire/lightning spells have
+  // a chance to splash to a second living enemy. Previously defined but never checked
+  // anywhere in combat — wired up here using the tier-effect helpers.
+  if (sk.elem === 'fire' && hasSpecEffect('wildfireChance') && Math.random() < getSpecEffect('wildfireChance')) {
+    const others = G.cbt.en.filter(e => e.hp > 0 && e !== tg);
+    if (others.length > 0) {
+      const splashTarget = others[Math.floor(Math.random() * others.length)];
+      const splashDmg = Math.max(1, Math.floor(finalDamage * getSpecEffect('wildfireDmg')));
+      splashTarget.hp -= splashDmg;
+      showEnemyDamage(splashTarget, splashDmg, false);
+      lg('🔥 Wildfire leaps to ' + splashTarget.n + ' for ' + splashDmg + '!');
+      if (splashTarget.hp <= 0) { splashTarget.hp = 0; lg('💀 ' + splashTarget.n + ' is defeated!'); checkBountyKill(splashTarget.n); trackBestiary(splashTarget); }
+    }
+  }
+  if (sk.elem === 'lightning' && hasSpecEffect('chainLightning')) {
+    const others = G.cbt.en.filter(e => e.hp > 0 && e !== tg);
+    if (others.length > 0) {
+      const splashTarget = others[Math.floor(Math.random() * others.length)];
+      const splashDmg = Math.max(1, Math.floor(finalDamage * getSpecEffect('chainLightningDmg')));
+      splashTarget.hp -= splashDmg;
+      showEnemyDamage(splashTarget, splashDmg, false);
+      lg('⚡ Lightning arcs to ' + splashTarget.n + ' for ' + splashDmg + '!');
+      if (splashTarget.hp <= 0) { splashTarget.hp = 0; lg('💀 ' + splashTarget.n + ' is defeated!'); checkBountyKill(splashTarget.n); trackBestiary(splashTarget); }
+    }
+  }
+
+  // Cryomancer's Absolute Zero: ice spells have a chance to freeze (skip turns) rather
+  // than just apply generic sk.status — also previously defined but never checked.
+  if (sk.elem === 'ice' && hasSpecEffect('freezeChance') && tg.hp > 0 && Math.random() < getSpecEffect('freezeChance')) {
+    if (!tg.status) tg.status = [];
+    if (!tg.status.some(s => s.type === 'shock')) {
+      tg.status.push({ type: 'shock', turns: getSpecEffect('freezeTurns') || 2 });
+      lg('❄️ ' + tg.n + ' is frozen solid, unable to act!');
+    }
+  }
   
   if (tg.hp <= 0) {
     tg.hp = 0;
     lg('💀 ' + tg.n + ' is defeated!');
     checkBountyKill(tg.n);
     trackBestiary(tg);
+  }
+
+  // Stormcaller's Godspeed: lightning spells have a chance not to end San's turn —
+  // the same spell fires again immediately, free. Guarded by !isFreeCast so the free
+  // recast itself can never trigger another Godspeed proc (no infinite chains), and
+  // only fires if there's still something alive to cast it at.
+  if (!isFreeCast && sk.elem === 'lightning' && hasSpecEffect('godspeedChance') && Math.random() < getSpecEffect('godspeedChance')) {
+    const stillAlive = G.cbt.en.some(e => e.hp > 0);
+    if (stillAlive) {
+      lg('⚡ GODSPEED! ' + sk.n + ' answers again before the moment passes!');
+      const nextTargetIdx = tg.hp > 0 ? ti : G.cbt.en.findIndex(e => e.hp > 0);
+      pa(si, nextTargetIdx, true);
+      return;
+    }
   }
   
   finishPlayerTurn();
@@ -10676,6 +10991,7 @@ function saveGame() {
     guildJoined: G.guildJoined,
     guildRep: G.guildRep,
     templeRep: G.templeRep,
+    companionPrestige: G.companionPrestige,
     guildRepBalance: G.guildRepBalance,
     guildContracts: G.guildContracts.map(c => ({ id: c.id, c: c.c, done: c.done, refreshWeek: c.refreshWeek })),
     strongholdSiege: G.strongholdSiege,
@@ -10882,6 +11198,7 @@ function loadGame() {
     G.guildJoined = data.guildJoined || false;
     G.guildRep = data.guildRep || 0;
     G.templeRep = data.templeRep || 0;
+    G.companionPrestige = data.companionPrestige || {};
     G.guildRepBalance = data.guildRepBalance !== undefined ? data.guildRepBalance : 0;
     if (data.guildContracts) {
       for (let c of G.guildContracts) {
@@ -14384,6 +14701,42 @@ function rGrowthAbilityBadge(memberName) {
     '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;">' + def.d + '</div></div>';
 }
 
+function rCompanionPrestigeBadge(memberName) {
+  // Soel doesn't fork into two paths — his identity is unconditional support, and
+  // forcing a binary choice would work against what he actually is. His capstone
+  // (The Chosen Family) auto-grants at the same level instead, so it gets its own
+  // display rather than routing through the choice-based structure below.
+  if (memberName === 'Soel') {
+    if (G.p.lvl < COMPANION_PRESTIGE_UNLOCK) return '';
+    return '<div style="margin-top:6px;padding:10px;background:color-mix(in srgb, var(--accent) 14%, transparent);border:1px solid var(--accent);border-radius:8px;">' +
+      '<div style="font-size:10px;font-weight:700;color:var(--accent-light);text-transform:uppercase;letter-spacing:0.05em;">🌟 The Chosen Family</div>' +
+      '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;">Warm Presence, Danger Sense, and Bonding Catalyst all deepen further. He was never going to choose one part of caring for this family over another \u2014 so he doesn\'t have to.</div></div>';
+  }
+
+  const paths = COMPANION_PRESTIGE[memberName];
+  if (!paths) return '';
+  const chosen = getCompanionPrestige(memberName);
+  if (chosen) {
+    const path = paths[chosen];
+    return '<div style="margin-top:6px;padding:10px;background:color-mix(in srgb, var(--accent) 14%, transparent);border:1px solid var(--accent);border-radius:8px;">' +
+      '<div style="font-size:10px;font-weight:700;color:var(--accent-light);text-transform:uppercase;letter-spacing:0.05em;">🌟 ' + path.name + '</div>' +
+      '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;">' + path.desc + '</div></div>';
+  }
+  if (G.p.lvl < COMPANION_PRESTIGE_UNLOCK) return '';
+  let h = '<div style="margin-top:6px;padding:10px;background:var(--bg-hover);border:1px dashed var(--accent);border-radius:8px;">';
+  h += '<div style="font-size:10px;font-weight:700;color:var(--accent-light);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">🌟 Prestige Available \u2014 Choose a Path</div>';
+  for (let key in paths) {
+    const path = paths[key];
+    h += '<button onclick="chooseCompanionPrestige(\'' + memberName + '\',\'' + key + '\')" style="display:block;width:100%;text-align:left;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:6px;cursor:pointer;color:var(--text);">';
+    h += '<div style="font-size:11px;font-weight:700;">' + path.name + '</div>';
+    h += '<div style="font-size:9px;color:var(--text-dim);margin-top:2px;">' + path.desc + '</div>';
+    h += '</button>';
+  }
+  h += '<div style="font-size:9px;color:var(--danger);margin-top:2px;">This choice is permanent \u2014 choose carefully.</div>';
+  h += '</div>';
+  return h;
+}
+
 function rParty(){
   let h='<div class="party-view"><h2 class="st">Party</h2>';
   const activeSyns = getActiveSynergies();
@@ -14403,7 +14756,7 @@ function rParty(){
   h += '<div class="plist">';
   for(let p of G.party){
     h+='<div class="pcard '+(p.on?'':'locked')+'"><div class="pava" style="background:'+p.col+'20;border-color:'+p.col+'">'+(p.on?portraitImg(p.n.toLowerCase(), p.col+'30', p.n[0]):'<span style="font-size:20px">🔒</span>')+(p.on?'<span class="pava-role-badge" title="'+p.r+'">'+re(p.r)+'</span>':'')+'</div><div class="pinfo"><div class="pn">'+p.n+' <span class="pt">'+p.t+'</span></div><div class="pr" style="color:'+p.col+'">'+p.r+'</div><div class="pd">'+p.d+'</div><div class="pb">'+p.b+'</div>'+(p.on?'<div class="ps">HP:'+p.hp+'/'+p.mhp+' ATK:'+p.atk+(p.gear&&p.gear.atk?'(+'+p.gear.atk+')':'')+' DEF:'+p.def+(p.gear&&p.gear.def?'(+'+p.gear.def+')':'')+' SPD:'+p.spd+(p.gear&&p.gear.spd?'(+'+p.gear.spd+')':'')+(getBlessDef(p)?' <span style="color:var(--rest);font-weight:700;">🐱+10 DEF</span>':'')+'</div>':'')+(G.affinity[p.n]?'<div class="affinity-bar"><div class="affinity-fill '+getAffinityColor(G.affinity[p.n].val)+'" style="width:'+getAffinityBarPct(p.n)+'%"></div></div><div class="affinity-label">'+(G.affinity[p.n].val>=70?'💕 Close':G.affinity[p.n].val>=40?'💛 Friendly':G.affinity[p.n].val>=20?'💔 Distant':'💀 Strained')+' ('+G.affinity[p.n].val+')</div>':'')
-+(G.affinityUnlocks[p.n]?'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">'+G.affinityUnlocks[p.n].map(function(u){var un=p.affinityBonuses&&p.affinityBonuses.includes(u.id);return '<span title="'+u.d+'" style="font-size:9px;padding:2px 6px;border-radius:8px;border:1px solid '+(un?'var(--xp);color:var(--xp);':'var(--border);color:var(--text-dim);opacity:0.6;')+'">'+(un?'🌟 ':'🔒 ')+u.n+' ('+u.th+')</span>';}).join('')+'</div>':'')+rGrowthAbilityBadge(p.n)+'</div></div>';
++(G.affinityUnlocks[p.n]?'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">'+G.affinityUnlocks[p.n].map(function(u){var un=p.affinityBonuses&&p.affinityBonuses.includes(u.id);return '<span title="'+u.d+'" style="font-size:9px;padding:2px 6px;border-radius:8px;border:1px solid '+(un?'var(--xp);color:var(--xp);':'var(--border);color:var(--text-dim);opacity:0.6;')+'">'+(un?'🌟 ':'🔒 ')+u.n+' ('+u.th+')</span>';}).join('')+'</div>':'')+rGrowthAbilityBadge(p.n)+rCompanionPrestigeBadge(p.n)+'</div></div>';
     // === COMPANION EQUIPMENT (8 slots for most, reduced for Soel — see hiddenSlots) ===
     if(p.on || p.ul <= G.p.lvl){
       const role = getCompanionRole(p.n);
