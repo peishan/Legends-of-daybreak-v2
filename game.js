@@ -4146,6 +4146,15 @@ function checkDayAdvance() {
   if (G.focusHistory.length > 30) G.focusHistory = G.focusHistory.slice(-30);
 
   G.gameDay += daysPassed;
+
+  // Mercenary tier was scaling off a lifetime completed-contract count with no cap and
+  // no reset — meaning difficulty only ever ratcheted up, disconnected from actual
+  // player level, and got punishing fast for anyone doing this repeatable content
+  // often. Resetting daily keeps escalation contained to a single day's grinding.
+  if (G.mercenary.completed > 0) {
+    lg('📋 Mercenary contracts reset for the day \u2014 tier back to 1.');
+    G.mercenary.completed = 0;
+  }
   
   // Handle streak
   const missedDays = daysPassed - 1;
@@ -5505,7 +5514,7 @@ function exitSiegeDefense() {
 // quests, achievements, guild rep, mercenary tier, and dragon hunt clears are untouched;
 // this only resets the level/xp/base-stat track, since that's the part the curve problem
 // actually lives in.
-const PRESTIGE_MIN_LEVEL = 30;
+const PRESTIGE_MIN_LEVEL = 45;
 const PRESTIGE_XP_PCT_PER_LEVEL = 0.4;   // % permanent XP bonus banked per level at reset
 const PRESTIGE_GOLD_PCT_PER_LEVEL = 0.3; // % permanent gold bonus banked per level at reset
 const PRESTIGE_BONUS_CAP = 200;          // sanity ceiling so repeated resets can't run away
@@ -5537,6 +5546,9 @@ function doPrestige() {
   G.p.hp = 80; G.p.mhp = 80;
   G.p.mp = 120; G.p.mmp = 120;
   G.p.stats = { str: 4, dex: 6, con: 5, int: 12, wis: 10, cha: 8 };
+  G.mercenary.completed = 0; // otherwise a level-1 post-prestige character still faces
+                             // whatever mercenary tier was built up pre-reset — backwards
+                             // for what's supposed to be a fresh start.
 
   lg('🌟 PRESTIGE! Level ' + oldLvl + ' banked into a permanent +' + xpGain + '% XP / +' + goldGain + '% gold.');
   lg('   Total bonus now: +' + G.prestige.xpBonusPct.toFixed(1) + '% XP, +' + G.prestige.goldBonusPct.toFixed(1) + '% gold.');
@@ -13360,7 +13372,7 @@ function rPrestige() {
 
   h += '<div class="panel">';
   h += '<div class="panel-title" style="margin-bottom:8px;">What Happens</div>';
-  h += '<div class="btn-hint" style="line-height:1.6;">Resets to Level 1: character level, XP, HP/MP pools, and base stats.<br><br>Untouched: gold, gear, inventory, companions, story progress, quests, achievements, guild reputation, mercenary tier, and Dragon Hunt clears.<br><br>Zones re-lock naturally since access is just your current level \u2014 you\'ll climb back through them, but every fight now pays out the bonus above, permanently, on top of whatever you bank today.</div>';
+  h += '<div class="btn-hint" style="line-height:1.6;">Resets to Level 1: character level, XP, HP/MP pools, base stats, and mercenary tier.<br><br>Untouched: gold, gear, inventory, companions, story progress, quests, achievements, guild reputation, temple reputation, and Dragon Hunt clears.<br><br>Zones re-lock naturally since access is just your current level \u2014 you\'ll climb back through them, but every fight now pays out the bonus above, permanently, on top of whatever you bank today.</div>';
   h += '</div>';
 
   if (unlocked) {
