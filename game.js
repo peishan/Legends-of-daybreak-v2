@@ -4820,6 +4820,20 @@ function checkGuildUnlock() {
   }
 }
 
+// Fires exactly once, the moment the player crosses the threshold — previously nothing
+// announced these at all, so a player could hit 45 or 50 and have no idea Prestige,
+// all seven companion prestige paths, and San's Tier 4 capstones just became available.
+function checkPrestigeUnlockAnnouncements() {
+  if (G.p.lvl === PRESTIGE_MIN_LEVEL) {
+    lg('🌟 PRESTIGE UNLOCKED! Check the Prestige screen — bank a permanent bonus by resetting to Level 1.');
+    showToast('🌟 Prestige unlocked!', 'gold');
+  }
+  if (G.p.lvl === COMPANION_PRESTIGE_UNLOCK) {
+    lg('🌟 COMPANION PRESTIGE UNLOCKED! Every companion \u2014 and San\'s own spec paths \u2014 has a permanent choice waiting on their Party card / Skill Tree.');
+    showToast('🌟 Companion Prestige unlocked!', 'gold');
+  }
+}
+
 function getTempleRank() {
   let rank = 0;
   for (let r of TEMPLE_RANKS) { if (G.templeRep >= r.repReq) rank = r.rank; }
@@ -10545,6 +10559,7 @@ function lvlup(){
     checkJournalLevelUnlocks();
     checkStoryUnlock();
     checkGuildUnlock();
+    checkPrestigeUnlockAnnouncements();
     for (let q of G.quests) {
       if (!q.done && !(q.hidden && !q.revealed) && q.t === 'reach_level') {
         q.c = Math.min(G.p.lvl, q.need);
