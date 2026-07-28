@@ -399,7 +399,7 @@ const G = {
     { n: 'The Nexus', lv: 20, elem: 'arcane', d: "The heart of all dimensions. The Planarch waits here — or what remains of it. Five phases. No mercy.", en: ['Nexus Guardian','Planar Titan','The Nexus Planarch'], loot: ['Nexus Core','Planar Crown','Reality Key'], xp: 500, dg: 'impossible' },
 
         // === EXPANSION: LV 21+ ZONES ===
-    { n: 'The Fractured Veil', lv: 21, elem: 'arcane', d: 'Reality tears at the seams. Fragments of dead worlds float in crystalline silence.', en: ['Veil Wraith','Shardling','Echo Walker'], loot: ['Planar Essence','Aether Shard','Reality Fragment'], xp: 550, dg: 'impossible' },
+    { n: 'The Fractured Veil', lv: 21, elem: 'arcane', d: 'Reality tears at the seams. Fragments of dead worlds float in crystalline silence.', en: ['Veil Wraith','Shardling','Echo Walker','Fracture Hound'], loot: ['Planar Essence','Aether Shard','Reality Fragment'], xp: 550, dg: 'impossible' },
         // === PHASE 1 EXPANSION: LV 22-23 ZONES ===
     { n: 'The Astral Maelstrom', lv: 22, elem: 'arcane', d: 'A storm of raw planar energy where dimensions collide and unravel. Reality here is a suggestion, not a rule.', en: ['Astral Construct','Void Hound','Phase Walker','Rift Rat','Reality Weaver'], loot: ['Astral Dust','Void Fragment','Planar Essence','Reality Anchor'], xp: 600, dg: 'impossible' },
         { n: 'Infernal Crucible', lv: 23, elem: 'fire', d: 'The forge where stars are born and die. Magma rivers flow upward into a sky of eternal flame.', en: ['Ember Wraith','Ash Phantom','Flame Serpent','Magma Titan'], loot: ['Inferno Gem','Ash Crystal','Ember Core','Phoenix Ash'], xp: 680, dg: 'impossible' },
@@ -4571,8 +4571,19 @@ function generateDailyQuests() {
   
   G.dailyQuestSeed = G.gameDay;
   G.dailyQuests = [];
-  const pool = [...DAILY_QUESTS];
   
+  // Rest & Recover is guaranteed every day rather than competing for one of the 3
+  // random slots below — it's simple enough (and its own daily reset flags depend on
+  // it enough elsewhere) that it shouldn't be possible to just never see it that day.
+  const restTemplate = DAILY_QUESTS.find(t => t.id === 'dq5');
+  if (restTemplate) {
+    G.dailyQuests.push({
+      id: restTemplate.id, n: restTemplate.n, d: restTemplate.d, t: restTemplate.t,
+      c: 0, need: restTemplate.need, rw: restTemplate.rw, done: false
+    });
+  }
+
+  const pool = DAILY_QUESTS.filter(t => t.id !== 'dq5');
   for (let i = 0; i < 3 && pool.length > 0; i++) {
     const idx = Math.floor(Math.random() * pool.length);
     const template = pool.splice(idx, 1)[0];
@@ -5787,8 +5798,30 @@ const PRESTIGE_XP_PCT_PER_LEVEL = 0.4;   // % permanent XP bonus banked per leve
 const PRESTIGE_GOLD_PCT_PER_LEVEL = 0.3; // % permanent gold bonus banked per level at reset
 const PRESTIGE_BONUS_CAP = 200;          // sanity ceiling so repeated resets can't run away
 
-function getPrestigeXpMult() { return 1 + (G.prestige.xpBonusPct || 0) / 100; }
-function getPrestigeGoldMult() { return 1 + (G.prestige.goldBonusPct || 0) / 100; }
+// Milestones tied to prestige COUNT specifically, not the stacking level-scaled bonus
+// above — without these, prestiging once versus ten times was mechanically identical
+// except for a bigger number. These give repeated prestiging its own recognition.
+const PRESTIGE_MILESTONES = [
+  { count: 1, title: 'The Reborn', desc: 'A permanent +3% crit chance \u2014 something of every reset stays with you.', critBonus: 0.03 },
+  { count: 3, title: 'The Relentless', desc: 'A permanent 5% reduction to all damage taken. The road gets easier to walk, even starting over.', dmgReduction: 0.05 },
+  { count: 5, title: 'The Unbroken', desc: 'Another +8% XP, on top of everything already banked. Starting from Level 1 stops meaning starting from nothing.', xpBonusFlat: 0.08 },
+  { count: 10, title: 'The Eternal', desc: 'Another +10% gold, and a title that follows you into every reset from here on. There may not be a reason to stop.', goldBonusFlat: 0.10 }
+];
+
+function getPrestigeMilestonesEarned() {
+  const count = G.prestige.count || 0;
+  return PRESTIGE_MILESTONES.filter(m => count >= m.count);
+}
+function getPrestigeMilestoneBonus(key) {
+  return getPrestigeMilestonesEarned().reduce((sum, m) => sum + (m[key] || 0), 0);
+}
+function getPrestigeTitle() {
+  const earned = getPrestigeMilestonesEarned();
+  return earned.length > 0 ? earned[earned.length - 1].title : null;
+}
+
+function getPrestigeXpMult() { return 1 + (G.prestige.xpBonusPct || 0) / 100 + getPrestigeMilestoneBonus('xpBonusFlat'); }
+function getPrestigeGoldMult() { return 1 + (G.prestige.goldBonusPct || 0) / 100 + getPrestigeMilestoneBonus('goldBonusFlat'); }
 
 function isPrestigeUnlocked() {
   return G.p.lvl >= PRESTIGE_MIN_LEVEL;
@@ -5855,6 +5888,15 @@ const DRAGONS = [
     mechanic: 'rampage', rampageTurn: 3, rampageDmg: 140,
     desc: 'What comes after the Breaking finishes breaking. It doesn\'t breathe fire so much as unmake the air where you\'re standing, every 3 turns.',
     hoardGoldMin: 24000, hoardGoldMax: 38000, itemLevel: 55
+  },
+  {
+    id: 'nyxathorne',
+    n: 'Nyxathorne, the Unmended Wound',
+    unlockLevel: 55,
+    hp: 110000, mhp: 110000, atk: 420, def: 260, xp: 60000, g: 42000,
+    mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 27500,
+    desc: "Every other wound in this world eventually closed. This one refused, out of pure spite, and grew something that could fight back. It does not get weaker as it bleeds \u2014 it gets angrier, in four distinct, escalating stages. This is the fight that actually asks whether everything you have built \u2014 every path chosen, every reset banked, every rank earned \u2014 was for something, or just for its own sake.",
+    hoardGoldMin: 48000, hoardGoldMax: 78000, itemLevel: 55
   }
 ];
 // Kept for backward compat — old code/save fields that only knew about one dragon.
@@ -7471,6 +7513,12 @@ function doEnemyAttack(enemy) {
     }
   }
 
+  // Prestige Milestone "The Relentless" — permanent, party-wide damage reduction.
+  const prestigeDmgReduction = getPrestigeMilestoneBonus('dmgReduction');
+  if (prestigeDmgReduction > 0) {
+    finalDamage = Math.max(1, Math.floor(finalDamage * (1 - prestigeDmgReduction)));
+  }
+
   // Senedra's Pinning Shot: the enemy landed the hit, but weaker than it should have been.
   // Beastmaster deepens the reduction further.
   if (wasPinned) {
@@ -8406,6 +8454,13 @@ function pa(si, ti, isFreeCast) {
     lg('🛡️ Guild-honed instincts! ' + sk.n + ' strikes true!');
   }
 
+  // Prestige Milestone "The Reborn" — permanent crit bonus that persists across resets.
+  const prestigeCritBonus = getPrestigeMilestoneBonus('critBonus');
+  if (!isCrit && prestigeCritBonus > 0 && Math.random() < prestigeCritBonus) {
+    isCrit = true;
+    lg('🌟 Something from every reset stays with you. ' + sk.n + ' strikes true!');
+  }
+
   // DEX / proficiency / equipment crit chance — getTotalCritChance() was previously
   // only ever read for the HUD display text, never actually applied to a real roll.
   // The base 5% is already covered by the natural-20 mechanism in attackRoll(), and
@@ -9141,6 +9196,7 @@ function startRest(siteId) {
     
     lg('💧 You bathe in ' + site.name + '. MP fully restored! (' + remaining + ' uses left)');
     lg('✨ Mana Spring Blessing: +20% MP regen for 3 combats.');
+    checkDailyQuests('rest', 1);
     render();
     return;
   }
@@ -9211,7 +9267,6 @@ function startRest(siteId) {
       clearInterval(restTimer);
       restTimer = null;
       G.rest.active = false;
-      checkDailyQuests('rest', 1);
       G.rest.ambushPending = true;
       setTimeout(() => {
         G.rest.ambushPending = false;
@@ -9255,6 +9310,7 @@ function completeRest() {
 
   // Stronghold daily stipend — once per day, resting at a claimed stronghold site
   if (G.rest.selectedSite) grantStrongholdStipend(G.rest.selectedSite);
+  checkDailyQuests('rest', 1);
   // Affinity gain for resting together
   for (let p of G.party) { if (p.on) updateAffinity(p.n, 2); }
   // Track rest_with quest progress
@@ -12341,7 +12397,8 @@ function render(){
 
   const a=document.getElementById('app'); if(!a)return;
   let h='';
-  h+='<div class="hdr"><div class="hdr-l"><div class="pname">'+G.p.name+' <span class="cls">'+G.p.cls+'</span></div><div class="lvl">Lv.'+G.p.lvl+'</div></div>';
+  const prestigeTitle = getPrestigeTitle();
+  h+='<div class="hdr"><div class="hdr-l"><div class="pname">'+G.p.name+' <span class="cls">'+G.p.cls+'</span>'+(prestigeTitle ? ' <span class="cls" style="background:var(--gold);color:#000;">'+prestigeTitle+'</span>' : '')+'</div><div class="lvl">Lv.'+G.p.lvl+'</div></div>';
   h+='<div class="hdr-r"><div class="sb"><span class="si">HP</span><div class="bar"><div class="bf bf-hp" style="width:'+((G.p.hp/G.p.mhp)*100)+'%"></div></div><span class="bt">'+G.p.hp+'/'+G.p.mhp+'</span></div>';
   h+='<div class="sb"><span class="si">MP</span><div class="bar"><div class="bf bf-mp" style="width:'+((G.p.mp/G.p.mmp)*100)+'%"></div></div><span class="bt">'+G.p.mp+'/'+G.p.mmp+'</span></div>';
   h+='<div class="sb"><span class="si">XP</span><div class="bar"><div class="bf bf-xp" style="width:'+((G.p.xp/G.p.xpN)*100)+'%"></div></div><span class="bt">'+G.p.xp+'/'+G.p.xpN+'</span></div>';
@@ -13956,7 +14013,10 @@ function rDragonHunt() {
     if (clearedCount > 0) {
       h += '<div style="font-size:12px;color:var(--gold);font-weight:600;margin-bottom:10px;">🏆 Slain ' + clearedCount + ' time' + (clearedCount > 1 ? 's' : '') + '</div>';
     }
-    h += '<div class="btn-hint" style="margin-bottom:10px;">Breathes elemental devastation across the whole party every ' + dragon.rampageTurn + ' turns. Hoard on victory: ' + dragon.hoardGoldMin.toLocaleString() + '\u2013' + dragon.hoardGoldMax.toLocaleString() + 'G, 3 guaranteed Legendaries, 1 guaranteed Epic \u2014 on top of normal XP/gold.</div>';
+    const mechanicDesc = dragon.mechanic === 'phase'
+      ? 'Grows more dangerous through ' + dragon.phases + ' escalating phases as its HP drops \u2014 the fight gets harder, not easier, the longer it goes.'
+      : 'Breathes elemental devastation across the whole party every ' + dragon.rampageTurn + ' turns.';
+    h += '<div class="btn-hint" style="margin-bottom:10px;">' + mechanicDesc + ' Hoard on victory: ' + dragon.hoardGoldMin.toLocaleString() + '\u2013' + dragon.hoardGoldMax.toLocaleString() + 'G, 3 guaranteed Legendaries, 1 guaranteed Epic \u2014 on top of normal XP/gold.</div>';
 
     if (unlocked) {
       h += '<button onclick="startDragonHunt(\'' + dragon.id + '\')" class="abtn" style="width:100%;">🐉 Wake the Wyrm</button>';
@@ -13983,6 +14043,19 @@ function rPrestige() {
   h += '<div class="panel-title" style="color:var(--gold);">Current Permanent Bonus</div>';
   h += '<div style="font-size:24px;font-weight:700;margin:8px 0;color:var(--gold);">+' + (G.prestige.xpBonusPct || 0).toFixed(1) + '% XP &nbsp;\u00b7&nbsp; +' + (G.prestige.goldBonusPct || 0).toFixed(1) + '% Gold</div>';
   h += '<div class="btn-hint">' + (G.prestige.count || 0) + ' prestige' + ((G.prestige.count || 0) === 1 ? '' : 's') + ' so far</div>';
+  h += '</div>';
+
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">🌟 Milestones</div>';
+  h += '<div class="btn-hint" style="margin-bottom:10px;">Real, permanent rewards tied to how many times you\'ve done this \u2014 not just the stacking bonus above.</div>';
+  const prestigeCount = G.prestige.count || 0;
+  for (let m of PRESTIGE_MILESTONES) {
+    const earned = prestigeCount >= m.count;
+    h += '<div style="background:' + (earned ? 'color-mix(in srgb, var(--gold) 12%, transparent)' : 'var(--bg-hover)') + ';border:1px solid ' + (earned ? 'var(--gold)' : 'var(--border)') + ';border-radius:10px;padding:10px;margin-bottom:6px;' + (earned ? '' : 'opacity:0.55;') + '">';
+    h += '<div style="font-weight:800;font-size:12px;color:' + (earned ? 'var(--gold)' : 'var(--text-dim)') + ';">' + (earned ? '✅' : '🔒') + ' ' + m.title + ' \u2014 ' + m.count + ' prestige' + (m.count === 1 ? '' : 's') + '</div>';
+    h += '<div style="font-size:11px;color:var(--text-dim);margin-top:2px;">' + m.desc + '</div>';
+    h += '</div>';
+  }
   h += '</div>';
 
   h += '<div class="panel">';
@@ -15761,6 +15834,7 @@ function templeFullHeal() {
   G.p.buffs = G.p.buffs.filter(b => b.t > 0);
   lg('✨ The temple\'s light washes over you. Fully healed, fully restored.');
   for (let p of G.party) { if (p.on) updateAffinity(p.n, 2); }
+  checkDailyQuests('rest', 1);
 
   // Stronghold daily stipend, same as the regular rest path
   grantStrongholdStipend(site);
