@@ -8590,6 +8590,7 @@ function pa(si, ti, isFreeCast) {
   if (sk.status && tg.hp > 0) {
     const statusRoll = Math.random();
     if (statusRoll < sk.status.chance) {
+      if (!tg.status) tg.status = [];
       const existing = tg.status.find(s => s.type === sk.status.type);
       if (!existing) {
         tg.status.push({ ...sk.status, turns: sk.status.turns });
