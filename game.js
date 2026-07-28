@@ -372,7 +372,7 @@ const G = {
   ],
 
  
-    cbt: { on: false, turn: 0, en: [], sk: 0, tg: 0, autoFlee: false, autoCombat: isAutoCombatPreferred() },
+    cbt: { on: false, turn: 0, en: [], sk: 0, tg: 0, autoFlee: false, autoCombat: false },
   autoCombatHeartbeat: 0,
 
   zones: [
@@ -9016,6 +9016,11 @@ function toggleTheme() {
 
 // Initialize theme immediately
 initTheme();
+
+// Auto-combat default — set here rather than inline in the initial state object,
+// since that object is constructed at the very top of the script before
+// AUTO_COMBAT_PREF_KEY has been declared (a temporal dead zone crash otherwise).
+G.cbt.autoCombat = isAutoCombatPreferred();
 
 let restTimer = null;
 
