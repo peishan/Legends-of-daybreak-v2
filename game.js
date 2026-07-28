@@ -599,7 +599,7 @@ const G = {
     { id: 59, n: 'What the Choir Knows', d: 'The Closed Choir has the last of the answers. Finish what the investigation started', t: 'reach_level', c: 0, need: 34, rw: { xp: 5500, g: 3200, templeRep: 120 }, done: false, chain: 'ser_aldric', reqQuest: 58, hidden: true, revealed: false },
 
     // === TEMPLE QUESTS PART 2: THE SCATTERED CHOIR ===
-    { id: 60, n: 'The Scattered Choir', d: 'Reach Level 38 \u2014 Ser Aldric asks to help finish what started with him', t: 'reach_level', c: 0, need: 38, rw: { xp: 6500, g: 3800, templeRep: 60 }, done: false, chain: 'scattered_choir', reqQuest: 55 },
+    { id: 60, n: 'The Scattered Choir', d: 'Reach Level 38 \u2014 Ser Aldric asks to help finish what started with him', t: 'reach_level', c: 0, need: 38, rw: { xp: 6500, g: 3800, templeRep: 60 }, done: false, chain: 'scattered_choir', reqQuest: 55, hidden: true, revealed: false },
     { id: 61, n: 'Brother Iss, the Unraveled', d: 'Hunt down Brother Iss, the Unraveled', t: 'boss_specific', target: 'Brother Iss, the Unraveled', c: 0, need: 1, rw: { xp: 8200, g: 4800, templeRep: 110 }, done: false, chain: 'scattered_choir', reqQuest: 60, hidden: true, revealed: false },
     { id: 62, n: 'The Splintered Two', d: 'Hunt down The Splintered Two', t: 'boss_specific', target: 'The Splintered Two', c: 0, need: 1, rw: { xp: 10200, g: 6000, templeRep: 170 }, done: false, chain: 'scattered_choir', reqQuest: 61, hidden: true, revealed: false },
     { id: 63, n: 'Sister Wren, the Last Believer', d: 'Hunt down Sister Wren, the Last Believer, and let the Cult of the Closed Eye finally end', t: 'boss_specific', target: 'Sister Wren, the Last Believer', c: 0, need: 1, rw: { xp: 13500, g: 8200, templeRep: 280 }, done: false, chain: 'scattered_choir', reqQuest: 62, hidden: true, revealed: false },
@@ -2161,6 +2161,46 @@ storyJournal: {
           { speaker: 'Narrator', text: 'There is no grand ending to announce. No cult banner to tear down, no final speech. Just the truth, finally said out loud by the last person still carrying it, and someone who has already walked the same road sitting with her while she starts to put it down.' },
           { speaker: 'San', text: '"The Cult of the Closed Eye is over," you say, quietly, to Joel, to Ser Aldric, to no one in particular. "Not because we won. Because there is finally no one left who needs it to keep going."' },
           { speaker: 'Narrator', text: 'The temple will record it as a victory. It feels, more than anything, like the end of a very long, very sad conversation — the kind that never needed a monster to defeat, just someone willing to finally say the honest thing out loud.' }
+        ]
+      }
+
+      ,{
+        id: 'journal_057',
+        title: 'What Soel Actually Is',
+        chapter: 57,
+        unlockType: 'level',
+        unlockAt: 45,
+        icon: '🐱',
+        summary: "San finally asks the question she's been avoiding since the cardboard box under Joel's porch.",
+        scenes: [
+          { speaker: 'Narrator', text: 'It is Eliz who finally says it out loud, one quiet evening, watching Soel doze in a patch of light that should not exist indoors. "He does not warm up the way an ordinary cat would. He warms the room."' },
+          { speaker: 'San', text: '"I have been trying very hard not to think about it," you admit. "He was a kitten. An ordinary, starving kitten, under Joel\'s porch, in a cardboard box that should not have kept anything alive. I remember that part clearly."' },
+          { speaker: 'Eliz', text: '"That part is true," Eliz says, gently. "It is also not the whole of it anymore. I do not think it has been for a long time."' },
+          { speaker: 'Narrator', text: 'What Eliz explains, carefully, in the unhurried way she explains anything that might be frightening if said too fast: some bonds go further than fondness. Further than loyalty. When a small thing chooses a person — not adopts them, not merely lives alongside them, but genuinely chooses, the way Soel chose all of you — something old and mostly forgotten answers back.' },
+          { speaker: 'Eliz', text: '"He is still the kitten from the porch," she says. "He is also something the Breaking-era world barely had words for, and this mended one has even fewer. A warmth that decided to stay. As long as the family he chose holds together, I do not think he can be fully lost. Reduced, maybe. Hurt, certainly. But not lost."' },
+          { speaker: 'San', text: '"That is why he reforms," you say slowly. "Every time. Spirit flame. I thought it was just... a phrase."' },
+          { speaker: 'Eliz', text: '"It is not just a phrase," Eliz says. "It is the truest thing about him. He decided you were worth staying for. I do not think that decision has an expiration on it."' },
+          { speaker: 'Narrator', text: 'Soel opens one eye, entirely unbothered by being the subject of the conversation, and goes back to sleep in his patch of impossible light. Some things, apparently, do not need to be explained to be true. They just need someone willing to finally ask.' }
+        ]
+      }
+      ,{
+        id: 'journal_058',
+        title: 'The One He Chose Before',
+        chapter: 58,
+        unlockType: 'level',
+        unlockAt: 45,
+        icon: '❄️',
+        summary: "The truth behind the echo in Frostspire Ruins — and why Soel's choice matters more than anyone realized.",
+        scenes: [
+          { speaker: 'Narrator', text: 'Eliz is not finished. She hesitates before the rest of it, the way she hesitates before anything that might reopen a wound rather than close one.' },
+          { speaker: 'Eliz', text: '"Soel is not the first," she says. "Whatever this is, whatever choosing truly means — there have been others, before him. Old, and rare, and mostly forgotten now. Some of them did not get to keep what they chose."' },
+          { speaker: 'San', text: '"The echo," you say, understanding arriving slower than it should. "In the ruins. The cat that was not him."' },
+          { speaker: 'Eliz', text: '"An older one of his kind," Eliz confirms. "Who chose someone too, once, the way Soel chose you. And lost them — not to indifference. To the Breaking itself. Whoever they were, the world came apart around them before the bond could be enough to hold on to anything at all."' },
+          { speaker: 'Narrator', text: 'You think of the frost-covered throne, the translucent shape, the voice that called itself someone who failed. Not cruel. Not a warning. Just old grief, worn down to something almost gentle, watching to see if this time would go differently.' },
+          { speaker: 'Eliz', text: '"It has been watching for a long time, I think," Eliz says. "Waiting to see if any bond since would actually hold, all the way through. I believe that is what it meant, San. You took good care of him. Better than I did — that was not really about you at all. It was relief. The kind that only comes after a very long wait."' },
+          { speaker: 'San', text: '"Then Soel\'s Choice," you say, thinking of the ability, of the moment he pulls the whole family back from the brink at once, "is not just a power. It is him refusing to become that echo."' },
+          { speaker: 'Eliz', text: '"I think that is exactly what it is," Eliz agrees quietly. "Every time he holds on, somewhere, something very old finally gets to stop grieving. That is not a small thing to be part of. I do not think either of you should treat it like one."' },
+          { speaker: 'Narrator', text: 'Soel, still pretending to be asleep, presses closer against your leg — not a spirit, not a mystery, in that particular moment. Just warm, and chosen, and staying. The Breaking took so much from so many. It is a strange kind of grace, that the smallest things sometimes get to be the ones who finally hold on.' }
         ]
       }
 
@@ -11301,6 +11341,22 @@ function migrateContent(data) {
   
   if (!data.quests) data.quests = [];
   mergeByKey(data.quests, G.quests, q => q.id);
+
+  // Quest 60 ("The Scattered Choir") was originally saved without hidden:true, which
+  // meant checkQuestChains() could never reveal it — it would show a permanent lock
+  // regardless of whether quest 55 was actually completed. Correct existing saves
+  // based on the player's real progress, rather than leaving it stuck either way.
+  const q60 = data.quests.find(q => q.id === 60);
+  const q55 = data.quests.find(q => q.id === 55);
+  if (q60 && q60.hidden === undefined) {
+    if (q55 && q55.done) {
+      q60.hidden = false;
+      q60.revealed = true;
+    } else {
+      q60.hidden = true;
+      q60.revealed = false;
+    }
+  }
   
   if (!data.exploreEvents) data.exploreEvents = [];
   mergeByKey(data.exploreEvents, G.exploreEvents, e => e.n);
