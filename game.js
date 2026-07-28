@@ -7489,6 +7489,7 @@ function doEnemyAttack(enemy) {
     lg('❌ ' + enemy.n + ' misses ' + (target.n || 'you') + '!');
     return;
   }
+  const critTag = attackResult.isCrit ? ' 💥CRIT' : '';
   
   const damageResult = DICE.damageRoll({
     diceExpr: '1d6',
@@ -15054,6 +15055,35 @@ function rRestSitesMap(healerOk) {
   return h;
 }
 
+// One distinct symbol per spell, replacing the old generic buff/damage-only icons
+// (🛡️ for every buff, ⚡ for every damage spell) — the actual fix for combat feeling
+// congested, since spells become scannable by shape/color instead of requiring the
+// name to be read every time. Grouped by element below for consistency of feel.
+const SPELL_ICONS = {
+  // Arcane — offense
+  'Magic Missile': '🎯', 'Chromatic Orb': '🔮', 'Vampiric Touch': '🩸',
+  'Mind Shatter': '🧠', 'Mesmeric Hold': '🌀', 'Chaotic Surge': '🎰',
+  'Spectral Blade': '👻', 'Prismatic Spray': '🌈', 'Finger of Death': '☠️',
+  'Planar Banish': '🌌', 'Black Blade of Disaster': '⚔️',
+  // Arcane — buff/utility
+  'Shield': '🛡️', 'Evasion Ward': '💨', 'Greater Evasion': '🌪️',
+  'Haste': '⏩', 'Improved Haste': '⏭️', 'Time Lag': '⏳',
+  'Stoneskin': '🗿', 'Arcane Ward': '🔷', 'Wondrous Recall': '🔄',
+  'Wish Fulfilled': '⭐', 'Time Stop': '⏸️',
+  // Fire
+  'Fireball': '🔥', 'Sunfire': '☀️', 'Incendiary Cloud': '🌋',
+  'Sunburst': '💥', 'Meteor Swarm': '☄️',
+  // Ice
+  'Web of Frost': '❄️', 'Fireshield (Blue)': '🧊', 'Ice Storm': '🌨️', 'Cone of Cold': '🥶',
+  // Lightning
+  'Lightning Bolt': '⚡', 'Chain Lightning': '🌩️',
+  // Poison
+  'Withering Fog': '☣️', 'Horrid Wilting': '🥀'
+};
+function getSpellIcon(sk) {
+  return SPELL_ICONS[sk.n] || (sk.buff ? '🛡️' : '⚡'); // fallback for anything not listed, no regression
+}
+
 function rCbt() {
   let h = '<div class="combat-view"><h2 class="st">' + (G.currentBoss ? '⚔️ BOSS FIGHT' : 'Combat') + '</h2>';
 
@@ -15174,7 +15204,7 @@ function rCbt() {
     const sel = G.cbt.sk == i && !G.cbt.autoCombat;
     const highTier = Number(s.slotTier || 1) >= 4;
     h += '<div class="skill-box' + (sel ? ' sel' : '') + (!u ? ' dis' : '') + (highTier ? ' elite' : '') + '" data-i="' + i + '" title="' + s.n + ' — ' + costLabel + ' · ' + (s.dmg || 'Buff') + ' · ' + s.d.replace(/"/g, '&quot;') + '">';
-    h += '<div class="skill-box-icon">' + (s.buff ? '🛡️' : '⚡') + '</div><div class="skill-box-name">' + s.n + '</div><div class="skill-box-cost">' + costLabel + '</div>';
+    h += '<div class="skill-box-icon">' + getSpellIcon(s) + '</div><div class="skill-box-name">' + s.n + '</div><div class="skill-box-cost">' + costLabel + '</div>';
     h += '</div>';
   }
   h += '</div>';
@@ -15379,7 +15409,7 @@ function rSkills(){
     h += 'Tier ' + t + ' <span style="font-weight:400;color:var(--text-dim);">(' + tierLearned + '/' + tierSkills.length + ')</span></div>';
     for(let s of tierSkills){
       const st=s.on?'LEARNED':'Unlocks Lv.'+s.ul;
-      h+='<div class="skcard '+(s.on?'':'locked')+'"><div class="skh"><span class="ski">'+(s.buff?'🛡️':'⚡')+'</span><span class="skt">'+s.n+'</span><span class="sks">'+st+'</span></div><div class="skd"><span class="dp">'+s.c+' MP</span><span class="dp">'+(s.dmg||'Buff')+'</span></div><div class="skdsc">'+s.d+'</div></div>';
+      h+='<div class="skcard '+(s.on?'':'locked')+'"><div class="skh"><span class="ski">'+getSpellIcon(s)+'</span><span class="skt">'+s.n+'</span><span class="sks">'+st+'</span></div><div class="skd"><span class="dp">'+s.c+' MP</span><span class="dp">'+(s.dmg||'Buff')+'</span></div><div class="skdsc">'+s.d+'</div></div>';
     }
   }
 
