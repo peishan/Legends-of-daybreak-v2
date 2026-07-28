@@ -598,6 +598,12 @@ const G = {
     { id: 58, n: "The Closed Eye's Hand", d: 'What Sister Maren knew, she cannot tell you anymore \u2014 but her Zealots left records', t: 'kill', c: 0, need: 10, rw: { xp: 3200, g: 1900, templeRep: 70 }, done: false, chain: 'ser_aldric', reqQuest: 57, hidden: true, revealed: false },
     { id: 59, n: 'What the Choir Knows', d: 'The Closed Choir has the last of the answers. Finish what the investigation started', t: 'reach_level', c: 0, need: 34, rw: { xp: 5500, g: 3200, templeRep: 120 }, done: false, chain: 'ser_aldric', reqQuest: 58, hidden: true, revealed: false },
 
+    // === TEMPLE QUESTS PART 2: THE SCATTERED CHOIR ===
+    { id: 60, n: 'The Scattered Choir', d: 'Reach Level 38 \u2014 Ser Aldric asks to help finish what started with him', t: 'reach_level', c: 0, need: 38, rw: { xp: 6500, g: 3800, templeRep: 60 }, done: false, chain: 'scattered_choir', reqQuest: 55 },
+    { id: 61, n: 'Brother Iss, the Unraveled', d: 'Hunt down Brother Iss, the Unraveled', t: 'boss_specific', target: 'Brother Iss, the Unraveled', c: 0, need: 1, rw: { xp: 8200, g: 4800, templeRep: 110 }, done: false, chain: 'scattered_choir', reqQuest: 60, hidden: true, revealed: false },
+    { id: 62, n: 'The Splintered Two', d: 'Hunt down The Splintered Two', t: 'boss_specific', target: 'The Splintered Two', c: 0, need: 1, rw: { xp: 10200, g: 6000, templeRep: 170 }, done: false, chain: 'scattered_choir', reqQuest: 61, hidden: true, revealed: false },
+    { id: 63, n: 'Sister Wren, the Last Believer', d: 'Hunt down Sister Wren, the Last Believer, and let the Cult of the Closed Eye finally end', t: 'boss_specific', target: 'Sister Wren, the Last Believer', c: 0, need: 1, rw: { xp: 13500, g: 8200, templeRep: 280 }, done: false, chain: 'scattered_choir', reqQuest: 62, hidden: true, revealed: false },
+
   ],
 
    bounties: [
@@ -1102,6 +1108,15 @@ const G = {
       mechanic: 'apocalypse', apocalypseTurn: 5, desc: 'Not one voice but many, singing the same hymn to the Breaking in perfect, practiced unison. They believe the mended world is the lie. They may be the only people left who miss the catastrophe.' },
     { n: 'The Hollow Prophet', zone: 'Temple Hunt: Where the Break Began', hp: 23500, mhp: 23500, atk: 268, def: 160, xp: 13000, g: 8000,
       mechanic: 'cosmic', desc: "Their leader, and the only one among them who never actually believed the doctrine \u2014 just found it useful. Grief is easy to weaponize. The Hollow Prophet has been doing exactly that since the day the world dared to heal." },
+
+    // === TEMPLE HUNTS PART 2: THE SCATTERED CHOIR ===
+    // No leader left to give the grief a shape. What's left is worse in a different way.
+    { n: 'Brother Iss, the Unraveled', zone: 'Temple Hunt: The Scattered Choir I', hp: 15400, mhp: 15400, atk: 214, def: 128, xp: 7400, g: 4200,
+      mechanic: 'apocalypse', apocalypseTurn: 5, desc: "He believed the doctrine completely, right up until the moment its author died proving he never had. Whatever he is now, it isn't faith. It's just what's left when faith gets pulled out from under someone all at once." },
+    { n: 'The Splintered Two', zone: 'Temple Hunt: The Scattered Choir II', hp: 18200, mhp: 18200, atk: 234, def: 140, xp: 9200, g: 5400,
+      mechanic: 'rampage', rampageTurn: 3, rampageDmg: 88, desc: 'Two of the Prophet\'s closest, now turning the doctrine into a private war between themselves. Anyone caught between them is just in the way.' },
+    { n: 'Sister Wren, the Last Believer', zone: 'Temple Hunt: The Scattered Choir III', hp: 21800, mhp: 21800, atk: 258, def: 154, xp: 12200, g: 7200,
+      mechanic: 'cosmic', desc: "She was close enough to the Prophet to know he never believed a word of it. She chose to keep believing anyway \u2014 not because the doctrine held up, but because stopping meant admitting what she'd lost people over wasn't real." },
   ],
 
   currentBoss: null,
@@ -2109,6 +2124,43 @@ storyJournal: {
           { speaker: 'San', text: '"You are allowed to have been shaken," you tell him. "That is not the same as having fallen."' },
           { speaker: 'Ser Aldric', text: '"I know the difference, intellectually," he says. "Give me time to know it the rest of the way too."' },
           { speaker: 'Narrator', text: 'You bring him back to the temple less like a rescued hostage and more like someone returning from a long illness — alive, which was never guaranteed, and changed, which was never going to be avoidable either. The temple marks the investigation closed. Ser Aldric, privately, does not consider himself finished with it at all.' }
+        ]
+      }
+
+      ,{
+        id: 'journal_055',
+        title: "What Faith Does Without Anyone to Follow",
+        chapter: 55,
+        unlockType: 'level',
+        unlockAt: 38,
+        icon: '🕯️',
+        summary: "Ser Aldric asks to help finish what the Cult of the Closed Eye left scattered behind it.",
+        scenes: [
+          { speaker: 'Narrator', text: "Ser Aldric finds you at the temple, not summoned, not assigned — just there, the way someone shows up when they have finally decided something for themselves instead of having it decided for them." },
+          { speaker: 'Ser Aldric', text: '"The Hollow Prophet is dead," he says. "But he was never the whole of it. There were others — people I lived among, for a while. Most of them believed something real, even if he never did. I do not think that belief just stops because the person who gave it a shape is gone."' },
+          { speaker: 'San', text: '"You want to find them," you say. Not a question.' },
+          { speaker: 'Ser Aldric', text: '"I want to finish something," he says. "I was the one they tried to convince. I would like to be the one who makes sure it actually ends, instead of just scattering into something worse with no one steering it at all."' },
+          { speaker: 'Narrator', text: 'It is not a request for rescue this time. You have done that already, and it changed him, and he has spent the time since deciding what to do with the change rather than just recovering from it.' },
+          { speaker: 'San', text: '"Then we finish it together," you tell him. "Properly, this time. Not scattered pieces left to whoever finds them first."' },
+          { speaker: 'Ser Aldric', text: '"Properly," he agrees, and for the first time since you found him, he sounds like he means to be the one doing the finding instead of the one who has to be found.' }
+        ]
+      }
+      ,{
+        id: 'journal_056',
+        title: 'The Last of the Believing',
+        chapter: 56,
+        unlockType: 'boss',
+        unlockAt: 'Sister Wren, the Last Believer',
+        icon: '🕯️',
+        summary: 'The Cult of the Closed Eye finally, actually ends — not with a monster, but with someone choosing to stop.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Sister Wren does not fight like someone defending a doctrine. She fights like someone defending the last thing she has left to have been right about.' },
+          { speaker: 'San', text: '"You knew," you say, once it is over, before she stops breathing hard enough to answer. "About the Prophet. That he never actually believed any of it."' },
+          { speaker: 'Sister Wren', text: '"I knew," she admits. "I kept going anyway. Stopping would have meant admitting what I already gave up for it was never worth giving up. It is a very hard thing, to be that honest with yourself. I was not ready. I am still not sure I am."' },
+          { speaker: 'Ser Aldric', text: '"Neither was I, for a long time," Ser Aldric says, kneeling beside her, no triumph in it at all. "It gets a little easier. Not all at once. But it does."' },
+          { speaker: 'Narrator', text: 'There is no grand ending to announce. No cult banner to tear down, no final speech. Just the truth, finally said out loud by the last person still carrying it, and someone who has already walked the same road sitting with her while she starts to put it down.' },
+          { speaker: 'San', text: '"The Cult of the Closed Eye is over," you say, quietly, to Joel, to Ser Aldric, to no one in particular. "Not because we won. Because there is finally no one left who needs it to keep going."' },
+          { speaker: 'Narrator', text: 'The temple will record it as a victory. It feels, more than anything, like the end of a very long, very sad conversation — the kind that never needed a monster to defeat, just someone willing to finally say the honest thing out loud.' }
         ]
       }
 
@@ -5860,7 +5912,10 @@ const TEMPLE_HUNT_ESCORTS = {
   'Brother Vess, the First Blind': { mook: 'Closed Eye Acolyte', count: 2, zoneLv: 19 },
   'Sister Maren, Keeper of Silence': { mook: 'Closed Eye Zealot', count: 2, zoneLv: 27 },
   'The Closed Choir': { mook: 'Closed Eye Warden', count: 2, zoneLv: 34 },
-  'The Hollow Prophet': { mook: 'Closed Eye Warden', count: 3, zoneLv: 45 }
+  'The Hollow Prophet': { mook: 'Closed Eye Warden', count: 3, zoneLv: 45 },
+  'Brother Iss, the Unraveled': { mook: 'Closed Eye Warden', count: 2, zoneLv: 38 },
+  'The Splintered Two': { mook: 'Closed Eye Warden', count: 2, zoneLv: 41 },
+  'Sister Wren, the Last Believer': { mook: 'Closed Eye Warden', count: 3, zoneLv: 44 }
 };
 
 function startTempleHunt(bossName) {
@@ -15543,7 +15598,7 @@ function rTemple() {
 
   // Cult of the Closed Eye hunts — only shown for whichever target the temple is
   // currently asking you to hunt, via the underlying quest chain.
-  const cultBosses = ['Brother Vess, the First Blind', 'Sister Maren, Keeper of Silence', 'The Closed Choir', 'The Hollow Prophet'];
+  const cultBosses = ['Brother Vess, the First Blind', 'Sister Maren, Keeper of Silence', 'The Closed Choir', 'The Hollow Prophet', 'Brother Iss, the Unraveled', 'The Splintered Two', 'Sister Wren, the Last Believer'];
   const activeHunts = cultBosses.map(n => ({ name: n, quest: getTempleHuntQuest(n) })).filter(h => h.quest);
   if (activeHunts.length > 0) {
     h2 += '<div class="panel" style="text-align:left;margin-top:16px;border-color:var(--danger);">';
