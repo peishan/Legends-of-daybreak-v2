@@ -11348,6 +11348,17 @@ function getSpeakerColor(speaker) {
   return null;
 }
 
+// Mirrors getSpeakerColor()'s exact lookup — San, a party member, or nobody
+// recognizable (Narrator, one-off NPCs, bosses/echoes). Returns null in the last
+// two cases so scenes without a real portrait render exactly as they did before.
+function getSpeakerPortrait(speaker) {
+  if (speaker === 'San') return portraitImg('san', '#7c3aed30', 'S');
+  if (speaker === 'Narrator') return null;
+  const member = G.party.find(p => p.n === speaker);
+  if (member) return portraitImg(speaker.toLowerCase(), member.col + '30', speaker[0]);
+  return null;
+}
+
 // === ENEMY ICONS: geometric SVG silhouettes, replacing emoji ===
 // Rather than hand-map every enemy name (impossible to keep up with new content),
 // enemies are classified into archetypes by keyword, each with one simple geometric
@@ -12573,7 +12584,7 @@ function render(){
   const a=document.getElementById('app'); if(!a)return;
   let h='';
   const prestigeTitle = getPrestigeTitle();
-  h+='<div class="hdr"><div class="hdr-l"><div class="pname">'+G.p.name+' <span class="cls">'+G.p.cls+'</span>'+(prestigeTitle ? ' <span class="cls" style="background:var(--gold);color:#000;">'+prestigeTitle+'</span>' : '')+'</div><div class="lvl">Lv.'+G.p.lvl+'</div></div>';
+  h+='<div class="hdr"><div class="hdr-l"><div class="hdr-portrait">'+getSpeakerPortrait('San')+'</div><div class="pname">'+G.p.name+' <span class="cls">'+G.p.cls+'</span>'+(prestigeTitle ? ' <span class="cls" style="background:var(--gold);color:#000;">'+prestigeTitle+'</span>' : '')+'</div><div class="lvl">Lv.'+G.p.lvl+'</div></div>';
   h+='<div class="hdr-r">';
   h+='<div class="sb"><div class="sb-row"><span class="si">HP</span><div class="bar"><div class="bf bf-hp" style="width:'+((G.p.hp/G.p.mhp)*100)+'%"></div></div></div><span class="bt">'+G.p.hp+'/'+G.p.mhp+'</span></div>';
   h+='<div class="sb"><div class="sb-row"><span class="si">MP</span><div class="bar"><div class="bf bf-mp" style="width:'+((G.p.mp/G.p.mmp)*100)+'%"></div></div></div><span class="bt">'+G.p.mp+'/'+G.p.mmp+'</span></div>';
@@ -13132,17 +13143,27 @@ function rJournalEntry(jid){
   h+='<div style="width:100%;height:4px;background:var(--timer-bg);border-radius:2px;margin-bottom:24px;">';
   h+='<div style="width:100%;height:100%;background:var(--accent);border-radius:2px;"></div></div>';
   
-  for(let scene of entry.scenes){
+  for(let i=0; i<entry.scenes.length; i++){
+    const scene = entry.scenes[i];
     const speakerColor = getSpeakerColor(scene.speaker);
+    const portrait = getSpeakerPortrait(scene.speaker);
     const isDialogue = scene.speaker !== 'Narrator';
     const sceneClass = isDialogue ? 'journal-scene journal-scene-dialogue' : 'journal-scene journal-scene-narrator';
     const textClass = isDialogue ? 'journal-text journal-text-dialogue' : 'journal-text journal-text-narrator';
-    const styleAttr = speakerColor ? ' style="--e-speaker:' + speakerColor + ';"' : '';
+    const delayStyle = 'animation-delay:' + Math.min(i * 0.12, 1.2) + 's;';
+    const styleAttr = ' style="' + delayStyle + (speakerColor ? '--e-speaker:' + speakerColor + ';' : '') + '"';
     h+='<div class="'+sceneClass+'"'+styleAttr+'>';
+    if (isDialogue && portrait) {
+      h+='<div class="journal-portrait-circle">'+portrait+'</div>';
+      h+='<div class="journal-dialogue-body">';
+    }
     if (isDialogue) {
       h+='<div class="journal-speaker">'+scene.speaker+'</div>';
     }
     h+='<div class="'+textClass+'">'+scene.text+'</div>';
+    if (isDialogue && portrait) {
+      h+='</div>';
+    }
     h+='</div>';
   }
   
@@ -13154,11 +13175,14 @@ function rJournalEntry(jid){
 function rStory(){
   const chapter = G.storyChapters[G.story.chapter];
   const scene = chapter.scenes[G.story.scene];
+  const portrait = getSpeakerPortrait(scene.speaker);
   let h='<div class="story-view" style="text-align:center;padding:20px;">';
   h+='<div style="font-size:12px;color:var(--accent-light);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;">Chapter '+(G.story.chapter+1)+': '+chapter.title+'</div>';
-  h+='<div class="dialogue-box" style="margin-bottom:24px;">';
+  h+='<div class="dialogue-box" style="margin-bottom:24px;'+(portrait ? 'display:flex;gap:12px;align-items:flex-start;text-align:left;' : '')+'">';
+  if (portrait) h+='<div class="journal-portrait-circle">'+portrait+'</div><div style="flex:1;min-width:0;">';
   h+='<div class="d-speaker">'+scene.speaker+'</div>';
   h+='<div class="d-text" style="font-size:15px;line-height:1.7;">'+scene.text+'</div>';
+  if (portrait) h+='</div>';
   h+='</div>';
   h+='<button class="abtn" style="max-width:200px;margin:0 auto;display:block;">Continue</button>';
   h+='<div style="margin-top:16px;font-size:11px;color:var(--text-dim);">'+(G.story.scene+1)+' / '+chapter.scenes.length+'</div>';
