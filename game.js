@@ -8857,6 +8857,135 @@ function initTheme() {
   }
 }
 
+// === MUSIC SYSTEM ===
+// Loaded on-demand rather than pre-cached — these are large files (30-80s loops,
+// several MB each) and pre-caching all 8 via the service worker would meaningfully
+// bloat first-load size and could bump into mobile cache storage limits. Only the
+// currently-playing track is ever fetched.
+const MUSIC_KEY = 'ldb_music_enabled';
+const MUSIC_VOL_KEY = 'ldb_music_volume';
+
+const MUSIC_TRACKS = {
+  explore: { file: 'kaazoom-the-forgotten-keep-night-version-full-version-572748.mp3', name: 'The Forgotten Keep' },
+  combat_a: { file: 'vespidaze-upbeat-rpg-battle-460971.mp3', name: 'Upbeat RPG Battle' },
+  combat_b: { file: 'hauntsync-rpg-battle-chiptune-video-game-music-346666.mp3', name: 'RPG Battle Chiptune' },
+  boss: { file: 'the_mountain-battle-music-179502.mp3', name: 'Battle Music' },
+  nightmare: { file: 'psychronic-battle-of-the-abyss-227337.mp3', name: 'Battle of the Abyss' },
+  dragon: { file: '17406877-battle-of-the-dragons-8037.mp3', name: 'Battle of the Dragons' },
+  siege: { file: 'dummy_daniel-under-siege-490053.mp3', name: 'Under Siege' },
+  raid: { file: 'psychronic-one-life-left-to-live-227310.mp3', name: 'One Life Left to Live' }
+};
+
+let _musicAudioEl = null;
+let _musicCurrentKey = null;
+let _musicFadeInterval = null;
+
+function isMusicEnabled() {
+  const saved = localStorage.getItem(MUSIC_KEY);
+  return saved === null ? false : saved === 'true'; // opt-in by default, not opt-out
+}
+function getMusicVolume() {
+  const saved = localStorage.getItem(MUSIC_VOL_KEY);
+  return saved === null ? 0.5 : parseFloat(saved);
+}
+
+function toggleMusic() {
+  const next = !isMusicEnabled();
+  localStorage.setItem(MUSIC_KEY, String(next));
+  if (next) {
+    lg('🎵 Music enabled.');
+    if (_musicCurrentKey) playMusic(_musicCurrentKey, true);
+  } else {
+    lg('🔇 Music disabled.');
+    stopMusic();
+  }
+  render();
+}
+
+function setMusicVolume(vol) {
+  localStorage.setItem(MUSIC_VOL_KEY, String(vol));
+  if (_musicAudioEl) _musicAudioEl.volume = vol;
+}
+
+// Fades the currently playing track out, swaps the source, fades the new one in.
+// Skips entirely (just updates the tracked key) if music is off or the requested
+// track is already playing, so this is safe to call on every state change without
+// needing to check "is this actually a change" at every call site.
+function playMusic(trackKey, force) {
+  if (trackKey === _musicCurrentKey && !force) return;
+  _musicCurrentKey = trackKey;
+  if (!isMusicEnabled()) return;
+  const track = MUSIC_TRACKS[trackKey];
+  if (!track) return;
+
+  if (_musicFadeInterval) clearInterval(_musicFadeInterval);
+
+  const startNew = () => {
+    if (!_musicAudioEl) {
+      _musicAudioEl = new Audio();
+      _musicAudioEl.loop = true;
+    }
+    _musicAudioEl.src = './audio/' + track.file;
+    _musicAudioEl.volume = 0;
+    _musicAudioEl.play().catch(() => {}); // ignore autoplay-block errors, matches typical browser policy until a user gesture happens
+    const targetVol = getMusicVolume();
+    let vol = 0;
+    _musicFadeInterval = setInterval(() => {
+      vol = Math.min(targetVol, vol + 0.05);
+      _musicAudioEl.volume = vol;
+      if (vol >= targetVol) clearInterval(_musicFadeInterval);
+    }, 80);
+  };
+
+  if (_musicAudioEl && !_musicAudioEl.paused) {
+    let vol = _musicAudioEl.volume;
+    _musicFadeInterval = setInterval(() => {
+      vol = Math.max(0, vol - 0.08);
+      _musicAudioEl.volume = vol;
+      if (vol <= 0) {
+        clearInterval(_musicFadeInterval);
+        startNew();
+      }
+    }, 60);
+  } else {
+    startNew();
+  }
+}
+
+function stopMusic() {
+  _musicCurrentKey = null;
+  if (_musicFadeInterval) clearInterval(_musicFadeInterval);
+  if (_musicAudioEl) {
+    _musicFadeInterval = setInterval(() => {
+      const vol = Math.max(0, _musicAudioEl.volume - 0.08);
+      _musicAudioEl.volume = vol;
+      if (vol <= 0) {
+        clearInterval(_musicFadeInterval);
+        _musicAudioEl.pause();
+      }
+    }, 60);
+  }
+}
+
+// Picks the right track for whatever's currently happening — called from render()
+// so it stays in sync with every state change automatically, rather than needing
+// a manual call added at every single place combat/exploration can start.
+function updateMusicForState() {
+  if (G.state === 'combat') {
+    if (G.dragonHunt.active) { playMusic('dragon'); return; }
+    if (G.siegeDefense.active) { playMusic('siege'); return; }
+    if (G.raid.active || G.bossRush?.active) { playMusic('raid'); return; }
+    if (G.endlessGrind.active && G.endlessGrind.difficulty === 'nightmare') { playMusic('nightmare'); return; }
+    if (G.currentBoss) { playMusic('boss'); return; }
+    // Alternate between the two general combat tracks by wave/kill parity, so
+    // regular fights don't play the identical loop every single time.
+    const useAlt = ((G.p.kills || 0) % 2) === 0;
+    playMusic(useAlt ? 'combat_b' : 'combat_a');
+  } else {
+    playMusic('explore');
+  }
+}
+
 function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme');
   const next = current === 'light' ? 'dark' : 'light';
@@ -12388,6 +12517,8 @@ function render(){
     return;
   }
 
+  updateMusicForState();
+
   // AFK Adventure Mode — same idea, but checked on activity alone rather than a
   // specific G.state, since this mode cycles between 'explore' and 'combat' every
   // single encounter (unlike Grind's autoNext, which stays in 'combat' throughout).
@@ -14670,6 +14801,19 @@ function rMenu(){
   h+='<button onclick="toggleTheme()" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:10px 20px;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;">';
   h+= isLight ? '🌙 Dark Mode' : '☀️ Light Mode';
   h+='</button></div>';
+
+  // Music controls
+  const musicOn = isMusicEnabled();
+  h+='<div style="margin-top:16px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;">';
+  h+='<h3 style="font-size:14px;margin-bottom:10px;color:var(--accent-light);">🎵 Music</h3>';
+  h+='<button onclick="toggleMusic()" style="background:'+(musicOn ? 'var(--accent)' : 'var(--bg-hover)')+';border:1px solid '+(musicOn ? 'var(--accent)' : 'var(--border)')+';border-radius:12px;padding:10px 20px;color:'+(musicOn ? 'white' : 'var(--text)')+';font-size:13px;font-weight:600;cursor:pointer;margin-bottom:10px;">';
+  h+= musicOn ? '🎵 Music On' : '🔇 Music Off';
+  h+='</button>';
+  if (musicOn) {
+    h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:4px;">Volume</div>';
+    h+='<input type="range" min="0" max="1" step="0.05" value="'+getMusicVolume()+'" oninput="setMusicVolume(parseFloat(this.value))" style="width:80%;accent-color:var(--accent);">';
+  }
+  h+='</div>';
   h+='<div style="margin-top:16px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:14px;">';
   h+='<h3 style="font-size:14px;margin-bottom:10px;color:var(--accent-light);">Save Data</h3>';
   h+='<div style="display:flex;gap:8px;flex-wrap:wrap;">';
