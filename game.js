@@ -6201,7 +6201,12 @@ function startChainQuest(chainId) {
   if (!chain) return;
   if (!isChainQuestUnlocked(chain)) { lg('🔒 ' + chain.name + ' unlocks at Level ' + chain.unlockLevel + '.'); return; }
   const prog = getChainProgress(chainId);
-  if (prog.cleared) { lg('✅ ' + chain.name + ' is already complete.'); return; }
+  if (prog.cleared) {
+    // Repeatable — reset to floor 1 for a fresh descent rather than blocking entirely.
+    prog.stageIndex = 0;
+    prog.cleared = false;
+    lg('🔄 ' + chain.name + ' resets. The vault refills, somehow, the way these things always seem to.');
+  }
   prog.active = true;
   G.activeChainQuestId = chainId;
   spawnChainQuestStage();
@@ -6268,6 +6273,7 @@ function handleChainQuestVictory() {
 
   if (prog.stageIndex >= chain.stages.length) {
     prog.cleared = true;
+    prog.clearCount = (prog.clearCount || 0) + 1;
     prog.active = false;
     G.activeChainQuestId = null;
     lg('🏆 ' + chain.name.toUpperCase() + ' COMPLETE! The vault is yours \u2014 for whatever that\'s worth now.');
@@ -12399,9 +12405,10 @@ function render(){
   let h='';
   const prestigeTitle = getPrestigeTitle();
   h+='<div class="hdr"><div class="hdr-l"><div class="pname">'+G.p.name+' <span class="cls">'+G.p.cls+'</span>'+(prestigeTitle ? ' <span class="cls" style="background:var(--gold);color:#000;">'+prestigeTitle+'</span>' : '')+'</div><div class="lvl">Lv.'+G.p.lvl+'</div></div>';
-  h+='<div class="hdr-r"><div class="sb"><span class="si">HP</span><div class="bar"><div class="bf bf-hp" style="width:'+((G.p.hp/G.p.mhp)*100)+'%"></div></div><span class="bt">'+G.p.hp+'/'+G.p.mhp+'</span></div>';
-  h+='<div class="sb"><span class="si">MP</span><div class="bar"><div class="bf bf-mp" style="width:'+((G.p.mp/G.p.mmp)*100)+'%"></div></div><span class="bt">'+G.p.mp+'/'+G.p.mmp+'</span></div>';
-  h+='<div class="sb"><span class="si">XP</span><div class="bar"><div class="bf bf-xp" style="width:'+((G.p.xp/G.p.xpN)*100)+'%"></div></div><span class="bt">'+G.p.xp+'/'+G.p.xpN+'</span></div>';
+  h+='<div class="hdr-r">';
+  h+='<div class="sb"><div class="sb-row"><span class="si">HP</span><div class="bar"><div class="bf bf-hp" style="width:'+((G.p.hp/G.p.mhp)*100)+'%"></div></div></div><span class="bt">'+G.p.hp+'/'+G.p.mhp+'</span></div>';
+  h+='<div class="sb"><div class="sb-row"><span class="si">MP</span><div class="bar"><div class="bf bf-mp" style="width:'+((G.p.mp/G.p.mmp)*100)+'%"></div></div></div><span class="bt">'+G.p.mp+'/'+G.p.mmp+'</span></div>';
+  h+='<div class="sb"><div class="sb-row"><span class="si">XP</span><div class="bar"><div class="bf bf-xp" style="width:'+((G.p.xp/G.p.xpN)*100)+'%"></div></div></div><span class="bt">'+G.p.xp.toLocaleString()+'/'+G.p.xpN.toLocaleString()+' ('+Math.floor((G.p.xp/G.p.xpN)*100)+'%)</span></div>';
   h+='<div class="gold">GOLD: '+G.p.gold+'</div></div></div>';
   if(G.p.buffs.length>0)h+='<div class="buffs">'+G.p.buffs.map(b=>'<span class="bp">'+b.n+' ('+b.t+')</span>').join('')+'</div>';
   if(G.p.ailments.length>0)h+='<div class="buffs">'+G.p.ailments.map(a=>'<span class="bp" style="background:var(--danger);">'+AILMENT_TYPES[a.type].icon+' '+a.n+'</span>').join('')+'</div>';
@@ -13857,7 +13864,7 @@ function rMercenary() {
 function rChainQuest() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">📜 Chain Quests</div>';
-  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">One-time descents, not repeatable grinds \u2014 floor by floor, full recovery between each, ending in a payout bigger than anything else in the game. Leave and come back anytime; your floor is saved.</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Deliberate descents, not repeatable grinds \u2014 floor by floor, full recovery between each, ending in a payout bigger than anything else in the game. Leave and come back anytime; your floor is saved. Repeatable once cleared.</div>';
 
   for (let chain of CHAIN_QUESTS) {
     const unlocked = isChainQuestUnlocked(chain);
@@ -13875,8 +13882,10 @@ function rChainQuest() {
     }
 
     if (prog.cleared) {
-      h += '<div style="font-size:12px;color:var(--gold);font-weight:600;margin:8px 0;">🏆 Complete</div>';
-      h += '<div class="btn-hint">' + chain.intro + '</div>';
+      h += '<div style="font-size:12px;color:var(--gold);font-weight:600;margin:8px 0;">🏆 Complete \u2014 ' + (prog.clearCount || 1) + ' time' + ((prog.clearCount || 1) > 1 ? 's' : '') + '</div>';
+      h += '<div class="btn-hint" style="margin-bottom:10px;">' + chain.intro + '</div>';
+      h += '<div class="btn-hint" style="margin-bottom:10px;">Total chain payout: ' + totalXp.toLocaleString() + ' XP, ' + totalGold.toLocaleString() + 'G across ' + chain.stages.length + ' floors, every time.</div>';
+      h += '<button onclick="startChainQuest(\'' + chain.id + '\')" class="abtn" style="width:100%;">📜 Descend Again</button>';
       h += '</div>';
       continue;
     }
