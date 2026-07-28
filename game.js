@@ -372,7 +372,7 @@ const G = {
   ],
 
  
-    cbt: { on: false, turn: 0, en: [], sk: 0, tg: 0, autoFlee: false, autoCombat: false },
+    cbt: { on: false, turn: 0, en: [], sk: 0, tg: 0, autoFlee: false, autoCombat: isAutoCombatPreferred() },
   autoCombatHeartbeat: 0,
 
   zones: [
@@ -2962,7 +2962,6 @@ function equipItem(invIndex) {
   recalcMaxHpMp();
   G.p.hp = Math.min(G.p.hp, G.p.mhp);
   G.p.mp = Math.min(G.p.mp, G.p.mmp);
- checkDailyQuests('cast_spells', 1); 
   render();
 }
 
@@ -4571,7 +4570,8 @@ function generateDailyQuests() {
   
   G.dailyQuestSeed = G.gameDay;
   G.dailyQuests = [];
-  
+  G.dailyZonesVisited = []; // reset for Explorer's "2 different zones" tracking
+
   // Rest & Recover is guaranteed every day rather than competing for one of the 3
   // random slots below — it's simple enough (and its own daily reset flags depend on
   // it enough elsewhere) that it shouldn't be possible to just never see it that day.
@@ -5739,7 +5739,7 @@ function handleSiegeVictory() {
 
   G.siegeDefense.wave++;
   G.currentBoss = null;
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.cbt.on = false;
 
   if (G.siegeDefense.wave >= G.siegeDefense.maxWaves) {
@@ -5777,7 +5777,7 @@ function exitSiegeDefense() {
   G.siegeDefense.active = false;
   G.siegeDefense.strongholdId = null;
   G.siegeDefense.wave = 0;
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.cbt.on = false;
   G.state = 'menu';
   render();
@@ -5973,7 +5973,7 @@ function handleDragonHuntVictory() {
   }
 
   G.currentBoss = null;
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.cbt.on = false;
   G.dragonHunt.active = false;
   G.dragonHunt.currentId = null;
@@ -6268,7 +6268,7 @@ function handleChainQuestVictory() {
 
   prog.stageIndex++;
   G.currentBoss = null;
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.cbt.on = false;
 
   if (prog.stageIndex >= chain.stages.length) {
@@ -6471,7 +6471,7 @@ function handleRaidVictory() {
 
   G.raid.stageIndex++;
   G.currentBoss = null;
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.cbt.on = false;
 
   if (G.raid.stageIndex >= raid.stages.length) {
@@ -6516,7 +6516,7 @@ function exitRaid() {
   G.raid.active = false;
   G.raid.raidId = null;
   G.raid.stageIndex = 0;
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.cbt.on = false;
   G.state = 'menu';
   render();
@@ -8278,7 +8278,7 @@ function handleVictory() {
   checkQ();
   
   G.currentBoss = null;
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.cbt.on = false;
   G.state = 'explore';
   render();
@@ -8327,7 +8327,7 @@ function handleDefeat() {
     }
   }
   
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.cbt.on = false;
   G.state = 'menu';
   render();
@@ -8362,6 +8362,11 @@ function pa(si, ti, isFreeCast) {
   }
   
   G.p.mp -= actualCost;
+
+  // Arcane Practice daily quest — counts an actual spell cast, not a basic staff
+  // attack. Previously this check lived inside equipItem() entirely by mistake,
+  // meaning it tracked gear changes instead of spell casts.
+  if (!isBasicAttack) checkDailyQuests('cast_spells', 1);
   
   if (sk.buff) {
     switch (sk.buffType) {
@@ -8836,9 +8841,23 @@ setInterval(() => {
   }
 }, 2000);
 
+const AUTO_COMBAT_PREF_KEY = 'ldb_auto_combat_pref';
+function isAutoCombatPreferred() {
+  const saved = localStorage.getItem(AUTO_COMBAT_PREF_KEY);
+  return saved === null ? true : saved === 'true'; // on by default
+}
+
+function toggleAutoCombatDefault() {
+  const next = !isAutoCombatPreferred();
+  localStorage.setItem(AUTO_COMBAT_PREF_KEY, String(next));
+  lg(next ? '⚔️ New fights will start with auto-attack on.' : '🖐️ New fights will start in manual control.');
+  render();
+}
+
 function toggleAutoCombat() {
   if (!G.cbt.on) return;
   G.cbt.autoCombat = !G.cbt.autoCombat;
+  localStorage.setItem(AUTO_COMBAT_PREF_KEY, String(G.cbt.autoCombat));
   if (G.cbt.autoCombat) {
     G.autoCombatHeartbeat = Date.now();
     lg('🤖 Auto-combat ENABLED!');
@@ -9805,7 +9824,7 @@ function exitGrindRoom() {
   lg('   Total XP: ' + G.endlessGrind.totalXp + ' | Total Gold: ' + G.endlessGrind.totalGold);
   G.endlessGrind.active = false;
   G.cbt.on = false;
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.state = 'menu';
   render();
 }
@@ -9820,7 +9839,7 @@ function leaveAndResetGrind() {
   G.endlessGrind.sessionStart = null;
   G.endlessGrind.autoNext = true;
   G.cbt.on = false;
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.state = 'menu';
   lg('🚪 Left the Grind Room. Progress reset — you can start fresh with new settings.');
   render();
@@ -10058,7 +10077,7 @@ function handleGrindVictory() {
   }
   
   G.currentBoss = null;
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.cbt.on = false;
   
   if (G.endlessGrind.autoNext) {
@@ -10138,7 +10157,7 @@ function startAfkGrind() {
 
 function stopAfkGrind() {
   G.grindAfkMode = false;
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.endlessGrind.active = false;
   G.cbt.on = false;
   G.state = 'menu';
@@ -10159,7 +10178,7 @@ handleDefeat = function() {
     lg('   Final: ' + G.endlessGrind.totalKills + ' kills | ' + G.endlessGrind.totalXp + ' XP | ' + G.endlessGrind.totalGold + 'G');
     G.p.hp = 1;
     for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
-    G.cbt.autoCombat = false;
+    G.cbt.autoCombat = isAutoCombatPreferred();
     G.cbt.on = false;
     G.endlessGrind.active = false;
     G.state = 'menu';
@@ -10184,7 +10203,7 @@ handleDefeat = function() {
     lg('   No progress carries over — the gauntlet resets from stage 1 next attempt.');
     G.p.hp = 1;
     for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
-    G.cbt.autoCombat = false;
+    G.cbt.autoCombat = isAutoCombatPreferred();
     G.cbt.on = false;
     G.raid.active = false;
     G.raid.raidId = null;
@@ -10210,7 +10229,7 @@ handleDefeat = function() {
     lg('💀 The defense falters at wave ' + (G.siegeDefense.wave + 1) + '/' + G.siegeDefense.maxWaves + ' — ' + (def ? def.name : 'the stronghold') + " isn't lost, but the reward slips away this time.");
     G.p.hp = 1;
     for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
-    G.cbt.autoCombat = false;
+    G.cbt.autoCombat = isAutoCombatPreferred();
     G.cbt.on = false;
     G.siegeDefense.active = false;
     G.siegeDefense.strongholdId = null;
@@ -10236,7 +10255,7 @@ handleDefeat = function() {
     lg('💀 ' + dragon.n + ' proves too much this time. The wyrm sleeps on, hoard untouched.');
     G.p.hp = 1;
     for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
-    G.cbt.autoCombat = false;
+    G.cbt.autoCombat = isAutoCombatPreferred();
     G.cbt.on = false;
     G.dragonHunt.active = false;
     G.dragonHunt.currentId = null;
@@ -10329,7 +10348,7 @@ function handleMercenaryVictory() {
   if (contract) lg('   ' + contract.complete);
 
   G.currentBoss = null;
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.cbt.on = false;
   G.mercenary.active = false;
   G.mercenary.current = null; // ready for a fresh contract next visit
@@ -10351,7 +10370,7 @@ handleDefeat = function() {
     lg('💀 The contract goes badly. No pay for a job half-finished.');
     G.p.hp = 1;
     for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
-    G.cbt.autoCombat = false;
+    G.cbt.autoCombat = isAutoCombatPreferred();
     G.cbt.on = false;
     G.mercenary.active = false;
     G.mercenary.current = null;
@@ -10424,7 +10443,7 @@ function stopAfkAdventure() {
   G.afkAdventure.active = false;
   G.afkAdventure.backgroundedAt = null;
   G.afkAdventurePicker = [];
-  G.cbt.autoCombat = false;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.cbt.on = false;
   G.currentBoss = null;
   G.state = 'menu';
@@ -10523,7 +10542,7 @@ handleDefeat = function() {
     lg('💀 AFK Adventure interrupted \u2014 the party could not hold.');
     G.p.hp = 1;
     for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
-    G.cbt.autoCombat = false;
+    G.cbt.autoCombat = isAutoCombatPreferred();
     G.cbt.on = false;
     G.afkAdventure.active = false;
     G.currentBoss = null;
@@ -10550,7 +10569,7 @@ handleVictory = function() {
     lg('🎉 ' + defeatedName + ' falls! +' + txp + ' XP, +' + tg2 + 'G (streak bonus: +' + Math.floor((rewardMult - 1) * 100) + '%)');
 
     G.currentBoss = null;
-    G.cbt.autoCombat = false;
+    G.cbt.autoCombat = isAutoCombatPreferred();
     G.cbt.on = false;
 
     // Partial recovery, same spirit as raid stages — enough to keep going, not a reset.
@@ -10574,7 +10593,7 @@ handleDefeat = function() {
     lg('💀 The rush ends here \u2014 final streak: ' + G.bossRush.streak + '. Everything earned along the way is kept.');
     G.p.hp = 1;
     for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
-    G.cbt.autoCombat = false;
+    G.cbt.autoCombat = isAutoCombatPreferred();
     G.cbt.on = false;
     G.bossRush.active = false;
     G.currentBoss = null;
@@ -10600,7 +10619,7 @@ handleDefeat = function() {
     lg('💀 The descent stops here for now \u2014 Floor ' + (prog.stageIndex + 1) + ' still stands. Progress through Floor ' + prog.stageIndex + ' is saved.');
     G.p.hp = 1;
     for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
-    G.cbt.autoCombat = false;
+    G.cbt.autoCombat = isAutoCombatPreferred();
     G.cbt.on = false;
     prog.active = false;
     G.activeChainQuestId = null;
@@ -10614,6 +10633,16 @@ handleDefeat = function() {
 
 function sc(zi, skipEvents) {
   const z=G.zones[zi];
+
+  // Explorer daily quest — tracks unique zones visited today, not just total visits,
+  // since the quest specifically asks for 2 *different* zones. Reset alongside the
+  // daily quest pool in generateDailyQuests().
+  if (!G.dailyZonesVisited) G.dailyZonesVisited = [];
+  if (!G.dailyZonesVisited.includes(z.n)) {
+    G.dailyZonesVisited.push(z.n);
+    checkDailyQuests('explore', 1);
+  }
+
   // 30% chance for explore event before combat
   if(!skipEvents && Math.random() < 0.3 && doExploreEvent()) {
     G.state='explore';
@@ -11379,6 +11408,7 @@ function saveGame() {
     lastRealDay: G.lastRealDay || 0,
     dailyQuests: G.dailyQuests || [],
     dailyQuestSeed: G.dailyQuestSeed || 0,
+    dailyZonesVisited: G.dailyZonesVisited || [],
     dailyEventDeck: G.dailyEventDeck || [],
     eventDeckSeed: G.eventDeckSeed || 0,
     eventDeckProgress: G.eventDeckProgress || {},
@@ -11993,6 +12023,7 @@ function loadGame() {
     G.lastRealDay = data.lastRealDay || 0;
     G.dailyQuests = data.dailyQuests || [];
     G.dailyQuestSeed = data.dailyQuestSeed || 0;
+    G.dailyZonesVisited = data.dailyZonesVisited || [];
     G.dailyEventDeck = data.dailyEventDeck || [];
     G.eventDeckSeed = data.eventDeckSeed || 0;
     G.eventDeckProgress = data.eventDeckProgress || {};
@@ -14813,6 +14844,16 @@ function rMenu(){
     h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:4px;">Volume</div>';
     h+='<input type="range" min="0" max="1" step="0.05" value="'+getMusicVolume()+'" oninput="setMusicVolume(parseFloat(this.value))" style="width:80%;accent-color:var(--accent);">';
   }
+  h+='</div>';
+
+  // Auto-Attack default preference
+  const autoOn = isAutoCombatPreferred();
+  h+='<div style="margin-top:16px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;">';
+  h+='<h3 style="font-size:14px;margin-bottom:10px;color:var(--accent-light);">⚔️ Auto-Attack</h3>';
+  h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:10px;">Whether new fights start with auto-attack already on.</div>';
+  h+='<button onclick="toggleAutoCombatDefault()" style="background:'+(autoOn ? 'var(--accent)' : 'var(--bg-hover)')+';border:1px solid '+(autoOn ? 'var(--accent)' : 'var(--border)')+';border-radius:12px;padding:10px 20px;color:'+(autoOn ? 'white' : 'var(--text)')+';font-size:13px;font-weight:600;cursor:pointer;">';
+  h+= autoOn ? '⚔️ On by Default' : '🖐️ Manual by Default';
+  h+='</button>';
   h+='</div>';
   h+='<div style="margin-top:16px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:14px;">';
   h+='<h3 style="font-size:14px;margin-bottom:10px;color:var(--accent-light);">Save Data</h3>';
