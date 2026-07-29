@@ -15112,7 +15112,19 @@ const CHAPTER_ART = {
   'The Stormsinger': 'chapter7-stormsinger.jpg',
   'journal_007': 'chapter7-stormsinger.jpg',
   'Shadows of the Past': 'chapter8-shadows-of-the-past.jpg',
-  'journal_008': 'chapter8-shadows-of-the-past.jpg'
+  'journal_008': 'chapter8-shadows-of-the-past.jpg',
+  'Into the Void': 'chapter10-into-the-void.jpg',
+  'The Frozen Crown': 'chapter9-frozen-crown.jpg',
+  'journal_009': 'chapter9-frozen-crown.jpg',
+  'journal_010': 'chapter10-into-the-void.jpg',
+  'Starlight Ascension': 'chapter11-starlight-ascension.jpg',
+  'journal_011': 'chapter11-starlight-ascension.jpg',
+  'Planar Convergence': 'chapter12-planar-convergence.jpg',
+  'journal_012': 'chapter12-planar-convergence.jpg',
+  'The Astral Threshold': 'chapter13-astral-threshold.jpg',
+  'journal_013': 'chapter13-astral-threshold.jpg',
+  'Heart of Fire': 'chapter14-heart-of-fire.jpg',
+  'journal_014': 'chapter14-heart-of-fire.jpg'
 };
 function getChapterArt(key) {
   const file = CHAPTER_ART[key];
