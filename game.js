@@ -15099,7 +15099,20 @@ function rRestSitesMap(healerOk) {
 // a file is missing, rather than showing a broken-image icon.
 const CHAPTER_ART = {
   'The Rain and the Kitten': 'chapter0-rain-and-kitten.jpg',
-  'journal_001': 'chapter0-rain-and-kitten.jpg'
+  'journal_001': 'chapter0-rain-and-kitten.jpg',
+  'The Awakening': 'chapter2-awakening.jpg',
+  'journal_002': 'chapter2-awakening.jpg',
+  'The First Bond': 'chapter3-first-bond.jpg',
+  'journal_003': 'chapter3-first-bond.jpg',
+  'Sisterblade': 'chapter4-sisterblade.jpg',
+  'journal_004': 'chapter4-sisterblade.jpg',
+  'journal_005': 'chapter5-weight-of-before.jpg',
+  "The Healer's Light": 'chapter6-healers-light.jpg',
+  'journal_006': 'chapter6-healers-light.jpg',
+  'The Stormsinger': 'chapter7-stormsinger.jpg',
+  'journal_007': 'chapter7-stormsinger.jpg',
+  'Shadows of the Past': 'chapter8-shadows-of-the-past.jpg',
+  'journal_008': 'chapter8-shadows-of-the-past.jpg'
 };
 function getChapterArt(key) {
   const file = CHAPTER_ART[key];
