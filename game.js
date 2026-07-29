@@ -13139,6 +13139,7 @@ function rJournalEntry(jid){
   h+='<div style="font-size:12px;color:var(--accent-light);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:8px;">📖 Journal — Chapter '+entry.chapter+'</div>';
   h+='<h2 style="font-family:Cinzel,serif;font-size:22px;margin-bottom:4px;">'+entry.icon+' '+entry.title+'</h2>';
   h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:24px;">'+entry.summary+'</div>';
+  h += getChapterArt(entry.id) || getChapterArt(entry.title);
   
   h+='<div style="width:100%;height:4px;background:var(--timer-bg);border-radius:2px;margin-bottom:24px;">';
   h+='<div style="width:100%;height:100%;background:var(--accent);border-radius:2px;"></div></div>';
@@ -13178,6 +13179,7 @@ function rStory(){
   const portrait = getSpeakerPortrait(scene.speaker);
   let h='<div class="story-view" style="text-align:center;padding:20px;">';
   h+='<div style="font-size:12px;color:var(--accent-light);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;">Chapter '+(G.story.chapter+1)+': '+chapter.title+'</div>';
+  if (G.story.scene === 0) h += getChapterArt(chapter.title);
   h+='<div class="dialogue-box" style="margin-bottom:24px;'+(portrait ? 'display:flex;gap:12px;align-items:flex-start;text-align:left;' : '')+'">';
   if (portrait) h+='<div class="journal-portrait-circle">'+portrait+'</div><div style="flex:1;min-width:0;">';
   h+='<div class="d-speaker">'+scene.speaker+'</div>';
@@ -15089,6 +15091,22 @@ function rRestSitesMap(healerOk) {
 // (🛡️ for every buff, ⚡ for every damage spell) — the actual fix for combat feeling
 // congested, since spells become scannable by shape/color instead of requiring the
 // name to be read every time. Grouped by element below for consistency of feel.
+// Optional chapter artwork — keyed by story-chapter title AND journal entry id, since
+// "The Rain and the Kitten" exists in both the main storyline and the journal as the
+// same scene. Most chapters have no entry here and simply render without an image;
+// this is purely additive so it can grow one chapter at a time without ever being a
+// blocking requirement. Images are lazy-loaded (loading="lazy") and fail silently if
+// a file is missing, rather than showing a broken-image icon.
+const CHAPTER_ART = {
+  'The Rain and the Kitten': 'chapter0-rain-and-kitten.jpg',
+  'journal_001': 'chapter0-rain-and-kitten.jpg'
+};
+function getChapterArt(key) {
+  const file = CHAPTER_ART[key];
+  if (!file) return '';
+  return '<img src="story-art/' + file + '" loading="lazy" class="chapter-art" onerror="this.style.display=\'none\';" alt="">';
+}
+
 const SPELL_ICONS = {
   // Arcane — offense
   'Magic Missile': '🎯', 'Chromatic Orb': '🔮', 'Vampiric Touch': '🩸',
