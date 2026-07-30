@@ -16483,12 +16483,17 @@ function rQuest(){
   h+='</div>';
   // Active quests section
   h+='<h2 class="st" style="margin-top:20px;">📜 Active Quests</h2><div class="qlist">';
+  const activeMainQuests = [];
+  const doneMainQuests = [];
   for(let q of G.quests){
     if(q.hidden && !q.revealed) continue;
+    (q.done ? doneMainQuests : activeMainQuests).push(q);
+  }
+  for(let q of activeMainQuests){
     const pc=Math.min(100,(q.c/q.need)*100);
     const timerStatus=getTimerStatus(q);
-    let cardClass=q.done?'done':(q.expired?'expired':(timerStatus?(timerStatus.cls==='timer-urgent'?'timed-urgent':'timed'):''));
-    h+='<div class="qc '+cardClass+'"><div class="qh"><span class="qn">'+(q.done?'✅ ':(q.expired?'❌ ':''))+q.n+'</span><span class="qr">'+q.rw.xp+' XP | '+q.rw.g+' G</span></div>';
+    let cardClass=q.expired?'expired':(timerStatus?(timerStatus.cls==='timer-urgent'?'timed-urgent':'timed'):'');
+    h+='<div class="qc '+cardClass+'"><div class="qh"><span class="qn">'+(q.expired?'❌ ':'')+q.n+'</span><span class="qr">'+q.rw.xp+' XP | '+q.rw.g+' G</span></div>';
     if(q.chain){
       h+='<div style="font-size:10px;color:var(--accent-light);margin-bottom:4px;">🔗 Chain: '+q.chain+'</div>';
     }
@@ -16497,7 +16502,7 @@ function rQuest(){
       h+='<div style="font-size:10px;color:var(--text-dim);font-style:italic;margin-bottom:4px;">🔒 Requires: '+(req?req.n:'Unknown')+'</div>';
     }
     h+='<div class="qd">'+q.d+'</div>';
-    if(q.target && !q.done){
+    if(q.target){
       const tz = findMonsterZone(q.target);
       if(tz) h+='<div style="font-size:10px;color:var(--accent-light);margin-bottom:4px;">📍 Found in: '+tz.n+(tz.lv?' (Lv.'+tz.lv+')':'')+'</div>';
     }
@@ -16507,7 +16512,28 @@ function rQuest(){
     }
     h+='<div class="qp"><div class="pbar"><div class="pfill" style="width:'+pc+'%"></div></div><span class="ptxt">'+Math.min(q.c,q.need)+'/'+q.need+'</span></div></div>';
   }
+  if (activeMainQuests.length === 0) {
+    h+='<div class="qc"><div class="qd">No active quests right now \u2014 check back as you level up or explore further.</div></div>';
+  }
   h+='</div>';
+  if (doneMainQuests.length > 0) {
+    const mainCollapsed = G.questCollapsed['__main_done__'];
+    h+='<div style="margin-top:12px;">';
+    h+='<div onclick="toggleQuestCollapse(\'__main_done__\')" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px 16px;background:var(--bg-hover);border-radius:14px;border:1px solid var(--border);user-select:none;">';
+    h+='<span style="font-size:12px;transition:transform 0.2s;display:inline-block;' + (mainCollapsed ? '' : 'transform:rotate(90deg);') + '">▶</span>';
+    h+='<span style="font-size:14px;font-weight:600;color:var(--success);">✅ Completed</span>';
+    h+='<span style="font-size:12px;color:var(--text-dim);margin-left:auto;">' + doneMainQuests.length + '</span>';
+    h+='</div>';
+    if (!mainCollapsed) {
+      h+='<div class="qlist" style="margin-top:8px;">';
+      for(let q of doneMainQuests){
+        h+='<div class="qc done" style="opacity:0.55;"><div class="qh"><span class="qn" style="text-decoration:line-through;">'+q.n+'</span><span class="qr" style="color:var(--success);">✓</span></div>';
+        h+='<div class="qd">'+q.d+'</div></div>';
+      }
+      h+='</div>';
+    }
+    h+='</div>';
+  }
     // Daily Quests section
   h += '<h2 class="st" style="margin-top:20px;">📋 Daily Quests</h2><div class="qlist">';
   generateDailyQuests();
