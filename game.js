@@ -2292,6 +2292,40 @@ storyJournal: {
           { speaker: 'Narrator', text: 'Dudin has already started unpacking something that looks suspiciously like field rations, insisting everyone eat before "whatever comes next." Wahyu is holding up a scrap of fabric to the light, already halfway through describing an idea for a jacket nobody asked for. And Jorvin bends back over the phone, muttering at it the exact same way he used to mutter at engines that would not turn over — like it is a puzzle worth being stubborn about, not because it is easy, but because it matters to someone he has already decided is worth the trouble.' },
         ]
       }
+      ,{
+        id: 'journal_061',
+        title: 'The Charge',
+        chapter: 61,
+        unlockType: 'level',
+        unlockAt: 42,
+        icon: '🔌',
+        summary: 'Jorvin fixes the phone but not the problem, Zul turns out to have a history that explains everything, and Mimi and Aisy come up empty on a way home.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It takes three days before Jorvin sends word he wants you back at the workshop. Three days of trying not to think about it too hard, and failing, mostly, at every attempt.' },
+          { speaker: 'Jorvin', text: 'He does not look up when you walk in, too focused on something small and delicate under a magnifying lens clamped to the bench. "Screen\'s fixed," he says, like it is nothing, like it did not take him three days to say. "Circuitry too. Whatever this world did to keep it intact all this time, I am not going to pretend I understand it. I am just glad it worked in my favor for once."' },
+          { speaker: 'San', text: '"It turns on?" Your voice comes out smaller than you meant it to.' },
+          { speaker: 'Jorvin', text: '"It will," he says, "the moment it has power to turn on with." He sets the phone down carefully, screen up, and for the first time you can see your own lockscreen through the repaired glass — cracked, but whole. "That is the part I cannot fix. No chargers out here. No wall sockets. Nothing that speaks the same language as a lithium battery."' },
+          { speaker: 'Narrator', text: 'You stare at the small dead rectangle of glass and metal, so close to working, and feel the particular ache of almost.' },
+          { speaker: 'San', text: '"I might be able to force something into it," you say slowly, thinking of arcane current, of Chain Lightning, of every reckless thing you have already survived out here. "It would not be gentle. But neither is anything else that has kept us alive."' },
+          { speaker: 'Jorvin', text: '"Figured you would say something like that." He almost smiles. "Not today, though. Let me at least make sure the wiring will not just cook itself the second something hits it. Give me a bit longer."' },
+          { speaker: 'Narrator', text: 'You nod, even though waiting is the hardest part, and something in Jorvin\'s expression softens, like he understands exactly what he is asking of you.' },
+          { speaker: 'Jorvin', text: '"Oh — before you go." He says it too casually, the way people do when they have been waiting for the right moment to bring something up. "You know Zul made it too, right?"' },
+          { speaker: 'San', text: '"Zul?" The name lands strange and familiar at once, like a word in a language you have not spoken in years.' },
+          { speaker: 'Jorvin', text: '"Drives people between zones now. Charges for it, obviously — some things do not change no matter what world you end up in." A short laugh. "Funny thing is, it is basically the same job he had back home. Dispatch. Running things from one place to another, making sure they actually arrive. He has just swapped the paperwork for people."' },
+          { speaker: 'San', text: '"I always assumed \'Kewangan\' was just him being blunt about money."' },
+          { speaker: 'Jorvin', text: '"That is half of it," Jorvin says, grinning properly now. "The other half is muscle memory. He spent years running documents over to Kewangan — Finance, back at the ministry — every single time someone needed a signature chased down. Ask him anything, and some part of him still checks first whether it is going to end in a trip to Finance." He shakes his head, fond. "Old habits do not exactly ask permission before following you into a new world."' },
+          { speaker: 'Narrator', text: 'You leave the workshop smiling despite yourself, turning the story over like a small warm thing, and it carries you all the way to Mimi\'s door before you remember why you originally went looking for her.' },
+          { speaker: 'San', text: '"Have you found anything?" you ask, no preamble, because Mimi has never needed one. "Any way to reach the old world. Dreams, whispers, anything at all."' },
+          { speaker: 'Mimi', text: 'She is quiet for a moment, the particular quiet of someone measuring how much a truth is going to cost before she hands it over. "Nothing," she says finally. "I have looked. Aisy has looked. Whatever door lets people and phones and stubborn old habits wander through into this world, it does not open the other way. Not for us. Not yet."' },
+          { speaker: 'Aisy', text: '"We would tell you," Aisy adds quietly, stepping out from wherever she had been standing that you had not quite noticed. "If there were something. You know we would."' },
+          { speaker: 'San', text: '"I know," you say, and you do. "I just needed to actually ask instead of just wondering."' },
+          { speaker: 'Narrator', text: 'The disappointment sits where it always sits, familiar by now, an old bruise you keep testing to see if it still hurts. It still hurts.' },
+          { speaker: 'San', text: '"Jorvin\'s here," you say instead, because it is the only piece of good news you actually have. "And Zul. Whatever brought all of you through, it is still bringing people. Slowly. But it has not stopped."' },
+          { speaker: 'Mimi', text: 'Something shifts behind her eyes — not hope exactly, you have all learned to be careful with that word, but something adjacent to it. "Then we keep looking," she says. "And we keep an eye out for whoever comes through next."' },
+          { speaker: 'Narrator', text: 'No way home yet. No voice on the other end of a phone that still cannot hold a charge. But the world keeps handing you pieces of what you lost anyway, one stubborn, unlikely arrival at a time, and for tonight you decide to let that be enough.' },
+        ]
+      }
+
 
 
 
