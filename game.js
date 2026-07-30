@@ -434,6 +434,7 @@ const G = {
     // === ACT 3: THE RECKONING (LV 41-45) ===
     { n: 'The Empty Ledger', lv: 41, elem: 'none', d: "Aisyah's trade routes, kept with the same precision she always used, except every entry now reads the same word in a hand that used to be steady: gone, gone, gone. She has not said a word since you arrived.", en: ['Ledger Phantom','Tally Wraith','Route Ghost'], loot: ['Steady Hand Ledger', 'Uncollected Debt', 'Sister\'s Old Ink'], xp: 1360, dg: 'impossible' },
     { n: 'The Weight You Carry', lv: 42, elem: 'void', d: 'A place built from every night you told Joel you were fine when you were not. Your own exhaustion, given a floor to stand on and a shape to wear. You did not know it followed you this far.', en: ['Doubt Wraith','Exhausted Echo','Silent Weight'], loot: ['Unspoken Fatigue', 'Borrowed Courage', 'The Smile You Practiced'], xp: 1420, dg: 'impossible' },
+    { n: 'The Static Fields', lv: 41, elem: 'lightning', d: 'A wide, cracked plain where debris from somewhere else has been washing up for longer than anyone can say. Old-world wreckage half-buried in the dirt, and a low electrical hum that never quite goes silent.', en: ['Static Wisp','Scrap Wraith','Signal Hound'], loot: ['Corroded Circuit', 'Warped Casing', 'A Signal, Still Waiting'], xp: 1380, dg: 'impossible' },
     { n: "The Architect's Chamber", lv: 43, elem: 'arcane', d: "The place where the Planarch's death first cracked the world — not an accident, you realize now, but a door someone built on purpose and never finished closing. The chamber hums with the specific, deliberate silence of a plan.", en: ['Chamber Sentinel','Fractured Construct','Time-Loop Wraith'], loot: ['Architect\'s Blueprint', 'Unfinished Seal', 'First Crack Fragment'], xp: 1480, dg: 'impossible' },
     { n: 'What Remains United', lv: 44, elem: 'lightning', d: "For the first time since the Breaking, this place does not test you alone. Every echo you have faced — Joel's, Eliz's, Zaki's, Mezstorm's, Aisyah's, your own — converges here, not as separate griefs anymore but as a single splintered court demanding to know why you keep choosing to stay whole.", en: ['Remnant Guard','Splinter Sentinel','Echo Legion'], loot: ['Splinter Court Seal', 'United Fragment', 'The Question They Ask'], xp: 1540, dg: 'impossible' },
     { n: 'Where the Break Began', lv: 45, elem: 'void', d: 'The exact moment the world first fractured, replaying itself forever at the center of everything you have survived. This is not another echo. This is the source — the first break, still breaking, waiting for someone to finally answer it instead of just enduring it.', en: ['Fracture Remnant','Broken Reality','Echo of Everything'], loot: ['The First Break', 'Mended Fragment', 'Proof the World Can Heal'], xp: 1650, dg: 'impossible' },
@@ -847,6 +848,37 @@ const G = {
         { n: 'Tinker Wrench', slot: 'weapon', q: 1, r: 'uncommon', price: 45, atk: 4 }
       ],
       unlocked: false, zone: 'Ember Peak', zoneLv: 4, visitCount: 0 },
+    { n: 'Jorvin', t: 'trader', title: 'The Mechanic', icon: '🔧', col: '#e11d48', zone: 'The Static Fields', zoneLv: 41,
+      d: "San's old colleague, before all this — the one who'd spend a whole lunch break arguing about engine specs nobody else at the table cared about. Out here, that same obsessive love for how things work is the only reason the phone stood a chance at all.",
+      stock: [
+        { n: "Overclocked Amulet", slot: 'amulet', q: 1, r: 'rare', price: 180, spd: 5, atk: 2, d: 'He swears it used to belong to a car stereo. It works better as jewelry.' },
+        { n: 'Pit Crew Gloves', slot: 'hands', q: 1, r: 'rare', price: 160, atk: 4, spd: 3, d: 'Built for changing a tire in under ten seconds. Repurposed for considerably higher stakes.' },
+        { n: "Redline Boots", slot: 'feet', q: 1, r: 'epic', price: 320, spd: 8, dex: 2, d: "He says top speed is a state of mind. The boots help." },
+        { n: 'Torque Wrench Blade', slot: 'weapon', q: 1, r: 'epic', price: 380, atk: 16, spd: 3, d: 'Not designed as a weapon. Works fine as one anyway.' },
+        { n: "Spare Battery Cell", t: 'mat', q: 1, r: 'rare', price: 60, d: "He has three of these left in the world. He is not selling all of them. Just this one." }
+      ],
+      unlocked: false, zone: 'The Static Fields', zoneLv: 41, visitCount: 0 },
+    { n: 'Dudin', t: 'trader', title: "Joel's Old Bunkmate", icon: '🎖️', col: '#4d7c0f', zone: 'The Static Fields', zoneLv: 41,
+      d: "One of Joel's dorm-mates from the old world, sharp and steady in the way people get when they've spent years making sure everyone else eats first. His supplies hit harder than Amad's — field rations built for people who might not get a second chance to eat that day.",
+      stock: [
+        { n: 'Field Ration Pack', t: 'food', eff: 'heal', v: 60, q: 1, r: 'uncommon', price: 30, d: 'Dense, plain, and built to actually keep you standing. Restores 60 HP.' },
+        { n: 'Combat Med-Kit', t: 'food', eff: 'heal', v: 85, q: 1, r: 'rare', price: 48, d: "Dudin doesn't hand these out to just anyone. Restores 85 HP." },
+        { n: 'Standard-Issue Canteen', t: 'drink', eff: 'mana', v: 45, q: 1, r: 'uncommon', price: 26, d: 'Tastes like nothing. Works like everything. Restores 45 MP.' },
+        { n: "Reserve Officer's Flask", t: 'drink', eff: 'mana', v: 65, q: 1, r: 'rare', price: 42, d: 'Saved for the people who actually needed it. Restores 65 MP.' }
+      ],
+      unlocked: false, zone: 'The Static Fields', zoneLv: 41, visitCount: 0 },
+    { n: 'Wahyu', t: 'trader', title: 'The Printmaker', icon: '👕', col: '#0e7490', zone: 'The Static Fields', zoneLv: 41,
+      d: "Joel's other dorm-mate — used to run a little side business printing custom tees back in the old world. Here, that same eye for making something one-of-a-kind shows up as armor built with extra room worked into the seams. He calls them customs. You call them a very good reason to keep a spare rune around.",
+      stock: [
+        { n: 'Custom-Fit Vest', slot: 'armor', q: 1, r: 'rare', price: 200, def: 10, con: 2, sockets: [null, null, null, null], d: 'Four sockets stitched in on purpose, not earned through grinding. Wahyu\'s whole pitch in one sentence.' },
+        { n: 'Print Run Bracer', slot: 'hands', q: 1, r: 'rare', price: 170, atk: 5, def: 3, sockets: [null, null, null], d: 'Limited edition, he says. There were exactly two. You have one of them.' },
+        { n: "One-of-One Pendant", slot: 'amulet', q: 1, r: 'epic', price: 340, int: 4, wis: 4, sockets: [null, null, null, null], d: "He won't make another one like it. That's kind of the whole point of a custom." }
+      ],
+      unlocked: false, zone: 'The Static Fields', zoneLv: 41, visitCount: 0 },
+    { n: 'Zul', t: 'driver', title: 'The Driver', icon: '🚗', col: '#1e293b',
+      d: 'Nobody quite remembers when Zul started showing up wherever the roads got long enough to matter. He drives something that shouldn\'t run anymore, on fuel nobody asks about, and he only ever wants one thing to know before he\'ll take you anywhere.',
+      greeting: 'Kewangan?',
+      unlocked: false, zoneLv: 41, visitCount: 0 },
     { n: 'Mimi', t: 'ally', title: 'The Whisperer', icon: '🦋', col: '#8b5cf6',
       d: 'A mysterious ally who communicates through dreams. Grants visions and cryptic advice.',
       ability: 'Dreamsight: Reveals hidden quest paths and secret loot locations.',
@@ -2204,6 +2236,63 @@ storyJournal: {
         ]
       }
 
+      ,{
+        id: 'journal_059',
+        title: 'The Cellphone',
+        chapter: 59,
+        unlockType: 'level',
+        unlockAt: 41,
+        icon: '📱',
+        summary: 'San and Joel find something that should not exist out here — and it opens a question neither of them is ready to answer.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Static Fields do not look like a place anything survives. Cracked earth, a low electrical hum that never quite stops, and wreckage half-buried everywhere — pieces of somewhere else, washed up here the way driftwood washes up on a shore. Zaki checks his pack before he lets either of you get close to any of it. Then checks it again.' },
+          { speaker: 'Zaki', text: '"Could be nothing," he says, already sounding like he does not believe himself. "Could also be a lot of things that want to eat us. I would just like to know which before you two go wandering off toward the shiny thing."' },
+          { speaker: 'Narrator', text: 'The shiny thing is small, black, half-swallowed by dirt, its screen a spiderweb of cracks catching the light at an angle that should not be possible for something this old, this buried. San is already crouching before Joel can say anything about safety.' },
+          { speaker: 'San', text: '"That\'s..." you start, and then just stop, because saying it out loud feels like it might make it stop being true. You turn it over in your hands. The weight is exactly right. The weight is exactly, impossibly right.' },
+          { speaker: 'Joel', text: '"San." Not a question. He already knows, from the look on your face, before you say anything else.' },
+          { speaker: 'San', text: '"It\'s mine," you say. "It\'s actually mine. I had a case on it, there was a crack right —" your thumb finds it without looking, the exact spot, worn smooth from years of the exact same motion. "Here. I dropped it once at Rasau and never got around to fixing it."' },
+          { speaker: 'Narrator', text: 'Joel takes it from you gently, turns it over once, hands it back. He does not ask how a phone survived whatever the Breaking actually was. He has stopped asking that question about most things.' },
+          { speaker: 'Joel', text: '"Do you remember," he says instead, quieter, "how much we used to argue about Shopee versus Lazada. Every single voucher war." A small laugh, mostly air. "Temu too, near the end. You\'d stay up checking flash sales for things we barely needed, because the things we did need never quite fit in what either of us made that month."' },
+          { speaker: 'San', text: '"We weren\'t buying anything we needed," you say. "We were buying anything at all. There\'s a difference, and I don\'t think either of us wanted to look at it too closely back then."' },
+          { speaker: 'Narrator', text: 'Zaki has gone very quiet, the way he does when a conversation turns into something he does not have the shape of yet. He does not ask. He just moves a little closer, the way he does before a fight, like proximity itself is a kind of help.' },
+          { speaker: 'Joel', text: '"If it still works," he says slowly, like he is testing whether the sentence is even allowed to exist, "that would mean —"' },
+          { speaker: 'San', text: '"I don\'t know what it would mean," you cut in, too fast, because you have already thought about it and the thinking did not go anywhere good. "It doesn\'t turn on. It might never turn on. I don\'t even know if \'the old world\' is a place a phone call could reach anymore, or if that question even makes sense here."' },
+          { speaker: 'Narrator', text: 'You hold it against your chest anyway, the cracked screen cool against your palm, and neither of you says the actual hope out loud — the one sitting underneath all the careful hedging. That somewhere, something on the other end of this small dead object might still be listening.' },
+          { speaker: 'San', text: '"It needs power first. Real power, not whatever\'s left in it after however many years." You glance at your own hands, the faint arcane lines still visible under the skin. "I might be able to force something into it. Chain Lightning wasn\'t exactly built for this, but neither was anything else out here."' },
+          { speaker: 'Joel', text: '"And if it doesn\'t work?" he asks. Not pushing. Just needing to have asked it once, out loud, so it is not just sitting unspoken between you.' },
+          { speaker: 'San', text: '"Then it doesn\'t work," you say, and mean it, mostly. "But I\'d rather know than spend the rest of this wondering." You tuck it carefully into your pack, next to nothing else, like it deserves the space to itself. "Someone out here has to know how to actually fix something like this properly. We just have to find them first."' },
+          { speaker: 'Narrator', text: 'Zaki checks his pack one more time on the walk back, mostly out of habit now, not fear. Whatever is ahead — the search, the boss fights standing in the way of wherever this leads, the very real chance that all of this comes to nothing — none of it changes what\'s already true: for the first time since any of you arrived here, the old world does not feel entirely gone. Just quiet. Waiting to see if anyone still knows how to call it back.' },
+        ]
+      }
+      ,{
+        id: 'journal_060',
+        title: 'The Mechanic',
+        chapter: 60,
+        unlockType: 'zone',
+        unlockAt: 'The Static Fields',
+        icon: '🔧',
+        summary: 'The search for someone who can fix the phone leads somewhere San did not expect — and reveals just how many familiar faces made it into this world.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The workshop, if it can be called that, is a lean-to built from salvaged panels and a generator that should not still be running. A man is bent over a workbench inside it, muttering at something in a language that is mostly just frustration, and San stops walking so suddenly that Joel nearly runs into her.' },
+          { speaker: 'San', text: '"Jorvin?" The name comes out before you have decided to say it, disbelief doing all the work.' },
+          { speaker: 'Narrator', text: 'The man looks up. Recognition arrives on his face slower than it did on yours, and then all at once, the way it always seems to happen out here — like the world needs a second to confirm a person is real before it lets you actually see them.' },
+          { speaker: 'Jorvin', text: '"San?" He sets down whatever he was holding, wipes his hands on a rag that has clearly given up on ever being clean again. "San from ops. I used to sit two desks down from you. You once spent an entire lunch break trying to convince me a Honda would outlast a Toyota and I have never forgiven you for how close you came to winning that argument."' },
+          { speaker: 'San', text: '"You still owe me for that debate," you say, and it comes out half-laughing, half something closer to tears. "I can\'t believe it\'s you. Out of everyone, out here —"' },
+          { speaker: 'Jorvin', text: '"Believe it. I have been fixing whatever crawls out of that field for longer than I want to admit. Turns out the thing I was best at back home — caring way too much about how things work — is apparently exactly what this place needed from somebody." He nods at Joel. "And you\'re the boyfriend. I remember San complaining about you exactly as much as she complained about traffic on the way to Muara."' },
+          { speaker: 'Joel', text: '"That checks out," Joel says, and something in his shoulders loosens — the particular relief of meeting someone who knew you both before any of this, who has nothing to compare you to except who you actually were.' },
+          { speaker: 'San', text: '"I need your help," you say, and you pull the phone out carefully, like it might dissolve if you are not gentle enough with it. "It\'s mine. From before. I don\'t know if it can even be fixed, but I need to know."' },
+          { speaker: 'Narrator', text: 'Jorvin takes it the way you took it — careful, reverent, turning it over like it might answer a question just by being held correctly. He does not promise anything. That, more than anything else, is what makes you trust him with it.' },
+          { speaker: 'Jorvin', text: '"I won\'t tell you I can fix this," he says honestly. "I don\'t know yet. But I know two people who might actually be useful here, and it turns out they both made it too." He raises his voice toward the back of the lean-to. "Dudin! Wahyu! Come see who wandered in."' },
+          { speaker: 'Narrator', text: 'Joel makes a sound that is not quite a word — somewhere between his own name and theirs, all at once. Two more people step out from behind a stack of salvaged parts, and for a moment nobody says anything at all, because some reunions do not actually need the words yet.' },
+          { speaker: 'Dudin', text: '"Joel." Just that, at first. Then, quieter: "We used to split rations at the dorm when neither of our paychecks quite stretched to the end of the month. I did not think I would ever get to do that again."' },
+          { speaker: 'Wahyu', text: '"I still owe you for covering my half of the electric bill that one month," he adds, and it is such a small, specific, ordinary thing to say after everything, that it somehow lands harder than anything grander could have.' },
+          { speaker: 'Narrator', text: 'You think, standing there, of everyone else this world has already given back in pieces — Mimi in her dreams, Aisy in the shadows she chooses to walk in, Lewis and Jonathan setting up shop before either of you had a name for any of this. The world took almost everything. It is only now, slowly, that you are starting to understand it did not take everyone.' },
+          { speaker: 'Jorvin', text: '"I\'ll see what I can do with the phone," he says, setting it down on the workbench with more care than the workbench probably deserves. "No promises. But if there\'s a way to get something like this running again, I would rather it be someone who already knows exactly what it\'s worth to you."' },
+          { speaker: 'San', text: '"Thank you," you say, and it is not nearly enough, and he seems to understand that anyway. "For all of it. Not just the phone."' },
+          { speaker: 'Narrator', text: 'Dudin has already started unpacking something that looks suspiciously like field rations, insisting everyone eat before "whatever comes next." Wahyu is holding up a scrap of fabric to the light, already halfway through describing an idea for a jacket nobody asked for. And Jorvin bends back over the phone, muttering at it the exact same way he used to mutter at engines that would not turn over — like it is a puzzle worth being stubborn about, not because it is easy, but because it matters to someone he has already decided is worth the trouble.' },
+        ]
+      }
+
 
 
 
@@ -3488,6 +3577,9 @@ const ENEMY_REGISTRY = {
   'Ledger Phantom': { template: 'balanced', elem: 'none', zoneLv: 41 },
   'Tally Wraith': { template: 'striker', elem: 'none', zoneLv: 41 },
   'Route Ghost': { template: 'tank', elem: 'none', zoneLv: 41 },
+  'Static Wisp': { template: 'striker', elem: 'lightning', zoneLv: 41 },
+  'Scrap Wraith': { template: 'tank', elem: 'lightning', zoneLv: 41 },
+  'Signal Hound': { template: 'balanced', elem: 'lightning', zoneLv: 41 },
   'Doubt Wraith': { template: 'striker', elem: 'void', zoneLv: 42 },
   'Exhausted Echo': { template: 'balanced', elem: 'void', zoneLv: 42 },
   'Silent Weight': { template: 'tank', elem: 'void', zoneLv: 42 },
@@ -4067,6 +4159,10 @@ function checkNPCUnlocks() {
       npc.unlocked = true;
       lg('🧳 New trader unlocked: ' + npc.n + ' at ' + npc.zone + '!');
     }
+    if (npc.t === 'driver' && !npc.unlocked && G.p.lvl >= npc.zoneLv) {
+      npc.unlocked = true;
+      lg('🚗 ' + npc.n + ' pulls up out of nowhere. "' + npc.greeting + '"');
+    }
     if (npc.t === 'ally' && !npc.unlocked && npc.reqMember) {
       if (G.affinity[npc.reqMember] && G.affinity[npc.reqMember].val >= npc.affinityReq) {
         npc.unlocked = true;
@@ -4074,6 +4170,24 @@ function checkNPCUnlocks() {
       }
     }
   }
+}
+
+function getZulTeleportCost(zoneLv) {
+  return Math.max(10, zoneLv * 5);
+}
+
+function teleportViaZul(zoneIndex) {
+  const zone = G.zones[zoneIndex];
+  if (!zone) return;
+  const cost = getZulTeleportCost(zone.lv);
+  if (G.p.gold < cost) {
+    lg('❌ Zul taps the wheel. "Kewangan?" You don\'t have the ' + cost + 'G.');
+    return;
+  }
+  G.p.gold -= cost;
+  lg('🚗 Zul drops you at ' + zone.n + ' without another word. (-' + cost + 'G)');
+  G.state = 'explore';
+  render();
 }
 
 function buyFromNPC(npcName, itemIdx) {
@@ -4116,6 +4230,11 @@ function buyFromNPC(npcName, itemIdx) {
   // Copy effect properties for consumables (food/drink/pot)
   if (item.eff !== undefined) boughtItem.eff = item.eff;
   if (item.v !== undefined) boughtItem.v = item.v;
+  // Copy sockets as a fresh array — some traders (Wahyu) sell gear with built-in
+  // bonus sockets baked into the stock definition itself, distinct from the normal
+  // ilvl-based socket migration. Must clone, not reference, so multiple purchases of
+  // the same stock item don't end up sharing one sockets array.
+  if (item.sockets !== undefined) boughtItem.sockets = new Array(item.sockets.length).fill(null);
   addI(boughtItem);
   npc.visitCount++;
   lg('🧳 Bought ' + item.n + ' from ' + npc.n + ' for ' + finalPrice + 'G!' + (aisyah ? ' (Aisyah haggled 10% off!)' : ''));
@@ -12430,6 +12549,34 @@ function rNPC() {
     h += '</div>';
   }
 
+  // Driver section — Zul
+  const drivers = G.npcs.filter(n => n.t === 'driver');
+  if (drivers.length > 0) {
+    h += '<div style="margin-bottom:20px;"><h3 style="font-size:14px;color:#94a3b8;margin-bottom:10px;">🚗 Drivers</h3>';
+    for (let npc of drivers) {
+      h += '<div class="npc-card ' + (npc.unlocked ? '' : 'locked') + '" style="border-color:' + (npc.unlocked ? '#94a3b8' : 'var(--border)') + ';">';
+      h += '<div class="npc-ava" style="background:' + npc.col + '20;border-color:' + npc.col + '">' + npc.icon + '</div>';
+      h += '<div class="npc-info">';
+      h += '<div class="npc-name">' + npc.n + ' <span class="npc-type npc-type-trader">' + npc.title + '</span></div>';
+      if (!npc.unlocked) {
+        h += '<div style="font-size:11px;color:var(--text-dim);margin-top:4px;">🔒 Shows up around Level ' + npc.zoneLv + '</div>';
+      } else {
+        h += '<div class="npc-desc">' + npc.d + '</div>';
+        h += '<div style="font-size:12px;font-style:italic;color:var(--text-dim);margin:6px 0;">"' + npc.greeting + '"</div>';
+        const reachableZones = G.zones.filter(z => z.lv <= G.p.lvl);
+        h += '<div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">';
+        for (let z of reachableZones) {
+          const cost = getZulTeleportCost(z.lv);
+          const canAfford = G.p.gold >= cost;
+          h += '<button class="zul-teleport ' + (canAfford ? 'ib-u' : 'ib-e') + '" data-zone="' + z.n + '" style="text-align:left;">' + z.n + ' (Lv.' + z.lv + ') \u2014 ' + cost + 'G</button>';
+        }
+        h += '</div>';
+      }
+      h += '</div></div>';
+    }
+    h += '</div>';
+  }
+
   // Allies section
   const allies = G.npcs.filter(n => n.t === 'ally');
   if (allies.length > 0) {
@@ -12852,6 +12999,14 @@ if(btnVnAdvance)btnVnAdvance.addEventListener('click',()=>{ advanceJournalVn(); 
       buyFromNPC(el.getAttribute('data-npc'),parseInt(el.getAttribute('data-item')));
     });
   });
+  document.querySelectorAll('.zul-teleport').forEach(el=>{
+    el.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      const zoneName = el.getAttribute('data-zone');
+      const zoneIndex = G.zones.findIndex(z => z.n === zoneName);
+      if (zoneIndex > -1) teleportViaZul(zoneIndex);
+    });
+  });
   document.querySelectorAll('.amad-sell').forEach(el=>{
     el.addEventListener('click',(e)=>{
       e.stopPropagation();
@@ -13166,7 +13321,7 @@ function rJournalEntry(jid){
     G.storyJournal.read.push(jid);
   }
 
-  const artFile = getChapterArt(entry.id) || getChapterArt(entry.title);
+  const artFile = getChapterArtFile(entry.id) || getChapterArtFile(entry.title);
 
   if (!G.journalVn || G.journalVn.jid !== jid) {
     G.journalVn = { jid: jid, sceneIndex: 0 };
@@ -13184,7 +13339,7 @@ function rJournalEntry(jid){
     const isLast = i === entry.scenes.length - 1;
 
     let h = '<div class="vn-view">';
-    h += '<div class="vn-stage"><img src="' + artFile + '" alt="">';
+    h += '<div class="vn-stage"><img src="story-art/' + artFile + '" loading="lazy" onerror="this.parentElement.style.display=\'none\';" alt="">';
     h += '<div class="vn-fade"></div>';
     h += '<div class="vn-chapter-label">Chapter ' + entry.chapter + ' \u00b7 ' + entry.title + '</div>';
     h += '</div>';
@@ -15222,6 +15377,12 @@ function getChapterArt(key) {
   const file = CHAPTER_ART[key];
   if (!file) return '';
   return '<img src="story-art/' + file + '" loading="lazy" class="chapter-art" onerror="this.style.display=\'none\';" alt="">';
+}
+// Returns just the filename (or empty string) — used where a full custom <img> tag
+// needs to be built with different attributes than getChapterArt's default markup,
+// like the VN view's backdrop image.
+function getChapterArtFile(key) {
+  return CHAPTER_ART[key] || '';
 }
 
 const SPELL_ICONS = {
