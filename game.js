@@ -6418,6 +6418,7 @@ function handleDragonHuntVictory() {
   G.p.xp += txp;
   G.p.gold += tg2;
   G.p.bossKills = (G.p.bossKills || 0) + 1;
+  checkBountyKill(dragon.n);
   G.dragonHunt.cleared = G.dragonHunt.cleared || {};
   G.dragonHunt.cleared[dragon.id] = (G.dragonHunt.cleared[dragon.id] || 0) + 1;
   checkAchievements();
@@ -6738,7 +6739,12 @@ function handleChainQuestVictory() {
   const tg2 = Math.floor(stage.rw.g * getPrestigeGoldMult());
   G.p.xp += txp;
   G.p.gold += tg2;
-  if (stage.type === 'boss') G.p.bossKills = (G.p.bossKills || 0) + 1;
+  if (stage.type === 'boss') {
+    G.p.bossKills = (G.p.bossKills || 0) + 1;
+    if (stage.name) checkBountyKill(stage.name);
+  } else if (stage.enemies) {
+    for (let en of stage.enemies) checkBountyKill(en);
+  }
   checkAchievements();
   lg('🎉 ' + stage.title + ' cleared! +' + txp + ' XP, +' + tg2 + 'G');
 
@@ -6939,7 +6945,12 @@ function handleRaidVictory() {
   if (guildGoldBonus > 0) tg2 = Math.floor(tg2 * (1 + guildGoldBonus));
   G.p.xp += txp;
   G.p.gold += tg2;
-  if (stage && stage.type === 'boss') G.p.bossKills = (G.p.bossKills || 0) + 1;
+  if (stage && stage.type === 'boss') {
+    G.p.bossKills = (G.p.bossKills || 0) + 1;
+    if (stage.name) checkBountyKill(stage.name);
+  } else if (stage && stage.enemies) {
+    for (let en of stage.enemies) checkBountyKill(en);
+  }
   checkAchievements();
   const clearedName = stage && stage.type === 'boss' ? stage.name : 'the elite pack';
   showBattleRewardPopup(txp, tg2, clearedName);
@@ -10845,6 +10856,7 @@ function handleMercenaryVictory() {
   const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * getPrestigeGoldMult());
   G.p.xp += txp;
   G.p.gold += tg2;
+  for (let e of G.cbt.en) checkBountyKill(e.n);
   showBattleRewardPopup(txp, tg2, contract ? contract.title : null);
   G.mercenary.completed = (G.mercenary.completed || 0) + 1;
   checkAchievements();
@@ -11068,6 +11080,7 @@ handleVictory = function() {
     G.p.xp += txp;
     G.p.gold += tg2;
     G.p.bossKills = (G.p.bossKills || 0) + 1;
+    checkBountyKill(defeatedName);
     G.bossRush.streak++;
     if (G.bossRush.streak > (G.bossRush.bestStreak || 0)) G.bossRush.bestStreak = G.bossRush.streak;
     checkAchievements();
