@@ -81,8 +81,8 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 
 /* Visual-novel journal presentation — only used for chapters with generated art */
 .vn-view { max-width: 500px; margin: 0 auto; }
-.vn-stage { position: relative; width: 100%; aspect-ratio: 3/2; overflow: hidden; }
-.vn-stage img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.vn-stage { position: relative; width: 100%; max-height: 360px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; }
+.vn-stage img { max-width: 100%; max-height: 360px; width: auto; height: auto; object-fit: contain; }
 .vn-fade { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(15,14,23,0) 40%, rgba(15,14,23,0.85) 80%, rgba(15,14,23,1) 100%); }
 .vn-chapter-label { position: absolute; top: 14px; left: 16px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.85); background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 8px; backdrop-filter: blur(4px); }
 .vn-dialogue-wrap { margin-top: -70px; position: relative; z-index: 2; padding: 0 16px 16px; }

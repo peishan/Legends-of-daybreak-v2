@@ -10292,7 +10292,14 @@ function startAfkGrind() {
   G.grindAfkStartTime = Date.now();
   G.grindAfkStartXp = G.endlessGrind.totalXp;
   G.grindAfkStartGold = G.endlessGrind.totalGold;
+  // Previously assumed auto-combat was already ticking when this was pressed — if it
+  // wasn't (or the tick chain had already died), nothing would ever actually run,
+  // leaving the display frozen at Wave 1 / 0m / 0XP indefinitely. Explicitly ensure
+  // both the flag and the actual tick loop are live before switching to the AFK view.
+  G.cbt.autoCombat = true;
+  G.autoCombatHeartbeat = Date.now();
   render();
+  doAutoCombatTick();
 }
 
 function stopAfkGrind() {
@@ -12717,6 +12724,17 @@ function rAchievements() {
 }
 
 function render(){
+  // Auto-combat kick-start safety net. toggleAutoCombat() has always explicitly
+  // called doAutoCombatTick() the moment it turns auto-combat on — but since
+  // auto-combat can now start already-true by default (rather than only being
+  // turned on manually), nothing was kicking off the actual tick loop for that
+  // case: the flag said "on" but the setTimeout chain never got its first push.
+  // Heartbeat is 0 only when the loop isn't currently running, so this is safe to
+  // check on every render without risk of double-starting an already-running loop.
+  if (G.cbt.on && G.cbt.autoCombat && G.autoCombatHeartbeat === 0) {
+    doAutoCombatTick();
+  }
+
   // AFK Grind Mode — bypasses the ENTIRE normal render pipeline (header, HP/MP/XP
   // bars, buffs row, everything) in favor of one tiny status line. Combat logic keeps
   // ticking normally underneath (doAutoCombatTick runs purely on state, never reads
