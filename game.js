@@ -15237,7 +15237,25 @@ const ZONE_MAP_TABS = [
   { label: 'Act II', min: 36, max: 40 },
   { label: 'Act III', min: 41, max: 45 },
   { label: 'Act IV', min: 46, max: 50 },
+  { label: 'Act V: The Long Walk', min: 51, max: 55 },
 ];
+
+// The Verdant Reach — level 56+, continuing directly from where "Where the Walk
+// Leads" already left off ("There will be another one after it. That used to feel
+// like a threat. It does not anymore."). Once unlocked, this REPLACES every tab
+// above in normal Explore navigation; everything before becomes reachable only
+// through Zul. Gated on having actually read the bridge chapter, not just hitting
+// a level, so the transition lands with the story rather than silently on a number.
+const VERDANT_REACH_TAB = { label: 'The Verdant Reach', min: 56, max: 200 };
+const VERDANT_REACH_BRIDGE_CHAPTER = 'journal_068'; // "What the World Let Go Of" — comes after the 6 backstory chapters (62-67), not yet written
+
+function hasEnteredVerdantReach() {
+  return G.storyJournal.read.includes(VERDANT_REACH_BRIDGE_CHAPTER);
+}
+
+function getActiveZoneMapTabs() {
+  return hasEnteredVerdantReach() ? [VERDANT_REACH_TAB] : ZONE_MAP_TABS;
+}
 
 function setExploreMapTab(idx) {
   G.exploreMapTab = idx;
@@ -15253,20 +15271,25 @@ function rExp(){
 }
 
 function rZoneMapTabs() {
-  if (G.exploreMapTab === undefined) G.exploreMapTab = 0;
+  const tabs = getActiveZoneMapTabs();
+  if (G.exploreMapTab === undefined || G.exploreMapTab >= tabs.length) G.exploreMapTab = 0;
   let h = '<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;">';
-  for (let i = 0; i < ZONE_MAP_TABS.length; i++) {
-    const tab = ZONE_MAP_TABS[i];
+  for (let i = 0; i < tabs.length; i++) {
+    const tab = tabs[i];
     const sel = G.exploreMapTab === i;
     h += '<button onclick="setExploreMapTab(' + i + ')" class="tier-btn' + (sel ? ' sel' : '') + '" style="flex-shrink:0;">' + tab.label + '</button>';
   }
   h += '</div>';
+  if (hasEnteredVerdantReach()) {
+    h += '<div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;">Everywhere before this is still there \u2014 Zul just drives now.</div>';
+  }
   return h;
 }
 
 function rZoneMapView() {
-  if (G.exploreMapTab === undefined) G.exploreMapTab = 0;
-  const range = ZONE_MAP_TABS[G.exploreMapTab] || ZONE_MAP_TABS[0];
+  const tabs = getActiveZoneMapTabs();
+  if (G.exploreMapTab === undefined || G.exploreMapTab >= tabs.length) G.exploreMapTab = 0;
+  const range = tabs[G.exploreMapTab] || tabs[0];
   // Keep each zone's TRUE index into G.zones (not the filtered array's position) —
   // the click handler reads data-i to look up G.zones[i] directly.
   const zonesWithIndex = G.zones
