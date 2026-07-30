@@ -10120,6 +10120,7 @@ function renderAfkAdventureBar() {
   const zoneNames = adv.zoneIndices.map(i => G.zones[i]?.n).filter(Boolean).join(', ');
   const bossEntries = Object.entries(adv.bossKills);
   a.innerHTML = '<div class="afk-grind-bar">'
+    + afkVitalsHtml()
     + '<div class="afk-grind-title">🎯 AFK Adventure</div>'
     + '<div style="text-align:center;font-size:12px;color:var(--text-dim);margin-bottom:12px;">' + zoneNames + '</div>'
     + '<div class="afk-grind-stats">'
@@ -10136,6 +10137,18 @@ function renderAfkAdventureBar() {
     + '</div>';
 }
 
+// Compact HP/MP/XP display shared by both AFK bar screens — these bypass the full
+// header render for performance, which previously meant vitals were invisible the
+// entire time you were AFK. Matches the normal header's bar markup/classes so it
+// looks consistent, just condensed into a single row instead of three.
+function afkVitalsHtml() {
+  return '<div style="display:flex;gap:10px;justify-content:center;margin-bottom:12px;padding:10px;background:var(--bg-hover);border-radius:10px;">'
+    + '<div style="flex:1;"><div style="font-size:9px;color:var(--text-dim);text-align:center;">HP ' + G.p.hp + '/' + G.p.mhp + '</div><div class="bar" style="height:6px;"><div class="bf bf-hp" style="width:' + ((G.p.hp / G.p.mhp) * 100) + '%"></div></div></div>'
+    + '<div style="flex:1;"><div style="font-size:9px;color:var(--text-dim);text-align:center;">MP ' + G.p.mp + '/' + G.p.mmp + '</div><div class="bar" style="height:6px;"><div class="bf bf-mp" style="width:' + ((G.p.mp / G.p.mmp) * 100) + '%"></div></div></div>'
+    + '<div style="flex:1;"><div style="font-size:9px;color:var(--text-dim);text-align:center;">Lv.' + G.p.lvl + ' \u00b7 ' + Math.floor((G.p.xp / G.p.xpN) * 100) + '%</div><div class="bar" style="height:6px;"><div class="bf bf-xp" style="width:' + ((G.p.xp / G.p.xpN) * 100) + '%"></div></div></div>'
+    + '</div>';
+}
+
 function renderAfkGrindBar() {
   const a = document.getElementById('app'); if (!a) return;
   const g = G.endlessGrind;
@@ -10143,6 +10156,7 @@ function renderAfkGrindBar() {
   const xpGained = g.totalXp - (G.grindAfkStartXp || 0);
   const goldGained = g.totalGold - (G.grindAfkStartGold || 0);
   a.innerHTML = '<div class="afk-grind-bar">'
+    + afkVitalsHtml()
     + '<div class="afk-grind-title">⚔️ Grind Room \u2014 Wave ' + g.wave + '</div>'
     + '<div class="afk-grind-stats">'
     + '<span>\u23F1\uFE0F ' + minutesPassed + 'm</span>'
@@ -12821,6 +12835,8 @@ document.querySelectorAll('.journal-card[data-jid]').forEach(el=>{
 });
 const btnBackJournal=document.getElementById('btn-back-journal');
 if(btnBackJournal)btnBackJournal.addEventListener('click',()=>{ setS('journal'); });
+const btnVnAdvance=document.getElementById('btn-vn-advance');
+if(btnVnAdvance)btnVnAdvance.addEventListener('click',()=>{ advanceJournalVn(); });
 
   document.querySelectorAll('.rs-card:not(.locked):not(.active)').forEach(el=>{
     el.addEventListener('click',()=>{const id=el.getAttribute('data-id');startRest(id);});
@@ -13127,6 +13143,21 @@ function rBonding(){
   return h;
 }
 
+// Advances the VN-style journal reader by one scene, or returns to the journal list
+// once the last scene has been reached (mirroring the old "Back to Journal" button).
+function advanceJournalVn() {
+  if (!G.journalVn) return;
+  const entry = G.storyJournal.entries.find(e => e.id === G.journalVn.jid);
+  if (!entry) return;
+  if (G.journalVn.sceneIndex >= entry.scenes.length - 1) {
+    G.state = 'journal';
+    G.journalVn = null;
+  } else {
+    G.journalVn.sceneIndex++;
+  }
+  render();
+}
+
 function rJournalEntry(jid){
   const entry=G.storyJournal.entries.find(e=>e.id===jid);
   if(!entry)return'<div>Entry not found</div>';
@@ -13134,12 +13165,47 @@ function rJournalEntry(jid){
   if(!G.storyJournal.read.includes(jid)){
     G.storyJournal.read.push(jid);
   }
-  
+
+  const artFile = getChapterArt(entry.id) || getChapterArt(entry.title);
+
+  if (!G.journalVn || G.journalVn.jid !== jid) {
+    G.journalVn = { jid: jid, sceneIndex: 0 };
+  }
+
+  // VN-style presentation — only used when this chapter actually has generated art,
+  // since the whole design leans on the art as a backdrop. Chapters without art fall
+  // through to the original plain-text layout below, completely unchanged.
+  if (artFile) {
+    const i = Math.min(G.journalVn.sceneIndex, entry.scenes.length - 1);
+    const scene = entry.scenes[i];
+    const isDialogue = scene.speaker !== 'Narrator';
+    const portrait = isDialogue ? getSpeakerPortrait(scene.speaker) : '';
+    const speakerColor = getSpeakerColor(scene.speaker);
+    const isLast = i === entry.scenes.length - 1;
+
+    let h = '<div class="vn-view">';
+    h += '<div class="vn-stage"><img src="' + artFile + '" alt="">';
+    h += '<div class="vn-fade"></div>';
+    h += '<div class="vn-chapter-label">Chapter ' + entry.chapter + ' \u00b7 ' + entry.title + '</div>';
+    h += '</div>';
+    h += '<div class="vn-dialogue-wrap">';
+    h += '<div class="vn-box' + (isDialogue ? '' : ' vn-narrator') + '" style="' + (speakerColor ? '--e-speaker:' + speakerColor + ';' : '') + '">';
+    if (portrait) h += '<div class="vn-portrait">' + portrait + '</div>';
+    h += '<div class="vn-body"><div class="vn-speaker">' + scene.speaker + '</div>';
+    h += '<div class="vn-text">' + scene.text + '</div></div>';
+    h += '</div></div>';
+    h += '<div class="vn-nav">';
+    h += '<span class="vn-progress">' + (i + 1) + ' / ' + entry.scenes.length + '</span>';
+    h += '<button class="vn-next-btn" id="btn-vn-advance">' + (isLast ? 'Finish' : 'Next \u25b8') + '</button>';
+    h += '</div>';
+    h += '</div>';
+    return h;
+  }
+
   let h='<div style="padding:16px;max-width:500px;margin:0 auto;">';
   h+='<div style="font-size:12px;color:var(--accent-light);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:8px;">📖 Journal — Chapter '+entry.chapter+'</div>';
   h+='<h2 style="font-family:Cinzel,serif;font-size:22px;margin-bottom:4px;">'+entry.icon+' '+entry.title+'</h2>';
   h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:24px;">'+entry.summary+'</div>';
-  h += getChapterArt(entry.id) || getChapterArt(entry.title);
   
   h+='<div style="width:100%;height:4px;background:var(--timer-bg);border-radius:2px;margin-bottom:24px;">';
   h+='<div style="width:100%;height:100%;background:var(--accent);border-radius:2px;"></div></div>';
