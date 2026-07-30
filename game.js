@@ -452,6 +452,16 @@ const G = {
     { n: 'The Salt Debt', lv: 53, elem: 'none', d: 'A trading settlement built entirely on obligation — everyone here owes someone, who owes someone else, all the way down. Aisyah recognizes the architecture of it immediately, and does not love what she recognizes.', en: ['Salt Wraith','Ledger Enforcer','Debt Collector Construct'], loot: ['Bound Ledger', 'A Debt With No Owner', 'Salt-Stained Contract'], xp: 2550, dg: 'impossible' },
     { n: 'The Quiet Uprising', lv: 54, elem: 'void', d: "Something under the Salt Debt has been listening to every unpaid promise for a very long time, and has finally decided it is owed something too.", en: ['Undertow Whisper','Drowned Malcontent','Silent Agitator'], loot: ['Undertow Fragment', 'A Promise Kept Too Late', 'Whispered Ledger'], xp: 2650, dg: 'impossible' },
     { n: 'Where the Walk Leads', lv: 55, elem: 'arcane', d: 'Not a destination. Just the furthest point this particular road has gone so far. There will be another one after it. That used to feel like a threat. It does not anymore.', en: ['Horizon Sentinel','Farlight Construct','Wandering Star Wisp'], loot: ['Horizon Fragment', 'The Next Step', 'Proof the Road Continues'], xp: 2900, dg: 'impossible' },
+
+    // === THE VERDANT REACH (Lv 56+) — everything before this was still living in the
+    // Breaking's damage. This is the first place the party finds where that damage is
+    // actually receding, not because anyone fixed it, but because enough time and
+    // enough small stubborn acts of mending — the party's own included — let something
+    // grow back on its own. Zones spaced wide deliberately; the grind between them is
+    // the content here, not constant new backdrops. ===
+    { n: 'The Unbroken Vale', lv: 56, elem: 'poison', d: 'The first stretch of ground the party has found since the Breaking that was never actually broken — or healed so completely there is no telling the difference anymore. No ruins. No ash. Just green, further than anyone can see, and the strange quiet of a wound that finally closed.', en: ['Bramble Warden','Wildroot Sprite','Thistle Stalker'], loot: ['Unbroken Root', 'First Bloom Petal', 'Soil That Remembers Nothing'], xp: 3050, g: 2100, dg: 'impossible' },
+    { n: 'Sunreach Fields', lv: 75, elem: 'poison', d: "A whole community living here, quietly, for who knows how long — fields actually under cultivation, harvests actually being brought in. Nobody out this far seems to know or care what the rest of the world has been through. They just kept growing things, the entire time.", en: ['Harvest Golem','Sunreach Guardian','Bloomwatcher'], loot: ['Sunreach Grain', 'A Harvest Nobody Rationed', 'Guardian\'s Bramble'], xp: 6000, g: 4400, dg: 'impossible' },
+    { n: 'The Rootbound Sanctuary', lv: 95, elem: 'poison', d: 'Whatever is actually doing the mending out here, this is close to its source — roots thick as towers, growth old enough to have opinions about who is allowed to pass through. Healing this deep does not come free. Something this old does not let go of what it has grown around without a reason.', en: ['Root-Bound Elder','Sanctuary Keeper','Elderwood Sentinel'], loot: ['Heartwood Shard', 'What the Roots Kept', 'The First Bloom, Still Sealed'], xp: 12000, g: 8800, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -1127,6 +1137,15 @@ const G = {
       mechanic: 'apocalypse', apocalypseTurn: 6, desc: "Everything the settlement above owed and never paid, finally surfacing at once. It is not cruelty. It is arithmetic that ran out of patience." },
     { n: 'The Horizon Keeper', zone: 'Where the Walk Leads', hp: 36000, mhp: 36000, atk: 260, def: 156, xp: 22000, g: 14000,
       mechanic: 'cosmic', desc: 'Not an ending. Just the edge of how far this particular road has been mapped. It guards nothing except the honest fact that there is more, always, past wherever you currently stand.' },
+    { n: 'The Vale Warden', zone: 'The Unbroken Vale', hp: 40000, mhp: 40000, atk: 270, def: 162, xp: 24000, g: 16000,
+      mechanic: 'rampage', rampageTurn: 4, rampageDmg: 105,
+      desc: "Grown, not built — thorns thick as pillars around something that was never actually wounded in the first place. It does not attack out of malice. It attacks because it has never once had to explain itself to anyone before now." },
+    { n: 'The Sunreach Elder', zone: 'Sunreach Fields', hp: 85000, mhp: 85000, atk: 380, def: 230, xp: 42000, g: 30000,
+      mechanic: 'resurrect', resurrectHp: 0.20,
+      desc: "The whole field rises with it when it stands — roots, harvest, and every quiet season this community spent surviving unnoticed. It does not forgive easily. It has spent a very long time protecting something it never once had to share." },
+    { n: 'The Verdant Heart', zone: 'The Rootbound Sanctuary', hp: 165000, mhp: 165000, atk: 525, def: 320, xp: 78000, g: 58000,
+      mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 41250,
+      desc: "As close to the actual source of the mending as anyone has ever gotten. It is not hostile so much as it is old, and rightly suspicious of anything that reaches this deep into what it has spent so long growing back. Getting past it will not be gentle. Very little worth reaching ever is." },
 
     // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
     // These are dedicated Temple-quest hunt targets, not tied to any zone's normal
@@ -2673,6 +2692,9 @@ storyJournal: {
     { id: 'salt_camp', name: 'The Unbound Ledger', type: 'camp', zone: 'The Salt Debt', zoneLv: 53, desc: 'The one place in the settlement where nothing you take is counted against you.', unlocked: false, icon: '⛺', cost: 0 },
     { id: 'uprising_spring', name: 'The Surfaced Spring', type: 'mana_spring', zone: 'The Quiet Uprising', zoneLv: 54, desc: 'Whatever was owed down there, this water was not part of the debt. It came up clean anyway.', unlocked: false, icon: '💧', cost: 18 },
     { id: 'horizon_camp', name: 'The Furthest Camp', type: 'camp', zone: 'Where the Walk Leads', zoneLv: 55, desc: 'Not the last camp. Just the last one anyone has needed so far.', unlocked: false, icon: '⛺', cost: 0 },
+    { id: 'vale_camp', name: 'The Unbroken Clearing', type: 'camp', zone: 'The Unbroken Vale', zoneLv: 56, desc: 'A patch of ground soft enough to actually sleep on, for once, instead of just surviving the night on top of.', unlocked: false, icon: '🌿', cost: 0 },
+    { id: 'sunreach_camp', name: "The Community Table", type: 'camp', zone: 'Sunreach Fields', zoneLv: 75, desc: 'Someone here always seems to have room for a few more at the table, no questions asked.', unlocked: false, icon: '🌾', cost: 0 },
+    { id: 'rootbound_camp', name: 'The Rootbound Hollow', type: 'camp', zone: 'The Rootbound Sanctuary', zoneLv: 95, desc: 'A hollow between roots thick enough to feel less like shelter and more like being held.', unlocked: false, icon: '🌳', cost: 0 },
     // Phase 3 mana springs
     { id: 'ms_spring3', name: 'Infernal Mana Spring', type: 'mana_spring', zone: 'Infernal Crucible', zoneLv: 23, desc: 'A spring of liquid flame that burns cold. Each sip sears the mind with forbidden knowledge.', unlocked: false, icon: '💧', cost: 20 },
     { id: 'ms_spring4', name: 'Abyssal Mana Spring', type: 'mana_spring', zone: 'Tidal Abyss', zoneLv: 25, desc: 'Dark water that glows with inner light. Drinking it feels like drowning in stars.', unlocked: false, icon: '💧', cost: 25 },
@@ -3932,6 +3954,17 @@ const ENEMY_REGISTRY = {
   'Farlight Construct': { template: 'balanced', elem: 'arcane', zoneLv: 55 },
   'Wandering Star Wisp': { template: 'striker', elem: 'arcane', zoneLv: 55 },
 
+  // === THE VERDANT REACH (Lv 56+) ===
+  'Bramble Warden': { template: 'tank', elem: 'poison', zoneLv: 56 },
+  'Wildroot Sprite': { template: 'striker', elem: 'poison', zoneLv: 56 },
+  'Thistle Stalker': { template: 'balanced', elem: 'poison', zoneLv: 56 },
+  'Harvest Golem': { template: 'tank', elem: 'poison', zoneLv: 75 },
+  'Sunreach Guardian': { template: 'balanced', elem: 'poison', zoneLv: 75 },
+  'Bloomwatcher': { template: 'striker', elem: 'poison', zoneLv: 75 },
+  'Root-Bound Elder': { template: 'tank', elem: 'poison', zoneLv: 95 },
+  'Sanctuary Keeper': { template: 'balanced', elem: 'poison', zoneLv: 95 },
+  'Elderwood Sentinel': { template: 'striker', elem: 'poison', zoneLv: 95 },
+
   // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
   'Closed Eye Acolyte': { template: 'striker', elem: 'void', zoneLv: 19 },
   'Closed Eye Zealot': { template: 'balanced', elem: 'void', zoneLv: 27 },
@@ -4881,7 +4914,7 @@ function resolveEventChoice(eventId, choiceKey) {
     g = choice.baseG + (success ? choice.bonusG : 0);
   }
 
-  xp = Math.floor(xp * getPrestigeXpMult());
+  xp = Math.floor(xp * getPrestigeXpMult() * getExpBoosterMult());
   g = Math.floor(g * getPrestigeGoldMult());
   G.p.xp += xp;
   G.p.gold += g;
@@ -4960,7 +4993,7 @@ function flipRuneCard(idx) {
 function finishRuneVault() {
   const rv = G.runeVault;
   const result = RUNE_VAULT_TIERS.find(t => rv.moves <= t.maxMoves);
-  const xp = Math.floor(result.xp * getPrestigeXpMult());
+  const xp = Math.floor(result.xp * getPrestigeXpMult() * getExpBoosterMult());
   const g = Math.floor(result.g * getPrestigeGoldMult());
   G.p.xp += xp;
   G.p.gold += g;
@@ -5328,7 +5361,8 @@ const TEMPLE_TRINKETS = [
 
 const TEMPLE_CONSUMABLES = [
   { n: 'Vial of Cleansing', t: 'pot', eff: 'cure_ailment', minRank: 1, cost: 60, r: 'uncommon', d: 'A portable version of the temple\'s own cure \u2014 no need to travel back for a single affliction.' },
-  { n: 'Draught of Steady Hands', t: 'pot', eff: 'bless', minRank: 5, cost: 140, r: 'rare', d: 'Temple Chosen only. A blessing you can carry into the field instead of waiting for one.' }
+  { n: 'Draught of Steady Hands', t: 'pot', eff: 'bless', minRank: 5, cost: 140, r: 'rare', d: 'Temple Chosen only. A blessing you can carry into the field instead of waiting for one.' },
+  { n: 'Elixir of Swift Growth', t: 'pot', eff: 'xp_boost', v: 30, boostPct: 0.5, minRank: 2, cost: 250, r: 'rare', d: '+50% XP for 30 real minutes. Only one can be active at a time \u2014 the Temple will not sell you a second bottle while the first still glows.' }
 ];
 
 function getGuildRank() {
@@ -6236,6 +6270,16 @@ function getPrestigeTitle() {
 }
 
 function getPrestigeXpMult() { return 1 + (G.prestige.xpBonusPct || 0) / 100 + getPrestigeMilestoneBonus('xpBonusFlat'); }
+
+// Growth Elixir — real-time-duration XP boost, checked live against Date.now() rather
+// than needing a separate expiry tick. Stacks multiplicatively with everything else
+// (Guild, Prestige), same as those do with each other.
+function getExpBoosterMult() {
+  if (G.expBooster && G.expBooster.expiresAt > Date.now()) {
+    return 1 + G.expBooster.mult;
+  }
+  return 1;
+}
 function getPrestigeGoldMult() { return 1 + (G.prestige.goldBonusPct || 0) / 100 + getPrestigeMilestoneBonus('goldBonusFlat'); }
 
 function isPrestigeUnlocked() {
@@ -6352,7 +6396,7 @@ function startDragonHunt(dragonId) {
 
 function handleDragonHuntVictory() {
   const dragon = getDragonById(G.dragonHunt.currentId) || DRAGONS[0];
-  const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult());
+  const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult() * getExpBoosterMult());
   const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * getPrestigeGoldMult());
   G.p.xp += txp;
   G.p.gold += tg2;
@@ -6673,7 +6717,7 @@ function handleChainQuestVictory() {
   const prog = getChainProgress(G.activeChainQuestId);
   const stage = chain.stages[prog.stageIndex];
 
-  const txp = Math.floor(stage.rw.xp * getPrestigeXpMult());
+  const txp = Math.floor(stage.rw.xp * getPrestigeXpMult() * getExpBoosterMult());
   const tg2 = Math.floor(stage.rw.g * getPrestigeGoldMult());
   G.p.xp += txp;
   G.p.gold += tg2;
@@ -8576,7 +8620,7 @@ function handleVictory() {
   const guildGoldBonus = getTotalGuildHallGoldBonus() + getGuildBonus('goldBonus');
   if (guildXpBonus > 0) txp = Math.floor(txp * (1 + guildXpBonus));
   if (guildGoldBonus > 0) tg2 = Math.floor(tg2 * (1 + guildGoldBonus));
-  txp = Math.floor(txp * getPrestigeXpMult());
+  txp = Math.floor(txp * getPrestigeXpMult() * getExpBoosterMult());
   tg2 = Math.floor(tg2 * getPrestigeGoldMult());
   
   G.p.xp += txp;
@@ -10779,7 +10823,7 @@ function startMercenaryContract() {
 
 function handleMercenaryVictory() {
   const contract = G.mercenary.current;
-  const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult());
+  const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult() * getExpBoosterMult());
   const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * getPrestigeGoldMult());
   G.p.xp += txp;
   G.p.gold += tg2;
@@ -11001,7 +11045,7 @@ handleVictory = function() {
   if (G.bossRush.active) {
     const defeatedName = G.currentBoss ? G.currentBoss.n : 'The boss';
     const rewardMult = Math.min(BOSS_RUSH_REWARD_MULT_CAP, 1 + G.bossRush.streak * BOSS_RUSH_REWARD_MULT_PER_KILL);
-    const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * rewardMult * getPrestigeXpMult());
+    const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * rewardMult * getPrestigeXpMult() * getExpBoosterMult());
     const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * rewardMult * getPrestigeGoldMult());
     G.p.xp += txp;
     G.p.gold += tg2;
@@ -11935,6 +11979,7 @@ function saveGame() {
     guildRep: G.guildRep,
     templeRep: G.templeRep,
     companionPrestige: G.companionPrestige,
+    expBooster: G.expBooster || null,
     guildRepBalance: G.guildRepBalance,
     guildContracts: G.guildContracts.map(c => ({ id: c.id, c: c.c, done: c.done, refreshWeek: c.refreshWeek })),
     strongholdSiege: G.strongholdSiege,
@@ -12158,6 +12203,7 @@ function loadGame() {
     G.guildRep = data.guildRep || 0;
     G.templeRep = data.templeRep || 0;
     G.companionPrestige = data.companionPrestige || {};
+    G.expBooster = data.expBooster || null;
     G.guildRepBalance = data.guildRepBalance !== undefined ? data.guildRepBalance : 0;
     if (data.guildContracts) {
       for (let c of G.guildContracts) {
@@ -13063,7 +13109,9 @@ function render(){
   h+='<div class="hdr-r">';
   h+='<div class="sb"><div class="sb-row"><span class="si">HP</span><div class="bar"><div class="bf bf-hp" style="width:'+((G.p.hp/G.p.mhp)*100)+'%"></div></div></div><span class="bt">'+G.p.hp+'/'+G.p.mhp+'</span></div>';
   h+='<div class="sb"><div class="sb-row"><span class="si">MP</span><div class="bar"><div class="bf bf-mp" style="width:'+((G.p.mp/G.p.mmp)*100)+'%"></div></div></div><span class="bt">'+G.p.mp+'/'+G.p.mmp+'</span></div>';
-  h+='<div class="sb"><div class="sb-row"><span class="si">XP</span><div class="bar"><div class="bf bf-xp" style="width:'+((G.p.xp/G.p.xpN)*100)+'%"></div></div></div><span class="bt">'+G.p.xp.toLocaleString()+'/'+G.p.xpN.toLocaleString()+' ('+Math.floor((G.p.xp/G.p.xpN)*100)+'%)</span></div>';
+  const boosterActive = G.expBooster && G.expBooster.expiresAt > Date.now();
+  const boosterMinsLeft = boosterActive ? Math.ceil((G.expBooster.expiresAt - Date.now()) / 60000) : 0;
+  h+='<div class="sb"><div class="sb-row"><span class="si">XP</span><div class="bar"><div class="bf bf-xp" style="width:'+((G.p.xp/G.p.xpN)*100)+'%"></div></div></div><span class="bt">'+G.p.xp.toLocaleString()+'/'+G.p.xpN.toLocaleString()+' ('+Math.floor((G.p.xp/G.p.xpN)*100)+'%)'+(boosterActive ? ' <span style="color:var(--gold);">\u26A1+'+Math.floor(G.expBooster.mult*100)+'% '+boosterMinsLeft+'m</span>' : '')+'</span></div>';
   h+='<div class="gold">GOLD: '+G.p.gold+'</div></div></div>';
   if(G.p.buffs.length>0)h+='<div class="buffs">'+G.p.buffs.map(b=>'<span class="bp">'+b.n+' ('+b.t+')</span>').join('')+'</div>';
   if(G.p.ailments.length>0)h+='<div class="buffs">'+G.p.ailments.map(a=>'<span class="bp" style="background:var(--danger);">'+AILMENT_TYPES[a.type].icon+' '+a.n+'</span>').join('')+'</div>';
@@ -16955,6 +17003,14 @@ function usePotionInCombat(invIndex) {
     if (alreadyBlessed) { lg('❌ Already blessed.'); G.potionMenu = false; render(); return; }
     G.p.buffs.push({ n: 'Blessed', t: 4, atk: Math.ceil(G.p.lvl * 0.3) });
     lg('🙏 Used ' + it.n + '! ATK increased for a few turns.');
+  } else if (it.eff === 'xp_boost') {
+    if (G.expBooster && G.expBooster.expiresAt > Date.now()) {
+      lg('❌ A growth elixir is already active. Wait for it to run out first.');
+      G.potionMenu = false; render(); return;
+    }
+    const durationMs = (it.v || 30) * 60 * 1000; // v = minutes, defaults to 30
+    G.expBooster = { mult: it.boostPct || 0.5, expiresAt: Date.now() + durationMs };
+    lg('✨ Used ' + it.n + '! +' + Math.floor((it.boostPct || 0.5) * 100) + '% XP for the next ' + (it.v || 30) + ' minutes.');
   }
 
   it.q--;
@@ -16969,7 +17025,7 @@ function usePotionInCombat(invIndex) {
 function getCombatPotions() {
   return G.p.inv.filter(it => 
     (it.t === 'pot' || it.t === 'food' || it.t === 'drink') &&
-    (it.eff === 'heal' || it.eff === 'mana' || it.eff === 'cure_ailment' || it.eff === 'bless') ||
+    (it.eff === 'heal' || it.eff === 'mana' || it.eff === 'cure_ailment' || it.eff === 'bless' || it.eff === 'xp_boost') ||
     it.t === 'revive'
   );
 }
