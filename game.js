@@ -4914,7 +4914,7 @@ function resolveEventChoice(eventId, choiceKey) {
     g = choice.baseG + (success ? choice.bonusG : 0);
   }
 
-  xp = Math.floor(xp * getPrestigeXpMult() * getExpBoosterMult());
+  xp = Math.floor(xp * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
   g = Math.floor(g * getPrestigeGoldMult());
   G.p.xp += xp;
   G.p.gold += g;
@@ -4993,7 +4993,7 @@ function flipRuneCard(idx) {
 function finishRuneVault() {
   const rv = G.runeVault;
   const result = RUNE_VAULT_TIERS.find(t => rv.moves <= t.maxMoves);
-  const xp = Math.floor(result.xp * getPrestigeXpMult() * getExpBoosterMult());
+  const xp = Math.floor(result.xp * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
   const g = Math.floor(result.g * getPrestigeGoldMult());
   G.p.xp += xp;
   G.p.gold += g;
@@ -6282,6 +6282,23 @@ function getExpBoosterMult() {
 }
 function getPrestigeGoldMult() { return 1 + (G.prestige.goldBonusPct || 0) / 100 + getPrestigeMilestoneBonus('goldBonusFlat'); }
 
+// Mimi and Aisy — restored as passive, always-on bonuses once unlocked, rather than
+// the chance-based Dreamsight/Shadow Step flavor text that was never actually wired
+// to anything. A flat, guaranteed presence in every fight matches "joined the battle
+// as an ally" far better than something that'd only ever matter if you were actively
+// watching combat happen — and actually helps during AFK Adventure/Grind, which the
+// old chance-based framing never would have.
+function isAllyUnlocked(name) {
+  const npc = G.npcs.find(n => n.n === name && n.t === 'ally');
+  return npc ? npc.unlocked : false;
+}
+function getAllyXpBonus() {
+  return isAllyUnlocked('Mimi') ? 0.08 : 0;
+}
+function getAllyAtkBonus() {
+  return isAllyUnlocked('Aisy') ? 0.08 : 0;
+}
+
 function isPrestigeUnlocked() {
   return G.p.lvl >= PRESTIGE_MIN_LEVEL;
 }
@@ -6396,7 +6413,7 @@ function startDragonHunt(dragonId) {
 
 function handleDragonHuntVictory() {
   const dragon = getDragonById(G.dragonHunt.currentId) || DRAGONS[0];
-  const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult() * getExpBoosterMult());
+  const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
   const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * getPrestigeGoldMult());
   G.p.xp += txp;
   G.p.gold += tg2;
@@ -6717,7 +6734,7 @@ function handleChainQuestVictory() {
   const prog = getChainProgress(G.activeChainQuestId);
   const stage = chain.stages[prog.stageIndex];
 
-  const txp = Math.floor(stage.rw.xp * getPrestigeXpMult() * getExpBoosterMult());
+  const txp = Math.floor(stage.rw.xp * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
   const tg2 = Math.floor(stage.rw.g * getPrestigeGoldMult());
   G.p.xp += txp;
   G.p.gold += tg2;
@@ -8620,7 +8637,7 @@ function handleVictory() {
   const guildGoldBonus = getTotalGuildHallGoldBonus() + getGuildBonus('goldBonus');
   if (guildXpBonus > 0) txp = Math.floor(txp * (1 + guildXpBonus));
   if (guildGoldBonus > 0) tg2 = Math.floor(tg2 * (1 + guildGoldBonus));
-  txp = Math.floor(txp * getPrestigeXpMult() * getExpBoosterMult());
+  txp = Math.floor(txp * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
   tg2 = Math.floor(tg2 * getPrestigeGoldMult());
   
   G.p.xp += txp;
@@ -9017,6 +9034,7 @@ function pa(si, ti, isFreeCast) {
   }
   finalDamage = applySynergyDamage(finalDamage, 'spell');
   finalDamage = Math.max(1, Math.floor(finalDamage * getAilmentMult('atk')));
+  if (getAllyAtkBonus() > 0) finalDamage = Math.floor(finalDamage * (1 + getAllyAtkBonus()));
 
   // Cryomancer's Eternal Winter: bonus damage against frozen enemies, checking the
   // same 'shock' status Absolute Zero's freeze applies (frozen enemies skip a turn
@@ -10823,7 +10841,7 @@ function startMercenaryContract() {
 
 function handleMercenaryVictory() {
   const contract = G.mercenary.current;
-  const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult() * getExpBoosterMult());
+  const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
   const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * getPrestigeGoldMult());
   G.p.xp += txp;
   G.p.gold += tg2;
@@ -11045,7 +11063,7 @@ handleVictory = function() {
   if (G.bossRush.active) {
     const defeatedName = G.currentBoss ? G.currentBoss.n : 'The boss';
     const rewardMult = Math.min(BOSS_RUSH_REWARD_MULT_CAP, 1 + G.bossRush.streak * BOSS_RUSH_REWARD_MULT_PER_KILL);
-    const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * rewardMult * getPrestigeXpMult() * getExpBoosterMult());
+    const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * rewardMult * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
     const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * rewardMult * getPrestigeGoldMult());
     G.p.xp += txp;
     G.p.gold += tg2;
@@ -15824,7 +15842,8 @@ function rCbt() {
         const icon = isHeal ? '❤️' : '💧';
         const color = isHeal ? '#ef4444' : '#3b82f6';
         const current = isHeal ? G.p.hp + '/' + G.p.mhp : G.p.mp + '/' + G.p.mmp;
-        const full = isHeal ? G.p.hp >= G.p.mhp : G.p.mp >= G.p.mmp;
+        const partyNeedsHeal = G.party.some(p => p.on && p.hp > 0 && p.hp < p.mhp);
+        const full = isHeal ? (G.p.hp >= G.p.mhp && !partyNeedsHeal) : G.p.mp >= G.p.mmp;
         h += '<button onclick="usePotionInCombat(' + i + ')" style="padding:10px 14px;border-radius:10px;border:1px solid ' + color + ';background:' + color + '15;color:' + (full ? 'var(--disabled)' : color) + ';font-size:12px;font-weight:600;cursor:' + (full ? 'not-allowed' : 'pointer') + ';display:flex;justify-content:space-between;align-items:center;opacity:' + (full ? '0.5' : '1') + ';">';
         h += '<span>' + icon + ' ' + it.n + (it.q > 1 ? ' x' + it.q : '') + '</span>';
         h += '<span>' + (full ? 'FULL' : '+' + it.v + ' ' + (isHeal ? 'HP' : 'MP')) + ' · ' + current + '</span>';
@@ -16985,10 +17004,19 @@ function usePotionInCombat(invIndex) {
   if (it.t !== 'pot' && it.t !== 'food' && it.t !== 'drink') return;
 
   if (it.eff === 'heal') {
-    const oldHp = G.p.hp;
-    G.p.hp = Math.min(G.p.mhp, G.p.hp + it.v);
-    const healed = G.p.hp - oldHp;
-    lg('🧪 Used ' + it.n + '! +' + healed + ' HP (' + G.p.hp + '/' + G.p.mhp + ')');
+    // Smart-target whoever is actually lowest on HP%, not always San — companions
+    // can take damage too, and previously had no way to ever receive a heal potion.
+    let target = { obj: G.p, name: 'You', pct: G.p.hp / G.p.mhp, isPlayer: true };
+    for (let p of G.party) {
+      if (p.on && p.hp > 0) {
+        const pct = p.hp / p.mhp;
+        if (pct < target.pct) target = { obj: p, name: p.n, pct: pct, isPlayer: false };
+      }
+    }
+    const oldHp = target.obj.hp;
+    target.obj.hp = Math.min(target.obj.mhp, target.obj.hp + it.v);
+    const healed = target.obj.hp - oldHp;
+    lg('🧪 Used ' + it.n + ' on ' + target.name + '! +' + healed + ' HP (' + target.obj.hp + '/' + target.obj.mhp + ')');
   } else if (it.eff === 'mana') {
     const oldMp = G.p.mp;
     G.p.mp = Math.min(G.p.mmp, G.p.mp + it.v);
