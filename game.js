@@ -680,7 +680,7 @@ const G = {
   // reputation system, not tied to owning any location.
   guildContracts: [
     { id: 'gc1', n: 'Goblin Warband', d: 'Defeat 8 Goblins for the Guild', t: 'kill_specific', target: 'Goblin', c: 0, need: 8, rw: { xp: 150, g: 100 }, rep: 20, done: false, refreshWeek: -1, minLv: 1, maxLv: 8 },
-    { id: 'gc2', n: 'Contract: Frozen Knight', d: 'Defeat the Frozen Knight for the Guild', t: 'boss_specific', target: 'Frozen Knight', c: 0, need: 1, rw: { xp: 300, g: 200 }, rep: 35, done: false, refreshWeek: -1, minLv: 5, maxLv: 12 },
+    { id: 'gc2', n: 'Contract: Frozen Knight', d: 'Defeat the Frozen Knight for the Guild', t: 'kill_specific', target: 'Frozen Knight', c: 0, need: 1, rw: { xp: 300, g: 200 }, rep: 35, done: false, refreshWeek: -1, minLv: 5, maxLv: 12 },
     { id: 'gc3', n: 'Rift Stalker Purge', d: 'Defeat 6 Rift Stalkers for the Guild', t: 'kill_specific', target: 'Rift Stalker', c: 0, need: 6, rw: { xp: 500, g: 350 }, rep: 50, done: false, refreshWeek: -1, minLv: 8, maxLv: 16 },
     { id: 'gc4', n: 'Contract: Elder Dragon', d: 'Defeat the Elder Dragon for the Guild', t: 'boss_specific', target: 'Elder Dragon', c: 0, need: 1, rw: { xp: 800, g: 550 }, rep: 70, done: false, refreshWeek: -1, minLv: 12, maxLv: 20 },
     { id: 'gc5', n: 'Void Weaver Contract', d: 'Defeat 5 Void Weavers for the Guild', t: 'kill_specific', target: 'Void Weaver', c: 0, need: 5, rw: { xp: 1100, g: 750 }, rep: 90, done: false, refreshWeek: -1, minLv: 16, maxLv: 24 },
@@ -719,7 +719,7 @@ const G = {
     { id: 'survivor', n: 'Survivor', d: 'Win a battle with 1 HP remaining', icon: '🩹', t: 'survivor', need: 1, rw: { xp: 75, g: 30 }, done: false, secret: false },
     { id: 'perfectionist', n: 'Perfectionist', d: 'Complete a 25-minute focus session', icon: '🧘', t: 'focus', need: 1, rw: { xp: 150, g: 75 }, done: false, secret: false },
     { id: 'secret_lover', n: 'Secret Admirer', d: 'Reach max affinity with a certain familiar...', icon: '❓', t: 'affinity', target: 'Soel', need: 100, rw: { xp: 500, g: 200 }, done: false, secret: true },
-    { id: 'void_touched', n: 'Void Touched', d: 'Survive the deepest darkness', icon: '❓', t: 'boss_specific', target: 'Abyssal Horror', need: 1, rw: { xp: 500, g: 250 }, done: false, secret: true },
+    { id: 'void_touched', n: 'Void Touched', d: 'Survive the deepest darkness', icon: '❓', t: 'kill_specific', target: 'Abyssal Horror', need: 1, rw: { xp: 500, g: 250 }, done: false, secret: true },
     { id: 'planar_pioneer', n: 'Planar Pioneer', d: 'Enter the Arcane Planar Tower', icon: '🌀', t: 'reach_level', need: 11, rw: { xp: 90, g: 85 }, done: false, secret: false },
     { id: 'rift_walker', n: 'Rift Walker', d: 'Defeat 20 enemies in the Arcane Planar Tower', icon: '🌌', t: 'kills', need: 20, rw: { xp: 500, g: 300 }, done: false, secret: false },
     { id: 'planarch_slayer', n: 'Planarch Slayer', d: 'Defeat The Planarch and claim the tower', icon: '👑', t: 'boss_specific', target: 'The Planarch', need: 1, rw: { xp: 420, g: 1500 }, done: false, secret: false },
@@ -5139,8 +5139,38 @@ function checkStoryline() {
   }
 }
 
-function checkBountyKill(enemyName) {
+function checkBountyKill(enemyName, isBossEncounter) {
   checkGuildContractKill(enemyName);
+
+  // boss_specific Guild Contracts — previously only ever checked inline inside the
+  // base handleVictory(), so Raid/Boss Rush/Dragon Hunt/Mercenary/Chain Quest/Grind
+  // never triggered these at all, only regular exploration combat did.
+  if (isBossEncounter && G.guildJoined) {
+    for (let c of G.guildContracts) {
+      if (c.done) continue;
+      if (c.t === 'boss_specific' && enemyName === c.target) completeGuildContract(c);
+    }
+  }
+
+  // G.quests — same story: kill_specific and boss_specific here were only ever
+  // updated inline inside the base handleVictory(), never in any alternate mode.
+  for (let q of G.quests) {
+    if (q.done) continue;
+    if (q.hidden && !q.revealed) continue;
+    if (q.t === 'kill_specific' && enemyName === q.target) {
+      q.c++;
+      lg('📜 ' + q.n + ': ' + q.c + '/' + q.need + ' ' + q.target + ' defeated');
+      showToast('📜 ' + q.target + ': ' + q.c + '/' + q.need);
+      if (q.c >= q.need) checkQ();
+    }
+    if (isBossEncounter && q.t === 'boss_specific' && enemyName === q.target) {
+      q.c++;
+      lg('📜 ' + q.n + ': ' + q.c + '/' + q.need + ' ' + q.target + ' defeated');
+      showToast('📜 ' + q.target + ': ' + q.c + '/' + q.need);
+      if (q.c >= q.need) checkQ();
+    }
+  }
+
   for (let b of G.bounties) {
     if (b.done) continue;
     if (b.t === 'kill_specific' && enemyName === b.target) {
@@ -6418,7 +6448,7 @@ function handleDragonHuntVictory() {
   G.p.xp += txp;
   G.p.gold += tg2;
   G.p.bossKills = (G.p.bossKills || 0) + 1;
-  checkBountyKill(dragon.n);
+  checkBountyKill(dragon.n, true);
   G.dragonHunt.cleared = G.dragonHunt.cleared || {};
   G.dragonHunt.cleared[dragon.id] = (G.dragonHunt.cleared[dragon.id] || 0) + 1;
   checkAchievements();
@@ -6741,7 +6771,7 @@ function handleChainQuestVictory() {
   G.p.gold += tg2;
   if (stage.type === 'boss') {
     G.p.bossKills = (G.p.bossKills || 0) + 1;
-    if (stage.name) checkBountyKill(stage.name);
+    if (stage.name) checkBountyKill(stage.name, true);
   } else if (stage.enemies) {
     for (let en of stage.enemies) checkBountyKill(en);
   }
@@ -6947,7 +6977,7 @@ function handleRaidVictory() {
   G.p.gold += tg2;
   if (stage && stage.type === 'boss') {
     G.p.bossKills = (G.p.bossKills || 0) + 1;
-    if (stage.name) checkBountyKill(stage.name);
+    if (stage.name) checkBountyKill(stage.name, true);
   } else if (stage && stage.enemies) {
     for (let en of stage.enemies) checkBountyKill(en);
   }
@@ -11080,7 +11110,7 @@ handleVictory = function() {
     G.p.xp += txp;
     G.p.gold += tg2;
     G.p.bossKills = (G.p.bossKills || 0) + 1;
-    checkBountyKill(defeatedName);
+    checkBountyKill(defeatedName, true);
     G.bossRush.streak++;
     if (G.bossRush.streak > (G.bossRush.bestStreak || 0)) G.bossRush.bestStreak = G.bossRush.streak;
     checkAchievements();
@@ -15358,6 +15388,10 @@ function rGuild() {
       h += '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px;">';
       h += '<div style="font-weight:600;font-size:12px;">' + c.n + (c.done ? ' <span style="color:var(--success);">✓ Complete</span>' : '') + '</div>';
       h += '<div style="font-size:10px;color:var(--text-dim);margin:4px 0;">' + c.d + '</div>';
+      if (!c.done && c.target) {
+        const tz = findMonsterZone(c.target);
+        if (tz) h += '<div style="font-size:10px;color:var(--accent-light);margin-bottom:4px;">📍 Found in: ' + tz.n + (tz.lv ? ' (Lv.' + tz.lv + ')' : '') + '</div>';
+      }
       if (!c.done) h += '<div class="pbar" style="margin-bottom:4px;"><div class="pbar-fill" style="width:' + Math.floor((c.c / c.need) * 100) + '%;"></div></div>';
       h += '<div style="font-size:10px;color:var(--accent-light);">Reward: ' + c.rw.xp + 'XP · ' + c.rw.g + 'G · ' + c.rep + ' Rep</div>';
       h += '</div>';
