@@ -11576,7 +11576,13 @@ function checkQuestChains(){
 }
 
 function addI(it){
-  const ex=G.p.inv.find(i=>i.n==it.n&&i.t==it.t);
+  // Equipment (identified by .slot) is always a unique instance — it can carry its own
+  // sockets/runes, forge upgrades, ilvl, and stat rolls, so it must never be merged into
+  // an existing same-named stack (that would silently discard all of that per-item state
+  // and just bump a quantity counter on an unrelated copy). Only true stackables (pot/
+  // food/drink/mat/revive, identified by .t) should dedupe by quantity.
+  if (it.slot) { G.p.inv.push({...it}); return; }
+  const ex=G.p.inv.find(i=>i.n==it.n&&i.t==it.t&&!i.slot);
   if(ex)ex.q+=it.q||1;
   else G.p.inv.push({...it,q:it.q||1});
 }
