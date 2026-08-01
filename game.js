@@ -11650,6 +11650,21 @@ function useI(ix){
   if(it.t=='pot' || it.t=='food' || it.t=='drink'){
     if(it.eff=='heal'){G.p.hp=Math.min(G.p.mhp,G.p.hp+it.v);lg('🍽️ Enjoyed '+it.n+'. +'+it.v+' HP.');}
     else if(it.eff=='mana'){G.p.mp=Math.min(G.p.mmp,G.p.mp+it.v);lg('🥤 Sipped '+it.n+'. +'+it.v+' MP.');}
+    else if(it.eff=='cure_ailment'){
+      if(G.p.ailments.length===0){lg('❌ No afflictions to cure.');return;}
+      cureAilments();lg('✨ Used '+it.n+'! Afflictions cleared.');
+    }
+    else if(it.eff=='bless'){
+      if(G.p.buffs.some(b=>b.n==='Blessed')){lg('❌ Already blessed.');return;}
+      G.p.buffs.push({n:'Blessed',t:4,atk:Math.ceil(G.p.lvl*0.3)});lg('🙏 Used '+it.n+'! ATK increased for a few turns.');
+    }
+    else if(it.eff=='xp_boost'){
+      if(G.expBooster && G.expBooster.expiresAt>Date.now()){lg('❌ A growth elixir is already active. Wait for it to run out first.');return;}
+      const durationMs=(it.v||30)*60*1000;
+      G.expBooster={mult:it.boostPct||0.5,expiresAt:Date.now()+durationMs};
+      lg('✨ Used '+it.n+'! +'+Math.floor((it.boostPct||0.5)*100)+'% XP for the next '+(it.v||30)+' minutes.');
+    }
+    else return; // unrecognized effect — don't consume the item for nothing
     it.q--; if(it.q<=0)G.p.inv.splice(ix,1);
     render();
   } else if(it.t=='revive'){
@@ -15941,6 +15956,10 @@ function rCbt() {
     const def = AILMENT_TYPES[a.type];
     badges.push({ icon: def.icon, text: a.n, full: a.n + ' \u2014 ATK/DEF weakened' + (def.dmgPerTurn ? ', ' + def.dmgPerTurn + ' HP/turn' : '') + '. Rest will not cure this \u2014 needs the Temple or a high-level Eliz.', color: 'var(--danger)' });
   }
+  if (G.expBooster && G.expBooster.expiresAt > Date.now()) {
+    const minsLeft = Math.ceil((G.expBooster.expiresAt - Date.now()) / 60000);
+    badges.push({ icon: '⚡', text: '+' + Math.floor(G.expBooster.mult * 100) + '% XP \u00b7 ' + minsLeft + 'm', full: 'Elixir of Swift Growth is active \u2014 +' + Math.floor(G.expBooster.mult * 100) + '% XP for the next ' + minsLeft + ' minute' + (minsLeft === 1 ? '' : 's') + '.', color: 'var(--gold)' });
+  }
 
   // === TOP STRIP: auto-combat + potion buttons and status badges share one row ===
   h += '<div class="combat-top-strip">';
@@ -16410,6 +16429,9 @@ function rInv(){
       if(it.eff==='heal') h+='<div style="font-size:10px;color:var(--success);">+'+it.v+' HP</div>';
       if(it.eff==='mana') h+='<div style="font-size:10px;color:var(--mp);">+'+it.v+' MP</div>';
       if(it.eff==='revive') h+='<div style="font-size:10px;color:var(--accent-light);">Revive '+it.v+'% HP</div>';
+      if(it.eff==='cure_ailment') h+='<div style="font-size:10px;color:var(--accent-light);">Cures afflictions</div>';
+      if(it.eff==='bless') h+='<div style="font-size:10px;color:var(--gold);">+ATK for 4 turns</div>';
+      if(it.eff==='xp_boost') h+='<div style="font-size:10px;color:var(--gold);">+'+Math.floor((it.boostPct||0.5)*100)+'% XP \u00b7 '+(it.v||30)+'m</div>';
       h+='<div class="iq">x'+it.q+'</div>';
       h+='<div class="ia">';
       h+='<button class="ib ib-u" data-i="'+i+'">Use</button>';
