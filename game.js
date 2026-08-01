@@ -2101,9 +2101,10 @@ storyJournal: {
         summary: "Joel's siblings — what his family survived, and what it is still carrying.",
         scenes: [
           { speaker: 'Narrator', text: 'The conversation about his parents opens a door Joel does not fully close again. A few nights later, unprompted, he tells you the rest — not all at once, but enough.' },
-          { speaker: 'Joel', text: '"My older sister had a similar story to my parents, in the beginning," he says. "An age gap, resistance from his side of the family. But hers went somewhere much worse than my parents\' ever did. Domestic violence. She had to remove herself from it — completely, no half measures. Her children, older now, live with my mother. That was not a small thing to walk away from. It was the right thing. Those are not always the same, and she did it anyway."' },
+          { speaker: 'Joel', text: '"My older sister has a story of her own," he says. "Not an age gap, this time. Pure resistance from the family, from the start. He hid everything — who he really was, what he already had going on, all of it. And she was blindly in love. The kind where every warning starts sounding like jealousy instead of truth. We tried to tell her. She was not ready to hear it, not then."' },
+          { speaker: 'Joel', text: '"It went somewhere much worse than any of us could have stopped by just talking. Domestic violence. She had to remove herself from it — completely, no half measures. Her children, older now, live with my mother. That was not a small thing to walk away from. It was the right thing. Those are not always the same, and she did it anyway."' },
           { speaker: 'San', text: 'You do not say anything clever. You just let him keep going, because this is clearly a story that needs to be told all the way through once it starts.' },
-          { speaker: 'Joel', text: '"I have four brothers, total, and one sister," he continues. "The brother right after me — we were estranged for a long stretch. I do not even remember exactly what started it anymore, which tells you something about how much it mattered in the end. We only really put it behind us after our father died. Grief has a way of making old arguments look very small."' },
+          { speaker: 'Joel', text: '"I have three siblings, total," he continues. "My sister is the eldest. Then me. Then two brothers after that — second of four, if you are counting." A small, tired smile. "The brother right after me — we were estranged for a long stretch. I do not even remember exactly what started it anymore, which tells you something about how much it mattered in the end. We only really put it behind us after our father died. Grief has a way of making old arguments look very small."' },
           { speaker: 'San', text: '"And now?" you ask.' },
           { speaker: 'Joel', text: '"Now the trouble is my youngest brother," Joel says, and rubs a hand over his face, tired in a way that has nothing to do with combat. "The last of us. He started a family with no planning, no job to speak of. The child is with his girlfriend most of the time, but comes to my mother whenever the girlfriend is working. My mother never gets a real break from any of it — she just absorbs whatever the rest of us cannot hold."' },
           { speaker: 'San', text: '"That sounds like a lot for one person to carry."' },
@@ -12020,6 +12021,21 @@ const ARCHETYPE_COLOR = {
   arachnid: 'var(--arch-arachnid)', serpent: 'var(--arch-serpent)', flying: 'var(--arch-flying)', knight: 'var(--arch-knight)',
   elemental: 'var(--arch-elemental)', eye: 'var(--arch-eye)', default: 'var(--arch-default)'
 };
+// Inline line-art icons — one consistent stroke language (1.6 stroke, round joins, small filled
+// accent dots via class="fill") across all 11 archetypes, designed to sit inside .eicon-medallion.
+const ARCHETYPE_SVG = {
+  beast: '<path d="M4 18 L7 9 L10 12 L12 6 L14 12 L17 9 L20 18 L16 15 L12 18 L8 15 Z"/><circle class="fill" cx="9.5" cy="10.5" r="0.6"/><circle class="fill" cx="14.5" cy="10.5" r="0.6"/>',
+  dragon: '<path d="M4 14 L8 8 L11 11 L12 6 L14 10 L18 6 L16 13 C14.5 15.5 9.5 15.5 8 13 Z"/><path d="M8 13 L6 19 M16 13 L18 19 M10.5 14.5 L10 18 M13.5 14.5 L14 18"/><circle class="fill" cx="10.5" cy="9.5" r="0.6"/>',
+  undead: '<path d="M12 3 C7 3 4 6.5 4 11 C4 14 5.5 16 7 17 L7 20 L9.5 20 L9.5 18 L11 18 L11 20 L13 20 L13 18 L14.5 18 L14.5 20 L17 20 L17 17 C18.5 16 20 14 20 11 C20 6.5 17 3 12 3 Z"/><circle class="fill" cx="9" cy="11" r="1.4"/><circle class="fill" cx="15" cy="11" r="1.4"/><path class="fill" d="M11 14 L13 14 L12 15.5 Z"/>',
+  construct: '<rect x="6" y="7" width="12" height="10" rx="2"/><path d="M9 7 L9 4 M15 7 L15 4 M9 4 L15 4"/><circle class="fill" cx="9.5" cy="12" r="1.3"/><circle class="fill" cx="14.5" cy="12" r="1.3"/><path d="M9 15.5 L15 15.5"/><path d="M4 11 L6 11 M18 11 L20 11"/>',
+  arachnid: '<ellipse cx="12" cy="13" rx="3.2" ry="4"/><circle cx="12" cy="7.5" r="2"/><path d="M9.5 11 L4 8 M9.5 12.5 L3.5 12 M9.5 14 L4 16 M14.5 11 L20 8 M14.5 12.5 L20.5 12 M14.5 14 L20 16"/>',
+  serpent: '<path d="M4 18 Q5 12 9 13 Q13 14 12 9 Q11 5 15 5.5 Q18 6 17.5 9"/><circle cx="17.7" cy="8" r="1.6"/><path d="M18.8 7 L21 5.5 M19 8.5 L21.5 8"/><circle class="fill" cx="18.1" cy="7.6" r="0.4"/>',
+  flying: '<path d="M12 9 C9 5 4 5.5 3 10 C6.5 9 9.5 10.5 11 12 Z"/><path d="M12 9 C15 5 20 5.5 21 10 C17.5 9 14.5 10.5 13 12 Z"/><ellipse cx="12" cy="12.5" rx="1.6" ry="2.2"/><path d="M11 9.5 L10 7.5 M13 9.5 L14 7.5"/>',
+  knight: '<path d="M7 12 C7 6.5 9.5 4 12 4 C14.5 4 17 6.5 17 12 L17 15 C17 17 15 18 12 18 C9 18 7 17 7 15 Z"/><path d="M10.5 10 L10.5 15 M13.5 10 L13.5 15 M8 12.5 L16 12.5"/><path d="M12 4 L12 1.5"/><path class="fill" d="M12 1.5 L15 2.5 L12 3.5 Z"/>',
+  elemental: '<path d="M12 3 C9 7 6 10 6 14 C6 18 9 21 12 21 C15 21 18 18 18 14 C18 10 15 7 12 3 Z"/><path class="fill" d="M12 9 C10.5 11 10 13 10 15 C10 17 11 18.5 12 18.5 C13 18.5 14 17 14 15 C14 13 13.5 11 12 9 Z"/>',
+  eye: '<path d="M3 12 C6 7 18 7 21 12 C18 17 6 17 3 12 Z"/><circle class="fill" cx="12" cy="12" r="2.6"/><path d="M12 3.5 L12 6 M12 18 L12 20.5 M3.5 12 L6 12 M18 12 L20.5 12"/>',
+  default: '<path d="M6 9 C6 5 9 3 12 3 C15 3 18 5 18 9 L18 16 L16 13.5 L14 16 L12 13.5 L10 16 L8 13.5 L6 16 Z"/><circle class="fill" cx="9.5" cy="9.5" r="1"/><circle class="fill" cx="14.5" cy="9.5" r="1"/>'
+};
 function ee(n){
   const archetype = getEnemyArchetype(n);
   return ARCHETYPE_EMOJI[archetype] || ARCHETYPE_EMOJI.default;
@@ -12027,6 +12043,11 @@ function ee(n){
 function ac(n){
   const archetype = getEnemyArchetype(n);
   return ARCHETYPE_COLOR[archetype] || ARCHETYPE_COLOR.default;
+}
+function es(n){
+  const archetype = getEnemyArchetype(n);
+  const inner = ARCHETYPE_SVG[archetype] || ARCHETYPE_SVG.default;
+  return '<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
 }
 
 function re(r){const m={'Tank':'🛡️','Rogue':'🗡️','Mage':'🔮','Healer':'💚','Ranger':'🏹','Warrior':'⚔️','Support':'🍀'};return m[r]||'👤';}
@@ -16028,7 +16049,7 @@ function rCbt() {
     const lowHp = !d && hpPct <= 0.3;
 
     h += '<div class="ecard ecard-compact ' + (d ? 'dead' : '') + ' ' + s + (isBoss ? ' boss' : '') + '" data-i="' + i + '" style="--e-elem:' + elemVar + ';" title="' + e.n + (isBoss ? ' (Boss)' : '') + '">';
-    h += '<div class="eicon eicon-compact"><span class="eicon-medallion compact" style="--arch-color:' + (d ? 'var(--arch-undead)' : ac(e.n)) + ';">' + (d ? '💀' : ee(e.n)) + (isBoss && !d ? '<span class="boss-crown">👑</span>' : '') + '</span></div>';
+    h += '<div class="eicon eicon-compact"><span class="eicon-medallion compact" style="--arch-color:' + (d ? 'var(--arch-undead)' : ac(e.n)) + ';">' + (d ? es('skeleton') : es(e.n)) + (isBoss && !d ? '<span class="boss-crown">👑</span>' : '') + '</span></div>';
     h += '<div class="ename ename-compact">' + e.n + '</div>';
     h += (d ? '<div class="dt">DEAD</div>' : '<div class="hps' + (lowHp ? ' low' : '') + '"><div class="bf bf-hp" style="width:' + (hpPct * 100) + '%"></div></div><div class="hpt">' + e.hp + '/' + e.mhp + '</div>');
     h += '</div>';
