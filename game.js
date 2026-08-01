@@ -16584,10 +16584,33 @@ function getEquipComparison(item) {
   return { better: false, arrow: '●', color: '#9ca3af', text: 'Sidegrade' };
 }
 
+function setInvTab(tab) {
+  G.invTab = tab;
+  render();
+}
+
 function rInv(){
+  const invTab = G.invTab || 'all';
   let h='<div class="inventory-view"><h2 class="st">Inventory</h2>';
 
+  // Tab bar — lets the player jump straight to potions/gear/etc instead of
+  // scrolling past everything to get there.
+  const invTabs = [
+    { id: 'all', label: 'All' },
+    { id: 'gear', label: '⚔️ Gear' },
+    { id: 'potions', label: '🧪 Potions' },
+    { id: 'party', label: '🧝 Party Gear' },
+    { id: 'materials', label: '💎 Materials' }
+  ];
+  h += '<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;">';
+  for (let t of invTabs) {
+    const sel = invTab === t.id;
+    h += '<button onclick="setInvTab(\'' + t.id + '\')" class="tier-btn' + (sel ? ' sel' : '') + '" style="flex-shrink:0;">' + t.label + '</button>';
+  }
+  h += '</div>';
+
   // Equipment Stats Summary
+  if (invTab === 'all' || invTab === 'gear') {
   const eqStats = getEquippedStats();
   h += '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:16px;">';
   h += '<div style="font-size:12px;font-weight:600;color:var(--accent-light);margin-bottom:8px;">⚔️ Equipment Bonuses</div>';
@@ -16633,6 +16656,7 @@ function rInv(){
     h+='</div>';
   }
   h+='</div></div>';
+  }
 
   // Categorize inventory items
   const equipItems = [];
@@ -16665,7 +16689,7 @@ function rInv(){
   });
 
   // Companion gear section — informational only; equip/unequip happens on the Party screen
-  if(companionGearItems.length > 0){
+  if(companionGearItems.length > 0 && (invTab === 'all' || invTab === 'party')){
     h+='<div class="its"><h3>🧝 Companion Gear ('+companionGearItems.length+')</h3><div class="ig">';
     for(let ci of companionGearItems){
       const it = ci.item;
@@ -16687,7 +16711,7 @@ function rInv(){
   }
 
   // Equipment section
-  if(equipItems.length > 0){
+  if(equipItems.length > 0 && (invTab === 'all' || invTab === 'gear')){
     h+='<div class="its"><h3>🎒 Equipment ('+equipItems.length+')</h3><div class="ig">';
     for(let ei of equipItems){
       const it = ei.item;
@@ -16722,7 +16746,7 @@ function rInv(){
   }
 
   // Consumables section
-  if(consumableItems.length > 0){
+  if(consumableItems.length > 0 && (invTab === 'all' || invTab === 'potions')){
     h+='<div class="its"><h3>🧪 Consumables ('+consumableItems.length+')</h3><div class="ig">';
     for(let ci of consumableItems){
       const it = ci.item;
@@ -16747,7 +16771,7 @@ function rInv(){
   }
 
   // Recipe books
-  if(bookItems.length > 0){
+  if(bookItems.length > 0 && (invTab === 'all' || invTab === 'materials')){
     h+='<div class="its"><h3>📖 Recipe Books ('+bookItems.length+')</h3><div class="ig">';
     for(let bi of bookItems){
       const it = bi.item;
@@ -16766,7 +16790,7 @@ function rInv(){
   }
 
   // Materials section
-  if(matItems.length > 0){
+  if(matItems.length > 0 && (invTab === 'all' || invTab === 'materials')){
     h+='<div class="its"><h3>💎 Materials ('+matItems.length+')</h3><div class="ig">';
     for(let mi of matItems){
       const it = mi.item;
@@ -16781,7 +16805,7 @@ function rInv(){
   }
 
   // Other items
-  if(otherItems.length > 0){
+  if(otherItems.length > 0 && (invTab === 'all' || invTab === 'materials')){
     h+='<div class="its"><h3>📦 Other ('+otherItems.length+')</h3><div class="ig">';
     for(let oi of otherItems){
       const it = oi.item;
@@ -16796,6 +16820,16 @@ function rInv(){
   }
 
   if(G.p.inv.length==0) h+='<div class="ei">Your pack is empty.</div>';
+  else {
+    const tabHasItems = {
+      all: true,
+      gear: equipItems.length > 0,
+      potions: consumableItems.length > 0,
+      party: companionGearItems.length > 0,
+      materials: (matItems.length + bookItems.length + otherItems.length) > 0
+    };
+    if (!tabHasItems[invTab]) h += '<div class="ei">Nothing in this category yet.</div>';
+  }
   h+='</div>';
   return h;
 }
