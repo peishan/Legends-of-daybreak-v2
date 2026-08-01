@@ -12527,32 +12527,9 @@ function loadGame() {
     }
     // Unlock any new rest sites added since last save (for level already achieved)
     unlockRestSites();
-    // Same catch-up for traders/allies (e.g. Mimi, Aisy) — was previously only checked
-    // inside lvlup()'s level-up loop, never re-checked on load.
-    checkNPCUnlocks();
 
 
 
-    if (data.affinity) {
-      for (let name in data.affinity) {
-        if (G.affinity[name]) {
-          G.affinity[name].val = data.affinity[name].val;
-          G.affinity[name].lastInteract = data.affinity[name].lastInteract;
-        }
-      }
-    }
-    if (data.achievements) {
-      for (let savedAch of data.achievements) {
-        const ach = G.achievements.find(a => a.id === savedAch.id);
-        if (ach) {
-          ach.done = savedAch.done;
-          ach.revealed = savedAch.revealed;
-        }
-      }
-    }
-    if (data.bestiary) {
-      G.bestiary = data.bestiary;
-    }
     if (data.affinity) {
       for (let name in data.affinity) {
         if (G.affinity[name]) {
@@ -12615,6 +12592,12 @@ function loadGame() {
         }
       }
     }
+    // Catch-up for traders/allies (e.g. Mimi, Aisy) — must run AFTER affinity and npc
+    // unlocked-state are both restored above, or it either checks against stale (pre-load)
+    // affinity, or gets its result immediately overwritten by the saved 'unlocked' flag.
+    // Re-checking here means an ally whose affinity requirement is already met unlocks
+    // even if the save file itself hadn't caught up yet.
+    checkNPCUnlocks();
     if (data.bounties) {
       for (let i = 0; i < G.bounties.length; i++) {
         if (data.bounties[i]) {
