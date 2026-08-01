@@ -2658,6 +2658,25 @@ storyJournal: {
           { speaker: 'San', text: '"Now it just feels like the road," you say, and step forward, past the last thing that was ever mapped, into everything that has not been yet.' },
         ]
       }
+,{
+        id: 'journal_070',
+        title: 'Forever and Ever',
+        chapter: 70,
+        unlockType: 'level',
+        unlockAt: 58,
+        icon: '🌙',
+        summary: 'The night before whatever comes next, San finds the one certainty this world has never once tried to take from her.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The camp is quiet by the time you finally sit still. Everyone else has drifted off to their own corners of the fire — Aisyah sharpening something that does not need sharpening, Soel curled against Joel\'s pack, the whole party breathing slow around you. Joel finds you last, the way he always does, like he waits on purpose so it is just the two of you by the time he arrives.' },
+          { speaker: 'Joel', text: '"These battles are endless," he says, quiet, not a complaint, just true. He sits close enough that his shoulder finds yours without either of you deciding it should. "But I am here with you. Forever and ever."' },
+          { speaker: 'Narrator', text: 'You do not answer with words. You close your eyes instead, and let yourself lean the rest of the way into him — into the steady weight of him, the warmth that has never once, not on the worst nights, felt like something you had to earn.' },
+          { speaker: 'Narrator', text: 'His hand finds your jaw, tilts your face up to his, careful the way he is careful with everything he has decided is worth protecting. You feel his breath before his mouth reaches yours — unhurried, like he has all the time in the world to get to you, like the endless battles outside this moment do not exist at all.' },
+          { speaker: 'Narrator', text: 'He holds you like something he has waited a long time to be allowed to hold. You kiss him back like someone who has finally stopped bracing for the ground to disappear. What follows, you keep — the warmth of him, the low sound of your own name in his voice, the fire burning down to embers while the rest of the world holds its breath and waits.' },
+          { speaker: 'Narrator', text: 'Later — much later, on the edge of sleep, his arm still around you — your mind does not go to tomorrow\'s fight. It has not, in a long time. It goes instead to the people you love, and the people who love you back, and the simple, ordinary miracle of all of them being safe, tonight, in whichever world happened to hold you.' },
+          { speaker: 'San', text: '"Forever and ever," you murmur back, half-asleep, and mean it the way you have only ever meant the truest things — without needing to prove it to anyone, least of all yourself.' },
+          { speaker: 'Narrator', text: 'The battles will keep coming. They always do. But that is a problem for the road ahead, not for tonight — and tonight, for once, is enough all on its own.' }
+        ]
+      }
 
 
 
