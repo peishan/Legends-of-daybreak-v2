@@ -35,6 +35,18 @@
   --el-arcane: #a78bfa;
   --el-poison: #84cc16;
   --el-none: #9ca3af;
+  /* Archetype accent palette — creature-type identity for enemy card medallions, distinct from elemental colors */
+  --arch-beast: #b45309;
+  --arch-dragon: #dc2626;
+  --arch-undead: #71717a;
+  --arch-construct: #64748b;
+  --arch-arachnid: #a21caf;
+  --arch-serpent: #15803d;
+  --arch-flying: #818cf8;
+  --arch-knight: #94a3b8;
+  --arch-elemental: #f97316;
+  --arch-eye: #ec4899;
+  --arch-default: #9ca3af;
 }
 
 [data-theme="light"] {
@@ -144,6 +156,22 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .ecard.dead::before { display: none; }
 .ecard.boss { border-color: var(--danger); border-width: 2px; animation: bossPulse 2.4s ease-in-out infinite; }
 .eicon { margin-bottom: 4px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)); }
+
+/* Sigil medallion — carved-badge treatment behind each enemy's emoji, tinted per archetype (--arch-color, set inline per enemy) */
+.eicon-medallion { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 4px; font-size: 19px; position: relative;
+  background: radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--arch-color, var(--arch-default)) 38%, var(--bg-card)) 0%, var(--bg-card) 72%);
+  border: 1.5px solid color-mix(in srgb, var(--arch-color, var(--arch-default)) 60%, var(--border));
+  box-shadow: inset 0 0 7px color-mix(in srgb, var(--arch-color, var(--arch-default)) 30%, transparent), 0 1px 3px rgba(0,0,0,0.35);
+  transition: box-shadow 0.2s, border-color 0.2s; }
+.eicon-medallion::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--arch-color, var(--arch-default)) 30%, transparent); pointer-events: none; }
+.eicon-medallion.compact { width: 34px; height: 34px; font-size: 16px; }
+.eicon-medallion .boss-crown { position: absolute; top: -7px; right: -5px; font-size: 14px; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.6)); }
+.ecard.dead .eicon-medallion { filter: grayscale(1); opacity: 0.55; box-shadow: none; border-color: #3a3a3a; }
+.ecard.dead .eicon-medallion::after { border-color: #3a3a3a; }
+.ecard.sel .eicon-medallion { border-color: var(--danger); box-shadow: inset 0 0 8px color-mix(in srgb, var(--danger) 35%, transparent), 0 0 8px color-mix(in srgb, var(--danger) 35%, transparent); }
+.ecard.boss .eicon-medallion { width: 44px; height: 44px; font-size: 21px; border-width: 2px; box-shadow: inset 0 0 10px color-mix(in srgb, var(--arch-color, var(--arch-default)) 40%, transparent), 0 0 10px color-mix(in srgb, var(--arch-color, var(--arch-default)) 45%, transparent); }
+.ecard.boss .eicon-medallion.compact { width: 38px; height: 38px; font-size: 18px; }
+
 .enemy-icon-svg { display: inline-block; width: 36px; height: 36px; color: var(--e-icon, var(--text-dim)); }
 .enemy-icon-svg svg { width: 100%; height: 100%; }
 .ecard.dead .enemy-icon-svg { color: #555; }

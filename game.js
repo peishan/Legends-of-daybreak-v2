@@ -12000,9 +12000,18 @@ const ARCHETYPE_EMOJI = {
   beast: '🐺', dragon: '🐲', undead: '💀', construct: '🤖', arachnid: '🕷️',
   serpent: '🐍', flying: '🦇', knight: '⚔️', elemental: '🔥', eye: '👁️', default: '👾'
 };
+const ARCHETYPE_COLOR = {
+  beast: 'var(--arch-beast)', dragon: 'var(--arch-dragon)', undead: 'var(--arch-undead)', construct: 'var(--arch-construct)',
+  arachnid: 'var(--arch-arachnid)', serpent: 'var(--arch-serpent)', flying: 'var(--arch-flying)', knight: 'var(--arch-knight)',
+  elemental: 'var(--arch-elemental)', eye: 'var(--arch-eye)', default: 'var(--arch-default)'
+};
 function ee(n){
   const archetype = getEnemyArchetype(n);
   return ARCHETYPE_EMOJI[archetype] || ARCHETYPE_EMOJI.default;
+}
+function ac(n){
+  const archetype = getEnemyArchetype(n);
+  return ARCHETYPE_COLOR[archetype] || ARCHETYPE_COLOR.default;
 }
 
 function re(r){const m={'Tank':'🛡️','Rogue':'🗡️','Mage':'🔮','Healer':'💚','Ranger':'🏹','Warrior':'⚔️','Support':'🍀'};return m[r]||'👤';}
@@ -16017,7 +16026,7 @@ function rCbt() {
     const lowHp = !d && hpPct <= 0.3;
 
     h += '<div class="ecard ecard-compact ' + (d ? 'dead' : '') + ' ' + s + (isBoss ? ' boss' : '') + '" data-i="' + i + '" style="--e-elem:' + elemVar + ';" title="' + e.n + (isBoss ? ' (Boss)' : '') + '">';
-    h += '<div class="eicon eicon-compact">' + (d ? '💀' : ee(e.n)) + (isBoss && !d ? ' 👑' : '') + '</div>';
+    h += '<div class="eicon eicon-compact"><span class="eicon-medallion compact" style="--arch-color:' + (d ? 'var(--arch-undead)' : ac(e.n)) + ';">' + (d ? '💀' : ee(e.n)) + (isBoss && !d ? '<span class="boss-crown">👑</span>' : '') + '</span></div>';
     h += '<div class="ename ename-compact">' + e.n + '</div>';
     h += (d ? '<div class="dt">DEAD</div>' : '<div class="hps' + (lowHp ? ' low' : '') + '"><div class="bf bf-hp" style="width:' + (hpPct * 100) + '%"></div></div><div class="hpt">' + e.hp + '/' + e.mhp + '</div>');
     h += '</div>';
