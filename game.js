@@ -3410,7 +3410,7 @@ function getTotalAC() {
     baseAC = 10 + Math.min(dexMod, 2) + (G.p.eq.armor.def || 0);
   }
   baseAC += eqStats.def;
-  const shieldBonus = G.p.buffs.reduce((s, b) => s + (b.def || 0), 0) + getFocusedDefBonus();
+  const shieldBonus = G.p.buffs.reduce((s, b) => s + (b.def || 0), 0) + getFocusedDefBonus() + getStatBoosterBonus('def');
   return baseAC + shieldBonus;
 }
 
@@ -3438,7 +3438,12 @@ function getFocusedDefBonus() {
 }
 
 function getPlayerAtkBuff() {
-  return G.p.buffs.reduce((s, b) => s + (b.atk || 0), 0) + getFocusedAtkBonus();
+  return G.p.buffs.reduce((s, b) => s + (b.atk || 0), 0) + getFocusedAtkBonus() + getStatBoosterBonus('atk');
+}
+
+function getStatBoosterBonus(stat) {
+  if (G.statBooster && G.statBooster.stat === stat && G.statBooster.expiresAt > Date.now()) return G.statBooster.val;
+  return 0;
 }
 
 // Migrates a single inventory item from the old t:'wep'/'arm'/'acc'/'pgear' schema to the
@@ -4671,28 +4676,19 @@ function buyFromNPC(npcName, itemIdx) {
   
   G.p.gold -= finalPrice;
 
-  // Equip items now carry .slot directly; only pot/food/drink/revive/mat still use .t
-  const boughtItem = { 
-    n: item.n, 
-    t: item.t, 
+  // Start from a full copy of the stock item so ANY field it defines survives the
+  // purchase (price/idx aside) — a hardcoded whitelist here previously dropped custom
+  // fields like stat/boostVal/mins the moment a new effect type introduced them,
+  // which either silently no-op'd the item or crashed useI() outright.
+  const { price: _price, ...itemData } = item;
+  const boughtItem = {
+    ...itemData,
     slot: item.slot || undefined,
     forCompanion: item.forCompanion || undefined,
-    q: item.q || 1, 
-    r: item.r,
+    q: item.q || 1,
     ilvl: item.ilvl || 1,
     d: item.d || 'A purchased item.'
   };
-  // Copy all stat properties
-  const statProps = ['atk', 'def', 'spd', 'hp', 'str', 'dex', 'con', 'int', 'wis', 'cha', 
-                     'fireDmg', 'iceDmg', 'lightDmg', 'voidDmg',
-                     'fireRes', 'iceRes', 'lightRes', 'voidRes',
-                     'lifeSteal', 'critChance', 'mpRegen', 'hpRegen', 'goldFind'];
-  for (let prop of statProps) {
-    if (item[prop] !== undefined) boughtItem[prop] = item[prop];
-  }
-  // Copy effect properties for consumables (food/drink/pot)
-  if (item.eff !== undefined) boughtItem.eff = item.eff;
-  if (item.v !== undefined) boughtItem.v = item.v;
   // Copy sockets as a fresh array — some traders (Wahyu) sell gear with built-in
   // bonus sockets baked into the stock definition itself, distinct from the normal
   // ilvl-based socket migration. Must clone, not reference, so multiple purchases of
@@ -7012,7 +7008,90 @@ const RAIDS = [
       { type: 'boss', name: 'Echo of Joel' }
     ],
     rw: { xp: 22000, gold: 17500 },
-    desc: "Aisyah's market, the flooded ledger, the docks, and the lighthouse — the whole shattered future, end to end, with elite remnants of that future guarding every threshold." }
+    desc: "Aisyah's market, the flooded ledger, the docks, and the lighthouse — the whole shattered future, end to end, with elite remnants of that future guarding every threshold." },
+  { id: 'long_silence_reckoning', name: 'The Long Silence, Reckoned', unlockLevel: 44, icon: '🌾',
+    stages: [
+      { type: 'elite', zoneLv: 36, enemies: ['Road Wraith', 'Toll Ghost'] },
+      { type: 'boss', name: 'The Vanished Guide' },
+      { type: 'elite', zoneLv: 37, enemies: ['Nursery Wraith', 'Quiet Sentinel'] },
+      { type: 'boss', name: 'Hollow Eliz' },
+      { type: 'elite', zoneLv: 38, enemies: ['Barracks Wraith', 'Hollow Drillmaster'] },
+      { type: 'boss', name: 'Rustbound Zaki' },
+      { type: 'elite', zoneLv: 39, enemies: ['Stormbound Wraith', 'Static Husk'] },
+      { type: 'boss', name: 'Mezstorm Unbound' }
+    ],
+    rw: { xp: 30000, gold: 24000 },
+    desc: "Senedra's roads, Eliz's nursery, Zaki's barracks, Mezstorm's storm — every echo from the Long Silence that the first gauntlet through this era never actually made you face." },
+  { id: 'weight_of_reckoning', name: 'The Weight of the Reckoning', unlockLevel: 47, icon: '⚖️',
+    stages: [
+      { type: 'elite', zoneLv: 40, enemies: ['Guttering Wisp', 'Forgotten Familiar'] },
+      { type: 'boss', name: 'The Fading Familiar' },
+      { type: 'elite', zoneLv: 41, enemies: ['Ledger Phantom', 'Route Ghost'] },
+      { type: 'boss', name: 'Echo of Aisyah' },
+      { type: 'elite', zoneLv: 42, enemies: ['Doubt Wraith', 'Silent Weight'] },
+      { type: 'boss', name: 'The Tired Version' },
+      { type: 'elite', zoneLv: 43, enemies: ['Chamber Sentinel', 'Time-Loop Wraith'] },
+      { type: 'boss', name: 'The Architect' }
+    ],
+    rw: { xp: 42000, gold: 33000 },
+    desc: "Soel's last ember, Aisyah's desperation, your own exhaustion given a face, and the one who built the door the Planarch fell through — the Reckoning's first half, unflinching." },
+  { id: 'reckonings_end', name: "The Reckoning's End", unlockLevel: 50, icon: '🕊️',
+    stages: [
+      { type: 'elite', zoneLv: 44, enemies: ['Remnant Guard', 'Echo Legion'] },
+      { type: 'boss', name: 'The Splinter Court' },
+      { type: 'elite', zoneLv: 45, enemies: ['Fracture Remnant', 'Broken Reality'] },
+      { type: 'boss', name: 'The First Break' },
+      { type: 'elite', zoneLv: 46, enemies: ['Rust Remnant', 'Unmended Shard'] },
+      { type: 'boss', name: 'The Unmended' },
+      { type: 'elite', zoneLv: 47, enemies: ['Backslide Wraith', 'Setback Sentinel'] },
+      { type: 'boss', name: 'The Relapse' }
+    ],
+    rw: { xp: 58000, gold: 46000 },
+    desc: 'Every echo fused into one tribunal, the original fracture itself, and the slow, unglamorous work of mending it — including the days it does not go forward. This is where the family stops surviving the world and starts actually repairing it.' },
+  { id: 'mending_complete', name: 'The Mending, Complete', unlockLevel: 53, icon: '🌅',
+    stages: [
+      { type: 'elite', zoneLv: 48, enemies: ['Question Wraith', 'Quiet Fear'] },
+      { type: 'boss', name: 'The Question of After' },
+      { type: 'elite', zoneLv: 49, enemies: ['Unity Sentinel', 'Chorus Wisp'] },
+      { type: 'boss', name: 'The Unity Ward' },
+      { type: 'elite', zoneLv: 50, enemies: ['Dawnlight Sentinel', 'Last Shadow'] },
+      { type: 'boss', name: 'Daybreak Incarnate' }
+    ],
+    rw: { xp: 78000, gold: 62000 },
+    desc: 'What happens after survival stops being the whole point, faced by the whole family at once — and the last resistance to a morning this family has spent a lifetime earning.' },
+  { id: 'the_long_walk_raid', name: 'The Long Walk', unlockLevel: 58, icon: '🧭',
+    stages: [
+      { type: 'elite', zoneLv: 51, enemies: ['Threshold Warden', 'Waymarker Construct'] },
+      { type: 'boss', name: 'The Wayfinder' },
+      { type: 'elite', zoneLv: 52, enemies: ['Riptide Fiend', 'Driftwood Horror'] },
+      { type: 'boss', name: 'The Tidereaver' },
+      { type: 'elite', zoneLv: 53, enemies: ['Salt Wraith', 'Ledger Enforcer'] },
+      { type: 'boss', name: 'The Ledgerbound' },
+      { type: 'elite', zoneLv: 54, enemies: ['Undertow Whisper', 'Silent Agitator'] },
+      { type: 'boss', name: 'The Undertow' },
+      { type: 'elite', zoneLv: 55, enemies: ['Horizon Sentinel', 'Wandering Star Wisp'] },
+      { type: 'boss', name: 'The Horizon Keeper' }
+    ],
+    rw: { xp: 115000, gold: 92000 },
+    desc: 'Past every border this family ever fought to hold — the unmapped road, the borrowed coast, the settlement built on debt, and the edge of how far anyone has bothered to map. Five trials, back to back, for a family that is finally curious instead of afraid.' },
+  { id: 'into_the_verdant_reach', name: 'Into the Verdant Reach', unlockLevel: 62, icon: '🌿',
+    stages: [
+      { type: 'elite', zoneLv: 56, enemies: ['Bramble Warden', 'Thistle Stalker'] },
+      { type: 'boss', name: 'The Vale Warden' },
+      { type: 'elite', zoneLv: 60, enemies: ['Associate Wraith', 'Non-Compete Bramble'] },
+      { type: 'boss', name: 'Robin C.' }
+    ],
+    rw: { xp: 150000, gold: 120000 },
+    desc: 'The first ground since the Breaking that was never actually broken — and, standing in the middle of it regardless, one more piece of unfinished business from a world that was supposed to have ended.' },
+  { id: 'the_verdant_heart_raid', name: "The Verdant Reach's Heart", unlockLevel: 80, icon: '🌳',
+    stages: [
+      { type: 'elite', zoneLv: 75, enemies: ['Harvest Golem', 'Bloomwatcher'] },
+      { type: 'boss', name: 'The Sunreach Elder' },
+      { type: 'elite', zoneLv: 95, enemies: ['Root-Bound Elder', 'Elderwood Sentinel'] },
+      { type: 'boss', name: 'The Verdant Heart' }
+    ],
+    rw: { xp: 320000, gold: 250000 },
+    desc: "A community that kept growing things through the end of the world, and, deeper still, whatever is actually doing the mending. As close to the source of it as this family has ever gotten — and very little worth reaching this deep comes easily." }
 ];
 
 // Raid bosses hit harder than their solo zone-encounter versions — a raid should feel
@@ -8158,7 +8237,7 @@ function doEnemyAttack(enemy) {
     let finalDamage = damageResult.total;
   const zakiCourageDef = (target !== G.p && target.n === 'Zaki' && checkZakiCourage()) ? 4 : 0;
   const targetDef = target === G.p 
-    ? ((G.p.eq.armor ? G.p.eq.armor.def : 0) + G.p.buffs.reduce((s, b) => s + (b.def || 0), 0)) * getAilmentMult('def')
+    ? ((G.p.eq.armor ? G.p.eq.armor.def : 0) + G.p.buffs.reduce((s, b) => s + (b.def || 0), 0) + getStatBoosterBonus('def')) * getAilmentMult('def')
     : (target.def || 0) + getBlessDef(target) + zakiCourageDef;
 
   finalDamage = Math.max(1, finalDamage - Math.floor(targetDef / 2));
@@ -11756,7 +11835,10 @@ function useI(ix){
       lg('💊 Used '+it.n+'! +'+(it.boostVal||5)+' '+(it.stat||'atk').toUpperCase()+' for the next '+(it.mins||30)+' minutes.');
     }
     else if(it.eff=='perm_stat'){
+      G.p.permStatsUsed = G.p.permStatsUsed || {};
+      if(G.p.permStatsUsed[it.stat]){lg('❌ You have already taken this permanently — a second dose gives no further benefit.');return;}
       G.p.stats[it.stat]=(G.p.stats[it.stat]||0)+(it.v||1);
+      G.p.permStatsUsed[it.stat]=true;
       recalcMaxHpMp();
       lg('⭐ Used '+it.n+'! Permanent +'+(it.v||1)+' '+it.stat.toUpperCase()+'.');
     }
@@ -12244,6 +12326,7 @@ function saveGame() {
     templeRep: G.templeRep,
     companionPrestige: G.companionPrestige,
     expBooster: G.expBooster || null,
+    statBooster: G.statBooster || null,
     guildRepBalance: G.guildRepBalance,
     guildContracts: G.guildContracts.map(c => ({ id: c.id, c: c.c, done: c.done, refreshWeek: c.refreshWeek })),
     strongholdSiege: G.strongholdSiege,
@@ -12468,6 +12551,7 @@ function loadGame() {
     G.templeRep = data.templeRep || 0;
     G.companionPrestige = data.companionPrestige || {};
     G.expBooster = data.expBooster || null;
+    G.statBooster = data.statBooster || null;
     G.guildRepBalance = data.guildRepBalance !== undefined ? data.guildRepBalance : 0;
     if (data.guildContracts) {
       for (let c of G.guildContracts) {
@@ -13364,6 +13448,10 @@ function render(){
   h+='<div class="sb"><div class="sb-row"><span class="si">XP</span><div class="bar"><div class="bf bf-xp" style="width:'+((G.p.xp/G.p.xpN)*100)+'%"></div></div></div><span class="bt">'+G.p.xp.toLocaleString()+'/'+G.p.xpN.toLocaleString()+' ('+Math.floor((G.p.xp/G.p.xpN)*100)+'%)'+(boosterActive ? ' <span style="color:var(--gold);">\u26A1+'+Math.floor(G.expBooster.mult*100)+'% '+boosterMinsLeft+'m</span>' : '')+'</span></div>';
   h+='<div class="gold">GOLD: '+G.p.gold+'</div></div></div>';
   if(G.p.buffs.length>0)h+='<div class="buffs">'+G.p.buffs.map(b=>'<span class="bp">'+b.n+' ('+b.t+')</span>').join('')+'</div>';
+  if(G.statBooster && G.statBooster.expiresAt>Date.now()){
+    const sbMins=Math.ceil((G.statBooster.expiresAt-Date.now())/60000);
+    h+='<div class="buffs"><span class="bp" style="background:var(--gold);color:#1a1200;">💊 +'+G.statBooster.val+' '+G.statBooster.stat.toUpperCase()+' ('+sbMins+'m)</span></div>';
+  }
   if(G.p.ailments.length>0)h+='<div class="buffs">'+G.p.ailments.map(a=>'<span class="bp" style="background:var(--danger);">'+AILMENT_TYPES[a.type].icon+' '+a.n+'</span>').join('')+'</div>';
   if(G.afkAdventure.active && G.afkAdventure.visible){
     h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;background:rgba(124,58,237,0.15);border-bottom:1px solid var(--accent);font-size:11px;">';
@@ -13784,7 +13872,7 @@ function rJournal(){
   let h='<div style="padding:16px;">';
   h+='<div class="st">📖 Journal</div>';
   
-  const entries=G.storyJournal.entries;
+  const entries=[...G.storyJournal.entries].sort((a,b)=>(a.chapter||0)-(b.chapter||0));
   const unlocked=G.storyJournal.unlocked;
   const read=G.storyJournal.read;
   
@@ -16079,6 +16167,10 @@ function rCbt() {
     const minsLeft = Math.ceil((G.expBooster.expiresAt - Date.now()) / 60000);
     badges.push({ icon: '⚡', text: '+' + Math.floor(G.expBooster.mult * 100) + '% XP \u00b7 ' + minsLeft + 'm', full: 'Elixir of Swift Growth is active \u2014 +' + Math.floor(G.expBooster.mult * 100) + '% XP for the next ' + minsLeft + ' minute' + (minsLeft === 1 ? '' : 's') + '.', color: 'var(--gold)' });
   }
+  if (G.statBooster && G.statBooster.expiresAt > Date.now()) {
+    const sbMinsLeft = Math.ceil((G.statBooster.expiresAt - Date.now()) / 60000);
+    badges.push({ icon: '💊', text: '+' + G.statBooster.val + ' ' + G.statBooster.stat.toUpperCase() + ' \u00b7 ' + sbMinsLeft + 'm', full: 'A supplement is active \u2014 +' + G.statBooster.val + ' ' + G.statBooster.stat.toUpperCase() + ' for the next ' + sbMinsLeft + ' minute' + (sbMinsLeft === 1 ? '' : 's') + '.', color: 'var(--gold)' });
+  }
 
   // === TOP STRIP: auto-combat + potion buttons and status badges share one row ===
   h += '<div class="combat-top-strip">';
@@ -16551,6 +16643,8 @@ function rInv(){
       if(it.eff==='cure_ailment') h+='<div style="font-size:10px;color:var(--accent-light);">Cures afflictions</div>';
       if(it.eff==='bless') h+='<div style="font-size:10px;color:var(--gold);">+ATK for 4 turns</div>';
       if(it.eff==='xp_boost') h+='<div style="font-size:10px;color:var(--gold);">+'+Math.floor((it.boostPct||0.5)*100)+'% XP \u00b7 '+(it.v||30)+'m</div>';
+      if(it.eff==='stat_boost') h+='<div style="font-size:10px;color:var(--gold);">+'+(it.boostVal||5)+' '+(it.stat||'atk').toUpperCase()+' \u00b7 '+(it.mins||30)+'m</div>';
+      if(it.eff==='perm_stat') h+='<div style="font-size:10px;color:'+((G.p.permStatsUsed&&G.p.permStatsUsed[it.stat])?'var(--disabled)':'var(--accent-light)')+';">'+((G.p.permStatsUsed&&G.p.permStatsUsed[it.stat])?'Already taken \u2014 no further effect':'Permanent +'+(it.v||1)+' '+(it.stat||'?').toUpperCase())+'</div>';
       h+='<div class="iq">x'+it.q+'</div>';
       h+='<div class="ia">';
       h+='<button class="ib ib-u" data-i="'+i+'">Use</button>';
