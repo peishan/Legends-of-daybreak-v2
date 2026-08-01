@@ -533,7 +533,12 @@ const G = {
     { n: "Eliz's Gentle Mercy", m: { 'Herb Bundle': 3, 'Iron Ore': 1 }, res: { n: 'Gentle Mercy', slot: 'weapon', forCompanion: 'Eliz', ilvl: 6, r: 'uncommon', atk: 4, def: 3, d: 'Mace for Eliz.' }, d: 'ATK +4, DEF +3 (Eliz only)' },
     { n: "Senedra's Longbow of the Woods", m: { 'Iron Ore': 2, 'Herb Bundle': 2 }, res: { n: 'Longbow of the Woods', slot: 'weapon', forCompanion: 'Senedra', ilvl: 6, r: 'uncommon', atk: 6, spd: 3, d: 'Bow for Senedra.' }, d: 'ATK +6, SPD +3 (Senedra only)' },
     { n: "Zaki's Young Blade", m: { 'Iron Ore': 3, 'Bone Shard': 1 }, res: { n: 'Young Blade', slot: 'weapon', forCompanion: 'Zaki', ilvl: 6, r: 'uncommon', atk: 6, def: 2, d: 'Sword for Zaki.' }, d: 'ATK +6, DEF +2 (Zaki only)' },
-    { n: "Soel's Warm Ember Charm", m: { 'Fire Essence': 1, 'Gem Dust': 1 }, res: { n: 'Warm Ember Charm', slot: 'weapon', forCompanion: 'Soel', ilvl: 6, r: 'uncommon', atk: 4, spd: 3, d: 'Charm for Soel.' }, d: 'ATK +4, SPD +3 (Soel only)' }
+    { n: "Soel's Warm Ember Charm", m: { 'Fire Essence': 1, 'Gem Dust': 1 }, res: { n: 'Warm Ember Charm', slot: 'weapon', forCompanion: 'Soel', ilvl: 6, r: 'uncommon', atk: 4, spd: 3, d: 'Charm for Soel.' }, d: 'ATK +4, SPD +3 (Soel only)' },
+
+    // === DR. AA'S BOOKS — Borneo-folklore recipes, locked until the matching book is read ===
+    { n: "Pontianak's Ward", locked: true, m: { 'Void Thread': 2, 'Aether Shard': 1, 'Bone Shard': 3 }, res: { n: "Pontianak's Ward", slot: 'amulet', ilvl: 32, r: 'epic', def: 14, voidRes: 0.15, d: "A charm strung from old bone and thread the old-world stories insisted actually worked. Apparently, out here, it still does." }, d: 'DEF +14, +15% Void Resist' },
+    { n: "Toyol's Bitter Root Tonic", locked: true, m: { 'Herb Bundle': 4, 'Gem Dust': 2, 'Frost Gem': 1 }, res: { n: "Toyol's Bitter Root Tonic", t: 'pot', eff: 'cure_ailment', q: 1, r: 'epic', d: "Bitter enough that Dr. AA insists it is basically self-administering penance. Also cures whatever is actually wrong with you, which the villagers who first brewed it considered a fair trade." }, d: 'Cures all afflictions' },
+    { n: "The Hantu Raya's Bargain", locked: true, m: { 'Fire Essence': 2, 'Obsidian': 3, 'Aether Shard': 2, 'Chrono Sand': 1 }, res: { n: "The Hantu Raya's Bargain", slot: 'weapon', ilvl: 35, r: 'epic', atk: 20, critChance: 0.05, d: "Old-world folklore says a Hantu Raya grants strength to whoever feeds it enough tribute. This is either a very good replica or something worse wearing a replica's shape. Either way, it works." }, d: 'ATK +20, +5% Crit Chance' }
   ],
   quests: [
     { id: 1, n: 'First Steps', d: 'Defeat 3 monsters in Whispering Woods', t: 'kill', c: 0, need: 3, rw: { xp: 50, g: 20 }, done: false },
@@ -953,9 +958,9 @@ const G = {
         { n: 'Old-World Multivitamin', t: 'pot', eff: 'stat_boost', stat: 'atk', boostVal: 10, mins: 30, q: 1, r: 'uncommon', price: 45, d: '+10 ATK for 30 minutes. He used to hand these out to patients who swore they had no time to eat properly.' },
         { n: 'Iron Tonic', t: 'pot', eff: 'perm_stat', stat: 'str', v: 1, q: 1, r: 'rare', price: 220, d: 'A permanent +1 STR. Not a miracle cure — just the kind of slow, unglamorous gain you only get from actually doing the work, the way the old Battle Square trials used to prove it.' },
         { n: 'Vital Draught', t: 'pot', eff: 'perm_stat', stat: 'con', v: 1, q: 1, r: 'rare', price: 220, d: 'A permanent +1 CON. Dr. AA calls it "boring medicine that works," which he considers the highest compliment he gives anything.' },
-        { n: 'Real Ghost Stories of Borneo, Vol. 1', t: 'mat', q: 1, r: 'uncommon', price: 15, d: "Purely for reading around the campfire — does nothing else. Dr. AA collected these from patients over the years and swears not one word is invented." },
-        { n: 'Real Ghost Stories of Borneo, Vol. 2', t: 'mat', q: 1, r: 'uncommon', price: 15, d: "Same as the first — no effect, just good company on a long watch. He says this volume is the one that actually kept him up at night." },
-        { n: 'Real Ghost Stories of Borneo, Vol. 3', t: 'mat', q: 1, r: 'uncommon', price: 15, d: "Flavor only. He is already asking if anyone wants to hear about the one that did not make it into the book." }
+        { n: 'Real Ghost Stories of Borneo, Vol. 1', t: 'book', eff: 'learn_recipe', recipe: "Pontianak's Ward", q: 1, r: 'uncommon', price: 40, d: "Dr. AA collected these from patients over the years and swears not one word is invented. Buried in the third chapter, between two accounts of a woman in white, is a charm his patients' grandmothers used to actually make. Learn: Pontianak's Ward." },
+        { n: 'Real Ghost Stories of Borneo, Vol. 2', t: 'book', eff: 'learn_recipe', recipe: "Toyol's Bitter Root Tonic", q: 1, r: 'uncommon', price: 40, d: "He says this is the volume that actually kept him up at night. It also happens to include his own handwritten notes on the bitter-root tonic villagers used to keep the little thieving spirits away. Learn: Toyol's Bitter Root Tonic." },
+        { n: 'Real Ghost Stories of Borneo, Vol. 3', t: 'book', eff: 'learn_recipe', recipe: "The Hantu Raya's Bargain", q: 1, r: 'uncommon', price: 40, d: "He is already asking if anyone wants to hear about the one that did not make it into the book. This one did — an old account of what a Hantu Raya asks for in tribute, and what it gives back. Learn: The Hantu Raya's Bargain." }
       ],
       unlocked: false, zone: 'The Unbroken Vale', zoneLv: 56, visitCount: 0 },
     { n: 'Zul', t: 'driver', title: 'The Driver', icon: '🚗', col: '#1e293b',
@@ -1270,6 +1275,7 @@ const G = {
   secretArea: { active: false, zone: null, choice: null, result: null },
   playerSpec: { path: null, tiers: [], respecCount: 0, lastRespec: 0 },
   currentMiniStory: null,
+  knownRecipes: [], // recipe names unlocked via 'learn_recipe' books (e.g. Dr. AA's) — recipes without a `locked` flag are known from the start
 storyJournal: {
     unlocked: [],
     read: [],
@@ -2829,6 +2835,8 @@ storyJournal: {
     { id: 'vale_camp', name: 'The Unbroken Clearing', type: 'camp', zone: 'The Unbroken Vale', zoneLv: 56, desc: 'A patch of ground soft enough to actually sleep on, for once, instead of just surviving the night on top of.', unlocked: false, icon: '🌿', cost: 0 },
     { id: 'sunreach_camp', name: "The Community Table", type: 'camp', zone: 'Sunreach Fields', zoneLv: 75, desc: 'Someone here always seems to have room for a few more at the table, no questions asked.', unlocked: false, icon: '🌾', cost: 0 },
     { id: 'rootbound_camp', name: 'The Rootbound Hollow', type: 'camp', zone: 'The Rootbound Sanctuary', zoneLv: 95, desc: 'A hollow between roots thick enough to feel less like shelter and more like being held.', unlocked: false, icon: '🌳', cost: 0 },
+    { id: 'grove_camp', name: 'The Mended Grove', type: 'camp', zone: 'The Unbroken Vale', zoneLv: 56, desc: 'Ground that healed itself before you ever arrived to claim it. It does not need defending so much as tending — which, it turns out, is a different kind of work entirely.', unlocked: false, icon: '🌱', cost: 0 },
+    { id: 'grove_tavern', name: 'The Root Cellar', type: 'tavern', zone: 'The Unbroken Vale', zoneLv: 56, desc: 'Carved into a root wide enough to walk through. Whatever is on tap tonight grew here, in the dark, without anyone having to ask it to.', unlocked: false, icon: '🍺', cost: 25 },
     // Phase 3 mana springs
     { id: 'ms_spring3', name: 'Infernal Mana Spring', type: 'mana_spring', zone: 'Infernal Crucible', zoneLv: 23, desc: 'A spring of liquid flame that burns cold. Each sip sears the mind with forbidden knowledge.', unlocked: false, icon: '💧', cost: 20 },
     { id: 'ms_spring4', name: 'Abyssal Mana Spring', type: 'mana_spring', zone: 'Tidal Abyss', zoneLv: 25, desc: 'Dark water that glows with inner light. Drinking it feels like drowning in stars.', unlocked: false, icon: '💧', cost: 25 },
@@ -6178,6 +6186,7 @@ const STRONGHOLDS = {
   arcaneTower: {
     name: 'Arcane Planar Tower',
     icon: '🗼',
+    era: 'oldWorld',
     restSiteIds: ['apt_camp', 'apt_tavern'],
     desc: 'The tower answers to you now. Its camp and tavern are yours — free, and always open — whenever you need them.',
     stipend: { xp: 40, gold: 60 },
@@ -6199,6 +6208,29 @@ const STRONGHOLDS = {
     zoneLv: 11, // used to scale siege-defense enemies
     siegeEnemies: ['Planar Wisp', 'Rift Stalker', 'Void Weaver', 'Astral Construct'],
     siegeReward: { xp: 350, gold: 300, guildRep: 25 }
+  },
+  mendedGrove: {
+    name: 'The Mended Grove',
+    icon: '🌿',
+    era: 'verdant',
+    restSiteIds: ['grove_camp', 'grove_tavern'],
+    desc: "Ground on the other side of everything that ever broke — the vale simply makes room for you, the way it apparently makes room for everyone who actually means to tend it instead of just passing through.",
+    stipend: { xp: 400, gold: 500 },
+    tasks: [
+      { id: 'st_grove_bramble', n: 'Bramble Watch', d: 'Defeat 3 Bramble Wardens to keep the grove\'s borders soft instead of hostile', t: 'kill_specific', target: 'Bramble Warden', c: 0, need: 3, rw: { xp: 900, g: 700 }, done: false, refreshDay: -1 },
+      { id: 'st_grove_thistle', n: 'Thistle Clearing', d: 'Defeat 2 Thistle Stalkers before they choke the new growth', t: 'kill_specific', target: 'Thistle Stalker', c: 0, need: 2, rw: { xp: 1100, g: 850 }, done: false, refreshDay: -1 },
+      { id: 'st_grove_harvest', n: "Harvest Escort", d: 'Defeat 3 Harvest Golems threatening the Sunreach trade road', t: 'kill_specific', target: 'Harvest Golem', c: 0, need: 3, rw: { xp: 1300, g: 1000 }, done: false, refreshDay: -1, minGuildLevel: 2 }
+    ],
+    guildHall: [
+      { level: 1, name: 'Grove Tended', cost: 0, desc: 'Free rest and a daily stipend — the vale already trusts you with this much.' },
+      { level: 2, name: "Root Cellar Stores", cost: 12000, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
+      { level: 3, name: 'Sunlit Training Ground', cost: 35000, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
+      { level: 4, name: "The Grove's Deep Roots", cost: 90000, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
+      { level: 5, name: 'Heartwood Sanctum', cost: 220000, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
+    ],
+    zoneLv: 56,
+    siegeEnemies: ['Bramble Warden', 'Wildroot Sprite', 'Thistle Stalker', 'Harvest Golem'],
+    siegeReward: { xp: 3500, gold: 3000, guildRep: 40 }
   }
 };
 
@@ -6292,6 +6324,7 @@ function checkStrongholdSiege() {
     if (!G.strongholds[id]) continue;
     const def = STRONGHOLDS[id];
     if (!def || !def.siegeEnemies) continue;
+    if (def.era === 'oldWorld' && hasEnteredVerdantReach()) continue; // left behind — cannot be reached to defend
     if (!G.strongholdSiege[id]) G.strongholdSiege[id] = { active: false, day: -1 };
     const siege = G.strongholdSiege[id];
     if (siege.day === G.gameDay) continue; // already rolled today
@@ -8922,6 +8955,11 @@ function handleVictory() {
     lg('🏆 You have conquered the Arcane Planar Tower!');
     lg('   The spire bends to your will. Planar energy surges through your veins.');
     claimStronghold('arcaneTower'); // guaranteed on defeat, independent of any quest-chain state
+  }
+  if (G.currentBoss && G.currentBoss.n === 'The Vale Warden') {
+    lg('🌿 The Unbroken Vale settles, and the ground itself seems to exhale.');
+    lg('   The Mended Grove opens to you — the first foothold on the other side of everything.');
+    claimStronghold('mendedGrove'); // guaranteed on defeat, independent of any quest-chain state
   }
   if (G.p.hp === 1) { G.p.survivedCritical = true; }
   checkAchievements();
@@ -11845,6 +11883,13 @@ function useI(ix){
     else return; // unrecognized effect — don't consume the item for nothing
     it.q--; if(it.q<=0)G.p.inv.splice(ix,1);
     render();
+  } else if(it.t=='book' && it.eff=='learn_recipe'){
+    G.knownRecipes = G.knownRecipes || [];
+    if(G.knownRecipes.includes(it.recipe)){lg('❌ You already know this recipe \u2014 rereading it won\'t teach you anything new.');return;}
+    G.knownRecipes.push(it.recipe);
+    lg('📖 Read '+it.n+'! Learned recipe: '+it.recipe+'.');
+    it.q--; if(it.q<=0)G.p.inv.splice(ix,1);
+    render();
   } else if(it.t=='revive'){
     const dead=getDeadParty();
     if(dead.length===0){lg('❌ No fallen companions to revive!');return;}
@@ -12228,7 +12273,7 @@ function es(n){
 }
 
 function re(r){const m={'Tank':'🛡️','Rogue':'🗡️','Mage':'🔮','Healer':'💚','Ranger':'🏹','Warrior':'⚔️','Support':'🍀'};return m[r]||'👤';}
-function ie(i){if(i.t=='pot')return i.eff=='heal'?'🧪':'💧';if(i.t=='food')return'🍽️';if(i.t=='drink')return'🥤';if(i.t=='revive')return'🔥';if(i.t=='wep')return'⚔️';if(i.t=='arm')return'🛡️';if(i.t=='acc')return'💍';if(i.t=='mat')return'💎';return'📦';}
+function ie(i){if(i.t=='pot')return i.eff=='heal'?'🧪':'💧';if(i.t=='food')return'🍽️';if(i.t=='drink')return'🥤';if(i.t=='revive')return'🔥';if(i.t=='wep')return'⚔️';if(i.t=='arm')return'🛡️';if(i.t=='acc')return'💍';if(i.t=='book')return'📖';if(i.t=='mat')return'💎';return'📦';}
 
 const SAVE_KEY = 'ldb_save_v5';
 
@@ -12268,6 +12313,7 @@ function saveGame() {
       ailments: G.p.ailments,
       kills: G.p.kills, quests: G.p.quests, fstreak: G.p.fstreak, focusMinutesToday: G.p.focusMinutesToday || 0, focusSessionsToday: G.p.focusSessionsToday || 0,
       storyJournal: { unlocked: G.storyJournal.unlocked, read: G.storyJournal.read },
+      knownRecipes: G.knownRecipes || [],
 
       // Add these inside the saveData object, alongside other fields:
     
@@ -12552,6 +12598,7 @@ function loadGame() {
     G.companionPrestige = data.companionPrestige || {};
     G.expBooster = data.expBooster || null;
     G.statBooster = data.statBooster || null;
+    G.knownRecipes = data.knownRecipes || [];
     G.guildRepBalance = data.guildRepBalance !== undefined ? data.guildRepBalance : 0;
     if (data.guildContracts) {
       for (let c of G.guildContracts) {
@@ -15598,6 +15645,16 @@ function rStrongholds() {
   for (let id of claimedIds) {
     const def = STRONGHOLDS[id];
     if (!def) continue;
+    const retired = def.era === 'oldWorld' && hasEnteredVerdantReach();
+    if (retired) {
+      const level = getGuildHallLevel(id);
+      h += '<div class="panel" style="opacity:0.7;">';
+      h += '<div class="panel-title">' + def.icon + ' ' + def.name + ' <span style="font-size:11px;color:var(--text-dim);font-weight:400;">(left behind)</span></div>';
+      h += '<div class="btn-hint" style="margin:6px 0;">The road back to it runs through a world that no longer answers when you call. What you built here stays built — every bonus already earned keeps counting — but the tower itself, the rest, the siege calls: all of that is on the other side of the bridge now.</div>';
+      h += '<div class="btn-hint" style="color:var(--gold);">Guild Hall Lv.' + level + ' — bonuses still active</div>';
+      h += '</div>';
+      continue;
+    }
     h += '<div class="panel">';
     h += '<div class="panel-title">' + def.icon + ' ' + def.name + '</div>';
     h += '<div class="btn-hint" style="margin:6px 0;">' + def.desc + '</div>';
@@ -15984,6 +16041,13 @@ function rZoneMapView() {
 
 
 
+function getStrongholdIdForRestSite(siteId) {
+  for (let id in STRONGHOLDS) {
+    if (STRONGHOLDS[id].restSiteIds && STRONGHOLDS[id].restSiteIds.includes(siteId)) return id;
+  }
+  return null;
+}
+
 // Rest site map — same winding-path visual language as the zone map, for consistency.
 // Camps/taverns show their parent zone's own icon; temples and mana springs keep their
 // distinct icons (⛪ / 💧) since those are meaningfully different kinds of stops, not just
@@ -16012,16 +16076,19 @@ function rRestSitesMap(healerOk) {
     let manaSpringRemaining = 8;
     if (G.manaSpringUses.day === G.gameDay) manaSpringRemaining = 8 - G.manaSpringUses.count;
     const isDepletedManaSpring = s.type === 'mana_spring' && manaSpringRemaining <= 0;
-    const locked = !s.unlocked || isDepletedManaSpring;
+    const ownerStrongholdId = s.stronghold ? getStrongholdIdForRestSite(s.id) : null;
+    const isRetiredStronghold = ownerStrongholdId && STRONGHOLDS[ownerStrongholdId].era === 'oldWorld' && hasEnteredVerdantReach();
+    const locked = !s.unlocked || isDepletedManaSpring || isRetiredStronghold;
     const canAfford = !s.cost || G.p.gold >= s.cost;
 
     const icon = (s.type === 'camp' || s.type === 'tavern') ? getZoneIcon(s.zone) : s.icon;
     const nodeColor = s.stronghold ? 'var(--gold)' : s.type === 'temple' ? 'var(--danger)' : s.type === 'mana_spring' ? 'var(--mp)' : 'var(--accent)';
-    const subLabel = locked
+    const subLabel = isRetiredStronghold ? 'Left behind'
+      : locked
       ? (isDepletedManaSpring ? manaSpringRemaining + '/8 today' : 'Lv.' + s.zoneLv)
       : (s.cost ? s.cost + 'G' : 'Free');
 
-    h += '<div class="rs-card map-node' + (locked ? ' locked' : '') + '" data-id="' + s.id + '" style="border-color:' + nodeColor + ';background:radial-gradient(circle at 35% 30%, color-mix(in srgb, ' + nodeColor + ' 20%, var(--bg-card)), var(--bg-card));left:' + p.x + 'px;top:' + p.y + 'px;' + (!canAfford && !locked ? 'opacity:0.6;' : '') + '" title="' + s.name + ' — ' + s.desc.replace(/"/g, '&quot;') + '">';
+    h += '<div class="rs-card map-node' + (locked ? ' locked' : '') + '" data-id="' + s.id + '" style="border-color:' + nodeColor + ';background:radial-gradient(circle at 35% 30%, color-mix(in srgb, ' + nodeColor + ' 20%, var(--bg-card)), var(--bg-card));left:' + p.x + 'px;top:' + p.y + 'px;' + (!canAfford && !locked ? 'opacity:0.6;' : '') + (isRetiredStronghold ? 'opacity:0.45;' : '') + '" title="' + s.name + (isRetiredStronghold ? ' \u2014 on the other side of the bridge now' : ' — ' + s.desc.replace(/"/g, '&quot;')) + '">';
     h += '<span class="map-node-icon">' + icon + '</span>';
     if (s.stronghold) h += '<div class="map-node-boss">🏰</div>';
     if (locked) h += '<div class="map-node-lock">🔒</div>';
@@ -16548,6 +16615,7 @@ function rInv(){
   const companionGearItems = [];
   const consumableItems = [];
   const matItems = [];
+  const bookItems = [];
   const otherItems = [];
   
   for(let i=0; i<G.p.inv.length; i++){
@@ -16556,6 +16624,7 @@ function rInv(){
     if(isEquip && it.forCompanion) companionGearItems.push({item: it, index: i});
     else if(isEquip) equipItems.push({item: it, index: i});
     else if(it.t==='pot' || it.t==='food' || it.t==='drink' || it.t==='revive') consumableItems.push({item: it, index: i});
+    else if(it.t==='book') bookItems.push({item: it, index: i});
     else if(it.t==='mat') matItems.push({item: it, index: i});
     else otherItems.push({item: it, index: i});
   }
@@ -16653,6 +16722,25 @@ function rInv(){
     h+='</div></div>';
   }
 
+  // Recipe books
+  if(bookItems.length > 0){
+    h+='<div class="its"><h3>📖 Recipe Books ('+bookItems.length+')</h3><div class="ig">';
+    for(let bi of bookItems){
+      const it = bi.item;
+      const i = bi.index;
+      const alreadyKnown = (G.knownRecipes||[]).includes(it.recipe);
+      h+='<div class="ic">';
+      h+='<div class="ii">'+ie(it)+'</div>';
+      h+='<div class="in" style="color:'+rc(it.r)+'">'+it.n+'</div>';
+      h+='<div style="font-size:10px;color:'+(alreadyKnown?'var(--disabled)':'var(--accent-light)')+';">'+(alreadyKnown?'Already known':'Teaches: '+it.recipe)+'</div>';
+      h+='<div class="iq">x'+it.q+'</div>';
+      h+='<div class="ia">';
+      h+='<button class="ib ib-u" data-i="'+i+'">Read</button>';
+      h+='</div></div>';
+    }
+    h+='</div></div>';
+  }
+
   // Materials section
   if(matItems.length > 0){
     h+='<div class="its"><h3>💎 Materials ('+matItems.length+')</h3><div class="ig">';
@@ -16691,7 +16779,9 @@ function rInv(){
 function rCraft(){
   let h='<div class="craft-view"><h2 class="st">Crafting</h2><div class="rlist">';
   for(let i=0;i<G.recipes.length;i++){
-    const r=G.recipes[i]; let ok=true,ms='';
+    const r=G.recipes[i];
+    if(r.locked && !(G.knownRecipes||[]).includes(r.n)) continue;
+    let ok=true,ms='';
     for(let [mn,mq] of Object.entries(r.m)){
       const iv=G.p.inv.find(x=>x.n==mn);
       const hv=iv?iv.q:0,en=hv>=mq;
