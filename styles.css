@@ -661,10 +661,9 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 /* ============================================================
    COMPACT COMBAT SCREEN
    ============================================================ */
-.combat-top-actions { display: flex; gap: 8px; margin-bottom: 10px; }
-.icon-btn { padding: 10px 8px; border-radius: 10px; font-weight: 600; cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: center; }
+.combat-top-strip { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.icon-btn { padding: 8px 10px; border-radius: 10px; font-weight: 600; cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
 
-.combat-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
 .combat-badge { font-size: 10px; padding: 3px 8px; border-radius: 8px; border: 1px solid; background: var(--bg-card); white-space: nowrap; }
 
 .party-strip { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
@@ -680,8 +679,8 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .eicon-compact { font-size: 22px; margin-bottom: 2px; }
 .ename-compact { font-size: 9px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 56px; margin: 0 auto 4px; }
 
-.skill-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 6px; }
-.skill-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 2px; text-align: center; cursor: pointer; user-select: none; transition: all 0.15s; }
+.skill-grid { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 6px; margin-bottom: 6px; padding-bottom: 6px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+.skill-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 2px; text-align: center; cursor: pointer; user-select: none; transition: all 0.15s; flex: 0 0 60px; scroll-snap-align: start; }
 .skill-box.sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, var(--bg-card)); }
 .skill-box.dis { opacity: 0.4; cursor: not-allowed; }
 .skill-box.elite .skill-box-name { color: var(--danger); }
@@ -689,6 +688,8 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .skill-box-name { font-size: 9px; font-weight: 600; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .skill-box-cost { font-size: 8px; color: var(--mp); margin-top: 1px; }
 .skill-selected-desc { font-size: 11px; color: var(--text-dim); padding: 6px 2px; margin-bottom: 8px; line-height: 1.4; }
+
+.combat-hud-info { flex: 0 0 auto; font-size: 12px; color: var(--text-dim); cursor: help; display: flex; align-items: center; padding: 0 4px; }
 
 /* ============================================================
    MAIN MENU — grouped sections with compact secondary cards

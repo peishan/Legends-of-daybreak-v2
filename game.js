@@ -15935,12 +15935,31 @@ function rCbt() {
     if (p.t === 'revive') return getDeadParty().length > 0;
     return true;
   });
-  h += '<div class="combat-top-actions">';
-  h += '<button id="btn-auto" class="icon-btn" style="flex:1;border-color:' + (G.cbt.autoCombat ? 'var(--success)' : 'var(--border)') + ';background:' + (G.cbt.autoCombat ? 'color-mix(in srgb, var(--success) 15%, transparent)' : 'var(--bg-card)') + ';color:' + (G.cbt.autoCombat ? 'var(--success)' : 'var(--text-dim)') + ';font-size:12px;gap:6px;" title="' + (G.cbt.autoCombat ? 'Auto-Combat ON — tap to take control' : 'Let the AI fight for you') + '">🤖 ' + (G.cbt.autoCombat ? 'AUTO ON' : 'Auto') + '</button>';
-  h += '<button onclick="togglePotionMenu()" class="icon-btn" style="flex:1;border-color:' + (usablePotions.length > 0 ? 'var(--success)' : 'var(--border)') + ';background:var(--bg-card);color:' + (usablePotions.length > 0 ? 'var(--success)' : 'var(--disabled)') + ';font-size:12px;gap:6px;cursor:' + (usablePotions.length > 0 ? 'pointer' : 'not-allowed') + ';" title="Potions">🧪 ' + usablePotions.length + '</button>';
+  // Condensed indicator badges — full text lives in the title attribute (tap-and-hold / hover), badge itself stays short
+  const badges = [];
+  if (zone && zone.elem) {
+    const resStatus = getResonanceStatus(zone.n);
+    badges.push({ icon: resStatus.icon, text: resStatus.status === 'matched' ? 'Resonance +25%' : resStatus.status === 'mismatched' ? 'Resonance -25%' : 'Neutral', full: resStatus.text, color: resStatus.color });
+  }
+  const riftStatus = getRiftStatus();
+  if (riftStatus) badges.push({ icon: riftStatus.icon, text: riftStatus.name, full: riftStatus.desc + ' (' + riftStatus.fightsLeft + ' left)', color: riftStatus.color });
+  if (zone && G.zoneHazards[zone.n]) badges.push({ icon: '⚠️', text: G.zoneHazards[zone.n].name, full: G.zoneHazards[zone.n].desc, color: '#f59e0b' });
+  if (G.currentBoss) badges.push({ icon: '🔥', text: 'Boss Ability', full: G.currentBoss.desc, color: 'var(--danger)' });
+  for (let a of G.p.ailments) {
+    const def = AILMENT_TYPES[a.type];
+    badges.push({ icon: def.icon, text: a.n, full: a.n + ' \u2014 ATK/DEF weakened' + (def.dmgPerTurn ? ', ' + def.dmgPerTurn + ' HP/turn' : '') + '. Rest will not cure this \u2014 needs the Temple or a high-level Eliz.', color: 'var(--danger)' });
+  }
+
+  // === TOP STRIP: auto-combat + potion buttons and status badges share one row ===
+  h += '<div class="combat-top-strip">';
+  h += '<button id="btn-auto" class="icon-btn" style="flex:0 0 auto;border-color:' + (G.cbt.autoCombat ? 'var(--success)' : 'var(--border)') + ';background:' + (G.cbt.autoCombat ? 'color-mix(in srgb, var(--success) 15%, transparent)' : 'var(--bg-card)') + ';color:' + (G.cbt.autoCombat ? 'var(--success)' : 'var(--text-dim)') + ';font-size:12px;padding:6px 10px;gap:6px;" title="' + (G.cbt.autoCombat ? 'Auto-Combat ON — tap to take control' : 'Let the AI fight for you') + '">🤖 ' + (G.cbt.autoCombat ? 'AUTO ON' : 'Auto') + '</button>';
+  h += '<button onclick="togglePotionMenu()" class="icon-btn" style="flex:0 0 auto;border-color:' + (usablePotions.length > 0 ? 'var(--success)' : 'var(--border)') + ';background:var(--bg-card);color:' + (usablePotions.length > 0 ? 'var(--success)' : 'var(--disabled)') + ';font-size:12px;padding:6px 10px;gap:6px;cursor:' + (usablePotions.length > 0 ? 'pointer' : 'not-allowed') + ';" title="Potions">🧪 ' + usablePotions.length + '</button>';
+  for (let b of badges) {
+    h += '<span class="combat-badge" style="border-color:' + b.color + ';color:' + b.color + ';margin:0;" title="' + b.full.replace(/"/g, '&quot;') + '">' + b.icon + (b.text ? ' ' + b.text : '') + '</span>';
+  }
   h += '</div>';
 
-  // Potion menu (unchanged content, still opens below the compact buttons)
+  // Potion menu (unchanged content, now opens below the merged strip)
   if (G.potionMenu && potions.length > 0) {
     h += '<div style="background:var(--bg-card);border:1px solid var(--success);border-radius:12px;padding:10px;margin-bottom:10px;">';
     h += '<div style="font-size:11px;color:var(--success);margin-bottom:8px;">🧪 Quick Potion Bag</div>';
@@ -15969,29 +15988,6 @@ function rCbt() {
       }
     }
     h += '</div></div>';
-  }
-
-  // Condensed indicator badges — full text lives in the title attribute (tap-and-hold / hover), badge itself stays short
-  const badges = [];
-  if (zone && zone.elem) {
-    const resStatus = getResonanceStatus(zone.n);
-    badges.push({ icon: resStatus.icon, text: resStatus.status === 'matched' ? 'Resonance +25%' : resStatus.status === 'mismatched' ? 'Resonance -25%' : 'Neutral', full: resStatus.text, color: resStatus.color });
-  }
-  const riftStatus = getRiftStatus();
-  if (riftStatus) badges.push({ icon: riftStatus.icon, text: riftStatus.name, full: riftStatus.desc + ' (' + riftStatus.fightsLeft + ' left)', color: riftStatus.color });
-  if (zone && G.zoneHazards[zone.n]) badges.push({ icon: '⚠️', text: G.zoneHazards[zone.n].name, full: G.zoneHazards[zone.n].desc, color: '#f59e0b' });
-  if (G.currentBoss) badges.push({ icon: '🔥', text: 'Boss Ability', full: G.currentBoss.desc, color: 'var(--danger)' });
-  for (let a of G.p.ailments) {
-    const def = AILMENT_TYPES[a.type];
-    badges.push({ icon: def.icon, text: a.n, full: a.n + ' \u2014 ATK/DEF weakened' + (def.dmgPerTurn ? ', ' + def.dmgPerTurn + ' HP/turn' : '') + '. Rest will not cure this \u2014 needs the Temple or a high-level Eliz.', color: 'var(--danger)' });
-  }
-
-  if (badges.length > 0) {
-    h += '<div class="combat-badges">';
-    for (let b of badges) {
-      h += '<span class="combat-badge" style="border-color:' + b.color + ';color:' + b.color + ';" title="' + b.full.replace(/"/g, '&quot;') + '">' + b.icon + (b.text ? ' ' + b.text : '') + '</span>';
-    }
-    h += '</div>';
   }
 
   // === PARTY STRIP: portraits + thin HP bars, no name text ===
@@ -16080,30 +16076,17 @@ function rCbt() {
     h += '</div>';
   }
 
-  // === ADVANCED STATS: collapsed by default, least essential info ===
+  // === STAT STRIP: always visible, one compact row — rules text moved into the info icon's tooltip ===
   const eqStats = getEquippedStats();
-  const statsOpen = G.combatStatsExpanded;
-  h += '<div style="margin-top:14px;">';
-  h += '<div onclick="toggleCombatStats()" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;background:var(--bg-hover);border-radius:10px;border:1px solid var(--border);user-select:none;">';
-  h += '<span style="font-size:11px;transition:transform 0.2s;display:inline-block;' + (statsOpen ? 'transform:rotate(90deg);' : '') + '">▶</span>';
-  h += '<span style="font-size:12px;color:var(--text-dim);">📊 Combat Stats & Rules</span>';
+  const rulesText = 'Attack: d20 + PROF(+' + DICE.proficiencyBonus(G.p.lvl) + ') + Ability Mod vs Target AC. Natural 20 = Critical Hit (double dice), Natural 1 = Critical Miss. Advantage: roll 2d20, keep higher. INT Mod: ' + (DICE.abilityMod(G.p.stats.int) >= 0 ? '+' : '') + DICE.abilityMod(G.p.stats.int) + '.';
+  h += '<div class="combat-hud" style="margin-top:10px;">';
+  h += '<div class="combat-hud-stat"><div class="combat-hud-label">AC</div><div class="combat-hud-value" style="color:var(--accent-light);">' + playerAC + (eqStats.def > 0 ? '<span class="combat-hud-bonus"> +' + eqStats.def + '</span>' : '') + '</div></div>';
+  h += '<div class="combat-hud-stat"><div class="combat-hud-label">Prof</div><div class="combat-hud-value" style="color:var(--gold);">+' + DICE.proficiencyBonus(G.p.lvl) + '</div></div>';
+  h += '<div class="combat-hud-stat"><div class="combat-hud-label">Atk</div><div class="combat-hud-value" style="color:var(--hp);">+' + (eqStats.atk + (G.p.eq.weapon?.atk||0)) + '</div></div>';
+  h += '<div class="combat-hud-stat"><div class="combat-hud-label">Crit</div><div class="combat-hud-value" style="color:var(--danger);">' + Math.floor(getTotalCritChance() * 100) + '%' + (eqStats.critChance > 0 ? '<span class="combat-hud-bonus"> +' + Math.floor(eqStats.critChance*100) + '</span>' : '') + '</div></div>';
+  h += '<span class="combat-hud-info" title="' + rulesText.replace(/"/g, '&quot;') + '">ℹ️</span>';
   h += '</div>';
-  if (statsOpen) {
-    h += '<div class="combat-hud" style="margin-top:8px;">';
-    h += '<div class="combat-hud-stat"><div class="combat-hud-label">AC</div><div class="combat-hud-value" style="color:var(--accent-light);">' + playerAC + (eqStats.def > 0 ? '<span class="combat-hud-bonus"> +' + eqStats.def + '</span>' : '') + '</div></div>';
-    h += '<div class="combat-hud-stat"><div class="combat-hud-label">Prof</div><div class="combat-hud-value" style="color:var(--gold);">+' + DICE.proficiencyBonus(G.p.lvl) + '</div></div>';
-    h += '<div class="combat-hud-stat"><div class="combat-hud-label">Atk</div><div class="combat-hud-value" style="color:var(--hp);">+' + (eqStats.atk + (G.p.eq.weapon?.atk||0)) + '</div></div>';
-    h += '<div class="combat-hud-stat"><div class="combat-hud-label">Crit</div><div class="combat-hud-value" style="color:var(--danger);">' + Math.floor(getTotalCritChance() * 100) + '%' + (eqStats.critChance > 0 ? '<span class="combat-hud-bonus"> +' + Math.floor(eqStats.critChance*100) + '</span>' : '') + '</div></div>';
-    h += '</div>';
-    h += '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:8px;">';
-    h += '<div style="font-size:10px;color:var(--text-dim);line-height:1.6;">';
-    h += '• Attack: d20 + PROF(+' + DICE.proficiencyBonus(G.p.lvl) + ') + Ability Mod vs Target AC<br>';
-    h += '• Natural 20 = Critical Hit (double dice) · Natural 1 = Critical Miss<br>';
-    h += '• Advantage: Roll 2d20, keep higher<br>';
-    h += '• INT Mod: ' + (DICE.abilityMod(G.p.stats.int) >= 0 ? '+' : '') + DICE.abilityMod(G.p.stats.int);
-    h += '</div></div>';
-  }
-  h += '</div>';
+
 
   h += '</div></div>';
   return h;
@@ -16115,11 +16098,6 @@ function rCbt() {
 function portraitImg(fileName, fallbackBg, letter) {
   return '<img src="portraits/' + fileName + '.jpg" class="party-avatar-img" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' +
     '<span class="party-avatar-fallback" style="display:none;background:' + fallbackBg + ';">' + letter + '</span>';
-}
-
-function toggleCombatStats() {
-  G.combatStatsExpanded = !G.combatStatsExpanded;
-  render();
 }
 
 
