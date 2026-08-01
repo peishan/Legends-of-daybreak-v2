@@ -8453,7 +8453,7 @@ function doEnemyAttack(enemy) {
       protectionMsg = '💫 Death Ward flares! ' + (target === G.p ? 'You are' : target.n + ' is') + ' pulled back from the brink!';
     } else {
       target.hp = 0;
-      protectionMsg = '💀 ' + (target.n || 'You') + ' fall unconscious!';
+      protectionMsg = '💀 ' + (target === G.p ? 'You fall' : (target.n || 'Ally') + ' falls') + ' unconscious!';
     }
   }
 
