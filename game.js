@@ -460,6 +460,7 @@ const G = {
     // grow back on its own. Zones spaced wide deliberately; the grind between them is
     // the content here, not constant new backdrops. ===
     { n: 'The Unbroken Vale', lv: 56, elem: 'poison', d: 'The first stretch of ground the party has found since the Breaking that was never actually broken — or healed so completely there is no telling the difference anymore. No ruins. No ash. Just green, further than anyone can see, and the strange quiet of a wound that finally closed.', en: ['Bramble Warden','Wildroot Sprite','Thistle Stalker'], loot: ['Unbroken Root', 'First Bloom Petal', 'Soil That Remembers Nothing'], xp: 3050, g: 2100, dg: 'impossible' },
+    { n: "The Retainer's Hollow", lv: 60, elem: 'poison', d: "A patch of the Vale that never grew right — silverleaf trees bent into rows like filing cabinets, roots knotted tight as a signature nobody actually got to read in full. There is an office here, standing where an office has no business standing. San recognizes the smell of it before she recognizes anything else: burnt coffee, cold fluorescent light, and somebody else's overtime.", en: ['Associate Wraith','Non-Compete Bramble','Overtime Root'], loot: ['Shredded Contract', 'Unsigned Ledger', 'A Clause Nobody Read'], xp: 3800, g: 2600, dg: 'impossible' },
     { n: 'Sunreach Fields', lv: 75, elem: 'poison', d: "A whole community living here, quietly, for who knows how long — fields actually under cultivation, harvests actually being brought in. Nobody out this far seems to know or care what the rest of the world has been through. They just kept growing things, the entire time.", en: ['Harvest Golem','Sunreach Guardian','Bloomwatcher'], loot: ['Sunreach Grain', 'A Harvest Nobody Rationed', 'Guardian\'s Bramble'], xp: 6000, g: 4400, dg: 'impossible' },
     { n: 'The Rootbound Sanctuary', lv: 95, elem: 'poison', d: 'Whatever is actually doing the mending out here, this is close to its source — roots thick as towers, growth old enough to have opinions about who is allowed to pass through. Healing this deep does not come free. Something this old does not let go of what it has grown around without a reason.', en: ['Root-Bound Elder','Sanctuary Keeper','Elderwood Sentinel'], loot: ['Heartwood Shard', 'What the Roots Kept', 'The First Bloom, Still Sealed'], xp: 12000, g: 8800, dg: 'impossible' },
   ],
@@ -790,6 +791,7 @@ const G = {
   npcs: [
     { n: 'Lewis', t: 'trader', title: 'Wandering Merchant', icon: '🧳', col: '#fbbf24', zone: 'Whispering Woods', zoneLv: 1,
       d: 'A shrewd merchant who appears in Whispering Woods. Sells rare herbs and curious trinkets.',
+      greeting: "Ah, San? You're back again? These woods'll wear a lesser adventurer down to nothing — good thing you're not one of them.",
       stock: [
         { n: 'Mystic Herb', t: 'mat', q: 1, r: 'uncommon', price: 15 },
         { n: 'Silver Thread', t: 'mat', q: 1, r: 'rare', price: 30 },
@@ -852,6 +854,7 @@ const G = {
       unlocked: false, visitCount: 0 },
     { n: 'Jonathan', t: 'trader', title: 'The Gearsmith', icon: '⚙️', col: '#f97316', zone: 'Ember Peak', zoneLv: 4,
       d: 'A tinkerer who sets up shop near Ember Peak. Deals in mechanical parts and weapon upgrades.',
+      greeting: "San, back again already? Bring me anything interesting this time, or just here to poke at my gears?",
       stock: [
         { n: 'Gear Assembly', t: 'mat', q: 1, r: 'uncommon', price: 20 },
         { n: 'Reinforced Plate', t: 'mat', q: 1, r: 'rare', price: 35 },
@@ -942,6 +945,19 @@ const G = {
         { n: 'Collar of the Space Between', slot: 'amulet', forCompanion: 'Soel', q: 1, r: 'epic', price: 400, ilvl: 28, def: 12, atk: 10, d: 'Collar for Soel. +12 DEF, +10 ATK' }
       ],
       unlocked: true, zone: 'The Static Fields', zoneLv: 26, visitCount: 0 },
+    { n: 'Dr. AA', t: 'trader', title: "The Old-World Doctor", icon: '🩺', col: '#0d9488', zone: 'The Unbroken Vale', zoneLv: 56,
+      d: "San's family doctor from the old world, of all people to turn up out here — the one who always had a ghost story ready between checkups and complained, only half-joking, that nobody ever wanted the vitamins as much as the stories. He still packs both. Proper medicine on one side of the cart, a stack of paperbacks on the other. He swears every one of them really happened.",
+      stock: [
+        { n: 'Antidote Vial', t: 'pot', eff: 'cure_ailment', q: 1, r: 'uncommon', price: 35, d: 'Clears whatever is currently ailing you. Dr. AA still insists on writing the dosage on the label, out of habit.' },
+        { n: 'Paracetamol', t: 'pot', eff: 'heal', v: 40, q: 1, r: 'common', price: 20, d: 'Restores 40 HP. "Take with food," he says, though out here that advice is mostly decorative. ' },
+        { n: 'Old-World Multivitamin', t: 'pot', eff: 'stat_boost', stat: 'atk', boostVal: 10, mins: 30, q: 1, r: 'uncommon', price: 45, d: '+10 ATK for 30 minutes. He used to hand these out to patients who swore they had no time to eat properly.' },
+        { n: 'Iron Tonic', t: 'pot', eff: 'perm_stat', stat: 'str', v: 1, q: 1, r: 'rare', price: 220, d: 'A permanent +1 STR. Not a miracle cure — just the kind of slow, unglamorous gain you only get from actually doing the work, the way the old Battle Square trials used to prove it.' },
+        { n: 'Vital Draught', t: 'pot', eff: 'perm_stat', stat: 'con', v: 1, q: 1, r: 'rare', price: 220, d: 'A permanent +1 CON. Dr. AA calls it "boring medicine that works," which he considers the highest compliment he gives anything.' },
+        { n: 'Real Ghost Stories of Borneo, Vol. 1', t: 'mat', q: 1, r: 'uncommon', price: 15, d: "Purely for reading around the campfire — does nothing else. Dr. AA collected these from patients over the years and swears not one word is invented." },
+        { n: 'Real Ghost Stories of Borneo, Vol. 2', t: 'mat', q: 1, r: 'uncommon', price: 15, d: "Same as the first — no effect, just good company on a long watch. He says this volume is the one that actually kept him up at night." },
+        { n: 'Real Ghost Stories of Borneo, Vol. 3', t: 'mat', q: 1, r: 'uncommon', price: 15, d: "Flavor only. He is already asking if anyone wants to hear about the one that did not make it into the book." }
+      ],
+      unlocked: false, zone: 'The Unbroken Vale', zoneLv: 56, visitCount: 0 },
     { n: 'Zul', t: 'driver', title: 'The Driver', icon: '🚗', col: '#1e293b',
       d: 'Nobody quite remembers when Zul started showing up wherever the roads got long enough to matter. He drives something that shouldn\'t run anymore, on fuel nobody asks about, and he only ever wants one thing to know before he\'ll take you anywhere.',
       greeting: 'Kewangan?',
@@ -1114,6 +1130,18 @@ const G = {
     mechanic: 'astral_phase', shiftTurn: 3, phases: 4, currentPhase: 1, desc: 'A being that consumes dimensions. Shifts between astral phases, each more dangerous than the last.' },
   { n: 'The Infernal Tyrant', zone: 'Infernal Crucible', hp: 4500, mhp: 4500, atk: 75, def: 42, xp: 2000, g: 1100,
         mechanic: 'inferno_core', infernoTurn: 4, infernoDmg: 50, desc: 'The heart of the Crucible given form. Builds inferno energy for 4 turns — interrupt or be incinerated.' },
+
+    // === PERSONAL: ROBIN C. — not an echo of grief like the Reckoning bosses. A real
+    // transmigrator, same as Jorvin, Zul, and Dr. AA — he came through into this world
+    // same as anyone else did, and true to form, immediately found a way to run the
+    // exact same racket somewhere new. Because he's a living transmigrator and not a
+    // one-time story boss, he's a normal repeatable zone encounter — beatable as many
+    // times as San wants to. ===
+    { n: 'Robin C.', zone: "The Retainer's Hollow", hp: 48000, mhp: 48000, atk: 288, def: 174, xp: 27000, g: 18500,
+      mechanic: 'rampage', rampageTurn: 3, rampageDmg: 110,
+      desc: "Made it through same as everyone else did, and set up shop within a season — same firm, same rules, new sign out front. He does not remember San's name. He never needed to.",
+      taunts: ["I can't break the retainer.", "Are you working, or are you on your phone?"],
+      defeatLine: "Robin goes down mid-sentence, and the ledger San has been carrying since the old world finally closes. Nine years for a hundred dollars was never a fair trade — this one is. He'll be back next season, the way he always is. San will be ready." },
 
     // === GAP FILLER ===
     { n: 'The Drowned King', zone: 'Sunken Temple', hp: 1800, mhp: 1800, atk: 38, def: 22, xp: 350, g: 300,
@@ -2468,7 +2496,7 @@ storyJournal: {
         scenes: [
           { speaker: 'Narrator', text: 'It is Zaki, of all people, who triggers it — insisting, entirely unprompted, on splitting the last of the trail rations evenly even though he caught none of it himself, just because that is what you do for people you actually consider yours. You watch him do it and feel something old and sour rise up before you can stop it.' },
           { speaker: 'Joel', text: '"You went somewhere," he says quietly, once Zaki has wandered off, pleased with himself. "Just now."' },
-          { speaker: 'San', text: '"Nine years," you say, before you have decided to say anything at all. "I gave a firm nine years. Robin\'s firm — she was one of the most well-regarded lawyers in the field, and I was good at my job. Genuinely good. I want that on the record before I say the rest of it."' },
+          { speaker: 'San', text: '"Nine years," you say, before you have decided to say anything at all. "I gave a firm nine years. Robin\'s firm — he was one of the most well-regarded lawyers in the field, and I was good at my job. Genuinely good. I want that on the record before I say the rest of it."' },
           { speaker: 'Joel', text: '"Noted," Joel says, gentle, giving you room.' },
           { speaker: 'San', text: '"After almost a decade, I got a hundred dollars," you say. "One increment. A hundred dollars, Joel, for nine years of never once being late, never once dropping something, covering for people who did not cover for me. I did the math obsessively for weeks afterward, like the number itself might change if I stared at it long enough. It never did."' },
           { speaker: 'Narrator', text: 'Joel does not say anything yet. You can tell he is doing the same math you did, and arriving at the same place.' },
@@ -2656,6 +2684,35 @@ storyJournal: {
           { speaker: 'San', text: '"There will be more after this," you say, half to them, half just to yourself, remembering another edge, another moment very much like this one, not so long ago. "There always is. That used to feel like a threat."' },
           { speaker: 'Aisyah', text: '"And now?" Aisyah asks.' },
           { speaker: 'San', text: '"Now it just feels like the road," you say, and step forward, past the last thing that was ever mapped, into everything that has not been yet.' },
+        ]
+      }
+,{
+        id: 'journal_071',
+        title: 'Same Firm, New Sign',
+        chapter: 71,
+        unlockType: 'zone',
+        unlockAt: 'The Unbroken Vale',
+        icon: '📎',
+        summary: "Dr. AA — San's old family doctor, somehow also standing in the Vale — recognizes a name San mentions in passing, and tells her Robin made it through into this world too.",
+        scenes: [
+          { speaker: 'Narrator', text: 'You almost walk past the cart before your brain catches up to what your eyes already know — the particular slouch of it, the hand-lettered sign, the smell of antiseptic fighting a losing battle against old paperback glue.' },
+          { speaker: 'San', text: '"Dr. AA?" you say, and it comes out smaller than you mean it to, more like the patient you used to be than the person who has since killed things twice this size as him.' },
+          { speaker: 'Dr. AA', text: '"San!" He looks up like you are a chart he has been meaning to review. "Good, you\'re upright. Bloodwork would\'ve been nice before whatever apocalypse this was, but I\'ll take upright."' },
+          { speaker: 'Narrator', text: 'You laugh, a little wet around the edges, because of course the man who once lectured you about your iron levels between ghost stories is exactly the same out here — just with a stranger cart and a stranger sky.' },
+          { speaker: 'San', text: '"How are you even here," you ask. "How is any of this — you were supposed to be three exam rooms down from a vending machine, not standing in a magic forest."' },
+          { speaker: 'Dr. AA', text: '"Same as everyone else who turns up, apparently," he says, shrugging like it is a minor administrative detail. "One day it\'s a waiting room full of coughs. Next day it\'s this. I brought what I had on the cart. Turns out paracetamol travels well."' },
+          { speaker: 'Narrator', text: 'It is such an absurdly practical answer that something in your chest, braced for a wound, relaxes instead.' },
+          { speaker: 'San', text: '"You would not believe the year I have had," you tell him, and start to explain — Joel, the Breaking, nine impossible years compressed into one exhausted sentence — and somewhere in the middle of it, out of habit more than anything, you say Robin\'s name.' },
+          { speaker: 'Narrator', text: 'Dr. AA goes very still. Not dramatically. The specific stillness of a man double-checking a chart he was hoping he had misread.' },
+          { speaker: 'Dr. AA', text: '"Robin," he repeats. "Tall. Never once said thank you to a receptionist in his life. That Robin?"' },
+          { speaker: 'San', text: '"That is an alarmingly accurate description," you say slowly. "Why."' },
+          { speaker: 'Dr. AA', text: '"Because he came through too," Dr. AA says, and has the decency to look apologetic about it, like a man delivering test results nobody wanted. "Set up somewhere past the Vale, if the traders are to be believed. Started running it exactly like he ran the last one, from what I hear. Contracts. A retainer. The whole apparatus, rebuilt from scratch in a world that did not ask for it."' },
+          { speaker: 'Narrator', text: 'You feel something old and familiar rise in you — not fear this time. Recognition, and underneath it, something sharper.' },
+          { speaker: 'San', text: '"Of course he did," you say. "Of course the one thing that survived the end of the entire world was Robin finding new people to bill."' },
+          { speaker: 'Dr. AA', text: '"For what it\'s worth," he says, gentler now, sliding a small paper bag across the cart without being asked, "you are allowed to go find out for yourself whether he still gets to be that person here. You were never the only one he did this to. You will not be the only one glad to see it end, either."' },
+          { speaker: 'Narrator', text: 'You look down at the bag — vitamins, of all things, and one battered paperback tucked in beside them, a ghost story he insists really happened — and feel the particular, specific relief of an old world reaching back through the cracks not to hurt you this time, but to hand you exactly what you need before you walk toward the Hollow.' },
+          { speaker: 'San', text: '"Thank you," you say, meaning the bag, and the warning, and the ten years of appointments before any of this, all at once.' },
+          { speaker: 'Dr. AA', text: '"Go be upright at him," Dr. AA says, already turning back to his cart. "Preferably from a safe distance and with excellent form."' },
         ]
       }
 ,{
@@ -7969,7 +8026,14 @@ function doPartyAttack(member, noBonus) {
 
 function doEnemyAttack(enemy) {
   if (enemy.hp <= 0) return;
-  
+
+  // Generic boss-taunt hook — any boss with a `taunts` array occasionally speaks
+  // mid-fight. Purely flavor; does not affect combat math.
+  if (enemy.taunts && enemy.taunts.length > 0 && Math.random() < 0.25) {
+    const line = enemy.taunts[Math.floor(Math.random() * enemy.taunts.length)];
+    lg('💬 ' + enemy.n + ': "' + line + '"');
+  }
+
   let wasPinned = false;
   if (enemy.status && enemy.status.length > 0) {
     for (let s of enemy.status) {
@@ -8766,6 +8830,7 @@ function handleVictory() {
    checkDailyQuests('kill', G.cbt.en.length); 
     if (G.party.filter(p => p.on).length >= 3) checkDailyQuests('full_party_battle', 1); 
   if (G.currentBoss) { G.p.bossKills = (G.p.bossKills || 0) + 1; }
+  if (G.currentBoss && G.currentBoss.defeatLine) { lg('💬 ' + G.currentBoss.defeatLine); }
     // Check boss-based journal unlocks
   for (let entry of G.storyJournal.entries) {
     if (entry.unlockType === 'boss' && G.currentBoss && G.currentBoss.n === entry.unlockAt && !G.storyJournal.unlocked.includes(entry.id)) {
@@ -11684,6 +11749,17 @@ function useI(ix){
       G.expBooster={mult:it.boostPct||0.5,expiresAt:Date.now()+durationMs};
       lg('✨ Used '+it.n+'! +'+Math.floor((it.boostPct||0.5)*100)+'% XP for the next '+(it.v||30)+' minutes.');
     }
+    else if(it.eff=='stat_boost'){
+      if(G.statBooster && G.statBooster.expiresAt>Date.now()){lg('❌ A supplement is already active. Wait for it to run out first.');return;}
+      const durationMs=(it.mins||30)*60*1000;
+      G.statBooster={stat:it.stat||'atk',val:it.boostVal||5,expiresAt:Date.now()+durationMs};
+      lg('💊 Used '+it.n+'! +'+(it.boostVal||5)+' '+(it.stat||'atk').toUpperCase()+' for the next '+(it.mins||30)+' minutes.');
+    }
+    else if(it.eff=='perm_stat'){
+      G.p.stats[it.stat]=(G.p.stats[it.stat]||0)+(it.v||1);
+      recalcMaxHpMp();
+      lg('⭐ Used '+it.n+'! Permanent +'+(it.v||1)+' '+it.stat.toUpperCase()+'.');
+    }
     else return; // unrecognized effect — don't consume the item for nothing
     it.q--; if(it.q<=0)G.p.inv.splice(ix,1);
     render();
@@ -13015,6 +13091,9 @@ function rNPC() {
         h += '<div style="font-size:11px;color:var(--text-dim);margin-top:4px;">🔒 Unlocked at ' + npc.zone + ' (Lv.' + npc.zoneLv + ')</div>';
       } else {
         h += '<div class="npc-desc">' + npc.d + '</div>';
+        if (npc.greeting) {
+          h += '<div style="font-size:12px;font-style:italic;color:var(--text-dim);margin:6px 0;">"' + npc.greeting + '"</div>';
+        }
         h += '<div class="npc-stock">';
         for (let j = 0; j < npc.stock.length; j++) {
           const item = npc.stock[j];
