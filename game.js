@@ -4613,7 +4613,7 @@ function updateAffinity(partyMemberName, amount) {
     const soelActive = G.party.some(p => p.n === 'Soel' && p.on && p.hp > 0);
     if (soelActive && G.p.lvl >= SOEL_BONDING_CATALYST_UNLOCK) {
       // The Chosen Family (capstone, auto-granted at 50): the bond deepens further.
-      amount = Math.ceil(amount * (G.p.lvl >= COMPANION_PRESTIGE_UNLOCK ? 1.30 : 1.15));
+      amount = Math.ceil(amount * (G.p.lvl >= LATE_GAME_BONUS_LEVEL ? 1.30 : 1.15));
     }
   }
   G.affinity[partyMemberName].val = Math.max(0, G.affinity[partyMemberName].val + amount);
@@ -5837,7 +5837,12 @@ const JOEL_SMITE_UNDEAD_UNLOCK = 42;
 // pattern: each path amplifies part of the companion's existing kit rather than
 // replacing it, so the choice deepens an established identity instead of contradicting
 // six-plus levels of built-up character.
-const COMPANION_PRESTIGE_UNLOCK = 50;
+const COMPANION_PRESTIGE_UNLOCK = 100;
+// A handful of unrelated late-game bonuses (gift amounts, affinity %, Soel's danger
+// sense) also used to step up exactly when Companion Prestige unlocked, purely by
+// coincidence of sharing a constant. Split out so raising the prestige-choice level
+// doesn't silently push those back too.
+const LATE_GAME_BONUS_LEVEL = 50;
 
 const COMPANION_PRESTIGE = {
   Joel: {
@@ -6035,7 +6040,7 @@ function tickSoelWarmPresence() {
   if (G.p.lvl < SOEL_WARM_PRESENCE_UNLOCK) return;
 
   // The Chosen Family (capstone, auto-granted at 50): the trickle runs deeper.
-  const pct = G.p.lvl >= COMPANION_PRESTIGE_UNLOCK ? 0.05 : 0.03;
+  const pct = G.p.lvl >= LATE_GAME_BONUS_LEVEL ? 0.05 : 0.03;
   const hpAmt = Math.max(1, Math.floor(G.p.mhp * pct));
   const mpAmt = Math.max(1, Math.floor(G.p.mmp * pct));
   let healedAnyone = false;
@@ -6514,7 +6519,7 @@ function exitSiegeDefense() {
 // quests, achievements, guild rep, mercenary tier, and dragon hunt clears are untouched;
 // this only resets the level/xp/base-stat track, since that's the part the curve problem
 // actually lives in.
-const PRESTIGE_MIN_LEVEL = 45;
+const PRESTIGE_MIN_LEVEL = 100;
 const PRESTIGE_XP_PCT_PER_LEVEL = 0.4;   // % permanent XP bonus banked per level at reset
 const PRESTIGE_GOLD_PCT_PER_LEVEL = 0.3; // % permanent gold bonus banked per level at reset
 const PRESTIGE_BONUS_CAP = 200;          // sanity ceiling so repeated resets can't run away
@@ -8318,7 +8323,7 @@ function doEnemyAttack(enemy) {
   // all of which are either always-on or triggered by low HP — this one only ever
   // matters in the first round, before anyone's actually been hurt yet.
   const soelActive = G.party.some(p => p.n === 'Soel' && p.on && p.hp > 0);
-  if (soelActive && G.cbt.turn === 0 && G.p.lvl >= SOEL_DANGER_SENSE_UNLOCK && Math.random() < (G.p.lvl >= COMPANION_PRESTIGE_UNLOCK ? 0.40 : 0.25)) {
+  if (soelActive && G.cbt.turn === 0 && G.p.lvl >= SOEL_DANGER_SENSE_UNLOCK && Math.random() < (G.p.lvl >= LATE_GAME_BONUS_LEVEL ? 0.40 : 0.25)) {
     lg('🐱 Soel senses it coming! ' + (target === G.p ? 'You step' : target.n + ' steps') + ' aside before ' + enemy.n + "'s opening strike lands.");
     return;
   }
