@@ -1150,12 +1150,12 @@ const G = {
       taunts: ["I can't break the retainer.", "Are you working, or are you on your phone?"],
       defeatLine: "Robin goes down mid-sentence, and the ledger San has been carrying since the old world finally closes. Nine years for a hundred dollars was never a fair trade — this one is. He'll be back next season, the way he always is. San will be ready." },
 
-    // === PERSONAL: JEFF, THE SKH SON-IN-LAW — Joel's old warehouse manager at SKH, the
+    // === PERSONAL: JEFF, THE SK* SON-IN-LAW — Joel's old warehouse manager at SK*, the
     // one who called people in on off days and sent anyone who worked too efficiently
     // out to clear the treeline as punishment. Same rule as Robin C.: a real
     // transmigrator, not a grief-echo, so he's a normal repeatable zone encounter, not
     // a one-time story kill. ===
-    { n: 'Jeff, the SKH Son-in-Law', zone: 'The Treeline Detail', hp: 115000, mhp: 115000, atk: 430, def: 260, xp: 55000, g: 40000,
+    { n: 'Jeff, the SK* Son-in-Law', zone: 'The Treeline Detail', hp: 115000, mhp: 115000, atk: 430, def: 260, xp: 55000, g: 40000,
       mechanic: 'crush', crushTurn: 5, desc: "Made it through and found the same arrangement he always finds — a warehouse, a family name, and people too tired to argue. Goes by Jeff out here now, of all things. He does not remember Joel's face. He remembers exactly how much weight he could load onto it.",
       taunts: ["No more MC, or I'm not renewing your contract.", "Joel, your performance now is bad.", "Joel talked up during the meeting, is he stupid?"],
       defeatLine: "He goes down still talking, mid-sentence, the way men like him always do — certain right up until the certainty runs out. Joel does not say anything for a while afterward. He does not need to. His shoulders, for once, are perfectly still." },
@@ -2556,7 +2556,7 @@ storyJournal: {
           { speaker: 'San', text: '"I worked there two more years after that. Then in September of 2025, they actually let me go. Officially, over money — big cuts, tied to cases that had not closed the way the firm needed them to."' },
           { speaker: 'Joel', text: '"Officially," he repeats, catching the word immediately.' },
           { speaker: 'San', text: '"Officially. What I pieced together after is that Robin himself was going through a divorce around then, having to hand back a good portion of what he owned to his wife. A man like that, used to a certain kind of lifestyle, does not absorb a loss like that quietly. Someone has to pay for it eventually. It was never going to be him."' },
-          { speaker: 'San', text: '"He is a prominent name here, Joel. Royal connections, the kind of reputation that makes people careful around him without ever being told to be. Whatever he actually lost in that divorce, it was never his dignity, because he never spent any currency on that to begin with. Not his own. Not mine."' },
+          { speaker: 'San', text: '"He has the kind of reputation that makes people careful around him without ever being told to be, Joel. Whatever he actually lost in that divorce, it was never his dignity, because he never spent any currency on that to begin with. Not his own. Not mine."' },
           { speaker: 'Joel', text: '"That is not justice," Joel says, low and hard — the same line as before, meant twice as hard this time. "That is just paperwork wearing the costume of justice."' },
           { speaker: 'San', text: '"That is exactly what it was," you agree. "No amount of severance was ever going to buy back nine years, or the things he said, or any of it. Money was never actually the thing missing. Respect was. And that was never for sale, as far as he was concerned — not at any price, to anyone."' },
           { speaker: 'Narrator', text: 'You watch his jaw tighten again, the specific way it does when he is holding something back out of respect for the fact that this is your story, not his to be angry on behalf of, even though he clearly wants to be.' },
@@ -2579,7 +2579,7 @@ storyJournal: {
         summary: 'San recognizes an old, familiar wince, and Joel finally talks about the warehouse job that taught his body to keep carrying weight long after it should have stopped.',
         scenes: [
           { speaker: 'Narrator', text: 'You notice it before he says a word — the particular way he rolls his shoulder after a long fight, wincing at the top of the motion, then smoothing his face over before he thinks you have seen. You have seen that exact motion before. Years before any of this.' },
-          { speaker: 'San', text: '"You used to do that at SKH," you say, quiet, not quite a question.' },
+          { speaker: 'San', text: '"You used to do that at SK*," you say, quiet, not quite a question.' },
           { speaker: 'Joel', text: 'He goes still for a second, caught. "The warehouse job," he says. "I did not think you remembered the specifics."' },
           { speaker: 'San', text: '"I remember all of it," you tell him. "I just never made you talk about it while it was happening. You never wanted to, back then."' },
           { speaker: 'Narrator', text: 'He is quiet for a while, and you let him take the time he needs to decide whether tonight is different.' },
@@ -2756,7 +2756,7 @@ storyJournal: {
           { speaker: 'San', text: '"Thank you," you say, meaning the bag, and the warning, and the ten years of appointments before any of this, all at once.' },
           { speaker: 'Dr. AA', text: '"Go be upright at him," Dr. AA says, already turning back to his cart. "Preferably from a safe distance and with excellent form."' },
           { speaker: 'Narrator', text: 'Joel has been quiet through most of this, hanging back at the edge of the conversation the way he does when something is turning over in him that he has not decided how to say yet. He does not let it go unsaid for long.' },
-          { speaker: 'Joel', text: '"You said people from before keep turning up," he says carefully. "Would that include a warehouse manager? SKH, out past the old highway. Married into the family that owned the place."' },
+          { speaker: 'Joel', text: '"You said people from before keep turning up," he says carefully. "Would that include a warehouse manager? SK*, out past the old highway. Married into the family that owned the place."' },
           { speaker: 'Dr. AA', text: 'Dr. AA does not need nearly as long to place this one as he did Robin. "The son-in-law," he says, and something in his voice goes flat and careful. "Heard about him too. Goes by Jeff out here now, if you can believe that. Set up some kind of work detail past Sunreach, from what the traders say — though nobody who signs onto it seems to describe it that way afterward."' },
           { speaker: 'Joel', text: '"That sounds exactly right," Joel says quietly, and something old settles back into his shoulders — not fear. The specific, familiar weariness of a body bracing out of habit, remembering exactly how much weight it used to carry.' },
           { speaker: 'Dr. AA', text: '"For what it\'s worth," Dr. AA says, gentler now, looking between the two of you, "whatever made men like that untouchable back home does not come through with them. Out here, it is just him. No contract. No family name that holds up." A small shrug. "Sounds like this family collects debts. Might as well go collect a couple more."' },
