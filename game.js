@@ -11573,10 +11573,13 @@ function sc(zi, skipEvents) {
   
   applyZoneBuffs(z.n); // STAGE 3: Apply zone buffs
   
-  // Boss fight: only when player is 2+ levels above zone minimum
+  // Boss fight: available as soon as the player reaches the zone's own level —
+  // previously required being 2+ levels above zone minimum, which made sense against
+  // the old XP curve's much slower pacing but left bosses lagging behind actual
+  // progression now that leveling is rebalanced.
   const bossChance = Math.random();
   let isBoss = false;
-  if (bossChance < 0.08 && G.p.lvl >= z.lv + 2) {
+  if (bossChance < 0.08 && G.p.lvl >= z.lv) {
     const boss = G.bosses.find(b => b.zone === z.n);
     if (boss) {
       isBoss = true;
