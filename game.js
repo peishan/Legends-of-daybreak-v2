@@ -6656,6 +6656,33 @@ const DRAGONS = [
     mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 27500,
     desc: "Every other wound in this world eventually closed. This one refused, out of pure spite, and grew something that could fight back. It does not get weaker as it bleeds \u2014 it gets angrier, in four distinct, escalating stages. This is the fight that actually asks whether everything you have built \u2014 every path chosen, every reset banked, every rank earned \u2014 was for something, or just for its own sake.",
     hoardGoldMin: 48000, hoardGoldMax: 78000, itemLevel: 55
+  },
+  {
+    id: 'corvenna',
+    n: 'Corvenna, the Root That Waited',
+    unlockLevel: 65,
+    hp: 200000, mhp: 200000, atk: 650, def: 380, xp: 95000, g: 65000,
+    mechanic: 'devour', devourTurn: 4,
+    desc: "Even the Vale had to bury something to become the Vale. It coiled in the deep roots so long ago that the ground simply grew over it and called it soil. It does not rampage. It waits, patient as everything else down here, then reaches up through the dark for exactly one of you at a time.",
+    hoardGoldMin: 90000, hoardGoldMax: 140000, itemLevel: 65
+  },
+  {
+    id: 'skarrowyn',
+    n: 'Skarrowyn, the Split Horizon',
+    unlockLevel: 80,
+    hp: 340000, mhp: 340000, atk: 850, def: 480, xp: 150000, g: 100000,
+    mechanic: 'phase', phases: 5, currentPhase: 1, phaseHp: 68000,
+    desc: "Sunreach Fields grows toward it without knowing why \u2014 every harvest here has always quietly leaned the same direction. Five distinct stages, each one less like a dragon and more like whatever a dragon becomes after outliving the reason dragons exist.",
+    hoardGoldMin: 150000, hoardGoldMax: 220000, itemLevel: 80
+  },
+  {
+    id: 'aetherum',
+    n: 'Aetherum, the Last Question',
+    unlockLevel: 92,
+    hp: 550000, mhp: 550000, atk: 1100, def: 620, xp: 240000, g: 165000,
+    mechanic: 'apocalypse', apocalypseTurn: 6,
+    desc: "Past the deepest root, past the reason the Vale was ever unbroken to begin with. It does not ask whether you are strong enough. It asks, once, at turn six, whether everything still standing behind you was worth what it cost to keep standing \u2014 and it does not wait politely for the answer.",
+    hoardGoldMin: 260000, hoardGoldMax: 380000, itemLevel: 90
   }
 ];
 // Kept for backward compat — old code/save fields that only knew about one dragon.
@@ -15302,6 +15329,10 @@ function rDragonHunt() {
     }
     const mechanicDesc = dragon.mechanic === 'phase'
       ? 'Grows more dangerous through ' + dragon.phases + ' escalating phases as its HP drops \u2014 the fight gets harder, not easier, the longer it goes.'
+      : dragon.mechanic === 'devour'
+      ? 'Attempts to devour one random party member outright starting turn ' + dragon.devourTurn + ' \u2014 a failed save can remove them from the fight entirely.'
+      : dragon.mechanic === 'apocalypse'
+      ? 'Everyone survives to turn ' + dragon.apocalypseTurn + ', or almost no one does \u2014 a single attack that drops the whole party to the edge of death at once.'
       : 'Breathes elemental devastation across the whole party every ' + dragon.rampageTurn + ' turns.';
     h += '<div class="btn-hint" style="margin-bottom:10px;">' + mechanicDesc + ' Hoard on victory: ' + dragon.hoardGoldMin.toLocaleString() + '\u2013' + dragon.hoardGoldMax.toLocaleString() + 'G, 3 guaranteed Legendaries, 1 guaranteed Epic \u2014 on top of normal XP/gold.</div>';
 
