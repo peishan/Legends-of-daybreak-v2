@@ -6,16 +6,28 @@ const APP_VERSION = '2026-07-27 14:30';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
+const PWA_INSTALL_DISMISSED_KEY = 'ldb_pwa_install_dismissed';
+const installWrap = document.createElement('div');
+installWrap.id = 'pwa-install-wrap';
+installWrap.style.cssText = 'position:fixed;bottom:80px;right:16px;z-index:1000;display:none;align-items:center;gap:6px;';
 const installBtn = document.createElement('button');
 installBtn.id = 'pwa-install-btn';
-installBtn.style.cssText = 'position:fixed;bottom:80px;right:16px;z-index:1000;padding:12px 20px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;display:none;box-shadow:0 4px 12px #7c3aed40;';
+installBtn.style.cssText = 'padding:12px 20px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 12px #7c3aed40;';
 installBtn.textContent = '⚔️ Install Daybreak';
-document.body.appendChild(installBtn);
+const installDismissBtn = document.createElement('button');
+installDismissBtn.id = 'pwa-install-dismiss';
+installDismissBtn.style.cssText = 'width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,0.4);color:#fff;border:none;font-size:14px;cursor:pointer;line-height:1;flex-shrink:0;';
+installDismissBtn.textContent = '\u2715';
+installDismissBtn.setAttribute('aria-label', 'Dismiss install prompt');
+installWrap.appendChild(installBtn);
+installWrap.appendChild(installDismissBtn);
+document.body.appendChild(installWrap);
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
+  if (localStorage.getItem(PWA_INSTALL_DISMISSED_KEY) === 'true') return; // user already said no thanks
   deferredPrompt = e;
-  installBtn.style.display = 'block';
+  installWrap.style.display = 'flex';
   lg('📲 PWA install available! Tap the floating button to install.');
 });
 
@@ -25,14 +37,20 @@ installBtn.addEventListener('click', async () => {
   const { outcome } = await deferredPrompt.userChoice;
   if (outcome === 'accepted') {
     lg('🎉 Daybreak installed! Welcome, San.');
-    installBtn.style.display = 'none';
+    installWrap.style.display = 'none';
   }
+  deferredPrompt = null;
+});
+
+installDismissBtn.addEventListener('click', () => {
+  installWrap.style.display = 'none';
+  localStorage.setItem(PWA_INSTALL_DISMISSED_KEY, 'true');
   deferredPrompt = null;
 });
 
 window.addEventListener('appinstalled', () => {
   deferredPrompt = null;
-  installBtn.style.display = 'none';
+  installWrap.style.display = 'none';
   lg('✅ Daybreak is now installed on your device!');
 });
 
@@ -627,7 +645,7 @@ const G = {
     { id: 66, n: 'The Verdant Choir', d: 'Push into The Verdant Choir and find what the ruins are still guarding', t: 'kill_specific', target: 'Rootbound Acolyte', c: 0, need: 8, rw: { xp: 14000, g: 8400, templeRep: 130 }, done: false, chain: 'verdant_choir', reqQuest: 65, hidden: true, revealed: false },
     { id: 67, n: 'The Last Vigil', d: 'Defeat The Last Vigil and let the guardian finally stand down', t: 'boss_specific', target: 'The Last Vigil', c: 0, need: 1, rw: { xp: 19000, g: 12500, templeRep: 220 }, done: false, chain: 'verdant_choir', reqQuest: 66, hidden: true, revealed: false },
     { id: 68, n: 'What Sister Wren Knows', d: 'Reach Level 60 \u2014 Sister Wren recognizes what the ruins actually are, and what they could be again', t: 'reach_level', c: 0, need: 60, rw: { xp: 16000, g: 9500, templeRep: 180 }, done: false, chain: 'verdant_choir', reqQuest: 67, hidden: true, revealed: false },
-    { id: 69, n: 'The Mended Sanctum, Restored', d: 'Complete the restoration of the Mended Sanctum', t: 'reach_level', c: 0, need: 62, rw: { xp: 24000, g: 16000, item: { n: 'Mendstone', t: 'mat', q: 1, r: 'legendary', d: 'Formed from the region\'s own healing, not mined from anything that was ever broken. It hums, faintly, like something still deciding what to grow into.' } }, done: false, chain: 'verdant_choir', reqQuest: 68, hidden: true, revealed: false },
+    { id: 69, n: 'The Mended Sanctum, Restored', d: 'Complete the restoration of the Mended Sanctum', t: 'reach_level', c: 0, need: 62, rw: { xp: 24000, g: 16000, item: { n: 'Mendstone', t: 'mat', q: 1, r: 'legendary', d: 'Formed from the region\'s own healing, not mined from anything that was ever broken. It hums, faintly, like something still deciding what to grow into.' } }, done: false, chain: 'verdant_choir', reqQuest: 68, hidden: true, revealed: false, unlockRestSite: 'mended_sanctum' },
 
   ],
 
@@ -984,6 +1002,10 @@ const G = {
       d: 'A wandering spirit who aids those she deems worthy. Enhances stealth and evasion.',
       ability: 'Shadow Step: 20% chance to avoid enemy attacks entirely.',
       unlocked: false, ul: 7, affinityReq: 50, reqMember: 'Aisyah' },
+    { n: 'Sister Wren', t: 'ally', title: 'The Last Believer', icon: '🕯️', col: '#d97706',
+      d: 'Once the last true believer of a doctrine built on a lie, now tending something small and honest instead. She knows the difference between real devotion and performed devotion better than almost anyone alive \u2014 and knows exactly what that knowledge cost her.',
+      ability: 'Hard-Won Faith: +8% Temple standing gained from every source.',
+      unlocked: false, ul: 62 },
     { n: 'Amad', t: 'trader', title: 'Brunei Food Merchant', icon: '🍜', col: '#16a34a', zone: 'Whispering Woods', zoneLv: 1,
       d: 'A warm-hearted vendor from Bandar Seri Begawan. Sells authentic Brunei comfort food and drinks. He will buy anything you have — drops, loot, used gear — at fair prices.',
       stock: [
@@ -2780,6 +2802,84 @@ storyJournal: {
         ]
       }
 ,{
+        id: 'journal_072',
+        title: 'Signs in the Green',
+        chapter: 72,
+        unlockType: 'level',
+        unlockAt: 56,
+        icon: '🌿',
+        summary: 'Ser Aldric asks San and Joel to help him find something himself, for once, instead of needing to be found.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Ser Aldric finds you at the edge of the Vale, not summoned, not assigned — the same way he found you once before, except this time there is no hesitation in how he walks toward you.' },
+          { speaker: 'Ser Aldric', text: '"I have been hearing things," he says, no preamble. "Old things. A temple, somewhere out past the green, older than the Cult, older maybe than the temple I actually serve. Nobody has been able to find it. I would like to be the one who does."' },
+          { speaker: 'San', text: '"You would like to," you repeat. "Not \'the temple has asked me to.\'"' },
+          { speaker: 'Ser Aldric', text: '"No," he agrees, and there is something almost pleased in how plainly he says it. "This one is mine to chase. I spent a long time being found by things. I would like to try finding one, for once, on my own terms."' },
+          { speaker: 'Joel', text: '"What do you need from us?" Joel asks, already the kind of question that assumes the answer is yes.' },
+          { speaker: 'Ser Aldric', text: '"Company," Ser Aldric says. "And whatever this vale throws at anyone who goes looking for something it has not decided to show yet."' },
+          { speaker: 'Narrator', text: 'You fall into step beside him without much more discussion than that. It occurs to you, walking, that this is the first time he has asked you to come with him instead of asking you to come get him.' },
+        ]
+      }
+,{
+        id: 'journal_073',
+        title: 'What Sister Wren Still Knows',
+        chapter: 73,
+        unlockType: 'level',
+        unlockAt: 58,
+        icon: '🕊️',
+        summary: 'Ser Aldric asks the one person who might actually recognize real devotion from the inside of something that mostly was not.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The trail runs cold twice before Ser Aldric admits, quietly, that he knows exactly one person who might actually recognize what they are looking for — and that asking her is going to cost him something to do.' },
+          { speaker: 'Ser Aldric', text: '"Sister Wren spent years learning to recognize real devotion from the inside of something that mostly was not," he says. "I do not enjoy needing that particular skill. I need it anyway."' },
+          { speaker: 'Narrator', text: 'She comes when he asks. Not eagerly — carefully, the way someone moves when they are still finding out whether they are actually welcome anywhere, or just tolerated.' },
+          { speaker: 'Sister Wren', text: '"You want to know if it is real," she says, before anyone explains anything, looking at the first weathered column half-buried in root. "That is always the actual question, with places like this. I got very good at answering it wrong, for a long time."' },
+          { speaker: 'San', text: '"Can you answer it right, now?" you ask, not unkindly.' },
+          { speaker: 'Sister Wren', text: '"I can try," she says. "It is the most honest thing I have to offer anyone these days. Trying, instead of certainty. I used to think certainty was the whole point of faith. I do not think that anymore."' },
+          { speaker: 'Ser Aldric', text: '"Neither do I," Ser Aldric says, and something passes between the two of them that is not quite forgiveness and not quite absolution — just two people who know exactly the same weight, agreeing to carry a little of it together instead of each alone.' },
+          { speaker: 'Narrator', text: 'She studies the columns a long moment, fingers finally resting on a symbol worn almost smooth. "This is real," she says. "I do not know what it wants yet. But this — whoever built this actually meant it."' },
+        ]
+      }
+,{
+        id: 'journal_074',
+        title: 'The Last Vigil',
+        chapter: 74,
+        unlockType: 'boss',
+        unlockAt: 'The Last Vigil',
+        icon: '⚔️',
+        summary: 'The guardian of the Verdant Choir is not hostile so much as exhausted — a duty that outlived its reason, kept anyway because stopping felt like betrayal.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It does not attack when you find it. It simply stands, ancient and patient, in the center of the ruined circle, and waits to see what you are before it decides whether you need stopping.' },
+          { speaker: 'San', text: '"It is not hostile," you say, lowering your staff slightly. "It is just — checking."' },
+          { speaker: 'Sister Wren', text: '"It has been checking for longer than any of us have been alive," she says quietly. "I recognize this too. A duty that outlived the reason for it, kept anyway because stopping felt like betrayal."' },
+          { speaker: 'Narrator', text: 'The Last Vigil moves then — not in anger, but in the exhausted, mechanical way of something that has performed the same motion so many times it no longer remembers choosing to.' },
+          { speaker: 'Ser Aldric', text: '"I am sorry," he tells it, mid-fight, and means it completely. "I know exactly how long a person can keep doing something out of nothing but momentum. Let us show you it is allowed to stop."' },
+          { speaker: 'Narrator', text: 'When it finally falls still, there is no triumphant collapse, no shattering. Just a long exhale — stone and root and old grief, all finally permitted to rest.' },
+          { speaker: 'Sister Wren', text: '"Thank you," she says to it, or to the space where it stood, or maybe to herself. "For however long you had to hold this alone."' },
+          { speaker: 'San', text: '"Come on," you say gently, to all of them. "Let\'s see what it was actually guarding."' },
+        ]
+      }
+,{
+        id: 'journal_075',
+        title: 'The Mended Sanctum',
+        chapter: 75,
+        unlockType: 'level',
+        unlockAt: 62,
+        icon: '🕯️',
+        summary: 'Small, quiet, and honest about what it is — the Mended Sanctum opens, tended by people who actually mean it.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Sanctum, once the growth is finally cleared away, is smaller than any of you expected — a single circular chamber, roof long since given way to open sky, moss soft enough to kneel on without meaning to.' },
+          { speaker: 'Sister Wren', text: '"This was never about scale," she says, turning slowly in the center of it. "The Cult built everything enormous, everything loud. This is the opposite of that. Whoever kept this place understood something we never did."' },
+          { speaker: 'Ser Aldric', text: '"What did they understand?" Joel asks.' },
+          { speaker: 'Sister Wren', text: '"That devotion does not need an audience to be real," she says. "I spent years performing mine for a room full of people. This place was built for exactly the opposite reason."' },
+          { speaker: 'Narrator', text: 'You help clear the last of the debris together — San, Joel, Ser Aldric, Sister Wren, no hierarchy to it, just four people doing the actual work of restoring something rather than just claiming it.' },
+          { speaker: 'San', text: '"The Mended Sanctum," you say, testing the name out loud, and it settles into the space like it was always going to be called that. "Somewhere real. Small enough to be honest about what it is."' },
+          { speaker: 'Narrator', text: 'As the last stone settles into place, something in the chamber floor catches the light — a vein of ore, warm to the touch, humming faintly with the same quiet persistence as everything else this region has quietly kept growing back.' },
+          { speaker: 'Sister Wren', text: '"Mendstone," she says, crouching beside it, something like wonder in her voice for the first time since any of you have known her. "I have heard the old stories. I did not think I would ever actually see it form."' },
+          { speaker: 'Ser Aldric', text: '"Seems fitting," Ser Aldric says, looking around at all of you. "A stone that only grows where something actually finished healing. This whole vale is made of it, in one form or another. We just happened to be standing here when it caught up to us."' },
+          { speaker: 'Narrator', text: 'The Mended Sanctum opens its doors — such as they are — properly, for the first time in longer than anyone can say. Not loud. Not enormous. Just real, and finally, quietly, tended by people who mean it.' },
+        ]
+      }
+
+,{
         id: 'journal_070',
         title: 'Forever and Ever',
         chapter: 70,
@@ -2833,6 +2933,7 @@ storyJournal: {
       { id: 'ad_camp', name: 'Abyssal Refuge', type: 'camp', zone: 'Abyssal Depths', zoneLv: 8, desc: 'A pocket of reality that the void has not claimed... yet.', unlocked: false, icon: '⛺', cost: 0 },
       { id: 'ad_tavern', name: 'The Last Light', type: 'tavern', zone: 'Abyssal Depths', zoneLv: 8, desc: 'The final tavern before oblivion. Prices are steep.', unlocked: false, icon: '🍺', cost: 25 },
       { id: 'temple', name: 'Temple of Resurrection', type: 'temple', zone: 'Sanctuary', zoneLv: 1, desc: 'An ancient temple that restores fallen companions to life.', unlocked: true, icon: '⛪', cost: 50 },
+      { id: 'mended_sanctum', name: 'The Mended Sanctum', type: 'temple', zone: 'The Verdant Choir', zoneLv: 65, desc: 'Small, quiet, and honest about what it is \u2014 the same temple, a second doorway, so much closer when the road out here gets long.', unlocked: false, icon: '\uD83D\uDD6F\uFE0F', cost: 50 },
       { id: 'apt_camp', name: 'Planar Anchor Camp', type: 'camp', zone: 'Arcane Planar Tower', zoneLv: 11, desc: 'A pocket of stable reality anchored by ancient runes. The walls still shimmer.', unlocked: false, icon: '⛺', cost: 0 },
       { id: 'apt_tavern', name: 'The Shifting Spire', type: 'tavern', zone: 'Arcane Planar Tower', zoneLv: 11, desc: 'A tavern that exists in multiple dimensions at once. The bartender may be a future version of yourself.', unlocked: false, icon: '🍺', cost: 30 },
           // === EXPANSION: LV 21+ REST SITES ===
@@ -4743,6 +4844,10 @@ function checkNPCUnlocks() {
         lg('🌟 ' + npc.n + ' ' + npc.title + ' has joined as an ally!');
       }
     }
+    if (npc.t === 'ally' && !npc.unlocked && !npc.reqMember && npc.ul && G.p.lvl >= npc.ul) {
+      npc.unlocked = true;
+      lg('🌟 ' + npc.n + ' ' + npc.title + ' has joined as an ally!');
+    }
   }
 }
 
@@ -5694,8 +5799,9 @@ function getTempleCost(baseCost) {
   return Math.max(1, Math.floor(baseCost * (1 - getTempleDiscount())));
 }
 function addTempleRep(amount) {
-  G.templeRep += amount;
-  lg('🙏 Temple standing +' + amount + ' (' + G.templeRep + ')');
+  const boosted = Math.floor(amount * (1 + getAllyTempleRepBonus()));
+  G.templeRep += boosted;
+  lg('🙏 Temple standing +' + boosted + ' (' + G.templeRep + ')');
 }
 
 function checkGuildRankUp(previousRank) {
@@ -6192,8 +6298,9 @@ function tickAilments() {
 
 
 const FORGE_UNLOCK_LEVEL = 20;
-const FORGE_MAX_LEVEL = 5;
-const FORGE_COSTS = [200, 500, 1200, 2500, 5000]; // cost to go from level index to index+1
+const FORGE_MAX_LEVEL = 6;
+const FORGE_COSTS = [200, 500, 1200, 2500, 5000, 18000]; // cost to go from level index to index+1 — tier 6 also requires a Mendstone
+const FORGE_MENDSTONE_TIER = 6; // the level that requires consuming a Mendstone alongside gold
 const FORGE_STAT_KEYS = ['atk', 'def', 'spd', 'hp', 'str', 'dex', 'con', 'int', 'wis', 'cha',
   'fireDmg', 'iceDmg', 'lightDmg', 'voidDmg', 'fireRes', 'iceRes', 'lightRes', 'voidRes',
   'lifeSteal', 'critChance', 'mpRegen', 'hpRegen', 'goldFind'];
@@ -6211,6 +6318,9 @@ function forgeUpgradeItem(ownerName, slot) {
   if (level >= FORGE_MAX_LEVEL) { lg('⚒️ ' + item.n + ' is already fully forged (+' + FORGE_MAX_LEVEL + ').'); return; }
   const cost = FORGE_COSTS[level];
   if (G.p.gold < cost) { lg('❌ Need ' + cost + 'G to forge ' + item.n + ' to +' + (level + 1) + ' (have ' + G.p.gold + 'G).'); return; }
+  const needsMendstone = (level + 1) === FORGE_MENDSTONE_TIER;
+  const mendstoneIdx = needsMendstone ? G.p.inv.findIndex(it => it.n === 'Mendstone') : -1;
+  if (needsMendstone && mendstoneIdx === -1) { lg('❌ Forging to +' + FORGE_MENDSTONE_TIER + ' also requires a Mendstone \u2014 the Mended Sanctum is the only known source.'); return; }
 
   // Snapshot original stats the first time this item is ever forged, so repeated
   // upgrades compute from the true base rather than compounding on an already-boosted value.
@@ -6220,6 +6330,11 @@ function forgeUpgradeItem(ownerName, slot) {
   }
 
   G.p.gold -= cost;
+  if (needsMendstone) {
+    const stone = G.p.inv[mendstoneIdx];
+    stone.q = (stone.q || 1) - 1;
+    if (stone.q <= 0) G.p.inv.splice(mendstoneIdx, 1);
+  }
   item.upgradeLevel = level + 1;
   const mult = 1 + item.upgradeLevel * FORGE_GROWTH_PER_LEVEL;
   for (let key in item.baseStats) {
@@ -6228,7 +6343,7 @@ function forgeUpgradeItem(ownerName, slot) {
       : Math.max(1, Math.round(item.baseStats[key] * mult));
   }
 
-  lg('⚒️ ' + item.n + ' forged to +' + item.upgradeLevel + '!');
+  lg('⚒️ ' + item.n + ' forged to +' + item.upgradeLevel + (needsMendstone ? ' \u2014 the Mendstone hums once, then settles quietly into the metal.' : '') + '!');
 
   if (ownerName !== 'San') {
     const member = G.party.find(p => p.n === ownerName);
@@ -6593,6 +6708,9 @@ function getAllyXpBonus() {
 }
 function getAllyAtkBonus() {
   return isAllyUnlocked('Aisy') ? 0.08 : 0;
+}
+function getAllyTempleRepBonus() {
+  return isAllyUnlocked('Sister Wren') ? 0.08 : 0;
 }
 
 function isPrestigeUnlocked() {
@@ -11963,7 +12081,7 @@ function checkQ(){
     if(q.t=='boss_specific'&&q.c>=q.need)q.c=q.need;
     if(q.t=='aisyah_battle'&&q.c>=q.need)q.c=q.need;
     if(q.t=='joel_battle'&&q.c>=q.need)q.c=q.need;
-    if(q.c>=q.need){q.done=true;G.p.xp+=q.rw.xp;G.p.gold+=q.rw.g;G.p.quests++;lg('Quest: '+q.n+'! +'+q.rw.xp+'XP +'+q.rw.g+'G');if(q.rw.templeRep){G.templeRep+=q.rw.templeRep;lg('🙏 Temple standing +'+q.rw.templeRep+' ('+G.templeRep+')');}if(q.rw.item){addI(JSON.parse(JSON.stringify(q.rw.item)));lg('🎁 Received: '+q.rw.item.n+'!');showToast('🎁 '+q.rw.item.n+' received!','gold');}if(q.stronghold)claimStronghold(q.stronghold);checkQuestChains();checkAchievements();lvlup();}
+    if(q.c>=q.need){q.done=true;G.p.xp+=q.rw.xp;G.p.gold+=q.rw.g;G.p.quests++;lg('Quest: '+q.n+'! +'+q.rw.xp+'XP +'+q.rw.g+'G');if(q.rw.templeRep){addTempleRep(q.rw.templeRep);}if(q.rw.item){addI(JSON.parse(JSON.stringify(q.rw.item)));lg('🎁 Received: '+q.rw.item.n+'!');showToast('🎁 '+q.rw.item.n+' received!','gold');}if(q.unlockRestSite){const site=G.rest.sites.find(s=>s.id===q.unlockRestSite);if(site){site.unlocked=true;lg('⛪ '+site.name+' is open to you now.');}}if(q.stronghold)claimStronghold(q.stronghold);checkQuestChains();checkAchievements();lvlup();}
   }
 }
 
@@ -14895,7 +15013,9 @@ function rForgeItemRow(ownerName, slot, item) {
   const level = item.upgradeLevel || 0;
   const maxed = level >= FORGE_MAX_LEVEL;
   const cost = maxed ? 0 : FORGE_COSTS[level];
-  const affordable = G.p.gold >= cost;
+  const needsMendstone = !maxed && (level + 1) === FORGE_MENDSTONE_TIER;
+  const hasMendstone = needsMendstone && G.p.inv.some(it => it.n === 'Mendstone');
+  const affordable = G.p.gold >= cost && (!needsMendstone || hasMendstone);
   const rarityColor = item.r ? (item.r==='epic'||item.r==='legendary'?'#a855f7':item.r==='rare'?'#3b82f6':item.r==='uncommon'?'#22c55e':'#9ca3af') : '#9ca3af';
   let h = '<div style="background:var(--bg-card);border:1px solid ' + (level > 0 ? 'var(--gold)' : 'var(--border)') + ';border-radius:10px;padding:10px 12px;margin-bottom:6px;">';
   h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
@@ -14903,9 +15023,12 @@ function rForgeItemRow(ownerName, slot, item) {
   if (maxed) {
     h += '<span class="btn-hint" style="color:var(--gold);">MAX</span>';
   } else {
-    h += '<button onclick="forgeUpgradeItem(\'' + ownerName + '\',\'' + slot + '\')" class="abtn' + (affordable ? '' : ' dis') + '" style="margin:0;padding:4px 10px;font-size:11px;">+1 for ' + cost + 'G</button>';
+    h += '<button onclick="forgeUpgradeItem(\'' + ownerName + '\',\'' + slot + '\')" class="abtn' + (affordable ? '' : ' dis') + '" style="margin:0;padding:4px 10px;font-size:11px;">+1 for ' + cost + 'G' + (needsMendstone ? ' + \uD83D\uDC8E' : '') + '</button>';
   }
   h += '</div>';
+  if (needsMendstone && !hasMendstone) {
+    h += '<div style="font-size:9px;color:var(--text-dim);margin-top:2px;">Requires a Mendstone \u2014 from the Mended Sanctum</div>';
+  }
   h += '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;">' + EQUIPMENT_SLOTS[slot]?.name || slot;
   h += '</div></div>';
   return h;
@@ -14918,7 +15041,7 @@ function rForge() {
   const unlocked = isForgeUnlocked();
   h += '<div class="panel' + (unlocked ? ' panel-gold' : '') + '" style="text-align:center;">';
   h += '<div class="panel-title" style="' + (unlocked ? 'color:var(--gold);' : '') + '">Master Kessler, the Forgemaster</div>';
-  h += '<div class="btn-hint" style="margin-top:6px;line-height:1.5;">"Bring me what you already carry. I don\'t sell anything \u2014 I just make what\'s yours better." Upgrades any equipped item up to +' + FORGE_MAX_LEVEL + ', each level a straight stat boost. Gold only, no materials needed.</div>';
+  h += '<div class="btn-hint" style="margin-top:6px;line-height:1.5;">"Bring me what you already carry. I don\'t sell anything \u2014 I just make what\'s yours better." Upgrades any equipped item up to +' + FORGE_MAX_LEVEL + ', each level a straight stat boost. Gold only, except the final tier \u2014 that one also asks for a Mendstone.</div>';
   h += '</div>';
 
   if (!unlocked) {
@@ -17351,7 +17474,7 @@ function rTemple() {
     const cost = getTempleCost(item.cost);
     h2 += '<div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg-card);border-radius:10px;padding:10px;margin-bottom:6px;' + (locked ? 'opacity:0.5;' : '') + '">';
     h2 += '<div><div style="font-weight:700;font-size:13px;">' + item.n + '</div><div style="font-size:10px;color:var(--text-dim);">' + item.d + '</div></div>';
-    h2 += '<button onclick="buyTempleConsumable(' + i + ')" class="btn-outline-ghost" style="flex-shrink:0;padding:6px 12px;font-size:11px;"' + (locked ? ' disabled' : '') + '>' + (locked ? '🔒' : cost + 'G') + '</button>';
+    h2 += '<button onclick="buyTempleConsumable(' + i + ')" class="btn-outline-ghost" style="flex-shrink:0;width:auto;padding:6px 12px;font-size:11px;"' + (locked ? ' disabled' : '') + '>' + (locked ? '🔒' : cost + 'G') + '</button>';
     h2 += '</div>';
   }
   h2 += '</div>';
