@@ -3348,11 +3348,16 @@ const LOOT_TABLES = {
 
 function rollRarity(zoneLevel, luckBonus = 0) {
   const roll = Math.random() + luckBonus;
-  const tier = Math.min(zoneLevel, 10);
-  if (roll > 0.995 - (tier * 0.005)) return 'legendary';
-  if (roll > 0.95 - (tier * 0.01))  return 'epic';
-  if (roll > 0.80 - (tier * 0.015)) return 'rare';
-  if (roll > 0.50 - (tier * 0.02))  return 'uncommon';
+  // Was: tier = min(zoneLevel, 10) — froze drop odds at zone-10 levels forever, so
+  // zone 42 and zone 95 rolled identically to zone 10. Rescaled with sqrt so zone 1-10
+  // matches the original curve exactly (progress=1 at zone 10), then keeps easing
+  // upward smoothly instead of flatlining — by zone 95, legendary climbs to ~16%
+  // (from 5.5%) and commons become rare instead of a third of all drops.
+  const progress = Math.sqrt(Math.min(zoneLevel, 95) / 10);
+  if (roll > 0.995 - (progress * 0.05)) return 'legendary';
+  if (roll > 0.95 - (progress * 0.10))  return 'epic';
+  if (roll > 0.80 - (progress * 0.15)) return 'rare';
+  if (roll > 0.50 - (progress * 0.20))  return 'uncommon';
   return 'common';
 }
 
@@ -4140,6 +4145,38 @@ const ENEMY_REGISTRY = {
   'Closed Eye Acolyte': { template: 'striker', elem: 'void', zoneLv: 19 },
   'Closed Eye Zealot': { template: 'balanced', elem: 'void', zoneLv: 27 },
   'Closed Eye Warden': { template: 'tank', elem: 'void', zoneLv: 34 },
+
+  // === ROBIN C.'S ZONE (Lv 60) ===
+  'Associate Wraith': { template: 'striker', elem: 'void', zoneLv: 60 },
+  'Non-Compete Bramble': { template: 'balanced', elem: 'poison', zoneLv: 60 },
+  'Overtime Root': { template: 'tank', elem: 'poison', zoneLv: 60 },
+
+  // === ACT 3-5 & VERDANT REACH BOSSES (previously unregistered — fell back to
+  // the default arcane element on their combat-card medallion) ===
+  'The Vanished Guide': { template: 'elite', elem: 'void', zoneLv: 36 },
+  'Hollow Eliz': { template: 'elite', elem: 'void', zoneLv: 37 },
+  'Rustbound Zaki': { template: 'elite', elem: 'none', zoneLv: 38 },
+  'Mezstorm Unbound': { template: 'elite', elem: 'lightning', zoneLv: 39 },
+  'The Fading Familiar': { template: 'elite', elem: 'fire', zoneLv: 40 },
+  'Echo of Aisyah': { template: 'elite', elem: 'none', zoneLv: 41 },
+  'The Tired Version': { template: 'elite', elem: 'void', zoneLv: 42 },
+  'The Architect': { template: 'elite', elem: 'arcane', zoneLv: 43 },
+  'The Splinter Court': { template: 'elite', elem: 'arcane', zoneLv: 44 },
+  'The First Break': { template: 'elite', elem: 'void', zoneLv: 45 },
+  'The Unmended': { template: 'elite', elem: 'none', zoneLv: 46 },
+  'The Relapse': { template: 'elite', elem: 'void', zoneLv: 47 },
+  'The Question of After': { template: 'elite', elem: 'void', zoneLv: 48 },
+  'The Unity Ward': { template: 'elite', elem: 'arcane', zoneLv: 49 },
+  'Daybreak Incarnate': { template: 'elite', elem: 'fire', zoneLv: 50 },
+  'The Wayfinder': { template: 'elite', elem: 'none', zoneLv: 51 },
+  'The Tidereaver': { template: 'elite', elem: 'ice', zoneLv: 52 },
+  'The Ledgerbound': { template: 'elite', elem: 'none', zoneLv: 53 },
+  'The Undertow': { template: 'elite', elem: 'ice', zoneLv: 54 },
+  'The Horizon Keeper': { template: 'elite', elem: 'arcane', zoneLv: 55 },
+  'The Vale Warden': { template: 'elite', elem: 'poison', zoneLv: 56 },
+  'Robin C.': { template: 'elite', elem: 'none', zoneLv: 60 },
+  'The Sunreach Elder': { template: 'elite', elem: 'poison', zoneLv: 75 },
+  'The Verdant Heart': { template: 'elite', elem: 'poison', zoneLv: 95 },
 };
 
 
@@ -11752,20 +11789,34 @@ function playLevelUpSound() {
   playTone(1046.5, 0.36, 0.30, 'triangle', 0.26); // C6
 }
 
+function xpNeededForLevel(targetLvl) {
+  let xpN = 100, lvl = 1;
+  while (lvl < targetLvl) {
+    lvl++;
+    if (lvl < 15) xpN = Math.floor(xpN * 1.5);
+    else if (lvl <= 50) xpN = Math.floor(xpN * 1.18);
+    else xpN = Math.floor(xpN * 1.025);
+  }
+  return xpN;
+}
+
 function lvlup(){
   const startLvl = G.p.lvl;
   while(G.p.xp>=G.p.xpN){
     G.p.xp-=G.p.xpN; G.p.lvl++;
-    // SOFTENED CURVE: 1.5x until Lv 15, then 1.35x through 49, matching 1-50 exactly
-    // as it already plays. From 50 onward, 1.35x compounding forever is what made
-    // level 100 require quadrillions of XP — switching to a much gentler 1.06x here
-    // keeps post-50 progression proportional instead of continuing to accelerate.
+    // XP CURVE (rebalanced): 1.5x through Lv 14 stays as-is — early levels felt right.
+    // Previously 1.35x from 15-50 then 1.06x forever after was still compounding hard
+    // enough that the reward curve (which only grows roughly linearly per zone, ~15xp
+    // at zone 1 up to ~3000xp by zone 56) could never keep pace — by level 56 a single
+    // level required 1.3 BILLION xp against ~3,000xp per kill, i.e. hundreds of
+    // thousands of kills for one level. Softened so level 95 lands around ~650M
+    // cumulative XP instead of ~205 billion — a long grind, but a finishable one.
     if(G.p.lvl < 15){
       G.p.xpN=Math.floor(G.p.xpN*1.5);
     } else if(G.p.lvl <= 50){
-      G.p.xpN=Math.floor(G.p.xpN*1.35);
+      G.p.xpN=Math.floor(G.p.xpN*1.18);
     } else {
-      G.p.xpN=Math.floor(G.p.xpN*1.06);
+      G.p.xpN=Math.floor(G.p.xpN*1.025);
     }
     G.p.mhp+=10; G.p.mmp+=15; G.p.hp=G.p.mhp; G.p.mp=G.p.mmp;
     G.p.stats.int+=2; G.p.stats.con+=1;
@@ -12528,6 +12579,14 @@ function loadGame() {
 
     // Phase 2: Initialize missing fields
     if (!data.player) return false;
+    // Recompute xpN to match the current level-up formula. xpN is a stored absolute
+    // value, not derived from a formula at read time, so a rebalanced curve (see
+    // lvlup()) would otherwise only take effect on the player's *next* level-up —
+    // leaving them stuck against whatever the old formula demanded until then. This
+    // keeps it self-correcting on every load instead.
+    if (data.player.lvl && data.player.xpN) {
+      data.player.xpN = xpNeededForLevel(data.player.lvl);
+    }
     if (!data.player.talents) data.player.talents = [];
     if (!data.player.runes) data.player.runes = [];
     if (data.player.riftCounter === undefined) data.player.riftCounter = 0;
