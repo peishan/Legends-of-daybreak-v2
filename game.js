@@ -461,6 +461,7 @@ const G = {
     // the content here, not constant new backdrops. ===
     { n: 'The Unbroken Vale', lv: 56, elem: 'poison', d: 'The first stretch of ground the party has found since the Breaking that was never actually broken — or healed so completely there is no telling the difference anymore. No ruins. No ash. Just green, further than anyone can see, and the strange quiet of a wound that finally closed.', en: ['Bramble Warden','Wildroot Sprite','Thistle Stalker'], loot: ['Unbroken Root', 'First Bloom Petal', 'Soil That Remembers Nothing'], xp: 3050, g: 2100, dg: 'impossible' },
     { n: "The Retainer's Hollow", lv: 60, elem: 'poison', d: "A patch of the Vale that never grew right — silverleaf trees bent into rows like filing cabinets, roots knotted tight as a signature nobody actually got to read in full. There is an office here, standing where an office has no business standing. San recognizes the smell of it before she recognizes anything else: burnt coffee, cold fluorescent light, and somebody else's overtime.", en: ['Associate Wraith','Non-Compete Bramble','Overtime Root'], loot: ['Shredded Contract', 'Unsigned Ledger', 'A Clause Nobody Read'], xp: 3800, g: 2600, dg: 'impossible' },
+    { n: 'The Verdant Choir', lv: 65, elem: 'poison', d: 'Fallen columns, half-swallowed by root and bloom, arranged in a circle too deliberate to be an accident of growth. Something was built here, once, and something has been quietly guarding what is left of it ever since — not fiercely. Patiently, the way only something that has waited a very long time can afford to be.', en: ['Rootbound Acolyte','Hollow Chorister','Bloomveiled Sentinel'], loot: ['Weathered Hymnal Page', 'A Bell That Still Rings', 'Sanctum Moss'], xp: 4600, g: 3200, dg: 'impossible' },
     { n: 'Sunreach Fields', lv: 75, elem: 'poison', d: "A whole community living here, quietly, for who knows how long — fields actually under cultivation, harvests actually being brought in. Nobody out this far seems to know or care what the rest of the world has been through. They just kept growing things, the entire time.", en: ['Harvest Golem','Sunreach Guardian','Bloomwatcher'], loot: ['Sunreach Grain', 'A Harvest Nobody Rationed', 'Guardian\'s Bramble'], xp: 6000, g: 4400, dg: 'impossible' },
     { n: 'The Treeline Detail', lv: 82, elem: 'poison', d: "Another patch of green quietly ruined by something that has no business out here — a loading dock bolted onto the edge of the vale, floodlights running on a generator nobody asked permission to install. Past the treeline, the brush has clearly been cleared, over and over, by people who were never given a choice about it.", en: ['Overtime Wraith','Off-Day Enforcer','Loading Dock Sentinel'], loot: ['Clocked-In Badge', 'A Shift Nobody Chose', 'Treeline Splinter'], xp: 9000, g: 6400, dg: 'impossible' },
     { n: 'The Rootbound Sanctuary', lv: 95, elem: 'poison', d: 'Whatever is actually doing the mending out here, this is close to its source — roots thick as towers, growth old enough to have opinions about who is allowed to pass through. Healing this deep does not come free. Something this old does not let go of what it has grown around without a reason.', en: ['Root-Bound Elder','Sanctuary Keeper','Elderwood Sentinel'], loot: ['Heartwood Shard', 'What the Roots Kept', 'The First Bloom, Still Sealed'], xp: 12000, g: 8800, dg: 'impossible' },
@@ -621,6 +622,12 @@ const G = {
     { id: 61, n: 'Brother Iss, the Unraveled', d: 'Hunt down Brother Iss, the Unraveled', t: 'boss_specific', target: 'Brother Iss, the Unraveled', c: 0, need: 1, rw: { xp: 8200, g: 4800, templeRep: 110 }, done: false, chain: 'scattered_choir', reqQuest: 60, hidden: true, revealed: false },
     { id: 62, n: 'The Splintered Two', d: 'Hunt down The Splintered Two', t: 'boss_specific', target: 'The Splintered Two', c: 0, need: 1, rw: { xp: 10200, g: 6000, templeRep: 170 }, done: false, chain: 'scattered_choir', reqQuest: 61, hidden: true, revealed: false },
     { id: 63, n: 'Sister Wren, the Last Believer', d: 'Hunt down Sister Wren, the Last Believer, and let the Cult of the Closed Eye finally end', t: 'boss_specific', target: 'Sister Wren, the Last Believer', c: 0, need: 1, rw: { xp: 13500, g: 8200, templeRep: 280 }, done: false, chain: 'scattered_choir', reqQuest: 62, hidden: true, revealed: false },
+    { id: 64, n: 'Signs in the Green', d: 'Reach Level 56 \u2014 Ser Aldric asks to help investigate rumors of an old temple, somewhere in the new region', t: 'reach_level', c: 0, need: 56, rw: { xp: 9000, g: 5200, templeRep: 80 }, done: false, chain: 'verdant_choir', reqQuest: 63, hidden: true, revealed: false },
+    { id: 65, n: 'The Reluctant Guide', d: 'Defeat 15 enemies in Verdant Reach while Sister Wren helps trace the signs', t: 'kill', c: 0, need: 15, rw: { xp: 11500, g: 6800, templeRep: 100 }, done: false, chain: 'verdant_choir', reqQuest: 64, hidden: true, revealed: false },
+    { id: 66, n: 'The Verdant Choir', d: 'Push into The Verdant Choir and find what the ruins are still guarding', t: 'kill_specific', target: 'Rootbound Acolyte', c: 0, need: 8, rw: { xp: 14000, g: 8400, templeRep: 130 }, done: false, chain: 'verdant_choir', reqQuest: 65, hidden: true, revealed: false },
+    { id: 67, n: 'The Last Vigil', d: 'Defeat The Last Vigil and let the guardian finally stand down', t: 'boss_specific', target: 'The Last Vigil', c: 0, need: 1, rw: { xp: 19000, g: 12500, templeRep: 220 }, done: false, chain: 'verdant_choir', reqQuest: 66, hidden: true, revealed: false },
+    { id: 68, n: 'What Sister Wren Knows', d: 'Reach Level 60 \u2014 Sister Wren recognizes what the ruins actually are, and what they could be again', t: 'reach_level', c: 0, need: 60, rw: { xp: 16000, g: 9500, templeRep: 180 }, done: false, chain: 'verdant_choir', reqQuest: 67, hidden: true, revealed: false },
+    { id: 69, n: 'The Mended Sanctum, Restored', d: 'Complete the restoration of the Mended Sanctum', t: 'reach_level', c: 0, need: 62, rw: { xp: 24000, g: 16000, item: { n: 'Mendstone', t: 'mat', q: 1, r: 'legendary', d: 'Formed from the region\'s own healing, not mined from anything that was ever broken. It hums, faintly, like something still deciding what to grow into.' } }, done: false, chain: 'verdant_choir', reqQuest: 68, hidden: true, revealed: false },
 
   ],
 
@@ -1242,6 +1249,9 @@ const G = {
     { n: 'The Vale Warden', zone: 'The Unbroken Vale', hp: 40000, mhp: 40000, atk: 270, def: 162, xp: 24000, g: 16000,
       mechanic: 'rampage', rampageTurn: 4, rampageDmg: 105,
       desc: "Grown, not built — thorns thick as pillars around something that was never actually wounded in the first place. It does not attack out of malice. It attacks because it has never once had to explain itself to anyone before now." },
+    { n: 'The Last Vigil', zone: 'The Verdant Choir', hp: 58000, mhp: 58000, atk: 315, def: 195, xp: 31000, g: 21000,
+      mechanic: 'phase', phases: 3, currentPhase: 1, phaseHp: 19334,
+      desc: "It stopped being able to tell genuine devotion from performed devotion so long ago that it simply started guarding against both. Not cruelty. Exhaustion, calcified into a duty nobody ever told it was allowed to end." },
     { n: 'The Sunreach Elder', zone: 'Sunreach Fields', hp: 85000, mhp: 85000, atk: 380, def: 230, xp: 42000, g: 30000,
       mechanic: 'resurrect', resurrectHp: 0.20,
       desc: "The whole field rises with it when it stands — roots, harvest, and every quiet season this community spent surviving unnoticed. It does not forgive easily. It has spent a very long time protecting something it never once had to share." },
@@ -4156,6 +4166,9 @@ const ENEMY_REGISTRY = {
 
   // === THE VERDANT REACH (Lv 56+) ===
   'Bramble Warden': { template: 'tank', elem: 'poison', zoneLv: 56 },
+  'Rootbound Acolyte': { template: 'balanced', elem: 'poison', zoneLv: 65 },
+  'Hollow Chorister': { template: 'striker', elem: 'poison', zoneLv: 65 },
+  'Bloomveiled Sentinel': { template: 'tank', elem: 'poison', zoneLv: 65 },
   'Wildroot Sprite': { template: 'striker', elem: 'poison', zoneLv: 56 },
   'Thistle Stalker': { template: 'balanced', elem: 'poison', zoneLv: 56 },
   'Harvest Golem': { template: 'tank', elem: 'poison', zoneLv: 75 },
@@ -11950,7 +11963,7 @@ function checkQ(){
     if(q.t=='boss_specific'&&q.c>=q.need)q.c=q.need;
     if(q.t=='aisyah_battle'&&q.c>=q.need)q.c=q.need;
     if(q.t=='joel_battle'&&q.c>=q.need)q.c=q.need;
-    if(q.c>=q.need){q.done=true;G.p.xp+=q.rw.xp;G.p.gold+=q.rw.g;G.p.quests++;lg('Quest: '+q.n+'! +'+q.rw.xp+'XP +'+q.rw.g+'G');if(q.rw.templeRep){G.templeRep+=q.rw.templeRep;lg('🙏 Temple standing +'+q.rw.templeRep+' ('+G.templeRep+')');}if(q.stronghold)claimStronghold(q.stronghold);checkQuestChains();checkAchievements();lvlup();}
+    if(q.c>=q.need){q.done=true;G.p.xp+=q.rw.xp;G.p.gold+=q.rw.g;G.p.quests++;lg('Quest: '+q.n+'! +'+q.rw.xp+'XP +'+q.rw.g+'G');if(q.rw.templeRep){G.templeRep+=q.rw.templeRep;lg('🙏 Temple standing +'+q.rw.templeRep+' ('+G.templeRep+')');}if(q.rw.item){addI(JSON.parse(JSON.stringify(q.rw.item)));lg('🎁 Received: '+q.rw.item.n+'!');showToast('🎁 '+q.rw.item.n+' received!','gold');}if(q.stronghold)claimStronghold(q.stronghold);checkQuestChains();checkAchievements();lvlup();}
   }
 }
 
@@ -13727,7 +13740,8 @@ function attachEvents() {
     else if(a=='bonding')setS('bonding');
     else if(a=='mercenary')setS('mercenary');
     else if(a=='today')setS('today');
-    else if(a=='afk_adventure')setS('afk_adventure');});
+    else if(a=='afk_adventure')setS('afk_adventure');
+    else if(a=='temple'){G.viewingTemple=true;setS('rest');}});
   });
  const btnClaimLogin = document.getElementById('btn-claim-login');
 if (btnClaimLogin) {
@@ -15911,6 +15925,7 @@ function rMenu(){
     {i:'👥',l:'Party',d:'Manage companions',a:'party'},
     {i:'🌀',l:'Grind Room',d:'Endless wave battles',a:'grind_room'},
     {i:'⚔️',l:'Raid Mode',d:'Boss gauntlets + elites',a:'raid_select'},
+    {i:'⛪',l:'Temple',d:'Blessings, cures, and revival',a:'temple'},
   ];
   const sections=[
     { title: '🐉 Legendary Hunts', items: [
