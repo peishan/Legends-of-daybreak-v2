@@ -1403,7 +1403,7 @@ storyJournal: {
           { speaker: 'Joel', text: "\"Do you ever think about them?\" he asks, not looking up. You know who he means. You have always known." },
           { speaker: 'San', text: "You stare into the flames. \"Every day,\" you admit. \"The youngest was only one. He was learning to walk. I left before he learned my name.\"" },
           { speaker: 'Narrator', text: "The words hang in the air like smoke. You have never said this out loud. Not to Joel. Not to anyone. The shame has been a stone in your chest for years, growing heavier with each birthday you missed, each milestone you only heard about through strained silence." },
-          { speaker: 'San', text: "\"Her grandmother fed him lies,\" you say, and your voice is steadier than you feel. \"About me. About my family. She made me feel small in my own home. And I was — I was so tired, Joel. I was drowning in a house that was never mine, in a life that was never mine. I didn't know I was autistic then. I just knew I was broken somehow, and I couldn't fix it fast enough for them.\"" },
+          { speaker: 'San', text: "\"His grandmother fed him lies,\" you say, and your voice is steadier than you feel. \"About me. About my family. She made me feel small in my own home. And I was — I was so tired, Joel. I was drowning in a house that was never mine, in a life that was never mine. I didn't know I was autistic then. I just knew I was broken somehow, and I couldn't fix it fast enough for them.\"" },
                     { speaker: 'Joel', text: "\"My daughter,\" he says quietly. \"She is one year older than your eldest. She was born after we broke. Before that, I had already taken the job in Brunei. I didn't leave her mother — I left for work.\" He pauses, the fire catching the lines around his eyes. \"Her mother found someone new. Had another baby. I send money every month. My mother visits, gives it to her. Holds her. Tells her about me. I have never watched her first steps. Never heard her first word. I visit every two years, when my contract renews. It is not the same. It is never the same.\"" },
           { speaker: 'Narrator', text: "The fire pops. Sparks rise into a sky with two moons. You think of Brunei. You think of the small apartment where you tried to be a wife, a mother, a daughter-in-law, everything to everyone, until there was nothing left of you but exhaustion and the certainty that you were failing at all of it." },
           { speaker: 'San', text: "\"Mez left home young,\" you say, and the old grief surfaces, familiar as a scar. \"She was strong. She made money. She could give Mum and Dad things I never could. And I was — I was stuck. In the marriage. In my own head. In the fear that if I left, I would be proving them right. That I was never good enough.\"" },
@@ -2636,23 +2636,25 @@ storyJournal: {
         unlockType: 'level',
         unlockAt: 47,
         icon: '🩺',
-        summary: 'San remembers the cholesterol scare, the kidney complication that made treatment uncertain, and what it felt like to be the one watching instead of the one being watched over.',
+        summary: 'San remembers the cholesterol scare, resolved through Dr. AA\'s directness rather than a stranger\'s chart, and the specific relief of ruling the kidneys out.',
         scenes: [
           { speaker: 'Narrator', text: 'It comes back to you in pieces, the way frightening things sometimes do — not all at once, but circling closer each time you let yourself think about it.' },
-          { speaker: 'San', text: '"Do you remember the bloodwork," you say, "right before everything changed. Your cholesterol."' },
-          { speaker: 'Joel', text: 'He nods slowly. "Abnormally high. High enough that the doctor did not bother softening how she said it."' },
-          { speaker: 'San', text: '"I remember sitting in that waiting room doing math I did not want to be doing," you say. "Wondering how many years that number was quietly taking off things, without ever once asking permission."' },
+          { speaker: 'San', text: '"Do you remember the text," you say, "the one from Dr. AA. About your cholesterol."' },
+          { speaker: 'Joel', text: 'He nods slowly. "Abnormally high. He did not soften it much, even over WhatsApp. Just sent the numbers and told you straight what they meant."' },
+          { speaker: 'San', text: '"I remember sitting there doing math I did not want to be doing," you say. "Wondering how many years that number was quietly taking off things, without ever once asking permission."' },
           { speaker: 'Narrator', text: 'You had been the one who needed tending, for so much of your life together up to that point. This was the first time you understood, fully, what it felt like from the other side — watching someone you love turn out to be more breakable than you had let yourself believe.' },
-          { speaker: 'Joel', text: '"The medication should have been simple," Joel says. "Standard treatment, standard dose. Except my kidneys have never quite behaved the way kidneys are supposed to. So nothing about it was simple. No one could tell us for certain what the medication would do to me instead of for me."' },
-          { speaker: 'San', text: '"I remember looking it up at two in the morning," you admit. "Reading every version of the worst case I could find. Terrified of the cholesterol, and just as terrified of the thing that was supposed to fix it."' },
+          { speaker: 'San', text: '"It was strange, finding out that way," you admit. "Dr. AA was never your doctor. He was mine, in a manner of speaking — someone I knew from the firm, back when I still worked there. A friend who happened to also be a physician. I only asked Dad to get his bloods done at his clinic because I already knew him well enough to ask directly, instead of waiting on someone we had never met."' },
+          { speaker: 'Joel', text: '"And I ended up going to the same clinic," Joel says, "since it was already familiar to you. It just happened that Dr. AA was the one who actually looked at my numbers himself, before whoever was technically assigned to my case even called me in."' },
+          { speaker: 'San', text: '"He has always done that," you say, something fond creeping into the exhaustion of the memory. "For Dad, for you. Every result, straight to me first, over text, like he still half remembers being the one who used to help me untangle a stuck sentence when I could not find the next line of a brief."' },
+          { speaker: 'Narrator', text: 'You remember the fear clearly — the specific terror of a kidney that had never quite behaved the way kidneys were supposed to, and a cholesterol medication that assumed it would.' },
+          { speaker: 'Joel', text: '"We did the full workup, in the end," Joel says. "No direct implication to the kidneys at all, as it turned out. Whatever discomfort I had been carrying around there was most likely just old damage — NSAIDs, taken carelessly enough in my twenties that my body was still quietly billing me for it years later."' },
+          { speaker: 'San', text: '"I remember how relieved I was," you say. "And how strange the relief felt, given it meant the actual problem — the cholesterol itself — was still sitting there, unresolved, just no longer tangled up with something worse."' },
+          { speaker: 'Joel', text: '"One fear at a time," Joel says. "That is all anyone can really ask for."' },
+          { speaker: 'San', text: '"I did not tell you how frightened I was, at two in the morning, reading every version of the worst case I could find," you admit. "I did not want you carrying my fear on top of your own body already doing enough to you."' },
           { speaker: 'Joel', text: '"You never told me that," he says, something shifting in his expression.' },
-          { speaker: 'San', text: '"I did not want you carrying my fear on top of your own body already doing enough to you," you say. "You had enough on your plate being the one it was actually happening to."' },
           { speaker: 'Narrator', text: 'He reaches over, quiet, and you let him take your hand the way you have let him take it a hundred times since, except this time you notice, really notice, how much you needed exactly this.' },
-          { speaker: 'Joel', text: '"I never got a real answer, in the end," Joel says. "Not before everything here happened. Just a number that scared us both, and a treatment nobody could promise was safe, and no time to find out which fear was going to turn out to be the bigger one."' },
-          { speaker: 'San', text: '"No," you agree quietly. "We never got to find out."' },
-          { speaker: 'Narrator', text: 'You do not know, sitting here now, whether that particular unfinished thing followed you into this world the way so much else did, or whether it stayed behind entirely, unresolved, in a life neither of you can currently reach. You do not say that part out loud. Some fears are not ready to be spoken as questions yet — only carried, a little longer, until they are.' },
-          { speaker: 'San', text: '"I am glad you are here," you say instead, simple, true, sidestepping the bigger question because tonight is not the night for it. "However that math actually worked out."' },
-          { speaker: 'Joel', text: '"Me too," Joel says, and squeezes your hand once, like a period at the end of a sentence neither of you is ready to finish yet.' },
+          { speaker: 'San', text: '"I am glad it was Dr. AA who found it," you say. "I do not think I would have trusted the number the same way, coming from someone who did not already know how to talk to me plainly."' },
+          { speaker: 'Joel', text: '"Me too," Joel says, and squeezes your hand once, warm, certain — not a fear finished, exactly, but one that finally has a shape small enough to hold.' },
         ]
       }
       ,{
@@ -2773,12 +2775,12 @@ storyJournal: {
         unlockType: 'zone',
         unlockAt: 'The Unbroken Vale',
         icon: '📎',
-        summary: "Dr. AA — San's old family doctor, somehow also standing in the Vale — recognizes a name San mentions in passing, and tells her Robin made it through into this world too.",
+        summary: "Dr. AA \u2014 a friend from San's old firm, a physician who once talked her through writer's block as easily as bloodwork, somehow also standing in the Vale \u2014 recognizes a name San mentions in passing, and tells her Robin made it through into this world too.",
         scenes: [
           { speaker: 'Narrator', text: 'You almost walk past the cart before your brain catches up to what your eyes already know — the particular slouch of it, the hand-lettered sign, the smell of antiseptic fighting a losing battle against old paperback glue.' },
-          { speaker: 'San', text: '"Dr. AA?" you say, and it comes out smaller than you mean it to, more like the patient you used to be than the person who has since killed things twice this size as him.' },
-          { speaker: 'Dr. AA', text: '"San!" He looks up like you are a chart he has been meaning to review. "Good, you\'re upright. Bloodwork would\'ve been nice before whatever apocalypse this was, but I\'ll take upright."' },
-          { speaker: 'Narrator', text: 'You laugh, a little wet around the edges, because of course the man who once lectured you about your iron levels between ghost stories is exactly the same out here — just with a stranger cart and a stranger sky.' },
+          { speaker: 'San', text: '"Dr. AA?" you say, and it comes out smaller than you mean it to, more like the colleague who used to text him at midnight about a stuck paragraph than the person who has since killed things twice this size.' },
+          { speaker: 'Dr. AA', text: '"San!" He looks up like you are a chart he has been meaning to review. "Good, you\'re upright. Would\'ve liked more warning before whatever apocalypse this was, but I\'ll take upright."' },
+          { speaker: 'Narrator', text: 'You laugh, a little wet around the edges, because of course the man who once talked you through an entire chapter of writer\'s block over lunch is exactly the same out here — just with a stranger cart and a stranger sky.' },
           { speaker: 'San', text: '"How are you even here," you ask. "How is any of this — you were supposed to be three exam rooms down from a vending machine, not standing in a magic forest."' },
           { speaker: 'Dr. AA', text: '"Same as everyone else who turns up, apparently," he says, shrugging like it is a minor administrative detail. "One day it\'s a waiting room full of coughs. Next day it\'s this. I brought what I had on the cart. Turns out paracetamol travels well."' },
           { speaker: 'Narrator', text: 'It is such an absurdly practical answer that something in your chest, braced for a wound, relaxes instead.' },
@@ -6574,7 +6576,7 @@ function startSiegeWave() {
   G.cbt.en = [];
   G.state = 'combat';
   G.currentBoss = null;
-
+  G.cbt.autoCombat = isAutoCombatPreferred();
   const waveSize = 2 + Math.floor(G.siegeDefense.wave / 2); // waves 0-1: 2 enemies, wave 2: 3 enemies
   for (let i = 0; i < waveSize; i++) {
     const name = def.siegeEnemies[Math.floor(Math.random() * def.siegeEnemies.length)];
@@ -6844,6 +6846,7 @@ function startDragonHunt(dragonId) {
   G.cbt.turn = 0;
   G.cbt.en = [];
   G.state = 'combat';
+  G.cbt.autoCombat = isAutoCombatPreferred();
   G.currentBoss = JSON.parse(JSON.stringify(dragon));
   G.currentBoss.id = 98;
   G.cbt.en.push(G.currentBoss);
@@ -6927,6 +6930,7 @@ function startTempleHunt(bossName) {
   G.cbt.turn = 0;
   G.cbt.en = [];
   G.state = 'combat';
+  G.cbt.autoCombat = isAutoCombatPreferred();
   // No custom victory handler needed here, unlike Dragon Hunt — boss_specific quest
   // tracking and templeRep rewards both already work generically off G.currentBoss
   // inside the unmodified base handleVictory()/checkQ() pipeline.
@@ -7039,6 +7043,7 @@ function spawnBossRushEncounter() {
   G.cbt.turn = 0;
   G.cbt.en = [];
   G.state = 'combat';
+  G.cbt.autoCombat = isAutoCombatPreferred();
 
   const boss = JSON.parse(JSON.stringify(bossDef));
   boss.id = 99;
@@ -7140,6 +7145,7 @@ function spawnChainQuestStage() {
   G.cbt.turn = 0;
   G.cbt.en = [];
   G.state = 'combat';
+  G.cbt.autoCombat = isAutoCombatPreferred();
 
   if (stage.type === 'boss') {
     const bossDef = G.bosses.find(b => b.n === stage.name);
@@ -7426,6 +7432,7 @@ function startRaidStage() {
   G.cbt.turn = 0;
   G.cbt.en = [];
   G.state = 'combat';
+  G.cbt.autoCombat = isAutoCombatPreferred();
 
   if (stage.type === 'boss') {
     const bossDef = G.bosses.find(b => b.n === stage.name);
@@ -10891,6 +10898,7 @@ function startGrindWave() {
   G.cbt.en = [];
   G.state = 'combat';
   G.currentBoss = null;
+  G.cbt.autoCombat = isAutoCombatPreferred();
   
   const wave = G.endlessGrind.wave;
   const playerLv = G.p.lvl;
@@ -11366,6 +11374,7 @@ function startMercenaryContract() {
   G.cbt.en = [];
   G.state = 'combat';
   G.currentBoss = null;
+  G.cbt.autoCombat = isAutoCombatPreferred();
 
   rollWeather();
 
@@ -11723,7 +11732,7 @@ function sc(zi, skipEvents) {
       showToast('📖 New story chapter unlocked!', 'gold');
     }
   }
-  G.cbt.on=true; G.cbt.turn=0; G.cbt.en=[]; G.state='combat';
+  G.cbt.on=true; G.cbt.turn=0; G.cbt.en=[]; G.state='combat'; G.cbt.autoCombat=isAutoCombatPreferred();
     checkDimensionalInstability(); // Phase 2: Dimensional Instability
   
   // === WEATHER SYSTEM ===
@@ -13725,9 +13734,13 @@ function render(){
   // auto-combat can now start already-true by default (rather than only being
   // turned on manually), nothing was kicking off the actual tick loop for that
   // case: the flag said "on" but the setTimeout chain never got its first push.
-  // Heartbeat is 0 only when the loop isn't currently running, so this is safe to
-  // check on every render without risk of double-starting an already-running loop.
-  if (G.cbt.on && G.cbt.autoCombat && G.autoCombatHeartbeat === 0) {
+  // Also catches a second, related gap: handleVictory() never resets the heartbeat
+  // when a fight cleanly ends, so a brand new fight can inherit a STALE (non-zero
+  // but no longer ticking) heartbeat from the previous fight — which fooled this
+  // check into thinking the loop was already running, leaving the new fight stuck
+  // until the separate watchdog (up to ~6s later) eventually caught it. Checking
+  // staleness here too means it self-corrects on the very next render instead.
+  if (G.cbt.on && G.cbt.autoCombat && (G.autoCombatHeartbeat === 0 || (Date.now() - G.autoCombatHeartbeat > 4000))) {
     doAutoCombatTick();
   }
 
@@ -15898,6 +15911,7 @@ function startRoadAmbush(zone) {
   G.cbt.en = [];
   G.state = 'combat';
   G.currentBoss = null;
+  G.cbt.autoCombat = isAutoCombatPreferred();
 
   rollWeather();
   applyZoneBuffs(zone.n);
