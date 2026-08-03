@@ -647,7 +647,7 @@ const G = {
     { id: 68, n: 'What Sister Wren Knows', d: 'Reach Level 60 \u2014 Sister Wren recognizes what the ruins actually are, and what they could be again', t: 'reach_level', c: 0, need: 60, rw: { xp: 16000, g: 9500, templeRep: 180 }, done: false, chain: 'verdant_choir', reqQuest: 67, hidden: true, revealed: false },
     { id: 69, n: 'The Mended Sanctum, Restored', d: 'Complete the restoration of the Mended Sanctum', t: 'reach_level', c: 0, need: 62, rw: { xp: 24000, g: 16000, item: { n: 'Mendstone', t: 'mat', q: 1, r: 'legendary', d: 'Formed from the region\'s own healing, not mined from anything that was ever broken. It hums, faintly, like something still deciding what to grow into.' } }, done: false, chain: 'verdant_choir', reqQuest: 68, hidden: true, revealed: false, unlockRestSite: 'mended_sanctum' },
     { id: 70, n: 'The Treeline Detail', d: 'Defeat Jeff, the SK* Son-in-Law, and give the Treeline Detail its first real day off', t: 'boss_specific', target: 'Jeff, the SK* Son-in-Law', c: 0, need: 1, rw: { xp: 55000, g: 40000 }, done: false },
-    { id: 71, n: "The Retainer's Hollow", d: 'Defeat Robin C. and let nine years finally, actually end', t: 'boss_specific', target: 'Robin C.', c: 0, need: 1, rw: { xp: 27000, g: 18500 }, done: false },
+    { id: 71, n: "The Retainer's Hollow", d: 'Defeat Robin C. and let nine years finally, actually end', t: 'boss_specific', target: 'Robin C.', c: 0, need: 1, rw: { xp: 58000, g: 42000 }, done: false },
 
   ],
 
@@ -706,7 +706,7 @@ const G = {
     { id: 'b42', n: 'Rust Automaton Scrap', d: 'Defeat 4 Rust Automatons', t: 'kill_specific', target: 'Rust Automaton', c: 0, need: 4, rw: { xp: 1700, g: 980 }, done: false, refreshDay: 0, minLv: 34, maxLv: 46 },
     { id: 'b43', n: 'Watching Echo Purge', d: 'Defeat 4 Watching Echoes', t: 'kill_specific', target: 'Watching Echo', c: 0, need: 4, rw: { xp: 1800, g: 1050 }, done: false, refreshDay: 0, minLv: 35, maxLv: 47 },
     { id: 'b44', n: 'Another Shift, Another Soul', d: 'Defeat Jeff, the SK* Son-in-Law', t: 'kill_specific', target: 'Jeff, the SK* Son-in-Law', c: 0, need: 1, rw: { xp: 12000, g: 8500 }, done: false, refreshDay: 0, minLv: 80, maxLv: 999 },
-    { id: 'b45', n: "Can't Break the Retainer", d: 'Defeat Robin C.', t: 'kill_specific', target: 'Robin C.', c: 0, need: 1, rw: { xp: 7000, g: 5000 }, done: false, refreshDay: 0, minLv: 58, maxLv: 999 },
+    { id: 'b45', n: "Can't Break the Retainer", d: 'Defeat Robin C.', t: 'kill_specific', target: 'Robin C.', c: 0, need: 1, rw: { xp: 13000, g: 9000 }, done: false, refreshDay: 0, minLv: 58, maxLv: 999 },
 
   ],
 
@@ -1177,10 +1177,22 @@ const G = {
     // exact same racket somewhere new. Because he's a living transmigrator and not a
     // one-time story boss, he's a normal repeatable zone encounter — beatable as many
     // times as San wants to. ===
-    { n: 'Robin C.', zone: "The Retainer's Hollow", hp: 48000, mhp: 48000, atk: 288, def: 174, xp: 27000, g: 18500,
-      mechanic: 'rampage', rampageTurn: 3, rampageDmg: 110,
-      desc: "Made it through same as everyone else did, and set up shop within a season — same firm, same rules, new sign out front. He does not remember San's name. He never needed to.",
-      taunts: ["I can't break the retainer.", "Are you working, or are you on your phone?"],
+    { n: 'Robin C.', zone: "The Retainer's Hollow", hp: 120000, mhp: 120000, atk: 445, def: 272, xp: 58000, g: 42000,
+      mechanic: ['billable_hours', 'freeze'],
+      billableDmg: 70, billableMsg: "Another hour, another line item, another year you'll never get back.",
+      freezeChance: 0.22, freezeMsg: "\uD83D\uDCC4 Robin slides a clause across the desk — bound by the fine print, you can't act!",
+      desc: "Made it through same as everyone else did, and set up shop within a season — same firm, same rules, new sign out front. He does not remember San's name. He never needed to. Nine years of quiet, grinding cost, given a shape big enough to finally have to answer for all of it at once.",
+      taunts: [
+        "I can't break the retainer.",
+        "Are you working, or are you on your phone?",
+        "Everyone's replaceable. That's just how the firm works.",
+        "You should be grateful for the opportunity, honestly.",
+        "I don't recall approving overtime for complaining.",
+        "This conversation isn't billable. Get back to it.",
+        "I built this practice. You just worked in it.",
+        "Loyalty is nice. It doesn't show up on a balance sheet.",
+        "You'll thank me for this someday. Probably not today."
+      ],
       defeatLine: "Robin goes down mid-sentence, and the ledger San has been carrying since the old world finally closes. Nine years for a hundred dollars was never a fair trade — this one is. He'll be back next season, the way he always is. San will be ready." },
 
     // === PERSONAL: JEFF, THE SK* SON-IN-LAW — Joel's old warehouse manager at SK*, the
@@ -9033,7 +9045,12 @@ function handleBossMechanics() {
     
     G.cbt.turn = G.cbt.turn || 0;
     
-    switch (e.mechanic) {
+    // Supports a boss having multiple simultaneous mechanics (e.g. Robin's Billable
+    // Hours + Can't Break the Retainer) — a plain string still works exactly as before
+    // for every existing single-mechanic boss, this just wraps it into a one-item list.
+    const mechanicsToRun = Array.isArray(e.mechanic) ? e.mechanic : [e.mechanic];
+    for (let activeMechanic of mechanicsToRun) {
+    switch (activeMechanic) {
       case 'rampage':
         if (G.cbt.turn >= e.rampageTurn) {
           lg('🔥 ' + e.n + ' ENRAGES! All party members take ' + e.rampageDmg + ' damage!');
@@ -9078,8 +9095,14 @@ function handleBossMechanics() {
           const targets = [G.p, ...G.party.filter(p => p.on && p.hp > 0)];
           const target = targets[Math.floor(Math.random() * targets.length)];
           target.frozen = true;
-          lg('❄️ ' + e.n + ' freezes ' + (target.n || 'you') + '! Skip next turn!');
+          lg((e.freezeMsg || ('❄️ ' + e.n + ' freezes ' + (target.n || 'you') + '!')) + ' Skip next turn!');
         }
+        break;
+      case 'billable_hours':
+        // A slow, constant drain every single turn rather than a periodic burst —
+        // meant to feel like accumulating cost rather than a dramatic attack.
+        lg('📋 ' + (e.billableMsg || (e.n + ' racks up another billable hour.')) + ' -' + e.billableDmg + ' HP.');
+        G.p.hp = Math.max(1, G.p.hp - e.billableDmg);
         break;
       case 'devour':
         if (G.cbt.turn >= e.devourTurn) {
@@ -9376,6 +9399,7 @@ function handleBossMechanics() {
         }
         break;
 
+    }
     }
   }        
 }
@@ -12811,6 +12835,7 @@ const ENEMY_ICON_SVGS = {
 
 function getEnemyArchetype(name) {
   const n = name.toLowerCase();
+  if (n === 'robin c.') return 'knight'; // a corrupted-authority reading — he sees himself as righteously defending the firm
   if (/wolf|hound|dog/.test(n)) return 'beast';
   if (/dragon|drake|wyrm/.test(n)) return 'dragon';
   if (/skeleton|zombie|bone|undead|lich|revenant|wraith|phantom|specter|ghost|echo|shade/.test(n)) return 'undead';
