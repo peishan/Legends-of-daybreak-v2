@@ -483,6 +483,7 @@ const G = {
     { n: 'Sunreach Fields', lv: 75, elem: 'poison', d: "A whole community living here, quietly, for who knows how long — fields actually under cultivation, harvests actually being brought in. Nobody out this far seems to know or care what the rest of the world has been through. They just kept growing things, the entire time.", en: ['Harvest Golem','Sunreach Guardian','Bloomwatcher'], loot: ['Sunreach Grain', 'A Harvest Nobody Rationed', 'Guardian\'s Bramble'], xp: 6000, g: 4400, dg: 'impossible' },
     { n: 'The Treeline Detail', lv: 82, elem: 'poison', d: "Another patch of green quietly ruined by something that has no business out here — a loading dock bolted onto the edge of the vale, floodlights running on a generator nobody asked permission to install. Past the treeline, the brush has clearly been cleared, over and over, by people who were never given a choice about it.", en: ['Overtime Wraith','Off-Day Enforcer','Loading Dock Sentinel'], loot: ['Clocked-In Badge', 'A Shift Nobody Chose', 'Treeline Splinter'], xp: 9000, g: 6400, dg: 'impossible' },
     { n: 'The Rootbound Sanctuary', lv: 95, elem: 'poison', d: 'Whatever is actually doing the mending out here, this is close to its source — roots thick as towers, growth old enough to have opinions about who is allowed to pass through. Healing this deep does not come free. Something this old does not let go of what it has grown around without a reason.', en: ['Root-Bound Elder','Sanctuary Keeper','Elderwood Sentinel'], loot: ['Heartwood Shard', 'What the Roots Kept', 'The First Bloom, Still Sealed'], xp: 12000, g: 8800, dg: 'impossible' },
+    { n: 'The Thinning', lv: 96, elem: 'void', d: "Past the edge of everything mapped, the ground does not end so much as it stops fully agreeing to exist. Colors run thin here. Sound arrives a half-second late, or not at all. Nothing is dying, exactly — it is just quietly, steadily, being asked fewer and fewer questions by the world it used to belong to.", en: ['Fraying Wisp','Unwoven Stalker','Hollow Seam'], loot: ['A Thinning Thread', 'Something Barely Held', 'Proof It Can Be Pushed Back'], xp: 24000, g: 17000, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -648,6 +649,9 @@ const G = {
     { id: 69, n: 'The Mended Sanctum, Restored', d: 'Complete the restoration of the Mended Sanctum', t: 'reach_level', c: 0, need: 62, rw: { xp: 24000, g: 16000, item: { n: 'Mendstone', t: 'mat', q: 1, r: 'legendary', d: 'Formed from the region\'s own healing, not mined from anything that was ever broken. It hums, faintly, like something still deciding what to grow into.' } }, done: false, chain: 'verdant_choir', reqQuest: 68, hidden: true, revealed: false, unlockRestSite: 'mended_sanctum' },
     { id: 70, n: 'The Treeline Detail', d: 'Defeat Jeff, the SK* Son-in-Law, and give the Treeline Detail its first real day off', t: 'boss_specific', target: 'Jeff, the SK* Son-in-Law', c: 0, need: 1, rw: { xp: 55000, g: 40000 }, done: false },
     { id: 71, n: "The Retainer's Hollow", d: 'Defeat Robin C. and let nine years finally, actually end', t: 'boss_specific', target: 'Robin C.', c: 0, need: 1, rw: { xp: 58000, g: 42000 }, done: false },
+    { id: 72, n: 'What Soel Remembers', d: 'Reach Level 45 \u2014 follow Soel toward Frostspire Ruins, wherever he is actually trying to lead you', t: 'reach_level', c: 0, need: 45, rw: { xp: 12000, g: 7500 }, done: false, chain: 'kindling_line', hidden: true, revealed: true },
+    { id: 73, n: 'The Warmth That Waited', d: 'Find the frost-throne and learn who waits there', t: 'reach_level', c: 0, need: 46, rw: { xp: 15000, g: 9000 }, done: false, chain: 'kindling_line', reqQuest: 72, hidden: true, revealed: false },
+    { id: 74, n: 'What the Cold Never Took', d: 'Give the Kindling who came before Soel the peace it never let itself have', t: 'reach_level', c: 0, need: 47, rw: { xp: 20000, g: 13000, item: { n: 'Starlight Tear', t: 'mat', q: 1, r: 'epic', d: 'Cold to the touch and warm at the center, all at once \u2014 the specific, contradictory shape of a bond that mattered even though it did not survive.' } }, done: false, chain: 'kindling_line', reqQuest: 73, hidden: true, revealed: false },
 
   ],
 
@@ -731,6 +735,12 @@ const G = {
     { id: 'gc14', n: 'Remnant Guard Contract', d: 'Defeat 5 Remnant Guards for the Guild', t: 'kill_specific', target: 'Remnant Guard', c: 0, need: 5, rw: { xp: 8200, g: 5600 }, rep: 470, done: false, refreshWeek: -1, minLv: 44, maxLv: 50 },
     { id: 'gc15', n: 'Contract: Daybreak Incarnate', d: 'Defeat Daybreak Incarnate for the Guild', t: 'boss_specific', target: 'Daybreak Incarnate', c: 0, need: 1, rw: { xp: 10000, g: 7000 }, rep: 540, done: false, refreshWeek: -1, minLv: 48, maxLv: 53 },
     { id: 'gc16', n: 'Contract: The Horizon Keeper', d: 'Defeat The Horizon Keeper for the Guild', t: 'boss_specific', target: 'The Horizon Keeper', c: 0, need: 1, rw: { xp: 12500, g: 9000 }, rep: 620, done: false, refreshWeek: -1, minLv: 52, maxLv: 58 },
+    { id: 'gc17', n: 'Contract: The Vale Warden', d: 'Defeat The Vale Warden for the Guild', t: 'boss_specific', target: 'The Vale Warden', c: 0, need: 1, rw: { xp: 15000, g: 11000 }, rep: 700, done: false, refreshWeek: -1, minLv: 56, maxLv: 64 },
+    { id: 'gc18', n: 'Contract: Robin C.', d: 'Defeat Robin C. for the Guild', t: 'boss_specific', target: 'Robin C.', c: 0, need: 1, rw: { xp: 18000, g: 13000 }, rep: 750, done: false, refreshWeek: -1, minLv: 58, maxLv: 70 },
+    { id: 'gc19', n: 'Contract: The Last Vigil', d: 'Defeat The Last Vigil for the Guild', t: 'boss_specific', target: 'The Last Vigil', c: 0, need: 1, rw: { xp: 20000, g: 14500 }, rep: 800, done: false, refreshWeek: -1, minLv: 65, maxLv: 73 },
+    { id: 'gc20', n: 'Contract: The Sunreach Elder', d: 'Defeat The Sunreach Elder for the Guild', t: 'boss_specific', target: 'The Sunreach Elder', c: 0, need: 1, rw: { xp: 24000, g: 17500 }, rep: 880, done: false, refreshWeek: -1, minLv: 75, maxLv: 82 },
+    { id: 'gc21', n: 'Contract: Jeff, the SK* Son-in-Law', d: 'Defeat Jeff, the SK* Son-in-Law for the Guild', t: 'boss_specific', target: 'Jeff, the SK* Son-in-Law', c: 0, need: 1, rw: { xp: 28000, g: 20000 }, rep: 950, done: false, refreshWeek: -1, minLv: 80, maxLv: 90 },
+    { id: 'gc22', n: 'Contract: The Verdant Heart', d: 'Defeat The Verdant Heart for the Guild', t: 'boss_specific', target: 'The Verdant Heart', c: 0, need: 1, rw: { xp: 35000, g: 26000 }, rep: 1100, done: false, refreshWeek: -1, minLv: 92, maxLv: 999 },
   ],
 
 
@@ -1311,6 +1321,9 @@ const G = {
     { n: 'The Verdant Heart', zone: 'The Rootbound Sanctuary', hp: 165000, mhp: 165000, atk: 525, def: 320, xp: 78000, g: 58000,
       mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 41250,
       desc: "As close to the actual source of the mending as anyone has ever gotten. It is not hostile so much as it is old, and rightly suspicious of anything that reaches this deep into what it has spent so long growing back. Getting past it will not be gentle. Very little worth reaching ever is." },
+    { n: 'The Unmade', zone: 'The Thinning', hp: 195000, mhp: 195000, atk: 570, def: 345, xp: 92000, g: 68000,
+      mechanic: 'cosmic',
+      desc: "Not a creature so much as a direction things fall in, once nothing is left actively holding them together. It does not hate what has been mended any more than water hates a shore. It simply keeps going, the way anything untended eventually does, and it has never once needed to be angry to be dangerous." },
 
     // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
     // These are dedicated Temple-quest hunt targets, not tied to any zone's normal
@@ -3232,6 +3245,115 @@ storyJournal: {
           { speaker: 'Mimi', text: '"You can say it now," Mimi says, warm. "We are not in a hurry anywhere. We have got time."' },
         ]
       }
+,{
+        id: 'journal_088',
+        title: 'What Soel Remembers',
+        chapter: 88,
+        unlockType: 'level',
+        unlockAt: 45,
+        icon: '❄️',
+        summary: 'Soel grows restless, pulling toward Frostspire Ruins and a memory none of you can fully name yet.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Soel has been restless for days — not sick, not scared, just pulled toward something none of you can name, pacing the edge of camp at odd hours, staring off in the same direction every single time.' },
+          { speaker: 'San', text: '"He wants to go somewhere," you say, watching him watch the horizon. "He has wanted to for a while now. I do not think it is nothing."' },
+          { speaker: 'Joel', text: '"Frostspire," Joel says slowly, following the line of Soel\'s gaze. "That is the direction. Every time."' },
+          { speaker: 'Narrator', text: 'You remember, distantly, a strange encounter out there once — an echo of something that looked like Soel but was not, sitting on a throne of frost, speaking like it already knew exactly who you were.' },
+          { speaker: 'San', text: '"Do you remember him?" you ask Soel directly, crouching to his level. He does not answer, obviously, but he presses his head against your hand once, firm, deliberate, in the exact way he does when he wants you to understand something without words.' },
+          { speaker: 'Joel', text: '"I think he does remember," Joel says quietly. "I think that is exactly the problem."' },
+          { speaker: 'San', text: '"Then let\'s go find out what he is trying to tell us," you say, and Soel is already moving before you finish the sentence, tail high, certain of the direction in a way he has not been certain of anything in days.' },
+        ]
+      }
+,{
+        id: 'journal_089',
+        title: 'The Warmth That Waited',
+        chapter: 89,
+        unlockType: 'level',
+        unlockAt: 46,
+        icon: '🐾',
+        summary: 'The frost-throne\'s echo finally tells its own story — a Kindling who stayed for someone who could not let the warmth in, and has spent an age since wondering if staying was enough.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The throne is exactly where it was — frost-covered, ancient, and this time, when you approach, the air does not simply shimmer and offer a few borrowed words. It waits, like it has been waiting specifically for this visit.' },
+          { speaker: '???', text: 'The cat that is not Soel opens its eyes properly this time, ancient and translucent and entirely aware. "You came back," it says. "He brought you back. I did not expect that either."' },
+          { speaker: 'San', text: '"Who were you?" you ask, gently, San\'s whole life of learning to ask hard questions carefully finally finding a use out here. "Before this throne. Before you were an echo."' },
+          { speaker: '???', text: '"Bonded," it says. "The same as him. Chosen, the same way, for the same reason — someone who needed warmth badly enough that I formed around the need itself." A long pause, frost shifting like breath. "I chose someone who could not let it in. Not because they did not want to. Because wanting felt too dangerous to survive, after everything that had already been taken from them."' },
+          { speaker: 'Joel', text: '"What happened?" Joel asks, quiet, already understanding more of this than he probably wants to.' },
+          { speaker: '???', text: '"I stayed," the echo says simply. "Every day, every cold night, every time they pushed me an inch further away out of fear instead of anything I had done wrong. I stayed until there was nothing left of them to stay for. I do not know if I helped. I have had a very long time to wonder whether staying was enough, or whether I only ever made the leaving quieter."' },
+          { speaker: 'San', text: '"That is not failure," you say, before you have fully decided to say it. "That is just love that arrived at someone who was not able to receive it yet. Those are not the same thing."' },
+          { speaker: '???', text: '"I have told myself that," the echo admits. "Some days I even believe it. Most days I just remember the warmth, and wonder if it counted for anything at all, in the end."' },
+          { speaker: 'Narrator', text: 'Soel presses close against the base of the throne, small and warm and entirely present, the exact opposite of everything this echo is describing — and something about that specific contrast seems to be the actual point of all of it.' },
+        ]
+      }
+,{
+        id: 'journal_090',
+        title: 'What the Cold Never Took',
+        chapter: 90,
+        unlockType: 'level',
+        unlockAt: 47,
+        icon: '🔥',
+        summary: 'A single, unsent thank-you finally reaches the one it was always meant for — and Soel\'s own bond with Joel gets to stand, completely, in the light of it.',
+        scenes: [
+          { speaker: 'Narrator', text: 'You find it — not by searching, exactly, more by finally being willing to look properly. A small, worn token half-buried at the base of the throne, old enough that the frost has grown around it rather than over it.' },
+          { speaker: 'San', text: '"This was theirs," you say, turning it over carefully. "The person. Not Soel\'s ancestor\'s — the person he chose." Something is scratched into the surface, faint, deliberate. "It says \'thank you for staying, even when I could not say it.\'"' },
+          { speaker: 'Narrator', text: 'The echo goes very still, the specific stillness of something that has waited a very long time to hear exactly this.' },
+          { speaker: '???', text: '"They wrote that?" the echo asks, and for the first time it sounds less like a memory and more like something genuinely alive again, however briefly.' },
+          { speaker: 'San', text: '"They did," you say gently. "I do not know when. But they knew. Whatever they could not say out loud, they knew what you gave them, and they wanted you to have proof of it, even if they never found the courage to hand it to you directly."' },
+          { speaker: 'Narrator', text: 'The frost around the throne begins, slowly, to recede — not shattering, not dramatic, just thawing, the way something does when it finally has permission to stop holding a shape it was never meant to keep forever.' },
+          { speaker: '???', text: '"The warm spots were worth it," the echo says, quiet, almost to itself. "I told the last visitor to say that, and I do not think I fully believed it myself, saying it. I think I do now."' },
+          { speaker: 'San', text: '"Rest," you tell it, and mean it completely. "You did not fail. You loved someone exactly as hard as you were built to, and it mattered, whether or not they ever got to tell you while you could still hear it."' },
+          { speaker: 'Narrator', text: 'The throne empties, gently, frost giving way to bare stone, and something in the air feels lighter for it — not erased, just finally, properly finished.' },
+          { speaker: 'Joel', text: 'Soel climbs into your lap the moment it is done, purring hard enough that you can feel it in your chest, and Joel watches him with something unguarded on his face. "Are you worried," Joel asks him, half a joke, half not, "that you might end up on a throne like that someday?"' },
+          { speaker: 'San', text: '"He chose you completely," you say, answering for him, watching the same certainty in Soel that has never once wavered since the day Joel found him in the rain. "That is the whole difference. He is not waiting to see if you will let him in. You already did. Every day, since the very beginning."' },
+          { speaker: 'Joel', text: '"I know," Joel says, quiet, holding them both a little closer. "I am just glad I get to keep proving it. Every single day, for as long as he\'ll have me."' },
+        ]
+      }
+,{
+        id: 'journal_091',
+        title: 'Not Recovering. Beginning.',
+        chapter: 91,
+        unlockType: 'level',
+        unlockAt: 95,
+        icon: '🌅',
+        summary: 'Standing at the actual edge of everything mapped, San realizes her life did not really start until now — everything before this was surviving, escaping, or recovering from something. This is the first thing she gets to simply want.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Waking Edge earns its name properly here — not a border, not a wall, just the exact place where everything that has ever been mapped simply stops, and something else, unnamed, begins.' },
+          { speaker: 'San', text: '"I keep waiting to feel the old thing," you say, looking out at it. "The bracing. The sense that whatever is out there is going to cost me something I have not already paid for."' },
+          { speaker: 'Joel', text: '"And?" Joel asks, watching you rather than the horizon.' },
+          { speaker: 'San', text: '"It is not there," you say slowly, testing the absence the way you have tested every hard-won thing since the wraiths, since Robin, since all of it. "I do not feel like I am walking toward something I have to survive. I feel like I am walking toward something I actually get to see."' },
+          { speaker: 'Narrator', text: 'You think of everything that brought you here — the ex-mother-in-law, the marriage built like a cage, nine years and a hundred dollars, a warehouse boss who never learned your name, a daughter measured out in two-year increments, a father who died quietly enough that his own son almost missed it. All of it real. All of it, finally, actually finished.' },
+          { speaker: 'San', text: '"I do not think my life really started until now," you say, and it surprises you, saying it, the plainness of it. "Everything before this was surviving something. Escaping something. Recovering from something. I do not think I have ever once, in my whole life, gotten to just want to see what happens next, without it being attached to getting away from what came before."' },
+          { speaker: 'Joel', text: '"That sounds like a beginning," Joel says, quiet, something warm and unguarded in it.' },
+          { speaker: 'San', text: '"It is," you agree. "Not a better chapter of the same story. An actual beginning. I do not know what is out there past this edge. For the first time in longer than I can measure, I do not need to know before I am willing to go looking."' },
+          { speaker: 'Narrator', text: 'Ser Aldric finds you both there, unsurprised, like he expected exactly this conversation to be happening exactly here.' },
+          { speaker: 'Ser Aldric', text: '"You have the look of someone about to actually live," he says, something like pride in it. "I have seen it before, rarely. It does not look like relief. It looks like this — just quiet, and forward-facing, and unafraid of not having all the answers yet."' },
+          { speaker: 'San', text: '"Is that what this is?" you ask.' },
+          { speaker: 'Ser Aldric', text: '"I believe so," he says. "For what it is worth — I do not think anyone gets to choose when their real life starts. But you get to notice when it does. Consider this noticed, on my part, if you needed a witness."' },
+          { speaker: 'Joel', text: 'Joel takes your hand, and for once neither of you needs to say anything else to make the moment complete.' },
+          { speaker: 'San', text: '"Whatever is out there," you say, looking past the edge of everything mapped, everything survived, everything finally, properly finished, "let\'s go find out. Not because we have to. Just because we get to."' },
+          { speaker: 'Narrator', text: 'You step past the edge together, into the first genuinely unwritten thing either of you has ever walked toward on purpose — and it does not feel like an ending, or even a continuation. It feels, simply, like a beginning, exactly as overdue as it is real.' },
+        ]
+      }
+,{
+        id: 'journal_092',
+        title: 'What Nothing Kindles',
+        chapter: 92,
+        unlockType: 'level',
+        unlockAt: 96,
+        icon: '🌫️',
+        summary: 'San understands what The Thinning actually is — not a monster to defeat once, but ground nobody has chosen to tend. The same practice as Soel choosing Joel, just at the scale of an entire unmapped region.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Thinning does not announce itself the way most dangerous places do. There is no wall of thorns, no obvious wound in the ground. It just gradually stops agreeing with you about what color things are, and how long a sound should take to reach your ears.' },
+          { speaker: 'Joel', text: '"This is different," Joel says, unnerved in a way you have rarely seen from him. "Everywhere else that was broken still felt like a place. This barely feels like it is trying anymore."' },
+          { speaker: 'San', text: '"I do not think it is trying," you say slowly, understanding arriving the way it sometimes does, all at once. "I think this is what happens when nothing kindles it. When there is no one, and nothing, actively choosing to hold it together."' },
+          { speaker: 'Narrator', text: 'You think of Soel, small and warm and entirely present, and the ancestor who came before him, choosing to stay through a cold that never once thanked it for staying. You think of Verdant Reach, and the specific, unglamorous work of tending something instead of just surviving near it.' },
+          { speaker: 'San', text: '"That is what this whole region actually is," you say. "Not a monster to defeat once. Ground that needs someone willing to keep choosing it, the same way Soel kept choosing Joel, the same way the Vale kept getting tended by anyone who bothered. This will not stay pushed back just because we win one fight here."' },
+          { speaker: 'Joel', text: '"Then we keep coming back," Joel says simply, like it is the easiest decision he has made in a long time. "As many times as it takes. That is not a burden. That is just what tending something actually looks like."' },
+          { speaker: 'Narrator', text: 'You feel something enormous settle into a shape you can finally hold — not a war to win and be done with, but a practice, ongoing, the same unglamorous, essential thing every real kind of care has always required.' },
+          { speaker: 'San', text: '"Let\'s go kindle something, then," you say, and mean it as completely as you have ever meant anything, stepping forward into ground that has forgotten how to hold itself together, entirely on purpose, for the first time in your life not because you have to, but because you get to."' },
+        ]
+      }
+
+
+
 
 
 
@@ -3357,6 +3479,8 @@ storyJournal: {
     { id: 'rootbound_camp', name: 'The Rootbound Hollow', type: 'camp', zone: 'The Rootbound Sanctuary', zoneLv: 95, desc: 'A hollow between roots thick enough to feel less like shelter and more like being held.', unlocked: false, icon: '🌳', cost: 0 },
     { id: 'grove_camp', name: 'The Mended Grove', type: 'camp', zone: 'The Unbroken Vale', zoneLv: 56, desc: 'Ground that healed itself before you ever arrived to claim it. It does not need defending so much as tending — which, it turns out, is a different kind of work entirely.', unlocked: false, icon: '🌱', cost: 0 },
     { id: 'grove_tavern', name: 'The Root Cellar', type: 'tavern', zone: 'The Unbroken Vale', zoneLv: 56, desc: 'Carved into a root wide enough to walk through. Whatever is on tap tonight grew here, in the dark, without anyone having to ask it to.', unlocked: false, icon: '🍺', cost: 25 },
+    { id: 'edge_camp', name: 'The Waking Edge', type: 'camp', zone: 'The Rootbound Sanctuary', zoneLv: 95, desc: 'The last solid ground before the map simply stops. Not dangerous, exactly. Just genuinely unfinished.', unlocked: false, icon: '🌄', cost: 0 },
+    { id: 'edge_tavern', name: "The Threshold House", type: 'tavern', zone: 'The Rootbound Sanctuary', zoneLv: 95, desc: 'Built from whatever the roots were willing to spare. Everyone who drinks here is, in some sense, waiting to see what comes next.', unlocked: false, icon: '🍺', cost: 35 },
     // Phase 3 mana springs
     { id: 'ms_spring3', name: 'Infernal Mana Spring', type: 'mana_spring', zone: 'Infernal Crucible', zoneLv: 23, desc: 'A spring of liquid flame that burns cold. Each sip sears the mind with forbidden knowledge.', unlocked: false, icon: '💧', cost: 20 },
     { id: 'ms_spring4', name: 'Abyssal Mana Spring', type: 'mana_spring', zone: 'Tidal Abyss', zoneLv: 25, desc: 'Dark water that glows with inner light. Drinking it feels like drowning in stars.', unlocked: false, icon: '💧', cost: 25 },
@@ -4652,6 +4776,9 @@ const ENEMY_REGISTRY = {
   'Root-Bound Elder': { template: 'tank', elem: 'poison', zoneLv: 95 },
   'Sanctuary Keeper': { template: 'balanced', elem: 'poison', zoneLv: 95 },
   'Elderwood Sentinel': { template: 'striker', elem: 'poison', zoneLv: 95 },
+  'Fraying Wisp': { template: 'striker', elem: 'void', zoneLv: 96 },
+  'Unwoven Stalker': { template: 'balanced', elem: 'void', zoneLv: 96 },
+  'Hollow Seam': { template: 'tank', elem: 'void', zoneLv: 96 },
 
   // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
   'Closed Eye Acolyte': { template: 'striker', elem: 'void', zoneLv: 19 },
@@ -6822,6 +6949,29 @@ const STRONGHOLDS = {
     zoneLv: 56,
     siegeEnemies: ['Bramble Warden', 'Wildroot Sprite', 'Thistle Stalker', 'Harvest Golem'],
     siegeReward: { xp: 3500, gold: 3000, guildRep: 40 }
+  },
+  wakingEdge: {
+    name: 'The Waking Edge',
+    icon: '🌄',
+    era: 'verdant',
+    restSiteIds: ['edge_camp', 'edge_tavern'],
+    desc: "Past the deepest root of the Vale, the ground simply stops being mapped — not blocked, not broken, just quietly unfinished, the way a sentence trails off instead of ending. Something out here is still deciding what it wants to grow into next.",
+    stipend: { xp: 900, gold: 1100 },
+    tasks: [
+      { id: 'st_edge_elder', n: "The Elder's Patience", d: 'Defeat 3 Root-Bound Elders before their patience runs out entirely', t: 'kill_specific', target: 'Root-Bound Elder', c: 0, need: 3, rw: { xp: 2200, g: 1700 }, done: false, refreshDay: -1 },
+      { id: 'st_edge_keeper', n: 'What the Sanctuary Keeps', d: 'Defeat 2 Sanctuary Keepers guarding whatever comes next', t: 'kill_specific', target: 'Sanctuary Keeper', c: 0, need: 2, rw: { xp: 2600, g: 2000 }, done: false, refreshDay: -1 },
+      { id: 'st_edge_sentinel', n: 'The Elderwood Line', c: 0, d: 'Defeat 3 Elderwood Sentinels holding the actual edge of the map', t: 'kill_specific', target: 'Elderwood Sentinel', need: 3, rw: { xp: 3000, g: 2400 }, done: false, refreshDay: -1, minGuildLevel: 2 }
+    ],
+    guildHall: [
+      { level: 1, name: 'Edge Claimed', cost: 0, desc: 'Free rest and a daily stipend — the first foothold past everything that has ever been mapped.' },
+      { level: 2, name: 'Provisions at the Threshold', cost: 30000, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
+      { level: 3, name: 'Watchfire Training Ground', cost: 85000, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
+      { level: 4, name: 'The Edge Deepens', cost: 220000, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
+      { level: 5, name: "Where the Map Ends", cost: 550000, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
+    ],
+    zoneLv: 95,
+    siegeEnemies: ['Root-Bound Elder', 'Sanctuary Keeper', 'Elderwood Sentinel'],
+    siegeReward: { xp: 9000, gold: 7000, guildRep: 90 }
   }
 };
 
@@ -9622,6 +9772,11 @@ function handleVictory() {
     lg('🌿 The Unbroken Vale settles, and the ground itself seems to exhale.');
     lg('   The Mended Grove opens to you — the first foothold on the other side of everything.');
     claimStronghold('mendedGrove'); // guaranteed on defeat, independent of any quest-chain state
+  }
+  if (G.currentBoss && G.currentBoss.n === 'The Verdant Heart') {
+    lg('🌄 Whatever the Verdant Heart was actually protecting settles, quietly, into something closer to peace.');
+    lg('   The Waking Edge opens ahead of you — the last solid ground before the map simply runs out.');
+    claimStronghold('wakingEdge'); // guaranteed on defeat, independent of any quest-chain state
   }
   if (G.p.hp === 1) { G.p.survivedCritical = true; }
   checkAchievements();
