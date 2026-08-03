@@ -652,6 +652,7 @@ const G = {
     { id: 72, n: 'What Soel Remembers', d: 'Reach Level 45 \u2014 follow Soel toward Frostspire Ruins, wherever he is actually trying to lead you', t: 'reach_level', c: 0, need: 45, rw: { xp: 12000, g: 7500 }, done: false, chain: 'kindling_line', hidden: true, revealed: true },
     { id: 73, n: 'The Warmth That Waited', d: 'Find the frost-throne and learn who waits there', t: 'reach_level', c: 0, need: 46, rw: { xp: 15000, g: 9000 }, done: false, chain: 'kindling_line', reqQuest: 72, hidden: true, revealed: false },
     { id: 74, n: 'What the Cold Never Took', d: 'Give the Kindling who came before Soel the peace it never let itself have', t: 'reach_level', c: 0, need: 47, rw: { xp: 20000, g: 13000, item: { n: 'Starlight Tear', t: 'mat', q: 1, r: 'epic', d: 'Cold to the touch and warm at the center, all at once \u2014 the specific, contradictory shape of a bond that mattered even though it did not survive.' } }, done: false, chain: 'kindling_line', reqQuest: 73, hidden: true, revealed: false },
+    { id: 75, n: 'The Thinning', d: 'Defeat The Unmade and prove the fraying can be pushed back', t: 'boss_specific', target: 'The Unmade', c: 0, need: 1, rw: { xp: 92000, g: 68000 }, done: false },
 
   ],
 
