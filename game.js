@@ -646,6 +646,8 @@ const G = {
     { id: 67, n: 'The Last Vigil', d: 'Defeat The Last Vigil and let the guardian finally stand down', t: 'boss_specific', target: 'The Last Vigil', c: 0, need: 1, rw: { xp: 19000, g: 12500, templeRep: 220 }, done: false, chain: 'verdant_choir', reqQuest: 66, hidden: true, revealed: false },
     { id: 68, n: 'What Sister Wren Knows', d: 'Reach Level 60 \u2014 Sister Wren recognizes what the ruins actually are, and what they could be again', t: 'reach_level', c: 0, need: 60, rw: { xp: 16000, g: 9500, templeRep: 180 }, done: false, chain: 'verdant_choir', reqQuest: 67, hidden: true, revealed: false },
     { id: 69, n: 'The Mended Sanctum, Restored', d: 'Complete the restoration of the Mended Sanctum', t: 'reach_level', c: 0, need: 62, rw: { xp: 24000, g: 16000, item: { n: 'Mendstone', t: 'mat', q: 1, r: 'legendary', d: 'Formed from the region\'s own healing, not mined from anything that was ever broken. It hums, faintly, like something still deciding what to grow into.' } }, done: false, chain: 'verdant_choir', reqQuest: 68, hidden: true, revealed: false, unlockRestSite: 'mended_sanctum' },
+    { id: 70, n: 'The Treeline Detail', d: 'Defeat Jeff, the SK* Son-in-Law, and give the Treeline Detail its first real day off', t: 'boss_specific', target: 'Jeff, the SK* Son-in-Law', c: 0, need: 1, rw: { xp: 55000, g: 40000 }, done: false },
+    { id: 71, n: "The Retainer's Hollow", d: 'Defeat Robin C. and let nine years finally, actually end', t: 'boss_specific', target: 'Robin C.', c: 0, need: 1, rw: { xp: 27000, g: 18500 }, done: false },
 
   ],
 
@@ -703,6 +705,8 @@ const G = {
     { id: 'b41', n: 'Ledger Wraith Hunt', d: 'Defeat 4 Ledger Wraiths', t: 'kill_specific', target: 'Ledger Wraith', c: 0, need: 4, rw: { xp: 1600, g: 920 }, done: false, refreshDay: 0, minLv: 33, maxLv: 45 },
     { id: 'b42', n: 'Rust Automaton Scrap', d: 'Defeat 4 Rust Automatons', t: 'kill_specific', target: 'Rust Automaton', c: 0, need: 4, rw: { xp: 1700, g: 980 }, done: false, refreshDay: 0, minLv: 34, maxLv: 46 },
     { id: 'b43', n: 'Watching Echo Purge', d: 'Defeat 4 Watching Echoes', t: 'kill_specific', target: 'Watching Echo', c: 0, need: 4, rw: { xp: 1800, g: 1050 }, done: false, refreshDay: 0, minLv: 35, maxLv: 47 },
+    { id: 'b44', n: 'Another Shift, Another Soul', d: 'Defeat Jeff, the SK* Son-in-Law', t: 'kill_specific', target: 'Jeff, the SK* Son-in-Law', c: 0, need: 1, rw: { xp: 12000, g: 8500 }, done: false, refreshDay: 0, minLv: 80, maxLv: 999 },
+    { id: 'b45', n: "Can't Break the Retainer", d: 'Defeat Robin C.', t: 'kill_specific', target: 'Robin C.', c: 0, need: 1, rw: { xp: 7000, g: 5000 }, done: false, refreshDay: 0, minLv: 58, maxLv: 999 },
 
   ],
 
@@ -3092,6 +3096,67 @@ storyJournal: {
           { speaker: 'Narrator', text: 'You do not know yet what comes next — only that for the first time since any of this began, neither of you is bracing for it to be another piece of the past, disguised as something new. It is simply what happens next. And for once, that is allowed to be enough.' },
         ]
       }
+,{
+        id: 'journal_084',
+        title: 'The Treeline Detail',
+        chapter: 84,
+        unlockType: 'boss',
+        unlockAt: 'Jeff, the SK* Son-in-Law',
+        icon: '🌲',
+        summary: 'Joel finally confronts the man who dismissed his pain as laziness and threatened his contract — and finds the closure was never going to depend on Jeff understanding any of it.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Treeline Detail looks exactly like every version of it Joel ever described — a loading dock that has no business being this far into the Vale, floodlights running on a generator nobody asked permission to install, brush cleared over and over by people who were never given a choice about it.' },
+          { speaker: 'Joel', text: 'He goes very still at the edge of the clearing, the specific stillness of a body that remembers a place before the mind has finished catching up. "This is it," he says. "Almost exactly. Down to the noise the generator makes."' },
+          { speaker: 'San', text: '"Do you want to turn back?" you ask, meaning it completely, no judgment folded into the offer.' },
+          { speaker: 'Joel', text: '"No," Joel says, and there is something steadier in his voice than you expected. "I have wanted this exact conversation for a long time. I just never thought I would actually get to have it."' },
+          { speaker: 'Narrator', text: 'Jeff, when he appears, looks almost bored — the same practiced indifference of a man who has never once had to consider that the people under him might eventually stop being under him.' },
+          { speaker: 'Jeff', text: '"Another one," he says, not even really looking at Joel yet. "Fine. There\'s brush past the treeline. Should\'ve been cleared yesterday."' },
+          { speaker: 'Joel', text: '"You do not recognize me," Joel says, and it is not quite a question.' },
+          { speaker: 'Jeff', text: 'Jeff looks at him properly for the first time, and something in his expression stays politely, genuinely blank. "Should I?"' },
+          { speaker: 'Narrator', text: 'You watch something in Joel absorb that blankness and, instead of breaking him further the way it might have once, seem to settle something instead — a confirmation of a suspicion he had clearly been carrying a long time.' },
+          { speaker: 'Joel', text: '"No," Joel says slowly. "I do not think you should. I do not think you ever once saw any of us clearly enough to remember a face. Just how much weight it could carry before it broke."' },
+          { speaker: 'Jeff', text: '"It\'s work," Jeff says, already bored again, already reaching for the next dismissal. "Everyone\'s replaceable. That\'s just how it works."' },
+          { speaker: 'Joel', text: '"It is," Joel agrees, quiet, and something in his tone makes even Jeff pause. "That is exactly the problem. You built an entire operation on nobody being able to afford to disagree with you. I could not, for a long time. I can now."' },
+          { speaker: 'Narrator', text: 'The fight is not cathartic in the way you half expected. Jeff does not rage or plead or even seem to fully register what is actually happening to him — he goes down the same way he ran the Detail, indifferent right up until indifference stops being an option.' },
+          { speaker: 'San', text: '"He does not even understand what this is," you say afterward, something between anger and pity in your voice.' },
+          { speaker: 'Joel', text: '"No," Joel agrees. "I do not think he ever will. I think I am finally alright with that being his problem instead of mine." He looks around the cleared brush, the floodlights, the whole ugly little operation. "The Detail gets a day off, at least. That is not nothing."' },
+          { speaker: 'San', text: '"It is not nothing," you agree. "How do you feel?"' },
+          { speaker: 'Joel', text: '"Lighter," Joel says, testing the word. "Not because I hurt him. Because I finally said it to his face, and it turns out I did not need him to understand it for it to still be true."' },
+          { speaker: 'Narrator', text: 'You leave the Treeline Detail behind, floodlights still humming uselessly into the daylight, and neither of you looks back at it even once on the way out.' },
+        ]
+      }
+,{
+        id: 'journal_085',
+        title: 'The Retainer\'s Hollow',
+        chapter: 85,
+        unlockType: 'boss',
+        unlockAt: 'Robin C.',
+        icon: '📋',
+        summary: 'San finally confronts Robin — and finds nine years does not need his understanding in order to actually be over.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Retainer\'s Hollow smells exactly the way San once described it — burnt coffee, cold fluorescent light, and somebody else\'s overtime, all of it standing in a clearing where an office has no business standing at all.' },
+          { speaker: 'San', text: 'You go very still at the edge of it, the same particular stillness Joel had at the Treeline Detail. "Same firm," you say. "Same rules. He just put a new sign out front."' },
+          { speaker: 'Joel', text: '"Do you want to do this alone?" he asks, careful, the offer genuine.' },
+          { speaker: 'San', text: '"No," you say, and mean it. "I did enough of this alone the first time. I would like you standing here for the second one."' },
+          { speaker: 'Narrator', text: 'Robin, when he appears, looks exactly as unbothered as nine years of memory insists he always was — the specific, practiced indifference of a man who has never once had to consider that the people under him were people at all.' },
+          { speaker: 'Robin', text: '"Can\'t break the retainer," he says, not even looking up properly. "Are you working, or are you on your phone?"' },
+          { speaker: 'San', text: '"You do not even recognize me," you say, and it comes out flatter than you expected, more observation than accusation.' },
+          { speaker: 'Robin', text: 'He looks at you properly then, and something in his expression stays genuinely, politely blank. "Should I?"' },
+          { speaker: 'Narrator', text: 'You feel something in your chest brace for the old hurt to land the way it always used to. It does not. It just confirms something you already suspected, the way a diagnosis confirms a symptom you had already learned to live around.' },
+          { speaker: 'San', text: '"No," you say slowly. "I do not think you ever once saw me clearly enough to remember. Nine years. A resignation letter you used two years after I\'d already come back, like paperwork mattered more than the person standing in front of you every single day since."' },
+          { speaker: 'Robin', text: '"It\'s the job," Robin says, already bored, already reaching for the next dismissal. "People are replaceable. That\'s how firms work."' },
+          { speaker: 'San', text: '"It is," you agree, quiet, and something in your certainty makes even Robin pause half a second. "That was always the whole problem. You built an entire practice on nobody being able to afford to disagree with you. I could not, for a long time. I can now."' },
+          { speaker: 'Narrator', text: 'The fight is not the release you half expected it to be. Robin does not rage or bargain or even seem to register what is actually happening to him — he goes down the same way he ran the firm, indifferent right up until indifference stops being an option available to him.' },
+          { speaker: 'Joel', text: '"He does not even understand what this is," Joel says afterward, something between anger and pity in his voice — the same thing you said to him, not so long ago, in a different clearing.' },
+          { speaker: 'San', text: '"No," you agree. "I do not think he ever will. I think I am finally alright with that being his problem instead of mine."' },
+          { speaker: 'Narrator', text: 'You think of the resignation letter, the laughing, the nine years measured out in a single hundred-dollar increment, the whiplash of being let go and asked back and let go again — and find, standing here, that none of it needs Robin\'s understanding in order to finally, actually be over.' },
+          { speaker: 'San', text: '"Nine years," you say, testing the number one more time, the way you have tested it so many times before. "Just a number now. Not a debt anymore."' },
+          { speaker: 'Joel', text: '"Just a number," Joel agrees, taking your hand. "Ready?"' },
+          { speaker: 'San', text: '"Ready," you say, and walk away from the Hollow without looking back at it even once.' },
+        ]
+      }
+
+
 
 
 
