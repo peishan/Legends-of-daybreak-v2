@@ -3515,10 +3515,23 @@ function generateItem(slot, zoneLevel, forceRarity) {
     n: base.n,
     slot: slot,
     r: rarity,
-    ilvl: base.ilvl,
     d: base.d || 'A piece of adventuring gear.',
     ...base
   };
+  item.ilvl = Math.max(base.ilvl, zoneLevel); // must be set after the spread, or base.ilvl silently overwrites it
+
+  // Scale stats to the actual zone level, not just the base template's original ilvl.
+  // The loot table's authored items only go up to ilvl 22 — without this, every drop
+  // from a level 23+ zone would silently reuse those same frozen-low stats forever,
+  // which is exactly what was making high-level drops feel weak.
+  const levelScale = Math.max(1, zoneLevel / Math.max(1, base.ilvl));
+  if (levelScale > 1) {
+    for (let key of FORGE_STAT_KEYS) {
+      if (item[key] !== undefined && key !== 'critChance' && key !== 'lifeSteal' && key !== 'mpRegen' && key !== 'hpRegen' && key !== 'goldFind') {
+        item[key] = Math.max(1, Math.round(item[key] * levelScale));
+      }
+    }
+  }
 
   // Apply rarity multiplier to core stats
   if (item.atk) item.atk = Math.floor(item.atk * rarityData.mult);
@@ -3547,10 +3560,10 @@ function generateItem(slot, zoneLevel, forceRarity) {
   }
 
   // Calculate sell value
-  item.value = Math.floor((base.ilvl * 5 + (rarityData.mult * 10)) * (1 + Math.random() * 0.5));
+  item.value = Math.floor((item.ilvl * 5 + (rarityData.mult * 10)) * (1 + Math.random() * 0.5));
 
   // Add sockets for Lv 20+ gear (Phase 2)
-  const socketCount = getSocketCount(base.ilvl);
+  const socketCount = getSocketCount(item.ilvl);
   if (socketCount > 0) {
     item.sockets = new Array(socketCount).fill(null);
     item.d += ' [' + socketCount + ' socket' + (socketCount > 1 ? 's' : '') + ']';
@@ -4867,8 +4880,7 @@ function teleportViaZul(zoneIndex) {
   }
   G.p.gold -= cost;
   lg('🚗 Zul drops you at ' + zone.n + ' without another word. (-' + cost + 'G)');
-  G.state = 'explore';
-  render();
+  sc(zoneIndex);
 }
 
 function buyFromNPC(npcName, itemIdx) {
@@ -4962,8 +4974,8 @@ function getJunkStashItems() {
   for (let i = 0; i < G.p.inv.length; i++) {
     const item = G.p.inv[i];
     const isEquip = item.slot && item.slot !== 'mat' && item.slot !== 'pot' && item.slot !== 'revive' && item.t !== 'food' && item.t !== 'drink';
-    if (!isEquip || item.forCompanion) continue;
-    const cmp = getEquipComparison(item);
+    if (!isEquip) continue;
+    const cmp = getEquipComparisonForOwner(item);
     if (!cmp || cmp.better) continue; // keep upgrades and anything that fills an empty slot
     let sellPrice = 0;
     if (item.value) sellPrice = Math.floor(item.value * 0.5);
@@ -13600,7 +13612,11 @@ function rNPC() {
       h += '<div class="npc-info">';
       h += '<div class="npc-name">' + npc.n + ' <span class="npc-type npc-type-ally">' + npc.title + '</span></div>';
       if (!npc.unlocked) {
-        h += '<div style="font-size:11px;color:var(--text-dim);margin-top:4px;">🔒 Requires ' + npc.reqMember + ' affinity ' + npc.affinityReq + '+ (currently ' + (aff ? aff.val : 0) + ')</div>';
+        if (npc.reqMember) {
+          h += '<div style="font-size:11px;color:var(--text-dim);margin-top:4px;">🔒 Requires ' + npc.reqMember + ' affinity ' + npc.affinityReq + '+ (currently ' + (aff ? aff.val : 0) + ')</div>';
+        } else if (npc.ul) {
+          h += '<div style="font-size:11px;color:var(--text-dim);margin-top:4px;">🔒 Arrives around Level ' + npc.ul + '</div>';
+        }
         if (aff) {
           h += '<div class="affinity-bar"><div class="affinity-fill ' + getAffinityColor(aff.val) + '" style="width:' + Math.min(100, (aff.val / npc.affinityReq * 100)) + '%"></div></div>';
           h += '<div class="affinity-label">' + (aff.val >= 70 ? '💕 Close' : aff.val >= 40 ? '💛 Friendly' : aff.val >= 20 ? '💔 Distant' : '💀 Strained') + ' (' + aff.val + '/' + npc.affinityReq + ')</div>';
@@ -16850,6 +16866,25 @@ function getEquipComparison(item) {
   if (!item || !item.slot) return null;
   const slot = item.slot === 'ring' ? (G.p.eq.ring1 ? 'ring2' : 'ring1') : item.slot;
   const equipped = G.p.eq[slot];
+  if (!equipped) return { better: true, arrow: '▲', color: '#22c55e', text: 'New slot' };
+  const itemScore = getEquipScore(item);
+  const eqScore = getEquipScore(equipped);
+  if (itemScore > eqScore) return { better: true, arrow: '▲', color: '#22c55e', text: 'Upgrade' };
+  if (itemScore < eqScore) return { better: false, arrow: '▼', color: '#ef4444', text: 'Downgrade' };
+  return { better: false, arrow: '●', color: '#9ca3af', text: 'Sidegrade' };
+}
+
+// Same comparison logic, but checks the correct owner's equipped gear — San's for
+// regular items, or the specific companion's for anything tagged forCompanion.
+// getEquipComparison() alone can't evaluate companion gear meaningfully since it
+// always compares against San's own equipment regardless of who an item is for.
+function getEquipComparisonForOwner(item) {
+  if (!item || !item.slot) return null;
+  if (!item.forCompanion) return getEquipComparison(item);
+  const owner = G.party.find(p => p.n === item.forCompanion);
+  if (!owner || !owner.eq) return null; // unknown owner — treat as unsellable, not junk
+  const slot = item.slot === 'ring' ? (owner.eq.ring1 ? 'ring2' : 'ring1') : item.slot;
+  const equipped = owner.eq[slot];
   if (!equipped) return { better: true, arrow: '▲', color: '#22c55e', text: 'New slot' };
   const itemScore = getEquipScore(item);
   const eqScore = getEquipScore(equipped);
