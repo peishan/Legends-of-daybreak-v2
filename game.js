@@ -13523,7 +13523,7 @@ function loadGame() {
     G.expBooster = data.expBooster || null;
     G.statBooster = data.statBooster || null;
     G.knownRecipes = data.knownRecipes || [];
-    G.migrations = data.migrations || {};
+    G.migrations = (data.player && data.player.migrations) || {};
     G.guildRepBalance = data.guildRepBalance !== undefined ? data.guildRepBalance : 0;
     if (data.guildContracts) {
       for (let c of G.guildContracts) {
