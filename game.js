@@ -13729,6 +13729,8 @@ function loadGame() {
       }
       G.migrations.robinJeffSwapFix = true;
       lg('🔧 Fixed a leftover journal unlock flag from the Robin/Jeff chapter swap \u2014 both will now unlock fresh, honestly, off whichever you actually defeat.');
+      saveGame(); // persist the flag immediately — this must not depend on the 30s autosave timer,
+                  // or a reload before that timer fires would wipe the flag and re-run this "one-time" fix
     }
     // Catch up any level/boss/zone-gated journal entries that should already be
     // unlocked but were missed — e.g. a boss defeated through a path that didn't
