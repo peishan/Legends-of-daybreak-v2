@@ -13174,6 +13174,7 @@ function saveGame() {
       kills: G.p.kills, quests: G.p.quests, fstreak: G.p.fstreak, focusMinutesToday: G.p.focusMinutesToday || 0, focusSessionsToday: G.p.focusSessionsToday || 0,
       storyJournal: { unlocked: G.storyJournal.unlocked, read: G.storyJournal.read },
       knownRecipes: G.knownRecipes || [],
+      migrations: G.migrations || {},
 
       // Add these inside the saveData object, alongside other fields:
     
@@ -13467,6 +13468,7 @@ function loadGame() {
     G.expBooster = data.expBooster || null;
     G.statBooster = data.statBooster || null;
     G.knownRecipes = data.knownRecipes || [];
+    G.migrations = data.migrations || {};
     G.guildRepBalance = data.guildRepBalance !== undefined ? data.guildRepBalance : 0;
     if (data.guildContracts) {
       for (let c of G.guildContracts) {
@@ -13679,6 +13681,30 @@ function loadGame() {
     }
     if (data.bestiary) {
       G.bestiary = data.bestiary;
+    }
+    // One-time fix: journal_084 and journal_085 had their content swapped (Robin C.'s
+    // and Jeff's chapters traded places) after some players had already unlocked
+    // whichever one was Robin's at the time. Because unlock state is stored by ID, not
+    // content, the "unlocked" flag stayed on the ID rather than following the story —
+    // so after the swap, Jeff's chapter could show unlocked even if Jeff was never
+    // actually fought. Runs exactly once (guarded by the migration flag below) so it
+    // never wipes a legitimately-earned unlock after this.
+    if (!G.migrations) G.migrations = {};
+    if (!G.migrations.robinJeffSwapFix) {
+      G.storyJournal.unlocked = G.storyJournal.unlocked.filter(id => id !== 'journal_084' && id !== 'journal_085');
+      G.storyJournal.read = G.storyJournal.read.filter(id => id !== 'journal_084' && id !== 'journal_085');
+      if (G.bestiary['Robin C.']) G.bestiary['Robin C.'].kills = 0;
+      if (G.bestiary['Jeff, the SK* Son-in-Law']) G.bestiary['Jeff, the SK* Son-in-Law'].kills = 0;
+      for (const qid of [70, 71, 'b44', 'b45']) {
+        const q = G.quests.find(x => x.id === qid);
+        if (q) { q.done = false; q.c = 0; if ('revealed' in q) q.revealed = false; }
+      }
+      for (const qid of ['gc18', 'gc21']) {
+        const q = G.guildContracts.find(x => x.id === qid);
+        if (q) { q.done = false; q.c = 0; }
+      }
+      G.migrations.robinJeffSwapFix = true;
+      lg('🔧 Fixed a leftover journal unlock flag from the Robin/Jeff chapter swap \u2014 both will now unlock fresh, honestly, off whichever you actually defeat.');
     }
     // Catch up any level/boss/zone-gated journal entries that should already be
     // unlocked but were missed — e.g. a boss defeated through a path that didn't
