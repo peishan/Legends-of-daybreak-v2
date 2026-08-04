@@ -486,6 +486,7 @@ const G = {
     { n: 'The Thinning', lv: 96, elem: 'void', d: "Past the edge of everything mapped, the ground does not end so much as it stops fully agreeing to exist. Colors run thin here. Sound arrives a half-second late, or not at all. Nothing is dying, exactly — it is just quietly, steadily, being asked fewer and fewer questions by the world it used to belong to.", en: ['Fraying Wisp','Unwoven Stalker','Hollow Seam'], loot: ['A Thinning Thread', 'Something Barely Held', 'Proof It Can Be Pushed Back'], xp: 24000, g: 17000, dg: 'impossible' },
     { n: 'The Held Line', lv: 97, elem: 'void', d: "Not abandoned like the rest of the Thinning — fought for. Scorch marks that are not scorch marks, ground that has clearly been defended, over and over, by something that never once had backup. The line is still holding. Barely. Whatever has been holding it has been doing this alone for longer than anything should have to.", en: ['Line-Breaker','Corrosion Vessel','Unmaking Sentinel'], loot: ['A Line Held Alone', 'Proof Someone Stayed', 'What the Solitary Carried'], xp: 30000, g: 21000, dg: 'impossible' },
     { n: 'Where Others Still Hold', lv: 98, elem: 'void', d: "Found on purpose this time, not stumbled into — the party going looking specifically for ground that is still being defended alone. This one has not been fighting as long as the last. There is still time here. That is the entire difference this visit is trying to make.", en: ['Testing Current','Patience-Eater','Unmaking Vanguard'], loot: ['A Line Found in Time', 'Backup, Finally', 'Proof It Does Not Have to Wear Someone All the Way Down First'], xp: 33000, g: 23500, dg: 'impossible' },
+    { n: "Someone Else's Watch", lv: 99, elem: 'void', d: "Tracks that are not yours, at a line none of you have visited before. Supplies left behind, tended, recent. Something was already here, already fighting, already doing exactly what you came out here to do — and for the first time since any of this started, that is not a disappointment. It is proof the practice was never just yours to begin with.", en: ['Remnant Current','Half-Won Vessel','Watching Sentinel'], loot: ["Someone Else's Kindling", 'Proof the Practice Spread', 'A Line Half-Won Already'], xp: 36000, g: 25500, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -657,6 +658,7 @@ const G = {
     { id: 75, n: 'The Thinning', d: 'Defeat The Unmade and prove the fraying can be pushed back', t: 'boss_specific', target: 'The Unmade', c: 0, need: 1, rw: { xp: 92000, g: 68000 }, done: false },
     { id: 76, n: 'The Held Line', d: 'Defeat What Alone Becomes and make sure the line finally has backup', t: 'boss_specific', target: 'What Alone Becomes', c: 0, need: 1, rw: { xp: 108000, g: 80000 }, done: false },
     { id: 77, n: 'Where Others Still Hold', d: 'Defeat Before It Wears Through and arrive while there is still time to matter', t: 'boss_specific', target: 'Before It Wears Through', c: 0, need: 1, rw: { xp: 118000, g: 87000 }, done: false },
+    { id: 78, n: "Someone Else's Watch", d: 'Defeat What Was Almost Enough and finish what someone else already started', t: 'boss_specific', target: 'What Was Almost Enough', c: 0, need: 1, rw: { xp: 128000, g: 94000 }, done: false },
 
   ],
 
@@ -716,6 +718,11 @@ const G = {
     { id: 'b43', n: 'Watching Echo Purge', d: 'Defeat 4 Watching Echoes', t: 'kill_specific', target: 'Watching Echo', c: 0, need: 4, rw: { xp: 1800, g: 1050 }, done: false, refreshDay: 0, minLv: 35, maxLv: 47 },
     { id: 'b44', n: 'Another Shift, Another Soul', d: 'Defeat Jeff, the SK* Son-in-Law', t: 'kill_specific', target: 'Jeff, the SK* Son-in-Law', c: 0, need: 1, rw: { xp: 12000, g: 8500 }, done: false, refreshDay: 0, minLv: 80, maxLv: 999 },
     { id: 'b45', n: "Can't Break the Retainer", d: 'Defeat Robin C.', t: 'kill_specific', target: 'Robin C.', c: 0, need: 1, rw: { xp: 13000, g: 9000 }, done: false, refreshDay: 0, minLv: 58, maxLv: 999 },
+    { id: 'b46', n: 'What the Roots Keep', d: 'Defeat The Verdant Heart', t: 'kill_specific', target: 'The Verdant Heart', c: 0, need: 1, rw: { xp: 18000, g: 13000 }, done: false, refreshDay: 0, minLv: 92, maxLv: 999 },
+    { id: 'b47', n: 'What Nothing Kindles, Again', d: 'Defeat The Unmade', t: 'kill_specific', target: 'The Unmade', c: 0, need: 1, rw: { xp: 22000, g: 16000 }, done: false, refreshDay: 0, minLv: 96, maxLv: 999 },
+    { id: 'b48', n: 'Still Holding', d: 'Defeat What Alone Becomes', t: 'kill_specific', target: 'What Alone Becomes', c: 0, need: 1, rw: { xp: 25000, g: 18500 }, done: false, refreshDay: 0, minLv: 97, maxLv: 999 },
+    { id: 'b49', n: 'Arrived in Time', d: 'Defeat Before It Wears Through', t: 'kill_specific', target: 'Before It Wears Through', c: 0, need: 1, rw: { xp: 27000, g: 20000 }, done: false, refreshDay: 0, minLv: 98, maxLv: 999 },
+    { id: 'b50', n: "Someone Else's Kindling", d: 'Defeat What Was Almost Enough', t: 'kill_specific', target: 'What Was Almost Enough', c: 0, need: 1, rw: { xp: 29000, g: 21500 }, done: false, refreshDay: 0, minLv: 99, maxLv: 999 },
 
   ],
 
@@ -746,6 +753,10 @@ const G = {
     { id: 'gc20', n: 'Contract: The Sunreach Elder', d: 'Defeat The Sunreach Elder for the Guild', t: 'boss_specific', target: 'The Sunreach Elder', c: 0, need: 1, rw: { xp: 24000, g: 17500 }, rep: 880, done: false, refreshWeek: -1, minLv: 75, maxLv: 82 },
     { id: 'gc21', n: 'Contract: Jeff, the SK* Son-in-Law', d: 'Defeat Jeff, the SK* Son-in-Law for the Guild', t: 'boss_specific', target: 'Jeff, the SK* Son-in-Law', c: 0, need: 1, rw: { xp: 28000, g: 20000 }, rep: 950, done: false, refreshWeek: -1, minLv: 80, maxLv: 90 },
     { id: 'gc22', n: 'Contract: The Verdant Heart', d: 'Defeat The Verdant Heart for the Guild', t: 'boss_specific', target: 'The Verdant Heart', c: 0, need: 1, rw: { xp: 35000, g: 26000 }, rep: 1100, done: false, refreshWeek: -1, minLv: 92, maxLv: 999 },
+    { id: 'gc23', n: 'Contract: The Unmade', d: 'Defeat The Unmade for the Guild', t: 'boss_specific', target: 'The Unmade', c: 0, need: 1, rw: { xp: 42000, g: 31000 }, rep: 1250, done: false, refreshWeek: -1, minLv: 96, maxLv: 999 },
+    { id: 'gc24', n: 'Contract: What Alone Becomes', d: 'Defeat What Alone Becomes for the Guild', t: 'boss_specific', target: 'What Alone Becomes', c: 0, need: 1, rw: { xp: 48000, g: 35500 }, rep: 1380, done: false, refreshWeek: -1, minLv: 97, maxLv: 999 },
+    { id: 'gc25', n: 'Contract: Before It Wears Through', d: 'Defeat Before It Wears Through for the Guild', t: 'boss_specific', target: 'Before It Wears Through', c: 0, need: 1, rw: { xp: 52000, g: 38500 }, rep: 1480, done: false, refreshWeek: -1, minLv: 98, maxLv: 999 },
+    { id: 'gc26', n: 'Contract: What Was Almost Enough', d: 'Defeat What Was Almost Enough for the Guild', t: 'boss_specific', target: 'What Was Almost Enough', c: 0, need: 1, rw: { xp: 56000, g: 41500 }, rep: 1580, done: false, refreshWeek: -1, minLv: 99, maxLv: 999 },
   ],
 
 
@@ -1335,6 +1346,9 @@ const G = {
     { n: 'Before It Wears Through', zone: 'Where Others Still Hold', hp: 255000, mhp: 255000, atk: 705, def: 428, xp: 118000, g: 87000,
       mechanic: 'phase', phases: 3, currentPhase: 1, phaseHp: 85000,
       desc: "Younger than the last one, in whatever way something like this has an age at all — still certain, still fighting like certainty is going to be enough on its own. It has not yet reached the part where certainty stops mattering and only endurance is left. That part is still coming, unless someone actually arrives first." },
+    { n: 'What Was Almost Enough', zone: "Someone Else's Watch", hp: 265000, mhp: 265000, atk: 720, def: 440, xp: 128000, g: 94000,
+      mechanic: 'phase', phases: 2, currentPhase: 1, phaseHp: 132500,
+      desc: "Already cracked before you ever arrived, by hands that were not yours, in a fight nobody invited you to witness the start of. Whoever got here first did real damage. Almost enough to finish it alone. Almost has never once been the same thing as enough, and it did not need to be — not when it turns out backup was always going to be a thing more than one pair could show up and give." },
 
     // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
     // These are dedicated Temple-quest hunt targets, not tied to any zone's normal
@@ -1445,7 +1459,7 @@ storyJournal: {
           { speaker: 'Narrator', text: "Aisyah joins your party. Family is complicated. Family with knives is complicated and useful. Now she teaches you the dangerous paths of Aethon." }
         ]
       },
-            {
+      {
         id: 'journal_005',
         title: 'The Weight of Before',
         chapter: 5,
@@ -1571,9 +1585,7 @@ storyJournal: {
           { speaker: 'Joel', text: "\"Breakfast,\" Joel says, like nothing happened. Like you did not almost end the world in your sleep. He squeezes your shoulder. His hand is warm. It has always been warm." },
           { speaker: 'Narrator', text: "The sun rises over Aethon. Two moons fade. Soel purrs on your chest, kneading soft circles into your heart. The story continues. Not ended. Just paused. And somewhere, in a small village in the Philippines, a mother wakes. In Brunei, two parents check their phones. The gravity still pulls. The orbit still holds. You are still a breadwinner. You are still choosing love. You are still — always — San." }
         ],
-      }
-            ,
-            
+      },
       {
         id: 'journal_013',
         title: 'The Astral Threshold',
@@ -1627,8 +1639,7 @@ storyJournal: {
           { speaker: 'Joel', text: "\"Thank you,\" Joel says to you, to the cat, to the daughter he will write to tomorrow. \"Thank you for letting me be more than a shield. Thank you for letting me be a person.\"" },
           { speaker: 'Narrator', text: "The magma hardens into stone. The fire becomes warmth. And somewhere, in a small village in the Philippines, a grandmother checks her phone for the message that does not come — not yet, but soon. A letter. In a handwriting her granddaughter will learn to recognize. In words that say: I am here. I have always been here. I am trying. I will keep trying. Until you believe me." }
         ]
-      }
-      ,
+      },
       {
         id: 'journal_015',
         title: 'The Shattered Veil',
@@ -1848,9 +1859,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'The fight that follows is not really a fight — it is an argument given weapons, a man refusing to become the thing standing in front of him. Grief does not want an audience. It wants company. And your Joel, steadfast as ever, refuses to leave the Echo alone with it, even as sword meets sword.' },
           { speaker: 'Narrator', text: 'When the Echo finally falls, it does not vanish like the other bosses did. It settles — like static resolving into a clear signal — and for one unguarded moment, Joel and his Echo look at each other like two ends of the same unfinished sentence. Then the light of the tower goes out, and the future it was warning against goes with it. Act One is over. Whatever waits in the years further gone, you will face it having already refused to become this.' }
         ]
-      }
-
-      ,{
+      },
+      {
         id: 'journal_027',
         title: 'The Roads Senedra Walked',
         chapter: 27,
@@ -1866,8 +1876,8 @@ storyJournal: {
           { speaker: 'San', text: '"You always found the way back," you tell her, and you mean it as more than reassurance — you mean it as fact, as the thing you have watched her do a hundred times across a hundred zones.' },
           { speaker: 'Narrator', text: 'When the Vanished Guide finally stops flickering long enough to be struck true, it does not resist much. It seems, in the end, almost relieved to be found — the particular relief of something tired of being lost. Senedra marks the spot with her own waymarker before you leave. Just in case, she says. Just in case someone else needs the road to remember them too.' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_028',
         title: 'The Room That Waited',
         chapter: 28,
@@ -1883,8 +1893,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'She fights like she heals — precise, patient, refusing to let the Hollow version of herself convince either of you that gentleness and helplessness are the same thing. When it finally falls, Eliz does not look away. She watches it go, and something in her face settles, like a door quietly closing on a room she no longer needs to fear.' },
           { speaker: 'Eliz', text: '"I am here," she says, to the empty crib, to you, to no one and everyone. "I am always going to be here. That is the whole of what I am for."' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_029',
         title: 'The Boy Who Stopped Checking',
         chapter: 29,
@@ -1900,8 +1910,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'He fights the Rustbound version of himself with something that looks almost like tenderness — not holding back, but never once losing the thing that makes him Zaki, the small constant worry that everyone around him makes it out fine. When it falls, he does not celebrate. He checks his own pack. Once. Just to be sure.' },
           { speaker: 'Zaki', text: '"Still here," he says, mostly to himself. "Still checking. Good."' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_030',
         title: 'The Storm That Never Broke',
         chapter: 30,
@@ -1917,8 +1927,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'He fights the Unbound version of himself with the storm itself as his weapon — not suppressing it, but finally, finally directing it somewhere. The lightning that used to just happen around him starts, for the first time, to mean something.' },
           { speaker: 'Mezstorm', text: '"The storm can stay," he says, breathing hard, watching the Unbound echo dissolve into rain. "It just does not get to be the only thing I say anymore."' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_031',
         title: 'What the Ember Remembers',
         chapter: 31,
@@ -1934,9 +1944,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'The fight is short, almost gentle — less a battle than a held hand, San\'s staff and Soel\'s claws working together to remind the guttering ember what it means to be chosen, over and over, in every world, in every form. When the Fading Familiar finally rejoins the true Soel, it does not feel like a kill. It feels like a promise kept.' },
           { speaker: 'Soel', text: 'Soel climbs into your lap, purring like nothing happened, like he has always known you would come. He chose you. That is rare. That is everything. And now, so does the part of him that almost forgot how.' }
         ]
-      }
-
-      ,{
+      },
+      {
         id: 'journal_032',
         title: 'What the Ledger Never Said',
         chapter: 32,
@@ -1952,8 +1961,8 @@ storyJournal: {
           { speaker: 'San', text: '"You never had to ask," you tell her, and mean it more than you have meant almost anything. "Family with knives is complicated and useful — you taught me that. You did not have to earn a place I already gave you."' },
           { speaker: 'Narrator', text: 'The Echo does not fight so much as it finally, finally sets the ledger down — and when it dissolves, Aisyah exhales like she has been holding her breath since long before the world broke. She does not say anything else. She does not need to.' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_033',
         title: 'The Version That Stopped Pretending',
         chapter: 33,
@@ -1969,8 +1978,8 @@ storyJournal: {
           { speaker: 'Narrator', text: "You fight the Tired Version knowing, somewhere underneath the dice and the damage numbers, that this is the one echo you cannot simply defeat and walk away from. You have to actually answer it. So you do — not with certainty, but with the truth: you are tired, and you are still here, and those two things have always been allowed to sit in the same sentence." },
           { speaker: 'San', text: '"I do not feel brave," you say, to the echo, to yourself, to no one. "I feel tired. I am doing it anyway. That was always the whole point."' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_034',
         title: 'The Door Someone Built on Purpose',
         chapter: 34,
@@ -1986,8 +1995,8 @@ storyJournal: {
           { speaker: 'San', text: '"That does not mean I let it finish," you say, and the fight that follows is not about hatred. It is about ending something that was always going to keep breaking the world unless someone chose, on purpose, to stop it.' },
           { speaker: 'Narrator', text: 'When The Architect falls, the chamber does not celebrate. It just goes quiet — the specific quiet of a plan that will never complete, and a world that finally gets to stop bracing for the next piece of it.' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_035',
         title: 'The Tribunal of Every Echo',
         chapter: 35,
@@ -2003,8 +2012,8 @@ storyJournal: {
           { speaker: 'Narrator', text: "The party fights as one, for the first time feeling less like individuals surviving separate griefs and more like what they actually are: people who chose each other, over and over, across every world this journey has thrown at them." },
           { speaker: 'San', text: '"We stay whole," you say, to the tribunal, to the echoes, to the part of yourself that still sometimes doubts it, "because every single one of you already showed me it was possible. That is the whole answer. That has always been the whole answer."' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_036',
         title: 'The First Break',
         chapter: 36,
@@ -2020,9 +2029,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'The fight is not a battle so much as an answer, finally given — San\'s staff, Joel\'s shield, Aisyah\'s blades, Mezstorm\'s storm, Eliz\'s light, Senedra\'s arrows, Zaki\'s sword, Soel\'s claws, all of it together, closing a door that has been open since before any of you arrived.' },
           { speaker: 'San', text: 'When The First Break finally quiets, the silence that follows is different from every silence before it. Not absence. Not grief. Just the world, for the first time in this whole shattered future, allowed to rest. "It can be mended," you say, to Joel, to all of them, to yourself. "We just proved it. Whatever comes next — we know that now."' }
         ]
-      }
-
-      ,{
+      },
+      {
         id: 'journal_037',
         title: 'The Slow Work',
         chapter: 37,
@@ -2038,8 +2046,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'The fight is not fast either — a long, grinding thing, everyone taking turns bearing the weight so no one carries it alone. When The Unmended finally gives way, it does not feel like a victory so much as a first, small, real repair.' },
           { speaker: 'Aisyah', text: '"One seam," Aisyah says, marking it in a ledger that finally has something other than debt written in it. "One seam mended. Plenty more. But one is not nothing."' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_038',
         title: 'A Setback Is Not a Failure',
         chapter: 38,
@@ -2055,8 +2063,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'The party fights The Relapse the way they have learned to fight everything that matters — together, patiently, refusing to let one setback erase the whole record of showing up.' },
           { speaker: 'San', text: 'When it finally falls, no one celebrates too loudly. You have learned, by now, that some victories are quiet ones. "We are still here," you say. "That is the only score that actually counts."' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_039',
         title: 'What Happens After',
         chapter: 39,
@@ -2072,8 +2080,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'The fight ends not with an answer but with something better — permission. Permission to not know, and to want a future anyway. The Question of After does not need defeating so much as it needs, finally, an honest response.' },
           { speaker: 'Joel', text: '"Then let us find out together," Joel says, and for the first time since the first day he asked to stand beside you, his voice sounds like relief instead of resolve.' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_040',
         title: 'The Whole Family',
         chapter: 40,
@@ -2089,8 +2097,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'The final phase breaks not because of any one hero\'s strike, but because eight people — San, Joel, Aisyah, Mezstorm, Eliz, Senedra, Zaki, Soel — commit to the same motion at the same moment, for the first time in the whole shattered future, completely undivided.' },
           { speaker: 'San', text: 'Soel presses against your leg as the Ward dissolves, purring, unkillable, chosen and choosing back. "Everyone," you say, looking around at all of them, "together." It is not a strategy anymore. It is just what is true.' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_041',
         title: 'Daybreak',
         chapter: 41,
@@ -2106,9 +2114,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'When Daybreak Incarnate finally, gently, comes apart, it does not feel like a kill. It feels like a held breath, released. The sky over Aethon — over every shattered zone you have ever walked through — opens, and for the first time in this entire journey, the light is not artificial, not desperate, not borrowed. It is just morning.' },
           { speaker: 'San', text: 'Everyone stands together in the new light — San, Joel, Aisyah, Mezstorm, Eliz, Senedra, Zaki, Soel. No one says anything grand. Aisyah counts something in her ledger and, for once, does not look worried. Zaki checks his pack, finds everything exactly where it should be, and smiles. Joel takes your hand. "Legends of Daybreak," you say, quiet, mostly to yourself, watching the sun actually rise. "I think that is us now." Whatever comes next, it will not be faced alone. It never really was.' }
         ]
-      }
-
-      ,{
+      },
+      {
         id: 'journal_042',
         title: 'Enough, Without Asking',
         chapter: 42,
@@ -2135,9 +2142,8 @@ storyJournal: {
           { speaker: 'Joel', text: '"Good," Joel says, simply, and takes your hand — not a grand gesture, just a steady one, exactly like him. "Because I was never going to wait for permission either. I asked to stand beside you. That was never conditional on anyone else agreeing it made sense."' },
           { speaker: 'San', text: 'You lean into him, and for once the old memories do not follow you into the quiet after. They just stay where they belong — true, and past, and no longer load-bearing. "Enough," you say, mostly to yourself. "I am enough, without anyone else signing off on it. That took a long time to actually believe."' }
         ]
-      }
-
-      ,{
+      },
+      {
         id: 'journal_043',
         title: 'The Question Neither of Them Answers',
         chapter: 43,
@@ -2166,9 +2172,8 @@ storyJournal: {
           { speaker: 'San', text: '"Priorities," you say, finally, sitting up, letting the morning actually start. "We focus on priorities. The rest finds us or it does not. Either way, we are still here for it."' },
           { speaker: 'Joel', text: '"Together," Joel says, like it was never actually in question. "Whatever the answer turns out to be."' }
         ]
-      }
-
-      ,{
+      },
+      {
         id: 'journal_044',
         title: 'The Weight Learns to Rest',
         chapter: 44,
@@ -2190,9 +2195,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'The light thins, unhurried, the way morning itself arrived — not vanishing so much as simply becoming part of the day. You are alone again, staff in hand, the camp quiet around you. But the weight feels different now. Not gone. Just finally allowed to rest.' },
           { speaker: 'San', text: '"A walk, then," you say, to no one, and mean it as a promise as much as an observation.' }
         ]
-      }
-
-      ,{
+      },
+      {
         id: 'journal_045',
         title: 'The Two Before Me',
         chapter: 45,
@@ -2211,8 +2215,8 @@ storyJournal: {
           { speaker: 'San', text: '"Both things are true," you agree. "I needed room to become myself. They needed to believe I would still be there to become it. We were both right, and it still took most of my life to stop being angry about it."' },
           { speaker: 'Narrator', text: 'You think of your parents now — an ocean and several realities away — and for the first time in a long while, the thought does not come with resentment attached. Just two people who loved carefully because they had already learned, twice, exactly what it cost to lose someone before they even got a name.' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_046',
         title: 'Before He Learned to Guard',
         chapter: 46,
@@ -2231,8 +2235,8 @@ storyJournal: {
           { speaker: 'San', text: '"You did not become that," you tell him, certain of it in a way you rarely let yourself be certain of anything.' },
           { speaker: 'Joel', text: '"Not yet," Joel says, quiet, almost a joke, almost not. "I am trying very hard to keep it that way."' }
         ]
-      }
-      ,{
+      },
+      {
         id: 'journal_047',
         title: 'What Family Costs',
         chapter: 47,
@@ -2253,12 +2257,41 @@ storyJournal: {
           { speaker: 'San', text: '"You are allowed to worry about your family from here," you tell him. "It does not make you any less present for this one."' },
           { speaker: 'Joel', text: '"I know," Joel says. "Knowing does not always make the worry smaller. But it helps, having somewhere to actually say it out loud instead of carrying it alone." He looks at you, steady as always. "Thank you for asking. Really asking, not just being polite about it."' }
         ]
-      }
-
-      ,{
+      },
+      {
         id: 'journal_048',
-        title: 'The First Step Beyond',
+        title: 'Never Really a Loan',
         chapter: 48,
+        unlockType: 'level',
+        unlockAt: 50,
+        icon: '🪙',
+        summary: 'San and Joel trade stories of quiet generosity and quiet debt — the customer, the friend, the boyfriend allowances, the dread of payday — and find real relief in realizing Aethon never asked either of them to keep score.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It comes up sideways, the way most real conversations do — not planned, just surfacing while you are both doing something else entirely, mending gear by firelight.' },
+          { speaker: 'Joel', text: '"You do this a lot," Joel says, watching you set aside coin for someone at camp who clearly needed it more than either of you did. "Help people. Quietly. Like it does not occur to you not to."' },
+          { speaker: 'San', text: '"I have always been like that," you say, not quite denying it, more turning it over. "There was a customer once, back when I still worked the counter, before the firm. She was mute. Needed her sister with her every time, just to actually talk to me, to make herself understood at all."' },
+          { speaker: 'San', text: '"She owed eighteen dollars, in the end. Never paid it. Their father had taken the money meant for it and put it into car repairs instead. I could have chased it. I did not. Eighteen dollars was never going to fix whatever was actually wrong in that house."' },
+          { speaker: 'Joel', text: '"You just let it go," Joel says, not a question, more confirming something he already suspected about you.' },
+          { speaker: 'San', text: '"I let a lot of things go, over the years," you admit. "There was a closer friend too. Someone I relied on for rides, actually — I paid her for the transport, and when she needed help back, I gave it without really thinking twice. She was broke. Could not find work, no matter how hard she tried. It got critical for her, the kind of critical where you stop pretending you can handle it alone."' },
+          { speaker: 'San', text: '"And then her husband got held, for something criminal. A mistake, the kind he regretted the second it was already done and too late to undo. I do not know if that makes it better or worse. I just knew she needed someone steady while it was happening, and I could be that, so I was."' },
+          { speaker: 'Joel', text: 'He is quiet a moment, something working behind his eyes. "You did the same thing for me," he says. "I do not think I ever properly said that back to you."' },
+          { speaker: 'San', text: '"You mean the money," you say, gentle, already knowing exactly which part he means.' },
+          { speaker: 'Joel', text: '"The three thousand," Joel says. "From Robin\'s payout. Getting my stepfather to Brunei, the deposits, the debts that were already sitting there before he even arrived. I do not think I ever would have managed it without you."' },
+          { speaker: 'San', text: '"I gave you boyfriend allowances too, back when I was still at the firm," you say, something fond and a little wry creeping into it. "When the salary was bigger, when the bonuses landed. Not because you asked. Because you mattered, and I could, and those two things together always felt like reason enough."' },
+          { speaker: 'Joel', text: '"I remember," Joel says quietly. "I remember exactly how much it helped, and exactly how much I did not know how to say thank you for it properly at the time."' },
+          { speaker: 'San', text: '"I wrote it off," you tell him, plainly. "Not just the number. The whole idea of it being a debt at all. You proved who you actually were, over and over, long before I ever needed the proof. That settled it for me. It was never really a loan to begin with, if I am honest. I just did not have the right word for what it actually was yet."' },
+          { speaker: 'Narrator', text: 'He reaches for your hand, quiet, and you let him hold it while the fire does the rest of the talking for a while.' },
+          { speaker: 'Joel', text: '"I used to dread payday," Joel admits eventually, something raw surfacing in it. "Every single time. The debts were always bigger than whatever landed in the account. I do not think I was ever once excited to get paid, not really, not the whole time I worked there. I just felt broke, permanently, no matter how much came in."' },
+          { speaker: 'San', text: '"I know that feeling," you say. "Different shape, same weight. Watching money arrive and already knowing exactly which parts of it were never really yours to keep."' },
+          { speaker: 'Joel', text: '"We do not have to think about any of that here," Joel says, like he is only now fully letting himself believe it. "No debts. No dread on payday. No math I have to do before I am even allowed to feel relieved about anything."' },
+          { speaker: 'San', text: '"No," you agree, quiet, something settling in your chest that has been unsettled for as long as you can remember. "Whatever else Aethon has cost either of us, it did not cost us that. For the first time in longer than I can measure, help just gets to be help. Not a debt either of us is quietly keeping score of."' },
+          { speaker: 'Joel', text: '"Good," Joel says simply, and pulls you a little closer against the cold. "I would like to keep it that way."' },
+        ]
+      },
+      {
+        id: 'journal_049',
+        title: 'The First Step Beyond',
+        chapter: 49,
         unlockType: 'boss',
         unlockAt: 'The Wayfinder',
         icon: '🗺️',
@@ -2272,11 +2305,11 @@ storyJournal: {
           { speaker: 'Narrator', text: 'The Wayfinder seems to accept that. When it finally yields, it does not vanish like an enemy defeated — it simply steps aside, the way a door opens rather than breaks.' },
           { speaker: 'San', text: '"A walk, then," you say again, quieter this time, remembering exactly where you first said it. "Let us see how far it actually goes."' }
         ]
-      }
-      ,{
-        id: 'journal_049',
+      },
+      {
+        id: 'journal_050',
         title: 'Every Name the Tide Kept',
-        chapter: 49,
+        chapter: 50,
         unlockType: 'boss',
         unlockAt: 'The Tidereaver',
         icon: '🌊',
@@ -2289,11 +2322,11 @@ storyJournal: {
           { speaker: 'Narrator', text: 'When it finally recedes, the coast is quieter than before, and Senedra adds one more mark to the rocks — small, deliberate, not a name so much as a note. You were here. You left on purpose. That part matters.' },
           { speaker: 'Senedra', text: '"First carving I have ever made that was not just marking a path," she says, almost smiling. "Feels different, doing it for its own sake."' }
         ]
-      }
-      ,{
-        id: 'journal_050',
+      },
+      {
+        id: 'journal_051',
         title: 'A Debt With No Owner',
-        chapter: 50,
+        chapter: 51,
         unlockType: 'boss',
         unlockAt: 'The Ledgerbound',
         icon: '📒',
@@ -2307,11 +2340,11 @@ storyJournal: {
           { speaker: 'Aisyah', text: '"I spent years teaching people that numbers do not lie," Aisyah says, breathing hard once it finally falls. "I did not always say the follow-up. Numbers do not lie. The people who design the system around them do, constantly."' },
           { speaker: 'Narrator', text: 'The ledgers across the settlement go quiet, at least for now — not erased, not forgiven, just no longer being actively enforced by something that never had a stake in fairness to begin with.' }
         ]
-      }
-      ,{
-        id: 'journal_051',
+      },
+      {
+        id: 'journal_052',
         title: 'What Was Owed, Surfacing',
-        chapter: 51,
+        chapter: 52,
         unlockType: 'boss',
         unlockAt: 'The Undertow',
         icon: '🌊',
@@ -2324,11 +2357,11 @@ storyJournal: {
           { speaker: 'Narrator', text: 'When it finally quiets, the silence after feels less like victory and more like relief — not a debt erased, but at least, finally, acknowledged out loud instead of buried and left to fester.' },
           { speaker: 'San', text: '"Some debts cannot be paid," you say, quiet, thinking of far more than the settlement above. "They can only be witnessed, and carried differently after that."' }
         ]
-      }
-      ,{
-        id: 'journal_052',
+      },
+      {
+        id: 'journal_053',
         title: 'Proof the Road Continues',
-        chapter: 52,
+        chapter: 53,
         unlockType: 'boss',
         unlockAt: 'The Horizon Keeper',
         icon: '🌅',
@@ -2341,12 +2374,11 @@ storyJournal: {
           { speaker: 'San', text: '"A walk," you say again, looking at everyone — Joel, Aisyah, Mezstorm, Eliz, Senedra, Zaki, Soel, all of them still here, still choosing this. "Not a sprint. Just a very, very long walk. I think I can live with that."' },
           { speaker: 'Narrator', text: 'The horizon does not close. It never really does. But for the first time, that feels less like an unfinished sentence and more like an open one — the good kind, the kind you get to keep writing instead of the kind that was forced on you.' }
         ]
-      }
-
-      ,{
-        id: 'journal_053',
+      },
+      {
+        id: 'journal_054',
         title: 'What the Hollow Prophet Believed',
-        chapter: 53,
+        chapter: 54,
         unlockType: 'boss',
         unlockAt: 'The Hollow Prophet',
         icon: '👁️',
@@ -2358,11 +2390,11 @@ storyJournal: {
           { speaker: 'Eliz', text: '"That is the saddest reason for any of this I have ever heard," Eliz says quietly, and means it as a diagnosis, not an accusation.' },
           { speaker: 'Narrator', text: 'The Cult of the Closed Eye ends there — not with a monster defeated, but with a grieving man finally out of reasons to keep lying to the people who trusted him with their pain. The temple will call it a victory. It feels, mostly, like a very long, very late funeral.' }
         ]
-      }
-      ,{
-        id: 'journal_054',
+      },
+      {
+        id: 'journal_055',
         title: 'The Knight Who Came Back Different',
-        chapter: 54,
+        chapter: 55,
         unlockType: 'level',
         unlockAt: 34,
         icon: '🗡️',
@@ -2375,12 +2407,11 @@ storyJournal: {
           { speaker: 'Ser Aldric', text: '"I know the difference, intellectually," he says. "Give me time to know it the rest of the way too."' },
           { speaker: 'Narrator', text: 'You bring him back to the temple less like a rescued hostage and more like someone returning from a long illness — alive, which was never guaranteed, and changed, which was never going to be avoidable either. The temple marks the investigation closed. Ser Aldric, privately, does not consider himself finished with it at all.' }
         ]
-      }
-
-      ,{
-        id: 'journal_055',
+      },
+      {
+        id: 'journal_056',
         title: "What Faith Does Without Anyone to Follow",
-        chapter: 55,
+        chapter: 56,
         unlockType: 'level',
         unlockAt: 38,
         icon: '🕯️',
@@ -2394,11 +2425,11 @@ storyJournal: {
           { speaker: 'San', text: '"Then we finish it together," you tell him. "Properly, this time. Not scattered pieces left to whoever finds them first."' },
           { speaker: 'Ser Aldric', text: '"Properly," he agrees, and for the first time since you found him, he sounds like he means to be the one doing the finding instead of the one who has to be found.' }
         ]
-      }
-      ,{
-        id: 'journal_056',
+      },
+      {
+        id: 'journal_057',
         title: 'The Last of the Believing',
-        chapter: 56,
+        chapter: 57,
         unlockType: 'boss',
         unlockAt: 'Sister Wren, the Last Believer',
         icon: '🕯️',
@@ -2412,12 +2443,11 @@ storyJournal: {
           { speaker: 'San', text: '"The Cult of the Closed Eye is over," you say, quietly, to Joel, to Ser Aldric, to no one in particular. "Not because we won. Because there is finally no one left who needs it to keep going."' },
           { speaker: 'Narrator', text: 'The temple will record it as a victory. It feels, more than anything, like the end of a very long, very sad conversation — the kind that never needed a monster to defeat, just someone willing to finally say the honest thing out loud.' }
         ]
-      }
-
-      ,{
-        id: 'journal_057',
+      },
+      {
+        id: 'journal_058',
         title: 'What Soel Actually Is',
-        chapter: 57,
+        chapter: 58,
         unlockType: 'level',
         unlockAt: 45,
         icon: '🐱',
@@ -2432,11 +2462,11 @@ storyJournal: {
           { speaker: 'Eliz', text: '"It is not just a phrase," Eliz says. "It is the truest thing about him. He decided you were worth staying for. I do not think that decision has an expiration on it."' },
           { speaker: 'Narrator', text: 'Soel opens one eye, entirely unbothered by being the subject of the conversation, and goes back to sleep in his patch of impossible light. Some things, apparently, do not need to be explained to be true. They just need someone willing to finally ask.' }
         ]
-      }
-      ,{
-        id: 'journal_058',
+      },
+      {
+        id: 'journal_059',
         title: 'The One He Chose Before',
-        chapter: 58,
+        chapter: 59,
         unlockType: 'level',
         unlockAt: 45,
         icon: '❄️',
@@ -2452,12 +2482,11 @@ storyJournal: {
           { speaker: 'Eliz', text: '"I think that is exactly what it is," Eliz agrees quietly. "Every time he holds on, somewhere, something very old finally gets to stop grieving. That is not a small thing to be part of. I do not think either of you should treat it like one."' },
           { speaker: 'Narrator', text: 'Soel, still pretending to be asleep, presses closer against your leg — not a spirit, not a mystery, in that particular moment. Just warm, and chosen, and staying. The Breaking took so much from so many. It is a strange kind of grace, that the smallest things sometimes get to be the ones who finally hold on.' }
         ]
-      }
-
-      ,{
-        id: 'journal_059',
+      },
+      {
+        id: 'journal_060',
         title: 'The Cellphone',
-        chapter: 59,
+        chapter: 60,
         unlockType: 'level',
         unlockAt: 41,
         icon: '📱',
@@ -2481,11 +2510,11 @@ storyJournal: {
           { speaker: 'San', text: '"Then it doesn\'t work," you say, and mean it, mostly. "But I\'d rather know than spend the rest of this wondering." You tuck it carefully into your pack, next to nothing else, like it deserves the space to itself. "Someone out here has to know how to actually fix something like this properly. We just have to find them first."' },
           { speaker: 'Narrator', text: 'Zaki checks his pack one more time on the walk back, mostly out of habit now, not fear. Whatever is ahead — the search, the boss fights standing in the way of wherever this leads, the very real chance that all of this comes to nothing — none of it changes what\'s already true: for the first time since any of you arrived here, the old world does not feel entirely gone. Just quiet. Waiting to see if anyone still knows how to call it back.' },
         ]
-      }
-      ,{
-        id: 'journal_060',
+      },
+      {
+        id: 'journal_061',
         title: 'The Mechanic',
-        chapter: 60,
+        chapter: 61,
         unlockType: 'zone',
         unlockAt: 'The Static Fields',
         icon: '🔧',
@@ -2515,11 +2544,38 @@ storyJournal: {
           { speaker: 'San', text: '"Thank you," you say, and it is not nearly enough, and he seems to understand that anyway. "For all of it. Not just the phone."' },
           { speaker: 'Narrator', text: 'Dudin has not put Soel down. Wahyu is holding up a scrap of fabric to the light, already halfway through describing an idea for a jacket nobody asked for. And Jorvin bends back over the phone, muttering at it the exact same way he used to mutter at engines that would not turn over — like it is a puzzle worth being stubborn about, not because it is easy, but because it matters to someone he has already decided is worth the trouble.' },
         ]
-      }
-      ,{
-        id: 'journal_061',
+      },
+      {
+        id: 'journal_062',
+        title: 'Proof of Where You Were Standing',
+        chapter: 62,
+        unlockType: 'level',
+        unlockAt: 41,
+        icon: '🦋',
+        summary: 'San finally says out loud that she once believed her own isolation at Robin\'s firm was her own fault — and finds, in the sheer number of real colleagues who made it through with her, proof that it never was.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It is Mimi who finally makes you say it out loud — not by asking, just by being exactly as warm and unbothered to see you as she always used to be, like no time at all had passed since the last time she leaned over your desk with something she was not supposed to know yet.' },
+          { speaker: 'San', text: '"I used to think it was me," you say, quiet, watching her across the fire. "At Robin\'s office. The distance. I told myself if people were cold, or careful around me, it was because I had pulled away first. That I had made myself difficult to be close to, and the prejudice was just people responding to that, fairly, in their own way."' },
+          { speaker: 'Mimi', text: '"That was never fair," Mimi says, gentle but certain, no hesitation in it at all. "You were surviving something. People built like Robin\'s office do not usually earn the benefit of the doubt just because they finally get the withdrawal they trained into someone."' },
+          { speaker: 'San', text: '"I know that now," you say. "I did not always. I spent a long time believing I had caused my own isolation, like it was some character flaw instead of the only reasonable response to how I was actually being treated."' },
+          { speaker: 'Narrator', text: 'You think of the specific shape that isolation took — not dramatic, never dramatic, just a slow retreat into yourself that felt, at the time, like the only room left where you were still allowed to exist without being assessed for it.' },
+          { speaker: 'San', text: '"I did not expect any of you to be here," you admit. "Not really. I hoped, the way you hope about anything you have already lost. But hoping and expecting are different things."' },
+          { speaker: 'Aisy', text: 'Aisy appears the way she always does, unhurried, like she was standing there the whole time and simply waited for the right moment to be noticed. "Lewis is two zones over," she says. "Jonathan too. Zul still does the same job, more or less, just with worse roads. Jorvin never really stopped being Jorvin."' },
+          { speaker: 'San', text: '"The whole department," you say slowly, the shape of it only now fully landing. "Not one or two of you. All of it. Whatever brought people through, it did not just save me a handful of strangers. It saved me the actual people."' },
+          { speaker: 'Mimi', text: '"We looked out for you back then too," Mimi says. "Quietly, mostly. You did not always let it land, and that was alright — you had enough coming at you already without needing to also perform being grateful for the small things. We knew. We are not surprised you did not always see it."' },
+          { speaker: 'San', text: '"I see it now," you say, and mean it completely. "I do not think I understood, until right now, how much I had convinced myself that Robin\'s office was the honest version of how people actually treat each other, and this" — you gesture at all of them, the fire, the whole unlikely gathering — "was the exception. It was never the exception. It was just further away."' },
+          { speaker: 'Narrator', text: 'You think of Amad too, the specific ache of one person you have not fully gotten back — the food he used to bring right to your floor, and the months before the world even ended when he simply stopped, for reasons you never learned and still cannot quite bring yourself to ask him about directly.' },
+          { speaker: 'San', text: '"Amad is out here too," you say, quieter. "I have not asked him why he stopped coming, before everything. I do not know if I ever will. Some things I think I am allowed to just not need the answer to."' },
+          { speaker: 'Aisy', text: '"That is allowed," Aisy agrees. "Not every gap needs closing to still be survivable."' },
+          { speaker: 'Narrator', text: 'You sit with all of them a while, the fire, the unlikely reunion of an entire department scattered across a broken world and somehow, mostly, found again — and understand, finally, completely, that the isolation was never proof of anything true about you. It was only ever proof of where you had been standing.' },
+          { speaker: 'San', text: '"Thank you," you say, to all of them, plainly. "For being exactly who you already were. I do not think I ever properly said that, back when it mattered just as much."' },
+          { speaker: 'Mimi', text: '"You can say it now," Mimi says, warm. "We are not in a hurry anywhere. We have got time."' },
+        ]
+      },
+      {
+        id: 'journal_063',
         title: 'The Charge',
-        chapter: 61,
+        chapter: 63,
         unlockType: 'level',
         unlockAt: 42,
         icon: '🔌',
@@ -2548,11 +2604,11 @@ storyJournal: {
           { speaker: 'Mimi', text: 'Something shifts behind her eyes — not hope exactly, you have all learned to be careful with that word, but something adjacent to it. "Then we keep looking," she says. "And we keep an eye out for whoever comes through next."' },
           { speaker: 'Narrator', text: 'No way home yet. No voice on the other end of a phone that still cannot hold a charge. But the world keeps handing you pieces of what you lost anyway, one stubborn, unlikely arrival at a time, and for tonight you decide to let that be enough.' },
         ]
-      }
-      ,{
-        id: 'journal_062',
+      },
+      {
+        id: 'journal_064',
         title: 'The Asset',
-        chapter: 62,
+        chapter: 64,
         unlockType: 'level',
         unlockAt: 43,
         icon: '🔗',
@@ -2575,11 +2631,11 @@ storyJournal: {
           { speaker: 'San', text: '"I do," you tell him, and mean it in a way that still occasionally surprises you, two years in. "That is the part that took the longest to believe. That wanting someone and needing to control them are not actually the same instinct, even when they can look identical from the outside."' },
           { speaker: 'Narrator', text: 'The night settles around you both, unremarkable and safe, and you let yourself notice — the way you are trying to teach yourself to notice, deliberately, on purpose — that nothing about this moment requires you to be useful in order to be allowed to stay in it.' },
         ]
-      }
-            ,{
-        id: 'journal_063',
+      },
+      {
+        id: 'journal_065',
         title: 'What I Was Actually Running From',
-        chapter: 63,
+        chapter: 65,
         unlockType: 'level',
         unlockAt: 44,
         icon: '💔',
@@ -2616,12 +2672,11 @@ storyJournal: {
           { speaker: 'Joel', text: '"Probably both," Joel admits. "I have never been good at picking just one."' },
           { speaker: 'Narrator', text: 'You let the story rest there, finally spoken all the way through instead of carried silently, and notice — the way you are still learning to notice — that it feels lighter now, having said it out loud to someone who did not flinch, uncertainty and all.' },
         ]
-      }
-
-,{
-        id: 'journal_064',
+      },
+      {
+        id: 'journal_066',
         title: 'Nine Years, One Hundred Dollars',
-        chapter: 64,
+        chapter: 66,
         unlockType: 'level',
         unlockAt: 45,
         icon: '📋',
@@ -2682,11 +2737,11 @@ storyJournal: {
           { speaker: 'San', text: '"You have been," you say. "For almost two years now. I am starting to actually believe it might just keep being true."' },
           { speaker: 'Narrator', text: 'Zaki, oblivious to all of it, calls over to ask if anyone wants the last of the rations after all, since apparently he counted wrong and there is more than he thought. You laugh, quiet and real, and let yourself just be somewhere you are allowed to stay.' },
         ]
-      }
-      ,{
-        id: 'journal_065',
+      },
+      {
+        id: 'journal_067',
         title: 'The Job That Never Says Enough',
-        chapter: 65,
+        chapter: 67,
         unlockType: 'level',
         unlockAt: 46,
         icon: '📦',
@@ -2710,11 +2765,11 @@ storyJournal: {
           { speaker: 'Joel', text: '"I am trying to believe that," Joel says. "It is a slower habit to unlearn than I expected."' },
           { speaker: 'San', text: '"I know," you say. "Mine too."' },
         ]
-      }
-      ,{
-        id: 'journal_066',
+      },
+      {
+        id: 'journal_068',
         title: 'What the Numbers Actually Meant',
-        chapter: 66,
+        chapter: 68,
         unlockType: 'level',
         unlockAt: 47,
         icon: '🩺',
@@ -2738,11 +2793,11 @@ storyJournal: {
           { speaker: 'San', text: '"I am glad it was Dr. AA who found it," you say. "I do not think I would have trusted the number the same way, coming from someone who did not already know how to talk to me plainly."' },
           { speaker: 'Joel', text: '"Me too," Joel says, and squeezes your hand once, warm, certain — not a fear finished, exactly, but one that finally has a shape small enough to hold.' },
         ]
-      }
-      ,{
-        id: 'journal_067',
+      },
+      {
+        id: 'journal_069',
         title: 'Not an Asset. Family.',
-        chapter: 67,
+        chapter: 69,
         unlockType: 'level',
         unlockAt: 48,
         icon: '🍵',
@@ -2766,11 +2821,11 @@ storyJournal: {
           { speaker: 'San', text: '"I do," you say, and for once the words come without any of the old bracing underneath them. "It took a while. But I do, now. Completely."' },
           { speaker: 'Narrator', text: 'He goes back to the stove, humming again, and you let yourself simply watch him for a while — not assessing, not bracing, not waiting to find out what you are worth. Just here, in a kitchen that finally, actually, belongs to both of you.' },
         ]
-      }
-,{
-        id: 'journal_068',
+      },
+      {
+        id: 'journal_070',
         title: 'No Service',
-        chapter: 68,
+        chapter: 70,
         unlockType: 'level',
         unlockAt: 49,
         icon: '🔋',
@@ -2813,11 +2868,11 @@ storyJournal: {
           { speaker: 'San', text: '"Thank you," you say, to Jorvin for the wiring, to Aisyah for staying, to Joel for simply being there while you read words you were terrified might not exist anymore.' },
           { speaker: 'Jorvin', text: '"Anytime," Jorvin says, already turning back to his workbench, pretending not to have noticed his own eyes were wet. "That is what the shop is for, apparently. Turns out I am in the business of small miracles now, not just carburetors."' },
         ]
-      }
-,{
-        id: 'journal_069',
+      },
+      {
+        id: 'journal_071',
         title: 'What the World Let Go Of',
-        chapter: 69,
+        chapter: 71,
         unlockType: 'level',
         unlockAt: 55,
         icon: '🌅',
@@ -2849,11 +2904,11 @@ storyJournal: {
           { speaker: 'Aisyah', text: '"And now?" Aisyah asks.' },
           { speaker: 'San', text: '"Now it just feels like the road," you say, and step forward, past the last thing that was ever mapped, into everything that has not been yet.' },
         ]
-      }
-,{
-        id: 'journal_071',
+      },
+      {
+        id: 'journal_072',
         title: 'Same Firm, New Sign',
-        chapter: 71,
+        chapter: 72,
         unlockType: 'zone',
         unlockAt: 'The Unbroken Vale',
         icon: '📎',
@@ -2886,11 +2941,11 @@ storyJournal: {
           { speaker: 'Dr. AA', text: '"For what it\'s worth," Dr. AA says, gentler now, looking between the two of you, "whatever made men like that untouchable back home does not come through with them. Out here, it is just him. No contract. No family name that holds up." A small shrug. "Sounds like this family collects debts. Might as well go collect a couple more."' },
           { speaker: 'San', text: '"We will," you say, and mean both names when you say it.' },
         ]
-      }
-,{
-        id: 'journal_072',
+      },
+      {
+        id: 'journal_073',
         title: 'Signs in the Green',
-        chapter: 72,
+        chapter: 73,
         unlockType: 'level',
         unlockAt: 56,
         icon: '🌿',
@@ -2904,11 +2959,11 @@ storyJournal: {
           { speaker: 'Ser Aldric', text: '"Company," Ser Aldric says. "And whatever this vale throws at anyone who goes looking for something it has not decided to show yet."' },
           { speaker: 'Narrator', text: 'You fall into step beside him without much more discussion than that. It occurs to you, walking, that this is the first time he has asked you to come with him instead of asking you to come get him.' },
         ]
-      }
-,{
-        id: 'journal_073',
+      },
+      {
+        id: 'journal_074',
         title: 'What Sister Wren Still Knows',
-        chapter: 73,
+        chapter: 74,
         unlockType: 'level',
         unlockAt: 58,
         icon: '🕊️',
@@ -2923,11 +2978,11 @@ storyJournal: {
           { speaker: 'Ser Aldric', text: '"Neither do I," Ser Aldric says, and something passes between the two of them that is not quite forgiveness and not quite absolution — just two people who know exactly the same weight, agreeing to carry a little of it together instead of each alone.' },
           { speaker: 'Narrator', text: 'She studies the columns a long moment, fingers finally resting on a symbol worn almost smooth. "This is real," she says. "I do not know what it wants yet. But this — whoever built this actually meant it."' },
         ]
-      }
-,{
-        id: 'journal_074',
+      },
+      {
+        id: 'journal_075',
         title: 'The Last Vigil',
-        chapter: 74,
+        chapter: 75,
         unlockType: 'boss',
         unlockAt: 'The Last Vigil',
         icon: '⚔️',
@@ -2942,11 +2997,30 @@ storyJournal: {
           { speaker: 'Sister Wren', text: '"Thank you," she says to it, or to the space where it stood, or maybe to herself. "For however long you had to hold this alone."' },
           { speaker: 'San', text: '"Come on," you say gently, to all of them. "Let\'s see what it was actually guarding."' },
         ]
-      }
-,{
-        id: 'journal_075',
+      },
+      {
+        id: 'journal_076',
+        title: 'Forever and Ever',
+        chapter: 76,
+        unlockType: 'level',
+        unlockAt: 58,
+        icon: '🌙',
+        summary: 'The night before whatever comes next, San finds the one certainty this world has never once tried to take from her.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The camp is quiet by the time you finally sit still. Everyone else has drifted off to their own corners of the fire — Aisyah sharpening something that does not need sharpening, Soel curled against Joel\'s pack, the whole party breathing slow around you. Joel finds you last, the way he always does, like he waits on purpose so it is just the two of you by the time he arrives.' },
+          { speaker: 'Joel', text: '"These battles are endless," he says, quiet, not a complaint, just true. He sits close enough that his shoulder finds yours without either of you deciding it should. "But I am here with you. Forever and ever."' },
+          { speaker: 'Narrator', text: 'You do not answer with words. You close your eyes instead, and let yourself lean the rest of the way into him — into the steady weight of him, the warmth that has never once, not on the worst nights, felt like something you had to earn.' },
+          { speaker: 'Narrator', text: 'His hand finds your jaw, tilts your face up to his, careful the way he is careful with everything he has decided is worth protecting. You feel his breath before his mouth reaches yours — unhurried, like he has all the time in the world to get to you, like the endless battles outside this moment do not exist at all.' },
+          { speaker: 'Narrator', text: 'He holds you like something he has waited a long time to be allowed to hold. You kiss him back like someone who has finally stopped bracing for the ground to disappear. What follows, you keep — the warmth of him, the low sound of your own name in his voice, the fire burning down to embers while the rest of the world holds its breath and waits.' },
+          { speaker: 'Narrator', text: 'Later — much later, on the edge of sleep, his arm still around you — your mind does not go to tomorrow\'s fight. It has not, in a long time. It goes instead to the people you love, and the people who love you back, and the simple, ordinary miracle of all of them being safe, tonight, in whichever world happened to hold you.' },
+          { speaker: 'San', text: '"Forever and ever," you murmur back, half-asleep, and mean it the way you have only ever meant the truest things — without needing to prove it to anyone, least of all yourself.' },
+          { speaker: 'Narrator', text: 'The battles will keep coming. They always do. But that is a problem for the road ahead, not for tonight — and tonight, for once, is enough all on its own.' }
+        ]
+      },
+      {
+        id: 'journal_077',
         title: 'The Mended Sanctum',
-        chapter: 75,
+        chapter: 77,
         unlockType: 'level',
         unlockAt: 62,
         icon: '🕯️',
@@ -2963,11 +3037,11 @@ storyJournal: {
           { speaker: 'Ser Aldric', text: '"Seems fitting," Ser Aldric says, looking around at all of you. "A stone that only grows where something actually finished healing. This whole vale is made of it, in one form or another. We just happened to be standing here when it caught up to us."' },
           { speaker: 'Narrator', text: 'The Mended Sanctum opens its doors — such as they are — properly, for the first time in longer than anyone can say. Not loud. Not enormous. Just real, and finally, quietly, tended by people who mean it.' },
         ]
-      }
-,{
-        id: 'journal_076',
+      },
+      {
+        id: 'journal_078',
         title: 'Where the Old Names Wait',
-        chapter: 76,
+        chapter: 78,
         unlockType: 'level',
         unlockAt: 68,
         icon: '🕯️',
@@ -2984,11 +3058,11 @@ storyJournal: {
           { speaker: 'San', text: '"Together, then," you say. "One old name at a time, until there are none left waiting for us."' },
           { speaker: 'Joel', text: '"Together," he agrees, and for the first time since Ser Aldric said any of this, some of the dread in his shoulders eases into something closer to resolve.' },
         ]
-      }
-,{
-        id: 'journal_077',
+      },
+      {
+        id: 'journal_079',
         title: 'What Doesn\'t Stay Buried',
-        chapter: 77,
+        chapter: 79,
         unlockType: 'boss',
         unlockAt: 'The Ex-Mother-in-Law',
         icon: '❄️',
@@ -3007,11 +3081,11 @@ storyJournal: {
           { speaker: 'Joel', text: '"You are not," he agrees, close now, his hand finding yours without needing to ask. "You never were. I am sorry it took a wraith and a magic sword to prove that to the part of you that still needed proving."' },
           { speaker: 'San', text: '"Me too," you say, and let yourself, finally, completely, believe it.' },
         ]
-      }
-,{
-        id: 'journal_078',
+      },
+      {
+        id: 'journal_080',
         title: 'What You Chose Instead',
-        chapter: 78,
+        chapter: 80,
         unlockType: 'boss',
         unlockAt: 'The Ex-Husband',
         icon: '🔒',
@@ -3030,11 +3104,11 @@ storyJournal: {
           { speaker: 'Joel', text: '"You do not," he agrees. "Finished does not require forgiven. It just requires done."' },
           { speaker: 'San', text: '"Done," you say, testing the word, and it fits better than you expected it to.' },
         ]
-      }
-,{
-        id: 'journal_079',
+      },
+      {
+        id: 'journal_081',
         title: 'The Roads Not Taken',
-        chapter: 79,
+        chapter: 81,
         unlockType: 'boss',
         unlockAt: 'The Village Ex',
         icon: '🛣️',
@@ -3054,11 +3128,11 @@ storyJournal: {
           { speaker: 'San', text: '"No," you agree, taking his hand. "But you are still in her life. That counts for something, even in increments."' },
           { speaker: 'Joel', text: '"It does," Joel says. "I am trying to let it be enough, instead of measuring it against everything it is not."' },
         ]
-      }
-,{
-        id: 'journal_080',
+      },
+      {
+        id: 'journal_082',
         title: 'What the Pandemic Took',
-        chapter: 80,
+        chapter: 82,
         unlockType: 'boss',
         unlockAt: 'The Brunei Ex',
         icon: '💊',
@@ -3080,11 +3154,11 @@ storyJournal: {
           { speaker: 'San', text: '"You can still thank him," you say gently. "Just not to his face anymore."' },
           { speaker: 'Joel', text: '"I know," Joel says, and something in his voice suggests he already does, often, quietly, in ways he has never described out loud until just now.' },
         ]
-      }
-,{
-        id: 'journal_081',
+      },
+      {
+        id: 'journal_083',
         title: 'Loyalty and Its Cost',
-        chapter: 81,
+        chapter: 83,
         unlockType: 'boss',
         unlockAt: 'The Stepfather',
         icon: '⚖️',
@@ -3104,11 +3178,11 @@ storyJournal: {
           { speaker: 'Joel', text: '"He is not going anywhere," Joel says afterward, matter-of-fact. "Neither am I. I think that is just what this is going to keep being. Family, the complicated kind, where you get frustrated and you still show up."' },
           { speaker: 'San', text: '"That sounds exactly like family to me," you say, and he laughs, a little tired, a little fond, entirely real.' },
         ]
-      }
-,{
-        id: 'journal_082',
+      },
+      {
+        id: 'journal_084',
         title: 'What Was Never Meant to Be Fought',
-        chapter: 82,
+        chapter: 84,
         unlockType: 'level',
         unlockAt: 70,
         icon: '🕊️',
@@ -3118,7 +3192,7 @@ storyJournal: {
           { speaker: 'San', text: '"You said his name back there," you say gently, that evening. "In the last fight. That you never got to thank him properly."' },
           { speaker: 'Joel', text: 'He is quiet a long moment, turning something over that has clearly been sitting unturned for a while. "He let me stay the whole pandemic. Never once asked when I was leaving, even when I am sure the house was smaller for it. Never once made me feel like a burden, even during the worst of the drinking."' },
           { speaker: 'San', text: '"How did he go," you ask, carefully, giving him every opportunity to not answer if he is not ready.' },
-          { speaker: 'Joel', text: '"Quietly," Joel says. "That is the part I am still not over. He was sick for longer than any of us knew. Hid it well enough that I found out the same week I left to work at SKH — like his body waited until I finally had somewhere to be, before it let go of holding on."' },
+          { speaker: 'Joel', text: '"Quietly," Joel says. "That is the part I am still not over. He was sick for longer than any of us knew. Hid it well enough that I found out the same week I left to work at SK* — like his body waited until I finally had somewhere to be, before it let go of holding on."' },
           { speaker: 'Narrator', text: 'You do not say anything to fill the silence. You have learned, with him, that some silences are not gaps to be closed, just space someone needs in order to keep going.' },
           { speaker: 'Joel', text: '"I keep thinking there should have been a sign," he says eventually. "Something I missed because I was too busy being grateful he let me stay, instead of actually looking at him. I do not know if that guilt is fair. I carry it anyway."' },
           { speaker: 'San', text: '"Grief rarely asks permission to be fair," you say quietly. "I do not think you missed anything, Joel. I think some people are just very good at carrying things alone, and he sounds like he had a lot of practice."' },
@@ -3134,11 +3208,11 @@ storyJournal: {
           { speaker: 'Joel', text: '"Showing up anyway," Joel says, echoing something he told the stepfather\'s wraith without seeming to notice he is repeating it. "Even complicated. Even unfinished. I think that might just be what family actually is, San, the parts that never quite resolve, and you keep showing up for them regardless."' },
           { speaker: 'Narrator', text: 'You reach for his hand, and he takes it, and for once neither of you feels the need to fill the quiet that follows with anything else at all.' },
         ]
-      }
-,{
-        id: 'journal_083',
+      },
+      {
+        id: 'journal_085',
         title: 'The Present, Whatever It Holds',
-        chapter: 83,
+        chapter: 85,
         unlockType: 'level',
         unlockAt: 71,
         icon: '🌅',
@@ -3160,11 +3234,11 @@ storyJournal: {
           { speaker: 'San', text: '"The present," you agree. "Whatever it turns out to actually hold."' },
           { speaker: 'Narrator', text: 'You do not know yet what comes next — only that for the first time since any of this began, neither of you is bracing for it to be another piece of the past, disguised as something new. It is simply what happens next. And for once, that is allowed to be enough.' },
         ]
-      }
-,{
-        id: 'journal_084',
+      },
+      {
+        id: 'journal_086',
         title: 'The Retainer\'s Hollow',
-        chapter: 84,
+        chapter: 86,
         unlockType: 'boss',
         unlockAt: 'Robin C.',
         icon: '📋',
@@ -3190,11 +3264,11 @@ storyJournal: {
           { speaker: 'Joel', text: '"Just a number," Joel agrees, taking your hand. "Ready?"' },
           { speaker: 'San', text: '"Ready," you say, and walk away from the Hollow without looking back at it even once.' },
         ]
-      }
-,{
-        id: 'journal_085',
+      },
+      {
+        id: 'journal_087',
         title: 'The Treeline Detail',
-        chapter: 85,
+        chapter: 87,
         unlockType: 'boss',
         unlockAt: 'Jeff, the SK* Son-in-Law',
         icon: '🌲',
@@ -3221,11 +3295,11 @@ storyJournal: {
           { speaker: 'Joel', text: '"Lighter," Joel says, testing the word. "Not because I hurt him. Because I finally said it to his face, and it turns out I did not need him to agree with any of it for it to still be true."' },
           { speaker: 'Narrator', text: 'You leave the Treeline Detail behind, floodlights still humming uselessly into the daylight, and neither of you looks back at it even once on the way out.' },
         ]
-      }
-,{
-        id: 'journal_086',
+      },
+      {
+        id: 'journal_088',
         title: 'What You Have to Resolve Yourself',
-        chapter: 86,
+        chapter: 88,
         unlockType: 'level',
         unlockAt: 65,
         icon: '🗝️',
@@ -3252,38 +3326,11 @@ storyJournal: {
           { speaker: 'San', text: '"And now," you say, looking out at whatever comes next, road and Vale and everything still unmapped past it, "we\'ve got a journey of our own."' },
           { speaker: 'Joel', text: '"We do," Joel says, taking your hand. "Let\'s go see what it actually holds."' },
         ]
-      }
-,{
-        id: 'journal_087',
-        title: 'Proof of Where You Were Standing',
-        chapter: 87,
-        unlockType: 'level',
-        unlockAt: 41,
-        icon: '🦋',
-        summary: 'San finally says out loud that she once believed her own isolation at Robin\'s firm was her own fault — and finds, in the sheer number of real colleagues who made it through with her, proof that it never was.',
-        scenes: [
-          { speaker: 'Narrator', text: 'It is Mimi who finally makes you say it out loud — not by asking, just by being exactly as warm and unbothered to see you as she always used to be, like no time at all had passed since the last time she leaned over your desk with something she was not supposed to know yet.' },
-          { speaker: 'San', text: '"I used to think it was me," you say, quiet, watching her across the fire. "At Robin\'s office. The distance. I told myself if people were cold, or careful around me, it was because I had pulled away first. That I had made myself difficult to be close to, and the prejudice was just people responding to that, fairly, in their own way."' },
-          { speaker: 'Mimi', text: '"That was never fair," Mimi says, gentle but certain, no hesitation in it at all. "You were surviving something. People built like Robin\'s office do not usually earn the benefit of the doubt just because they finally get the withdrawal they trained into someone."' },
-          { speaker: 'San', text: '"I know that now," you say. "I did not always. I spent a long time believing I had caused my own isolation, like it was some character flaw instead of the only reasonable response to how I was actually being treated."' },
-          { speaker: 'Narrator', text: 'You think of the specific shape that isolation took — not dramatic, never dramatic, just a slow retreat into yourself that felt, at the time, like the only room left where you were still allowed to exist without being assessed for it.' },
-          { speaker: 'San', text: '"I did not expect any of you to be here," you admit. "Not really. I hoped, the way you hope about anything you have already lost. But hoping and expecting are different things."' },
-          { speaker: 'Aisy', text: 'Aisy appears the way she always does, unhurried, like she was standing there the whole time and simply waited for the right moment to be noticed. "Lewis is two zones over," she says. "Jonathan too. Zul still does the same job, more or less, just with worse roads. Jorvin never really stopped being Jorvin."' },
-          { speaker: 'San', text: '"The whole department," you say slowly, the shape of it only now fully landing. "Not one or two of you. All of it. Whatever brought people through, it did not just save me a handful of strangers. It saved me the actual people."' },
-          { speaker: 'Mimi', text: '"We looked out for you back then too," Mimi says. "Quietly, mostly. You did not always let it land, and that was alright — you had enough coming at you already without needing to also perform being grateful for the small things. We knew. We are not surprised you did not always see it."' },
-          { speaker: 'San', text: '"I see it now," you say, and mean it completely. "I do not think I understood, until right now, how much I had convinced myself that Robin\'s office was the honest version of how people actually treat each other, and this" — you gesture at all of them, the fire, the whole unlikely gathering — "was the exception. It was never the exception. It was just further away."' },
-          { speaker: 'Narrator', text: 'You think of Amad too, the specific ache of one person you have not fully gotten back — the food he used to bring right to your floor, and the months before the world even ended when he simply stopped, for reasons you never learned and still cannot quite bring yourself to ask him about directly.' },
-          { speaker: 'San', text: '"Amad is out here too," you say, quieter. "I have not asked him why he stopped coming, before everything. I do not know if I ever will. Some things I think I am allowed to just not need the answer to."' },
-          { speaker: 'Aisy', text: '"That is allowed," Aisy agrees. "Not every gap needs closing to still be survivable."' },
-          { speaker: 'Narrator', text: 'You sit with all of them a while, the fire, the unlikely reunion of an entire department scattered across a broken world and somehow, mostly, found again — and understand, finally, completely, that the isolation was never proof of anything true about you. It was only ever proof of where you had been standing.' },
-          { speaker: 'San', text: '"Thank you," you say, to all of them, plainly. "For being exactly who you already were. I do not think I ever properly said that, back when it mattered just as much."' },
-          { speaker: 'Mimi', text: '"You can say it now," Mimi says, warm. "We are not in a hurry anywhere. We have got time."' },
-        ]
-      }
-,{
-        id: 'journal_088',
+      },
+      {
+        id: 'journal_089',
         title: 'What Soel Remembers',
-        chapter: 88,
+        chapter: 89,
         unlockType: 'level',
         unlockAt: 45,
         icon: '❄️',
@@ -3297,11 +3344,11 @@ storyJournal: {
           { speaker: 'Joel', text: '"I think he does remember," Joel says quietly. "I think that is exactly the problem."' },
           { speaker: 'San', text: '"Then let\'s go find out what he is trying to tell us," you say, and Soel is already moving before you finish the sentence, tail high, certain of the direction in a way he has not been certain of anything in days.' },
         ]
-      }
-,{
-        id: 'journal_089',
+      },
+      {
+        id: 'journal_090',
         title: 'The Warmth That Waited',
-        chapter: 89,
+        chapter: 90,
         unlockType: 'level',
         unlockAt: 46,
         icon: '🐾',
@@ -3317,11 +3364,11 @@ storyJournal: {
           { speaker: '???', text: '"I have told myself that," the echo admits. "Some days I even believe it. Most days I just remember the warmth, and wonder if it counted for anything at all, in the end."' },
           { speaker: 'Narrator', text: 'Soel presses close against the base of the throne, small and warm and entirely present, the exact opposite of everything this echo is describing — and something about that specific contrast seems to be the actual point of all of it.' },
         ]
-      }
-,{
-        id: 'journal_090',
+      },
+      {
+        id: 'journal_091',
         title: 'What the Cold Never Took',
-        chapter: 90,
+        chapter: 91,
         unlockType: 'level',
         unlockAt: 47,
         icon: '🔥',
@@ -3340,11 +3387,11 @@ storyJournal: {
           { speaker: 'San', text: '"He chose you completely," you say, answering for him, watching the same certainty in Soel that has never once wavered since the day Joel found him in the rain. "That is the whole difference. He is not waiting to see if you will let him in. You already did. Every day, since the very beginning."' },
           { speaker: 'Joel', text: '"I know," Joel says, quiet, holding them both a little closer. "I am just glad I get to keep proving it. Every single day, for as long as he\'ll have me."' },
         ]
-      }
-,{
-        id: 'journal_091',
+      },
+      {
+        id: 'journal_092',
         title: 'Not Recovering. Beginning.',
-        chapter: 91,
+        chapter: 92,
         unlockType: 'level',
         unlockAt: 95,
         icon: '🌅',
@@ -3366,11 +3413,11 @@ storyJournal: {
           { speaker: 'San', text: '"Whatever is out there," you say, looking past the edge of everything mapped, everything survived, everything finally, properly finished, "let\'s go find out. Not because we have to. Just because we get to."' },
           { speaker: 'Narrator', text: 'You step past the edge together, into the first genuinely unwritten thing either of you has ever walked toward on purpose — and it does not feel like an ending, or even a continuation. It feels, simply, like a beginning, exactly as overdue as it is real.' },
         ]
-      }
-,{
-        id: 'journal_092',
+      },
+      {
+        id: 'journal_093',
         title: 'What Nothing Kindles',
-        chapter: 92,
+        chapter: 93,
         unlockType: 'level',
         unlockAt: 96,
         icon: '🌫️',
@@ -3385,38 +3432,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'You feel something enormous settle into a shape you can finally hold — not a war to win and be done with, but a practice, ongoing, the same unglamorous, essential thing every real kind of care has always required.' },
           { speaker: 'San', text: '"Let\'s go kindle something, then," you say, and mean it as completely as you have ever meant anything, stepping forward into ground that has forgotten how to hold itself together, entirely on purpose, for the first time in your life not because you have to, but because you get to."' },
         ]
-      }
-,{
-        id: 'journal_093',
-        title: 'Never Really a Loan',
-        chapter: 93,
-        unlockType: 'level',
-        unlockAt: 50,
-        icon: '🪙',
-        summary: 'San and Joel trade stories of quiet generosity and quiet debt — the customer, the friend, the boyfriend allowances, the dread of payday — and find real relief in realizing Aethon never asked either of them to keep score.',
-        scenes: [
-          { speaker: 'Narrator', text: 'It comes up sideways, the way most real conversations do — not planned, just surfacing while you are both doing something else entirely, mending gear by firelight.' },
-          { speaker: 'Joel', text: '"You do this a lot," Joel says, watching you set aside coin for someone at camp who clearly needed it more than either of you did. "Help people. Quietly. Like it does not occur to you not to."' },
-          { speaker: 'San', text: '"I have always been like that," you say, not quite denying it, more turning it over. "There was a customer once, back when I still worked the counter, before the firm. She was mute. Needed her sister with her every time, just to actually talk to me, to make herself understood at all."' },
-          { speaker: 'San', text: '"She owed eighteen dollars, in the end. Never paid it. Their father had taken the money meant for it and put it into car repairs instead. I could have chased it. I did not. Eighteen dollars was never going to fix whatever was actually wrong in that house."' },
-          { speaker: 'Joel', text: '"You just let it go," Joel says, not a question, more confirming something he already suspected about you.' },
-          { speaker: 'San', text: '"I let a lot of things go, over the years," you admit. "There was a closer friend too. Someone I relied on for rides, actually — I paid her for the transport, and when she needed help back, I gave it without really thinking twice. She was broke. Could not find work, no matter how hard she tried. It got critical for her, the kind of critical where you stop pretending you can handle it alone."' },
-          { speaker: 'San', text: '"And then her husband got held, for something criminal. A mistake, the kind he regretted the second it was already done and too late to undo. I do not know if that makes it better or worse. I just knew she needed someone steady while it was happening, and I could be that, so I was."' },
-          { speaker: 'Joel', text: 'He is quiet a moment, something working behind his eyes. "You did the same thing for me," he says. "I do not think I ever properly said that back to you."' },
-          { speaker: 'San', text: '"You mean the money," you say, gentle, already knowing exactly which part he means.' },
-          { speaker: 'Joel', text: '"The three thousand," Joel says. "From Robin\'s payout. Getting my stepfather to Brunei, the deposits, the debts that were already sitting there before he even arrived. I do not think I ever would have managed it without you."' },
-          { speaker: 'San', text: '"I gave you boyfriend allowances too, back when I was still at the firm," you say, something fond and a little wry creeping into it. "When the salary was bigger, when the bonuses landed. Not because you asked. Because you mattered, and I could, and those two things together always felt like reason enough."' },
-          { speaker: 'Joel', text: '"I remember," Joel says quietly. "I remember exactly how much it helped, and exactly how much I did not know how to say thank you for it properly at the time."' },
-          { speaker: 'San', text: '"I wrote it off," you tell him, plainly. "Not just the number. The whole idea of it being a debt at all. You proved who you actually were, over and over, long before I ever needed the proof. That settled it for me. It was never really a loan to begin with, if I am honest. I just did not have the right word for what it actually was yet."' },
-          { speaker: 'Narrator', text: 'He reaches for your hand, quiet, and you let him hold it while the fire does the rest of the talking for a while.' },
-          { speaker: 'Joel', text: '"I used to dread payday," Joel admits eventually, something raw surfacing in it. "Every single time. The debts were always bigger than whatever landed in the account. I do not think I was ever once excited to get paid, not really, not the whole time I worked there. I just felt broke, permanently, no matter how much came in."' },
-          { speaker: 'San', text: '"I know that feeling," you say. "Different shape, same weight. Watching money arrive and already knowing exactly which parts of it were never really yours to keep."' },
-          { speaker: 'Joel', text: '"We do not have to think about any of that here," Joel says, like he is only now fully letting himself believe it. "No debts. No dread on payday. No math I have to do before I am even allowed to feel relieved about anything."' },
-          { speaker: 'San', text: '"No," you agree, quiet, something settling in your chest that has been unsettled for as long as you can remember. "Whatever else Aethon has cost either of us, it did not cost us that. For the first time in longer than I can measure, help just gets to be help. Not a debt either of us is quietly keeping score of."' },
-          { speaker: 'Joel', text: '"Good," Joel says simply, and pulls you a little closer against the cold. "I would like to keep it that way."' },
-        ]
-      }
-,{
+      },
+      {
         id: 'journal_094',
         title: 'What the Line Never Had',
         chapter: 94,
@@ -3440,8 +3457,8 @@ storyJournal: {
           { speaker: 'Joel', text: '"Then that is what we do from here," Joel says, certain in a way that settles something in your own chest too. "Wherever the next line is. We do not let anything hold it by itself again, not if we can help it."' },
           { speaker: 'Narrator', text: 'You look out at whatever comes next, unmapped, uncertain, and understand — clearly, for the first time since any of this began — that the actual fight was never going to be won by strength alone. It was always going to be won by refusing to let anything hold a line by itself.' },
         ]
-      }
-,{
+      },
+      {
         id: 'journal_095',
         title: 'Before It Gets That Bad',
         chapter: 95,
@@ -3465,52 +3482,33 @@ storyJournal: {
           { speaker: 'Joel', text: '"Where next, then?" Joel asks, already looking past this line toward whatever comes after it.' },
           { speaker: 'San', text: '"Wherever else is still holding," you say, certain, already moving. "We just have to keep going looking."' },
         ]
-      }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-,{
-        id: 'journal_070',
-        title: 'Forever and Ever',
-        chapter: 70,
+      },
+      {
+        id: 'journal_096',
+        title: 'Not the Exception',
+        chapter: 96,
         unlockType: 'level',
-        unlockAt: 58,
-        icon: '🌙',
-        summary: 'The night before whatever comes next, San finds the one certainty this world has never once tried to take from her.',
+        unlockAt: 99,
+        icon: '👣',
+        summary: 'Tracks that are not theirs, a line already half-won by someone else entirely — San and Joel learn they were never the only ones who decided nothing gets to hold a line alone. The practice was always bigger than the two of them.',
         scenes: [
-          { speaker: 'Narrator', text: 'The camp is quiet by the time you finally sit still. Everyone else has drifted off to their own corners of the fire — Aisyah sharpening something that does not need sharpening, Soel curled against Joel\'s pack, the whole party breathing slow around you. Joel finds you last, the way he always does, like he waits on purpose so it is just the two of you by the time he arrives.' },
-          { speaker: 'Joel', text: '"These battles are endless," he says, quiet, not a complaint, just true. He sits close enough that his shoulder finds yours without either of you deciding it should. "But I am here with you. Forever and ever."' },
-          { speaker: 'Narrator', text: 'You do not answer with words. You close your eyes instead, and let yourself lean the rest of the way into him — into the steady weight of him, the warmth that has never once, not on the worst nights, felt like something you had to earn.' },
-          { speaker: 'Narrator', text: 'His hand finds your jaw, tilts your face up to his, careful the way he is careful with everything he has decided is worth protecting. You feel his breath before his mouth reaches yours — unhurried, like he has all the time in the world to get to you, like the endless battles outside this moment do not exist at all.' },
-          { speaker: 'Narrator', text: 'He holds you like something he has waited a long time to be allowed to hold. You kiss him back like someone who has finally stopped bracing for the ground to disappear. What follows, you keep — the warmth of him, the low sound of your own name in his voice, the fire burning down to embers while the rest of the world holds its breath and waits.' },
-          { speaker: 'Narrator', text: 'Later — much later, on the edge of sleep, his arm still around you — your mind does not go to tomorrow\'s fight. It has not, in a long time. It goes instead to the people you love, and the people who love you back, and the simple, ordinary miracle of all of them being safe, tonight, in whichever world happened to hold you.' },
-          { speaker: 'San', text: '"Forever and ever," you murmur back, half-asleep, and mean it the way you have only ever meant the truest things — without needing to prove it to anyone, least of all yourself.' },
-          { speaker: 'Narrator', text: 'The battles will keep coming. They always do. But that is a problem for the road ahead, not for tonight — and tonight, for once, is enough all on its own.' }
+          { speaker: 'Narrator', text: 'The tracks stop you before the fighting does. Boot prints that are not yours, worn into ground none of you have ever set foot on. A waterskin, half-full, tucked against a root like someone meant to come back for it. Something was already here.' },
+          { speaker: 'Joel', text: '"Someone beat us to it," Joel says, and there is no disappointment in his voice at all, just a kind of quiet astonishment.' },
+          { speaker: 'San', text: '"Someone else is doing this," you say slowly, the idea only now fully landing, bigger than you expected it to feel. "Not just us. Somewhere out here, completely separate from anything we know about, somebody else decided the exact same thing we did — that nothing gets to hold a line alone anymore."' },
+          { speaker: 'Narrator', text: 'Soel presses close to the waterskin, sniffing at it with an intensity that says more than any words could — recognition, maybe, or something closer to kinship.' },
+          { speaker: 'Joel', text: '"Do you think they know about Soel\'s line?" Joel asks. "The Kindling. Whatever it actually is, under all of it."' },
+          { speaker: 'San', text: '"I do not know," you admit. "I do not think it matters, honestly. Maybe they found their own reason. Maybe it does not need to be the same reason, to still be the same practice."' },
+          { speaker: 'Narrator', text: 'The fight, when it comes, is already half-won before you ever arrive — whatever this line was defending against has clearly already taken real damage, already been pushed back once by hands that were not yours.' },
+          { speaker: 'Joel', text: '"Almost enough," Joel says, mid-fight, something almost reverent in it. "Somebody almost finished this alone. We just get to be the ones who make sure almost turns into actually."' },
+          { speaker: 'Narrator', text: 'It does not take long, not compared to the others. Whoever came before you did real work here, and you are only ever finishing what they started, not carrying the whole weight yourselves.' },
+          { speaker: 'San', text: '"I do not know their names," you say afterward, looking at the waterskin, the worn ground, all of it. "I do not think I need to. I just needed to know they exist. That this was never something only the two of us happened to invent out of nowhere."' },
+          { speaker: 'Joel', text: '"It spread," Joel says, and the wonder in it is completely unguarded now. "However it started, wherever it actually began, it spread. Other people, other pairs, out there doing exactly this, for their own reasons, without ever needing our permission or our example."' },
+          { speaker: 'San', text: '"That changes something," you say slowly, working through the actual shape of it. "I thought we were the exception. San and Joel, and Soel\'s strange inheritance, doing something nobody else was doing. We are not the exception. We might just be one version of something a lot bigger than either of us realized."' },
+          { speaker: 'Narrator', text: 'You leave the waterskin exactly where you found it, refilled, a small and deliberate kindness for whoever left it there first, whenever they happen to pass this way again.' },
+          { speaker: 'Joel', text: '"Whoever you are," Joel says to the empty clearing, to no one, to everyone, "thank you for getting here first. We will keep going too."' },
+          { speaker: 'San', text: '"Wherever the next line is," you agree, "we are clearly not the only ones going looking for it. I think that might be the best thing we have learned out here yet."' },
         ]
       }
-
-
-
-
-
-
-
-
-
-
-
-
     ]
   },
 
@@ -3774,6 +3772,7 @@ storyJournal: {
   currentDialogue: null,
   ambushWarning: null,
   bestiary: {},
+  bestiaryExpanded: null,
   story: { active: true, chapter: 0, scene: 0, shown: false },
   storyChapters: [
     { title: 'The Rain and the Kitten', unlockLevel: 1, scenes: [
@@ -4903,6 +4902,9 @@ const ENEMY_REGISTRY = {
   'Testing Current': { template: 'striker', elem: 'void', zoneLv: 98 },
   'Patience-Eater': { template: 'balanced', elem: 'void', zoneLv: 98 },
   'Unmaking Vanguard': { template: 'tank', elem: 'void', zoneLv: 98 },
+  'Remnant Current': { template: 'striker', elem: 'void', zoneLv: 99 },
+  'Half-Won Vessel': { template: 'balanced', elem: 'void', zoneLv: 99 },
+  'Watching Sentinel': { template: 'tank', elem: 'void', zoneLv: 99 },
 
   // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
   'Closed Eye Acolyte': { template: 'striker', elem: 'void', zoneLv: 19 },
@@ -14697,6 +14699,14 @@ if (btnClaimLogin) {
   if(btnCombine)btnCombine.addEventListener('click',()=>{
     openCombineModal();
   });
+  // Bestiary glossary — tap an entry to expand/collapse its full record
+  document.querySelectorAll('.bestiary-entry').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const name = el.getAttribute('data-bname');
+      G.bestiaryExpanded = (G.bestiaryExpanded === name) ? null : name;
+      render();
+    });
+  });
   // Rune socket modal events
   document.querySelectorAll('.rune-select-btn').forEach(el=>{
     el.addEventListener('click',()=>{
@@ -15196,16 +15206,37 @@ function rBestiary(){
   if(entries.length===0){
     h+='<div style="text-align:center;padding:40px;color:var(--text-dim);">No creatures catalogued yet.<br>Defeat enemies to fill the bestiary.</div>';
   }else{
-    h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;">'+entries.length+' species discovered</div>';
+    h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;">'+entries.length+' species discovered \u2014 tap any entry for its full record</div>';
     h+='<div class="zlist">';
     for(let [name,data] of entries){
-      const elemIcon = data.elem==='fire'?'🔥':data.elem==='ice'?'❄️':data.elem==='lightning'?'⚡':data.elem==='void'?'🌑':'✦';
-      h+='<div class="zcard" style="cursor:default;">';
-      h+='<div class="zh"><span class="zn">'+ee(name)+' '+name+'</span><span class="zl">'+data.kills+' kills</span></div>';
+      const elemIcon = data.elem==='fire'?'🔥':data.elem==='ice'?'❄️':data.elem==='lightning'?'⚡':data.elem==='void'?'🌑':data.elem==='poison'?'☠️':'✦';
+      const bossEntry = G.bosses.find(b => b.n === name);
+      const isExpanded = G.bestiaryExpanded === name;
+      h+='<div class="zcard bestiary-entry" data-bname="'+name.replace(/"/g,'&quot;')+'" style="cursor:pointer;'+(bossEntry?'border-color:var(--gold);':'')+'">';
+      h+='<div class="zh"><span class="zn">'+ee(name)+' '+name+(bossEntry?' <span style="color:var(--gold);font-size:10px;">★ BOSS</span>':'')+'</span><span class="zl">'+data.kills+' kills</span></div>';
       h+='<div style="display:flex;gap:12px;font-size:12px;color:var(--text-dim);margin-top:6px;">';
       h+='<span>HP: '+data.mhp+'</span><span>ATK: '+data.atk+'</span><span>DEF: '+data.def+'</span><span>'+elemIcon+' '+data.elem+'</span>';
       h+='</div>';
       h+='<div style="font-size:10px;color:var(--disabled);margin-top:4px;">First seen: '+new Date(data.firstSeen).toLocaleDateString()+'</div>';
+      if(isExpanded){
+        h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;line-height:1.6;color:var(--text);">';
+        if(bossEntry){
+          h+='<div style="font-style:italic;margin-bottom:8px;">'+bossEntry.desc+'</div>';
+          if(bossEntry.mechanic){
+            const mechList = Array.isArray(bossEntry.mechanic) ? bossEntry.mechanic.join(', ') : bossEntry.mechanic;
+            h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:6px;">Combat pattern: '+mechList+'</div>';
+          }
+          if(data.kills > 0 && bossEntry.defeatLine){
+            h+='<div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);color:var(--gold);font-size:11px;"><b>On defeat:</b> '+bossEntry.defeatLine+'</div>';
+          }
+        } else {
+          const archetype = typeof getEnemyArchetype === 'function' ? getEnemyArchetype(name) : null;
+          const archFlavor = archetype ? ('A creature of the ' + archetype + ' archetype') : 'A creature';
+          const elemFlavor = data.elem && data.elem !== 'none' ? (', aligned with ' + data.elem) : '';
+          h+='<div style="color:var(--text-dim);">'+archFlavor+elemFlavor+'. No individual record exists for this one \u2014 not every name that appears in the Vale gets its story told, but every one of them is real.</div>';
+        }
+        h+='</div>';
+      }
       h+='</div>';
     }
     h+='</div>';
