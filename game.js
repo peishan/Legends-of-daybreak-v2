@@ -3376,6 +3376,37 @@ storyJournal: {
           { speaker: 'San', text: '"Let\'s go kindle something, then," you say, and mean it as completely as you have ever meant anything, stepping forward into ground that has forgotten how to hold itself together, entirely on purpose, for the first time in your life not because you have to, but because you get to."' },
         ]
       }
+,{
+        id: 'journal_093',
+        title: 'Never Really a Loan',
+        chapter: 93,
+        unlockType: 'level',
+        unlockAt: 50,
+        icon: '🪙',
+        summary: 'San and Joel trade stories of quiet generosity and quiet debt — the customer, the friend, the boyfriend allowances, the dread of payday — and find real relief in realizing Aethon never asked either of them to keep score.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It comes up sideways, the way most real conversations do — not planned, just surfacing while you are both doing something else entirely, mending gear by firelight.' },
+          { speaker: 'Joel', text: '"You do this a lot," Joel says, watching you set aside coin for someone at camp who clearly needed it more than either of you did. "Help people. Quietly. Like it does not occur to you not to."' },
+          { speaker: 'San', text: '"I have always been like that," you say, not quite denying it, more turning it over. "There was a customer once, back when I still worked the counter, before the firm. She was mute. Needed her sister with her every time, just to actually talk to me, to make herself understood at all."' },
+          { speaker: 'San', text: '"She owed eighteen dollars, in the end. Never paid it. Their father had taken the money meant for it and put it into car repairs instead. I could have chased it. I did not. Eighteen dollars was never going to fix whatever was actually wrong in that house."' },
+          { speaker: 'Joel', text: '"You just let it go," Joel says, not a question, more confirming something he already suspected about you.' },
+          { speaker: 'San', text: '"I let a lot of things go, over the years," you admit. "There was a closer friend too. Someone I relied on for rides, actually — I paid her for the transport, and when she needed help back, I gave it without really thinking twice. She was broke. Could not find work, no matter how hard she tried. It got critical for her, the kind of critical where you stop pretending you can handle it alone."' },
+          { speaker: 'San', text: '"And then her husband got held, for something criminal. A mistake, the kind he regretted the second it was already done and too late to undo. I do not know if that makes it better or worse. I just knew she needed someone steady while it was happening, and I could be that, so I was."' },
+          { speaker: 'Joel', text: 'He is quiet a moment, something working behind his eyes. "You did the same thing for me," he says. "I do not think I ever properly said that back to you."' },
+          { speaker: 'San', text: '"You mean the money," you say, gentle, already knowing exactly which part he means.' },
+          { speaker: 'Joel', text: '"The three thousand," Joel says. "From Robin\'s payout. Getting my stepfather to Brunei, the deposits, the debts that were already sitting there before he even arrived. I do not think I ever would have managed it without you."' },
+          { speaker: 'San', text: '"I gave you boyfriend allowances too, back when I was still at the firm," you say, something fond and a little wry creeping into it. "When the salary was bigger, when the bonuses landed. Not because you asked. Because you mattered, and I could, and those two things together always felt like reason enough."' },
+          { speaker: 'Joel', text: '"I remember," Joel says quietly. "I remember exactly how much it helped, and exactly how much I did not know how to say thank you for it properly at the time."' },
+          { speaker: 'San', text: '"I wrote it off," you tell him, plainly. "Not just the number. The whole idea of it being a debt at all. You proved who you actually were, over and over, long before I ever needed the proof. That settled it for me. It was never really a loan to begin with, if I am honest. I just did not have the right word for what it actually was yet."' },
+          { speaker: 'Narrator', text: 'He reaches for your hand, quiet, and you let him hold it while the fire does the rest of the talking for a while.' },
+          { speaker: 'Joel', text: '"I used to dread payday," Joel admits eventually, something raw surfacing in it. "Every single time. The debts were always bigger than whatever landed in the account. I do not think I was ever once excited to get paid, not really, not the whole time I worked there. I just felt broke, permanently, no matter how much came in."' },
+          { speaker: 'San', text: '"I know that feeling," you say. "Different shape, same weight. Watching money arrive and already knowing exactly which parts of it were never really yours to keep."' },
+          { speaker: 'Joel', text: '"We do not have to think about any of that here," Joel says, like he is only now fully letting himself believe it. "No debts. No dread on payday. No math I have to do before I am even allowed to feel relieved about anything."' },
+          { speaker: 'San', text: '"No," you agree, quiet, something settling in your chest that has been unsettled for as long as you can remember. "Whatever else Aethon has cost either of us, it did not cost us that. For the first time in longer than I can measure, help just gets to be help. Not a debt either of us is quietly keeping score of."' },
+          { speaker: 'Joel', text: '"Good," Joel says simply, and pulls you a little closer against the cold. "I would like to keep it that way."' },
+        ]
+      }
+
 
 
 
