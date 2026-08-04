@@ -4839,6 +4839,9 @@ const ENEMY_REGISTRY = {
   'Robin C.': { template: 'elite', elem: 'none', zoneLv: 60 },
   'The Sunreach Elder': { template: 'elite', elem: 'poison', zoneLv: 75 },
   'The Verdant Heart': { template: 'elite', elem: 'poison', zoneLv: 95 },
+  'Overtime Wraith': { template: 'striker', elem: 'poison', zoneLv: 82 },
+  'Off-Day Enforcer': { template: 'balanced', elem: 'poison', zoneLv: 82 },
+  'Loading Dock Sentinel': { template: 'tank', elem: 'poison', zoneLv: 82 },
 };
 
 
