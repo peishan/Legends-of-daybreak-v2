@@ -647,8 +647,8 @@ const G = {
     { id: 67, n: 'The Last Vigil', d: 'Defeat The Last Vigil and let the guardian finally stand down', t: 'boss_specific', target: 'The Last Vigil', c: 0, need: 1, rw: { xp: 19000, g: 12500, templeRep: 220 }, done: false, chain: 'verdant_choir', reqQuest: 66, hidden: true, revealed: false },
     { id: 68, n: 'What Sister Wren Knows', d: 'Reach Level 60 \u2014 Sister Wren recognizes what the ruins actually are, and what they could be again', t: 'reach_level', c: 0, need: 60, rw: { xp: 16000, g: 9500, templeRep: 180 }, done: false, chain: 'verdant_choir', reqQuest: 67, hidden: true, revealed: false },
     { id: 69, n: 'The Mended Sanctum, Restored', d: 'Complete the restoration of the Mended Sanctum', t: 'reach_level', c: 0, need: 62, rw: { xp: 24000, g: 16000, item: { n: 'Mendstone', t: 'mat', q: 1, r: 'legendary', d: 'Formed from the region\'s own healing, not mined from anything that was ever broken. It hums, faintly, like something still deciding what to grow into.' } }, done: false, chain: 'verdant_choir', reqQuest: 68, hidden: true, revealed: false, unlockRestSite: 'mended_sanctum' },
-    { id: 70, n: 'The Treeline Detail', d: 'Defeat Jeff, the SK* Son-in-Law, and give the Treeline Detail its first real day off', t: 'boss_specific', target: 'Jeff, the SK* Son-in-Law', c: 0, need: 1, rw: { xp: 55000, g: 40000 }, done: false },
-    { id: 71, n: "The Retainer's Hollow", d: 'Defeat Robin C. and let nine years finally, actually end', t: 'boss_specific', target: 'Robin C.', c: 0, need: 1, rw: { xp: 58000, g: 42000 }, done: false },
+    { id: 70, n: "The Retainer's Hollow", d: 'Defeat Robin C. and let nine years finally, actually end', t: 'boss_specific', target: 'Robin C.', c: 0, need: 1, rw: { xp: 58000, g: 42000 }, done: false },
+    { id: 71, n: 'The Treeline Detail', d: 'Defeat Jeff, the SK* Son-in-Law, and give the Treeline Detail its first real day off', t: 'boss_specific', target: 'Jeff, the SK* Son-in-Law', c: 0, need: 1, rw: { xp: 55000, g: 40000 }, done: false },
     { id: 72, n: 'What Soel Remembers', d: 'Reach Level 45 \u2014 follow Soel toward Frostspire Ruins, wherever he is actually trying to lead you', t: 'reach_level', c: 0, need: 45, rw: { xp: 12000, g: 7500 }, done: false, chain: 'kindling_line', hidden: true, revealed: true },
     { id: 73, n: 'The Warmth That Waited', d: 'Find the frost-throne and learn who waits there', t: 'reach_level', c: 0, need: 46, rw: { xp: 15000, g: 9000 }, done: false, chain: 'kindling_line', reqQuest: 72, hidden: true, revealed: false },
     { id: 74, n: 'What the Cold Never Took', d: 'Give the Kindling who came before Soel the peace it never let itself have', t: 'reach_level', c: 0, need: 47, rw: { xp: 20000, g: 13000, item: { n: 'Starlight Tear', t: 'mat', q: 1, r: 'epic', d: 'Cold to the touch and warm at the center, all at once \u2014 the specific, contradictory shape of a bond that mattered even though it did not survive.' } }, done: false, chain: 'kindling_line', reqQuest: 73, hidden: true, revealed: false },
@@ -1748,6 +1748,10 @@ storyJournal: {
           { speaker: 'Narrator', text: "Some magic, unnamed and unasked-for, has reached backward and pulled youth from wherever youth goes when it is spent, and given it back to the two of you specifically — the breadwinner and the steadfast man, the two who gave the most and rested the least. It is not a gift. It does not feel like a gift yet. It feels like falling." },
           { speaker: 'Narrator', text: "And then the falling stops. Not gently — it simply stops, like a held breath, like a clock with its hands snapped off. You are young again, and you are staying that way. Whatever is happening to time in this place, it has decided you are finished changing." },
           { speaker: 'Soel', text: 'Soel does not fall. Soel does not shift. He was already outside of aging — spirit-flame, reformed, never quite bound to years the way flesh is. He climbs into your lap anyway, the way he always has, the only steady thing in a moment that has none.' },
+          { speaker: 'Narrator', text: 'And then, as suddenly as she vanished somewhere on the road behind you — weeks ago now, gone between one camp and the next with no trace and no warning — Aisyah is simply there again, solid and real and blinking against the same wrongness in the light that all of you are.' },
+          { speaker: 'Aisyah', text: '"Do not ask me where I was," Aisyah says, already steadying herself, already reaching for a blade out of pure habit before she has even finished taking in the scene. "I do not fully know myself. Wherever the tear reached, it reached me too. It just decided to give me back."' },
+          { speaker: 'San', text: '"Aisyah—" Your voice breaks on her name, weeks of quiet, unspoken fear collapsing all at once into the relief of her actually standing in front of you.' },
+          { speaker: 'Aisyah', text: '"I am here," she says, gripping your shoulder hard, grounding you both. "I am here. Whatever this is, we will work out the rest of it together. That part has not changed."' },
           { speaker: 'Narrator', text: 'The world around you keeps moving, though. You can feel it — a wrongness in the air, like time is still running everywhere except inside your own chest. You do not know yet what that means for the others. You do not know yet what it means for you. But the ground beneath you is not the ground you stood on a moment ago, and the sky above is the color of something that has already ended.' }
         ]
       },
@@ -1773,12 +1777,16 @@ storyJournal: {
         unlockType: 'boss',
         unlockAt: 'Scavenger King',
         icon: '🏮',
-        summary: "The market Aisyah built is gone. Someone else rules it now.",
+        summary: "The market Aisyah built is gone, ruled by someone who never learned what any of it was worth \u2014 but this time, San does not have to face the ruins of it alone.",
         scenes: [
           { speaker: 'Narrator', text: "Ashfall Market was Aisyah's — her routes, her prices, her particular genius for turning dried goods into something people would cross kingdoms for. What stands here now is looted down to the stalls' bones, ash settling over everything like snow that forgot how to melt." },
           { speaker: 'San', text: '"She would hate this," you say, and you mean it literally — Aisyah hated waste more than almost anything, hated seeing value go unrecognized. This place is nothing but unrecognized value, picked apart by someone who never learned to see what she saw.' },
-          { speaker: 'Narrator', text: 'The Scavenger King wears armor stitched from a dozen fallen traders — not Aisyah\'s armor, you note, with a relief that surprises you in its intensity. Wherever she is, whenever she is, she is not here. That has to mean something. You choose to believe it means she is still out there, still counting gold twice, still teaching someone the trade routes.' },
-          { speaker: 'Joel', text: '"We will find her," Joel says, and it is not a question, and you let yourself believe him, because believing him has never once been the wrong choice.' }
+          { speaker: 'Narrator', text: "Aisyah is not missing this time. She is standing right beside you, close enough that you do not have to imagine her reaction — you can just watch it happen, her jaw tightening at every overturned stall, every ledger left to rot in the open." },
+          { speaker: 'Aisyah', text: '"I built every one of these routes myself," she says, quiet, something old and proprietary in it. "Whoever did this never learned to see what any of it was actually worth. That is the real theft. Not the goods. The not-knowing."' },
+          { speaker: 'San', text: '"I was so afraid, while you were gone," you admit, the words arriving easier now that she is actually here to hear them. "I did not let myself think about what it would mean if you did not come back the way you did."' },
+          { speaker: 'Narrator', text: 'The Scavenger King wears armor stitched from a dozen fallen traders — not Aisyah\'s armor, and this time the relief of that does not have to be a private, silent thing. You can simply reach for her hand instead, and she lets you.' },
+          { speaker: 'Aisyah', text: '"You do not have to be afraid of that anymore," Aisyah says, steady. "I came back. Whatever pulled me out there and put me back here, it did not manage to keep me. That has to count for something."' },
+          { speaker: 'Joel', text: '"It counts for everything," Joel says, and none of you argue with him.' }
         ]
       },
       {
@@ -2586,7 +2594,7 @@ storyJournal: {
           { speaker: 'San', text: '"I could not breathe, some days, near the end of it. I felt trapped in something I could not fully explain to anyone, including myself."' },
           { speaker: 'San', text: '"I carried the guilt for two years after that. Missing my kids constantly. Still telling myself I loved him, because it was easier than the alternative."' },
           { speaker: 'San', text: '"Eventually I found the strength to actually walk away from it, real or not. I picked up other games, made real friends inside them, slowly filled the space he had been occupying with people who were actually there. Then I cut him off completely — treated the money and the time as a loss and stopped looking back. That was September 2024."' },
-          { speaker: 'San', text: '"I met Joel two months after that. November 2024. On an app called Litmatch, of all things." A small, genuine laugh, the first real one since you started this. "And it has been the best thing that has ever happened to me. I need you to hear that this was never a rebound, whatever it might have looked like from the outside given the timing. He grew into the best partner I have ever had. Responsible. Actually takes accountability out loud, the moment something goes wrong, instead of making me guess at it. And not once — not once — has he looked down at me for any of it. Not that relationship. Not the mistakes I made when I was younger and did not know better yet."' },
+          { speaker: 'San', text: '"I met you two months after that. November 2024. On an app called Litmatch, of all things." A small, genuine laugh, the first real one since you started this. "And it has been the best thing that has ever happened to me. I need you to hear that this was never a rebound, whatever it might have looked like from the outside given the timing. You grew into the best partner I have ever had. Responsible. Actually take accountability out loud, the moment something goes wrong, instead of making me guess at it. And not once — not once — have you looked down at me for any of it. Not that relationship. Not the mistakes I made when I was younger and did not know better yet."' },
           { speaker: 'Narrator', text: 'You have never said any of it out loud quite this plainly before, and something in your chest loosens slightly at finally hearing it exist outside your own head.' },
           { speaker: 'San', text: '"I have had a long time to think about why I stayed two years in something that confusing," you say. "And I do not think it was ever love, if I am finally honest about it. I think I just needed a reason not to go running back to my ex. Something else to point to, so I would not have to face how much I still, some days, wanted to go back to something familiar and terrible simply because it was familiar."' },
           { speaker: 'San', text: '"That is the actual thing that scares me most, looking back. Not whether he was lying. Whether I was."' },
@@ -3145,37 +3153,8 @@ storyJournal: {
       }
 ,{
         id: 'journal_084',
-        title: 'The Treeline Detail',
-        chapter: 84,
-        unlockType: 'boss',
-        unlockAt: 'Jeff, the SK* Son-in-Law',
-        icon: '🌲',
-        summary: 'Joel finally confronts the man who dismissed his pain as laziness and threatened his contract — and finds the closure was never going to depend on Jeff understanding any of it.',
-        scenes: [
-          { speaker: 'Narrator', text: 'The Treeline Detail looks exactly like every version of it Joel ever described — a loading dock that has no business being this far into the Vale, floodlights running on a generator nobody asked permission to install, brush cleared over and over by people who were never given a choice about it.' },
-          { speaker: 'Joel', text: 'He goes very still at the edge of the clearing, the specific stillness of a body that remembers a place before the mind has finished catching up. "This is it," he says. "Almost exactly. Down to the noise the generator makes."' },
-          { speaker: 'San', text: '"Do you want to turn back?" you ask, meaning it completely, no judgment folded into the offer.' },
-          { speaker: 'Joel', text: '"No," Joel says, and there is something steadier in his voice than you expected. "I have wanted this exact conversation for a long time. I just never thought I would actually get to have it."' },
-          { speaker: 'Narrator', text: 'Jeff, when he appears, looks almost bored — the same practiced indifference of a man who has never once had to consider that the people under him might eventually stop being under him.' },
-          { speaker: 'Jeff', text: '"Another one," he says, not even really looking at Joel yet. "Fine. There\'s brush past the treeline. Should\'ve been cleared yesterday."' },
-          { speaker: 'Joel', text: '"You do not recognize me," Joel says, and it is not quite a question.' },
-          { speaker: 'Jeff', text: 'Jeff looks at him properly for the first time, and something in his expression stays politely, genuinely blank. "Should I?"' },
-          { speaker: 'Narrator', text: 'You watch something in Joel absorb that blankness and, instead of breaking him further the way it might have once, seem to settle something instead — a confirmation of a suspicion he had clearly been carrying a long time.' },
-          { speaker: 'Joel', text: '"No," Joel says slowly. "I do not think you should. I do not think you ever once saw any of us clearly enough to remember a face. Just how much weight it could carry before it broke."' },
-          { speaker: 'Jeff', text: '"It\'s work," Jeff says, already bored again, already reaching for the next dismissal. "Everyone\'s replaceable. That\'s just how it works."' },
-          { speaker: 'Joel', text: '"It is," Joel agrees, quiet, and something in his tone makes even Jeff pause. "That is exactly the problem. You built an entire operation on nobody being able to afford to disagree with you. I could not, for a long time. I can now."' },
-          { speaker: 'Narrator', text: 'The fight is not cathartic in the way you half expected. Jeff does not rage or plead or even seem to fully register what is actually happening to him — he goes down the same way he ran the Detail, indifferent right up until indifference stops being an option.' },
-          { speaker: 'San', text: '"He does not even understand what this is," you say afterward, something between anger and pity in your voice.' },
-          { speaker: 'Joel', text: '"No," Joel agrees. "I do not think he ever will. I think I am finally alright with that being his problem instead of mine." He looks around the cleared brush, the floodlights, the whole ugly little operation. "The Detail gets a day off, at least. That is not nothing."' },
-          { speaker: 'San', text: '"It is not nothing," you agree. "How do you feel?"' },
-          { speaker: 'Joel', text: '"Lighter," Joel says, testing the word. "Not because I hurt him. Because I finally said it to his face, and it turns out I did not need him to understand it for it to still be true."' },
-          { speaker: 'Narrator', text: 'You leave the Treeline Detail behind, floodlights still humming uselessly into the daylight, and neither of you looks back at it even once on the way out.' },
-        ]
-      }
-,{
-        id: 'journal_085',
         title: 'The Retainer\'s Hollow',
-        chapter: 85,
+        chapter: 84,
         unlockType: 'boss',
         unlockAt: 'Robin C.',
         icon: '📋',
@@ -3200,6 +3179,35 @@ storyJournal: {
           { speaker: 'San', text: '"Nine years," you say, testing the number one more time, the way you have tested it so many times before. "Just a number now. Not a debt anymore."' },
           { speaker: 'Joel', text: '"Just a number," Joel agrees, taking your hand. "Ready?"' },
           { speaker: 'San', text: '"Ready," you say, and walk away from the Hollow without looking back at it even once.' },
+        ]
+      }
+,{
+        id: 'journal_085',
+        title: 'The Treeline Detail',
+        chapter: 85,
+        unlockType: 'boss',
+        unlockAt: 'Jeff, the SK* Son-in-Law',
+        icon: '🌲',
+        summary: 'Joel finally confronts the man who dismissed his pain as laziness and threatened his contract — and finds the closure was never going to depend on Jeff understanding any of it.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Treeline Detail looks exactly like every version of it Joel ever described — a loading dock that has no business being this far into the Vale, floodlights running on a generator nobody asked permission to install, brush cleared over and over by people who were never given a choice about it.' },
+          { speaker: 'Joel', text: 'He goes very still at the edge of the clearing, the specific stillness of a body that remembers a place before the mind has finished catching up. "This is it," he says. "Almost exactly. Down to the noise the generator makes."' },
+          { speaker: 'San', text: '"Do you want to turn back?" you ask, meaning it completely, no judgment folded into the offer.' },
+          { speaker: 'Joel', text: '"No," Joel says, and there is something steadier in his voice than you expected. "I have wanted this exact conversation for a long time. I just never thought I would actually get to have it."' },
+          { speaker: 'Narrator', text: 'Jeff, when he appears, looks almost bored — the same practiced indifference of a man who has never once had to consider that the people under him might eventually stop being under him.' },
+          { speaker: 'Jeff', text: '"Another one," he says, not even really looking at Joel yet. "Fine. There\'s brush past the treeline. Should\'ve been cleared yesterday."' },
+          { speaker: 'Joel', text: '"You do not recognize me," Joel says, and it is not quite a question.' },
+          { speaker: 'Jeff', text: 'Jeff looks at him properly for the first time, and something in his expression stays politely, genuinely blank. "Should I?"' },
+          { speaker: 'Narrator', text: 'You watch something in Joel absorb that blankness and, instead of breaking him further the way it might have once, seem to settle something instead — a confirmation of a suspicion he had clearly been carrying a long time.' },
+          { speaker: 'Joel', text: '"No," Joel says slowly. "I do not think you should. I do not think you ever once saw any of us clearly enough to remember a face. Just how much weight it could carry before it broke."' },
+          { speaker: 'Jeff', text: '"It\'s work," Jeff says, already bored again, already reaching for the next dismissal. "Everyone\'s replaceable. That\'s just how it works."' },
+          { speaker: 'Joel', text: '"It is," Joel agrees, quiet, and something in his tone makes even Jeff pause. "That is exactly the problem. You built an entire operation on nobody being able to afford to disagree with you. I could not, for a long time. I can now."' },
+          { speaker: 'Narrator', text: 'The fight is not cathartic in the way you half expected. Jeff does not rage or plead or even seem to fully register what is actually happening to him — he goes down the same way he ran the Detail, indifferent right up until indifference stops being an option.' },
+          { speaker: 'San', text: '"He does not even understand what this is," you say afterward, something between anger and pity in your voice.' },
+          { speaker: 'Joel', text: '"No," Joel agrees. "I do not think he ever will. I think I am finally alright with that being his problem instead of mine." He looks around the cleared brush, the floodlights, the whole ugly little operation. "The Detail gets a day off, at least. That is not nothing."' },
+          { speaker: 'San', text: '"It is not nothing," you agree. "How do you feel?"' },
+          { speaker: 'Joel', text: '"Lighter," Joel says, testing the word. "Not because I hurt him. Because I finally said it to his face, and it turns out I did not need him to understand it for it to still be true."' },
+          { speaker: 'Narrator', text: 'You leave the Treeline Detail behind, floodlights still humming uselessly into the daylight, and neither of you looks back at it even once on the way out.' },
         ]
       }
 ,{
