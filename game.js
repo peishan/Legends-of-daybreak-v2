@@ -13345,6 +13345,25 @@ function migrateContent(data) {
 // =========================
 
 
+// Debug/testing helper — resets a specific boss's journal chapter, quest, and bounty
+// back to their pre-defeat state, so the full reward flow can be re-tested from
+// scratch. Not exposed in any UI; call directly from the browser console, e.g.
+// resetBossContent('Robin C.') or resetBossContent('Jeff, the SK* Son-in-Law').
+function resetBossContent(bossName) {
+  const entry = G.storyJournal.entries.find(e => e.unlockType === 'boss' && e.unlockAt === bossName);
+  if (entry) {
+    G.storyJournal.unlocked = G.storyJournal.unlocked.filter(id => id !== entry.id);
+    G.storyJournal.read = G.storyJournal.read.filter(id => id !== entry.id);
+  }
+  const quest = G.quests.find(q => q.t === 'boss_specific' && q.target === bossName);
+  if (quest) { quest.done = false; quest.c = 0; }
+  const bounty = G.bounties.find(b => b.t === 'kill_specific' && b.target === bossName);
+  if (bounty) { bounty.done = false; bounty.c = 0; }
+  saveGame();
+  console.log('Reset complete for:', bossName, '— journal:', !!entry, '| quest:', !!quest, '| bounty:', !!bounty);
+  render();
+}
+
 function loadGame() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
