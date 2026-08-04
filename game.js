@@ -8731,13 +8731,16 @@ function trackBestiary(enemy) {
   if (!G.bestiary[enemy.n]) {
     G.bestiary[enemy.n] = {
       kills: 0,
-      firstSeen: Date.now(),
-      elem: enemy.elem || 'none',
-      mhp: enemy.mhp,
-      atk: enemy.atk,
-      def: enemy.def
+      firstSeen: Date.now()
     };
   }
+  // Always refresh stats to the current version, not just on first encounter —
+  // otherwise a later rebalance leaves the bestiary permanently showing whatever
+  // stats happened to be live the very first time this enemy was ever fought.
+  G.bestiary[enemy.n].elem = enemy.elem || 'none';
+  G.bestiary[enemy.n].mhp = enemy.mhp;
+  G.bestiary[enemy.n].atk = enemy.atk;
+  G.bestiary[enemy.n].def = enemy.def;
   G.bestiary[enemy.n].kills++;
   G.bestiary[enemy.n].lastSeen = Date.now();
 }
