@@ -484,6 +484,8 @@ const G = {
     { n: 'The Treeline Detail', lv: 82, elem: 'poison', d: "Another patch of green quietly ruined by something that has no business out here — a loading dock bolted onto the edge of the vale, floodlights running on a generator nobody asked permission to install. Past the treeline, the brush has clearly been cleared, over and over, by people who were never given a choice about it.", en: ['Overtime Wraith','Off-Day Enforcer','Loading Dock Sentinel'], loot: ['Clocked-In Badge', 'A Shift Nobody Chose', 'Treeline Splinter'], xp: 9000, g: 6400, dg: 'impossible' },
     { n: 'The Rootbound Sanctuary', lv: 95, elem: 'poison', d: 'Whatever is actually doing the mending out here, this is close to its source — roots thick as towers, growth old enough to have opinions about who is allowed to pass through. Healing this deep does not come free. Something this old does not let go of what it has grown around without a reason.', en: ['Root-Bound Elder','Sanctuary Keeper','Elderwood Sentinel'], loot: ['Heartwood Shard', 'What the Roots Kept', 'The First Bloom, Still Sealed'], xp: 12000, g: 8800, dg: 'impossible' },
     { n: 'The Thinning', lv: 96, elem: 'void', d: "Past the edge of everything mapped, the ground does not end so much as it stops fully agreeing to exist. Colors run thin here. Sound arrives a half-second late, or not at all. Nothing is dying, exactly — it is just quietly, steadily, being asked fewer and fewer questions by the world it used to belong to.", en: ['Fraying Wisp','Unwoven Stalker','Hollow Seam'], loot: ['A Thinning Thread', 'Something Barely Held', 'Proof It Can Be Pushed Back'], xp: 24000, g: 17000, dg: 'impossible' },
+    { n: 'The Held Line', lv: 97, elem: 'void', d: "Not abandoned like the rest of the Thinning — fought for. Scorch marks that are not scorch marks, ground that has clearly been defended, over and over, by something that never once had backup. The line is still holding. Barely. Whatever has been holding it has been doing this alone for longer than anything should have to.", en: ['Line-Breaker','Corrosion Vessel','Unmaking Sentinel'], loot: ['A Line Held Alone', 'Proof Someone Stayed', 'What the Solitary Carried'], xp: 30000, g: 21000, dg: 'impossible' },
+    { n: 'Where Others Still Hold', lv: 98, elem: 'void', d: "Found on purpose this time, not stumbled into — the party going looking specifically for ground that is still being defended alone. This one has not been fighting as long as the last. There is still time here. That is the entire difference this visit is trying to make.", en: ['Testing Current','Patience-Eater','Unmaking Vanguard'], loot: ['A Line Found in Time', 'Backup, Finally', 'Proof It Does Not Have to Wear Someone All the Way Down First'], xp: 33000, g: 23500, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -653,6 +655,8 @@ const G = {
     { id: 73, n: 'The Warmth That Waited', d: 'Find the frost-throne and learn who waits there', t: 'reach_level', c: 0, need: 46, rw: { xp: 15000, g: 9000 }, done: false, chain: 'kindling_line', reqQuest: 72, hidden: true, revealed: false },
     { id: 74, n: 'What the Cold Never Took', d: 'Give the Kindling who came before Soel the peace it never let itself have', t: 'reach_level', c: 0, need: 47, rw: { xp: 20000, g: 13000, item: { n: 'Starlight Tear', t: 'mat', q: 1, r: 'epic', d: 'Cold to the touch and warm at the center, all at once \u2014 the specific, contradictory shape of a bond that mattered even though it did not survive.' } }, done: false, chain: 'kindling_line', reqQuest: 73, hidden: true, revealed: false },
     { id: 75, n: 'The Thinning', d: 'Defeat The Unmade and prove the fraying can be pushed back', t: 'boss_specific', target: 'The Unmade', c: 0, need: 1, rw: { xp: 92000, g: 68000 }, done: false },
+    { id: 76, n: 'The Held Line', d: 'Defeat What Alone Becomes and make sure the line finally has backup', t: 'boss_specific', target: 'What Alone Becomes', c: 0, need: 1, rw: { xp: 108000, g: 80000 }, done: false },
+    { id: 77, n: 'Where Others Still Hold', d: 'Defeat Before It Wears Through and arrive while there is still time to matter', t: 'boss_specific', target: 'Before It Wears Through', c: 0, need: 1, rw: { xp: 118000, g: 87000 }, done: false },
 
   ],
 
@@ -1325,6 +1329,12 @@ const G = {
     { n: 'The Unmade', zone: 'The Thinning', hp: 195000, mhp: 195000, atk: 570, def: 345, xp: 92000, g: 68000,
       mechanic: 'cosmic',
       desc: "Not a creature so much as a direction things fall in, once nothing is left actively holding them together. It does not hate what has been mended any more than water hates a shore. It simply keeps going, the way anything untended eventually does, and it has never once needed to be angry to be dangerous." },
+    { n: 'What Alone Becomes', zone: 'The Held Line', hp: 230000, mhp: 230000, atk: 672, def: 407, xp: 108000, g: 80000,
+      mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 57500,
+      desc: "Something held this ground for longer than anything should have to hold anything alone. It is not clear anymore whether it remembers what it was defending, or who it was defending it for, or whether either of those things still exist. It just knows the line has not fallen yet, and some exhausted, structural part of it refuses to be the reason it finally does." },
+    { n: 'Before It Wears Through', zone: 'Where Others Still Hold', hp: 255000, mhp: 255000, atk: 705, def: 428, xp: 118000, g: 87000,
+      mechanic: 'phase', phases: 3, currentPhase: 1, phaseHp: 85000,
+      desc: "Younger than the last one, in whatever way something like this has an age at all — still certain, still fighting like certainty is going to be enough on its own. It has not yet reached the part where certainty stops mattering and only endurance is left. That part is still coming, unless someone actually arrives first." },
 
     // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
     // These are dedicated Temple-quest hunt targets, not tied to any zone's normal
@@ -3406,6 +3416,58 @@ storyJournal: {
           { speaker: 'Joel', text: '"Good," Joel says simply, and pulls you a little closer against the cold. "I would like to keep it that way."' },
         ]
       }
+,{
+        id: 'journal_094',
+        title: 'What the Line Never Had',
+        chapter: 94,
+        unlockType: 'level',
+        unlockAt: 97,
+        icon: '🛡️',
+        summary: 'San recognizes The Held Line for what it actually is — exactly what Soel\'s ancestor was, before it finally got to rest. The whole framework clicks into place: everywhere the Fraying wins is somewhere nothing had backup.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Held Line looks nothing like the rest of the Thinning. The rest of it has simply stopped agreeing to exist. This ground has clearly been fought for, over and over, by something that never once had anyone standing beside it while it did.' },
+          { speaker: 'San', text: '"This is different," you say slowly, taking in the scorch marks that are not scorch marks, the ground worn down in a very specific, defensive shape. "The Thinning just fades. This place was defended."' },
+          { speaker: 'Joel', text: '"By what?" Joel asks, already scanning the treeline out of old habit.' },
+          { speaker: 'Narrator', text: 'You do not get a clean answer, not yet — just the growing, uncomfortable understanding that whatever has been holding this ground has been doing it completely alone, for longer than anything reasonably should have to.' },
+          { speaker: 'San', text: '"Soel," you say slowly, looking down at him, something clicking into place. "This is what the ancestor was, is it not? Before we found it. Before it finally got to rest. Something exactly like this — still fighting, still holding, with absolutely no one there to share any of it."' },
+          { speaker: 'Narrator', text: 'Soel does not answer, obviously, but he presses close against your leg, unusually still, watching the treeline with an intensity that answers the question better than words could.' },
+          { speaker: 'Joel', text: '"That is the actual pattern, is it not," Joel says, working through it out loud. "Every place the Fraying has properly beaten is a place nothing was tending. Every place still holding, barely, is a place something refused to stop trying. And the ones closest to breaking are always the ones trying to do it completely by themselves."' },
+          { speaker: 'San', text: '"Kindling only works because it does not stay solitary," you say, the whole framework finally clicking into full focus. "Soel is not just warm. He is warm because he stayed, and because we let him. Whatever is holding this line never got that. It has just been surviving on its own, alone, for so long that surviving and actually living stopped being the same thing."' },
+          { speaker: 'Narrator', text: 'When the fight finally comes, it does not feel like fighting an enemy so much as it feels like finally, forcibly introducing something to the idea that it does not have to keep doing this by itself.' },
+          { speaker: 'Joel', text: '"We are not here to replace you," Joel says, mid-fight, to whatever is actually listening underneath all that exhausted, structural refusal to fall. "We are here because you should never have had to do this without backup in the first place."' },
+          { speaker: 'Narrator', text: 'When it finally stops, there is no dramatic collapse, no shattering — just something enormous and exhausted finally, properly exhaling, the way anything does when a weight it has carried completely alone finally gets to be shared, even just once, even this late.' },
+          { speaker: 'San', text: '"The line is still holding," you say quietly, looking at the ground, the scorch marks, all of it. "It is just not alone anymore. I do not think that is nothing. I think that might actually be the whole difference."' },
+          { speaker: 'Joel', text: '"Then that is what we do from here," Joel says, certain in a way that settles something in your own chest too. "Wherever the next line is. We do not let anything hold it by itself again, not if we can help it."' },
+          { speaker: 'Narrator', text: 'You look out at whatever comes next, unmapped, uncertain, and understand — clearly, for the first time since any of this began — that the actual fight was never going to be won by strength alone. It was always going to be won by refusing to let anything hold a line by itself.' },
+        ]
+      }
+,{
+        id: 'journal_095',
+        title: 'Before It Gets That Bad',
+        chapter: 95,
+        unlockType: 'level',
+        unlockAt: 98,
+        icon: '🔦',
+        summary: 'San and Joel go looking on purpose this time, and find something worn but not yet broken — proof that the actual practice was never one great rescue, just arriving sooner, over and over, before anything has to hold alone for too long.',
+        scenes: [
+          { speaker: 'Narrator', text: 'This time you go looking. That is the whole difference, and all of you feel it the moment you actually set out — not stumbling onto ground that needed help, but deciding, on purpose, to go find it before it got as bad as the last one.' },
+          { speaker: 'San', text: '"How do we even know where to look?" you ask, and it is a real question, not a rhetorical one.' },
+          { speaker: 'Joel', text: '"We do not, exactly," Joel admits. "We just go toward the places that feel like they are still holding. Somewhere still fighting has a different shape than somewhere that has already given up. You learn to feel the difference, the more of these you find."' },
+          { speaker: 'Narrator', text: 'Soel leads, mostly — some instinct in him, some leftover thread connecting him to whatever the ancestor once was, pulling toward ground that is worn but not yet broken.' },
+          { speaker: 'San', text: '"This one is different," you say, when you finally reach it. "Younger, somehow. It does not feel as tired as the last one did."' },
+          { speaker: 'Joel', text: '"That is the point, is it not," Joel says, understanding arriving steady and certain. "We are not here to save something after it has already worn all the way down. We are here before that. While there is still time for it to matter that someone showed up."' },
+          { speaker: 'Narrator', text: 'When the fight comes, there is a different quality to it — not the exhausted, structural refusal of something that has forgotten what living feels like, but something closer to genuine surprise. It did not expect anyone. It clearly never let itself hope for anyone.' },
+          { speaker: 'San', text: '"You do not have to keep doing this by yourself," you say, mid-fight, meaning it as plainly as you have ever meant anything. "Not one more day of it, if we can help it."' },
+          { speaker: 'Narrator', text: 'It does not take as long as the last one did. It does not need to. Whatever this is, it had not yet spent everything it had on holding alone — there was still enough of it left to actually believe you, once you finally arrived.' },
+          { speaker: 'Joel', text: '"That has to count for something," Joel says afterward, something quietly satisfied in it. "Getting to someone before they are all the way worn through, instead of after."' },
+          { speaker: 'San', text: '"It counts for everything," you say, echoing something he told you once, in a different clearing, about a different kind of arriving late. "This is what the practice actually looks like, is it not. Not one great rescue. Just going looking, over and over, before it gets as bad as it can get."' },
+          { speaker: 'Narrator', text: 'You think of Soel again, of the ancestor who waited far too long to be found, of every place the Fraying has ever properly won belonging to something that had to hold it completely alone. This is the actual answer to all of it. Not a bigger sword. Just showing up sooner.' },
+          { speaker: 'Joel', text: '"Where next, then?" Joel asks, already looking past this line toward whatever comes after it.' },
+          { speaker: 'San', text: '"Wherever else is still holding," you say, certain, already moving. "We just have to keep going looking."' },
+        ]
+      }
+
+
 
 
 
@@ -4835,6 +4897,12 @@ const ENEMY_REGISTRY = {
   'Fraying Wisp': { template: 'striker', elem: 'void', zoneLv: 96 },
   'Unwoven Stalker': { template: 'balanced', elem: 'void', zoneLv: 96 },
   'Hollow Seam': { template: 'tank', elem: 'void', zoneLv: 96 },
+  'Line-Breaker': { template: 'striker', elem: 'void', zoneLv: 97 },
+  'Corrosion Vessel': { template: 'balanced', elem: 'void', zoneLv: 97 },
+  'Unmaking Sentinel': { template: 'tank', elem: 'void', zoneLv: 97 },
+  'Testing Current': { template: 'striker', elem: 'void', zoneLv: 98 },
+  'Patience-Eater': { template: 'balanced', elem: 'void', zoneLv: 98 },
+  'Unmaking Vanguard': { template: 'tank', elem: 'void', zoneLv: 98 },
 
   // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
   'Closed Eye Acolyte': { template: 'striker', elem: 'void', zoneLv: 19 },
