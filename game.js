@@ -7978,11 +7978,13 @@ const RAIDS = [
     stages: [
       { type: 'elite', zoneLv: 75, enemies: ['Harvest Golem', 'Bloomwatcher'] },
       { type: 'boss', name: 'The Sunreach Elder' },
+      { type: 'elite', zoneLv: 82, enemies: ['Overtime Wraith', 'Off-Day Enforcer'] },
+      { type: 'boss', name: 'Jeff, the SK* Son-in-Law' },
       { type: 'elite', zoneLv: 95, enemies: ['Root-Bound Elder', 'Elderwood Sentinel'] },
       { type: 'boss', name: 'The Verdant Heart' }
     ],
-    rw: { xp: 320000, gold: 250000 },
-    desc: "A community that kept growing things through the end of the world, and, deeper still, whatever is actually doing the mending. As close to the source of it as this family has ever gotten — and very little worth reaching this deep comes easily." }
+    rw: { xp: 375000, gold: 290000 },
+    desc: "A community that kept growing things through the end of the world, and, deeper still, whatever is actually doing the mending. As close to the source of it as this family has ever gotten — and very little worth reaching this deep comes easily, least of all the parts that never had anything to do with the Vale at all." }
 ];
 
 // Raid bosses hit harder than their solo zone-encounter versions — a raid should feel
