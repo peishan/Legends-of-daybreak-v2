@@ -487,6 +487,7 @@ const G = {
     { n: 'The Held Line', lv: 97, elem: 'void', d: "Not abandoned like the rest of the Thinning — fought for. Scorch marks that are not scorch marks, ground that has clearly been defended, over and over, by something that never once had backup. The line is still holding. Barely. Whatever has been holding it has been doing this alone for longer than anything should have to.", en: ['Line-Breaker','Corrosion Vessel','Unmaking Sentinel'], loot: ['A Line Held Alone', 'Proof Someone Stayed', 'What the Solitary Carried'], xp: 30000, g: 21000, dg: 'impossible' },
     { n: 'Where Others Still Hold', lv: 98, elem: 'void', d: "Found on purpose this time, not stumbled into — the party going looking specifically for ground that is still being defended alone. This one has not been fighting as long as the last. There is still time here. That is the entire difference this visit is trying to make.", en: ['Testing Current','Patience-Eater','Unmaking Vanguard'], loot: ['A Line Found in Time', 'Backup, Finally', 'Proof It Does Not Have to Wear Someone All the Way Down First'], xp: 33000, g: 23500, dg: 'impossible' },
     { n: "Someone Else's Watch", lv: 99, elem: 'void', d: "Tracks that are not yours, at a line none of you have visited before. Supplies left behind, tended, recent. Something was already here, already fighting, already doing exactly what you came out here to do — and for the first time since any of this started, that is not a disappointment. It is proof the practice was never just yours to begin with.", en: ['Remnant Current','Half-Won Vessel','Watching Sentinel'], loot: ["Someone Else's Kindling", 'Proof the Practice Spread', 'A Line Half-Won Already'], xp: 36000, g: 25500, dg: 'impossible' },
+    { n: 'The Farthest Kindling', lv: 100, elem: 'void', d: "Deeper than tracks and waterskins this time — an actual camp, tended, occupied. Someone is here. Not gone, not glimpsed after the fact, not evidence of a visit already finished. Actually here, actually fighting, close enough to call out to. The practice just stopped being a rumor.", en: ['Deepfray Current','Warden of the Gap','Unmaking Herald'], loot: ['A Shared Kindling', 'Proof of Another Hand', 'What Two Lines Held Together'], xp: 45000, g: 32000, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -659,6 +660,7 @@ const G = {
     { id: 76, n: 'The Held Line', d: 'Defeat What Alone Becomes and make sure the line finally has backup', t: 'boss_specific', target: 'What Alone Becomes', c: 0, need: 1, rw: { xp: 108000, g: 80000 }, done: false },
     { id: 77, n: 'Where Others Still Hold', d: 'Defeat Before It Wears Through and arrive while there is still time to matter', t: 'boss_specific', target: 'Before It Wears Through', c: 0, need: 1, rw: { xp: 118000, g: 87000 }, done: false },
     { id: 78, n: "Someone Else's Watch", d: 'Defeat What Was Almost Enough and finish what someone else already started', t: 'boss_specific', target: 'What Was Almost Enough', c: 0, need: 1, rw: { xp: 128000, g: 94000 }, done: false },
+    { id: 79, n: 'The Farthest Kindling', d: 'Defeat The Line Neither Could Hold Alone, together with whoever else is already fighting it', t: 'boss_specific', target: 'The Line Neither Could Hold Alone', c: 0, need: 1, rw: { xp: 165000, g: 118000 }, done: false },
 
   ],
 
@@ -723,6 +725,7 @@ const G = {
     { id: 'b48', n: 'Still Holding', d: 'Defeat What Alone Becomes', t: 'kill_specific', target: 'What Alone Becomes', c: 0, need: 1, rw: { xp: 25000, g: 18500 }, done: false, refreshDay: 0, minLv: 97, maxLv: 999 },
     { id: 'b49', n: 'Arrived in Time', d: 'Defeat Before It Wears Through', t: 'kill_specific', target: 'Before It Wears Through', c: 0, need: 1, rw: { xp: 27000, g: 20000 }, done: false, refreshDay: 0, minLv: 98, maxLv: 999 },
     { id: 'b50', n: "Someone Else's Kindling", d: 'Defeat What Was Almost Enough', t: 'kill_specific', target: 'What Was Almost Enough', c: 0, need: 1, rw: { xp: 29000, g: 21500 }, done: false, refreshDay: 0, minLv: 99, maxLv: 999 },
+    { id: 'b51', n: 'Two Lines, One Fight', d: 'Defeat The Line Neither Could Hold Alone', t: 'kill_specific', target: 'The Line Neither Could Hold Alone', c: 0, need: 1, rw: { xp: 34000, g: 25000 }, done: false, refreshDay: 0, minLv: 100, maxLv: 999 },
 
   ],
 
@@ -757,6 +760,7 @@ const G = {
     { id: 'gc24', n: 'Contract: What Alone Becomes', d: 'Defeat What Alone Becomes for the Guild', t: 'boss_specific', target: 'What Alone Becomes', c: 0, need: 1, rw: { xp: 48000, g: 35500 }, rep: 1380, done: false, refreshWeek: -1, minLv: 97, maxLv: 999 },
     { id: 'gc25', n: 'Contract: Before It Wears Through', d: 'Defeat Before It Wears Through for the Guild', t: 'boss_specific', target: 'Before It Wears Through', c: 0, need: 1, rw: { xp: 52000, g: 38500 }, rep: 1480, done: false, refreshWeek: -1, minLv: 98, maxLv: 999 },
     { id: 'gc26', n: 'Contract: What Was Almost Enough', d: 'Defeat What Was Almost Enough for the Guild', t: 'boss_specific', target: 'What Was Almost Enough', c: 0, need: 1, rw: { xp: 56000, g: 41500 }, rep: 1580, done: false, refreshWeek: -1, minLv: 99, maxLv: 999 },
+    { id: 'gc27', n: 'Contract: The Line Neither Could Hold Alone', d: 'Defeat The Line Neither Could Hold Alone for the Guild', t: 'boss_specific', target: 'The Line Neither Could Hold Alone', c: 0, need: 1, rw: { xp: 62000, g: 46000 }, rep: 1700, done: false, refreshWeek: -1, minLv: 100, maxLv: 999 },
   ],
 
 
@@ -1349,6 +1353,9 @@ const G = {
     { n: 'What Was Almost Enough', zone: "Someone Else's Watch", hp: 265000, mhp: 265000, atk: 720, def: 440, xp: 128000, g: 94000,
       mechanic: 'phase', phases: 2, currentPhase: 1, phaseHp: 132500,
       desc: "Already cracked before you ever arrived, by hands that were not yours, in a fight nobody invited you to witness the start of. Whoever got here first did real damage. Almost enough to finish it alone. Almost has never once been the same thing as enough, and it did not need to be — not when it turns out backup was always going to be a thing more than one pair could show up and give." },
+    { n: 'The Line Neither Could Hold Alone', zone: 'The Farthest Kindling', hp: 340000, mhp: 340000, atk: 830, def: 495, xp: 165000, g: 118000,
+      mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 85000,
+      desc: "Too much for one pair. It was always going to be too much for one pair — that was never a flaw in anyone's practice, just an honest fact about how large the Fraying can grow when it is finally allowed to concentrate somewhere undefended long enough. It does not know yet that it is not fighting one pair anymore. That is about to become the whole problem it never accounted for." },
 
     // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
     // These are dedicated Temple-quest hunt targets, not tied to any zone's normal
@@ -3509,6 +3516,39 @@ storyJournal: {
           { speaker: 'San', text: '"Wherever the next line is," you agree, "we are clearly not the only ones going looking for it. I think that might be the best thing we have learned out here yet."' },
         ]
       }
+,{
+        id: 'journal_097',
+        title: 'Meant to Be Done Together',
+        chapter: 97,
+        unlockType: 'level',
+        unlockAt: 100,
+        icon: '🦊',
+        summary: 'San and Joel finally meet another Kindled pair face to face — Iris and her fox, Ash — and fight alongside them for the first time. The practice was never meant to be a solitary habit.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The camp is real before the person in it is — a fire, tended recently, gear laid out with the particular efficiency of someone who has done this enough times to stop wasting motion. Then she straightens up, sees you, and does not look surprised so much as she looks like she has been waiting.' },
+          { speaker: 'Iris', text: '"You are the pair from further back," she says, not quite a question. "I heard there might be others. I did not expect to actually meet you."' },
+          { speaker: 'San', text: '"San," you say. "This is Joel. We did not expect this either, if it helps."' },
+          { speaker: 'Narrator', text: 'A fox steps out from behind her, sharp-eyed and entirely unbothered, close enough to her heel that the bond is obvious before anyone explains it.' },
+          { speaker: 'Iris', text: '"Ash," she says, following your gaze. "My own strange inheritance, same as yours, I am guessing, from the way your familiar is sitting."' },
+          { speaker: 'Joel', text: '"How long have you been doing this?" Joel asks. "The going-looking. The lines."' },
+          { speaker: 'Iris', text: '"Longer than I expected to have to," Iris says, something tired and wry in it. "Ash chose me during my own worst night, same as I am guessing yours chose you. I did not know there was a name for it, or a practice, or anyone else. I just kept finding ground worth defending and defended it, because stopping felt like betraying the reason Ash stayed in the first place."' },
+          { speaker: 'San', text: '"We thought we were the only ones," you admit. "Tracks, once. A waterskin, refilled and left behind. This is the first time it has been an actual person."' },
+          { speaker: 'Iris', text: '"I left that waterskin," she says, something almost embarrassed in it. "I did not think anyone would ever know it was me."' },
+          { speaker: 'Narrator', text: 'Something settles between all four of you at that — not quite friendship yet, too new for that, but the specific, immediate kinship of people who recognize the exact shape of what the other has been carrying.' },
+          { speaker: 'Iris', text: '"This line is too big for me alone," Iris admits, nodding toward the ground ahead, something in her voice that costs her to say out loud. "I was not going to be able to hold it. I do not think I would have admitted that to anyone, if you had not turned up first."' },
+          { speaker: 'Joel', text: '"You do not have to hold it alone," Joel says. "That is kind of the entire point we have been learning too. Let us actually help."' },
+          { speaker: 'Narrator', text: 'The fight that follows is unlike anything either of you has faced out here — not because it is impossible, but because for the first time, it is not just the two of you carrying it. Ash and Iris fight alongside you, four bonded creatures and three humans against something that was never built to expect this many hands.' },
+          { speaker: 'San', text: '"It does not know what to do with us," you call out, mid-fight, something like joy breaking through the exhaustion. "It was ready for one pair. It was never ready for two."' },
+          { speaker: 'Narrator', text: 'When it finally falls, it falls all at once, overwhelmed rather than worn down — the first time the practice has actually looked like what it always should have been. Not a lone act of endurance. An actual, shared effort.' },
+          { speaker: 'Iris', text: '"Thank you," she says afterward, quiet, meaning it with her whole chest. "I do not think I say that enough, to anyone. I have been alone in this for a very long time."' },
+          { speaker: 'San', text: '"You are not anymore," you tell her, and mean it as completely as you have ever meant anything out here. "None of us have to be, apparently. That might be the actual discovery. Not that the practice exists. That it was always meant to be done together."' },
+          { speaker: 'Iris', text: '"Where are you two headed next?" she asks, already looking past this fire toward whatever comes after it.' },
+          { speaker: 'Joel', text: '"Wherever the next line is," Joel says. "Same as always."' },
+          { speaker: 'Iris', text: '"Mind if Ash and I come with you a while?" Iris asks, something hopeful under the careful casualness of it. "It has been a long time since going looking felt like something other than a solitary habit."' },
+          { speaker: 'San', text: '"We would like that," you say, and Soel, pressed warm against your side, seems to agree completely.' },
+        ]
+      }
+
     ]
   },
 
@@ -4905,6 +4945,9 @@ const ENEMY_REGISTRY = {
   'Remnant Current': { template: 'striker', elem: 'void', zoneLv: 99 },
   'Half-Won Vessel': { template: 'balanced', elem: 'void', zoneLv: 99 },
   'Watching Sentinel': { template: 'tank', elem: 'void', zoneLv: 99 },
+  'Deepfray Current': { template: 'striker', elem: 'void', zoneLv: 100 },
+  'Warden of the Gap': { template: 'balanced', elem: 'void', zoneLv: 100 },
+  'Unmaking Herald': { template: 'tank', elem: 'void', zoneLv: 100 },
 
   // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
   'Closed Eye Acolyte': { template: 'striker', elem: 'void', zoneLv: 19 },
