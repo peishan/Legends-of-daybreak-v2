@@ -17969,7 +17969,9 @@ function bossArtFileName(bossName) {
   if (n === 'frost queen') return 'frostqueen';
   if (n === 'sister wren, the last believer') return 'sisterwren';
   if (n === 'the foreman') return 'theforeman';
+  if (n === 'the nexus planarch') return 'thenexusplanarch';
   if (n === 'the veilshaper') return 'theveilshaper';
+  if (n === 'abyssal leviathan') return 'abyssalleviathan';
   if (n === 'the hollow prophet') return 'thehollowprophet';
   if (n === 'the infernal tyrant') return 'theinfernaltyrant';
   if (n === 'elder dragon') return 'elderdragon';
