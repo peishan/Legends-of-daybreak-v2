@@ -219,6 +219,35 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .ecard.hit-flash, .ecard.crit-flash { animation-name: lungeRecoil, hitFlash; animation-duration: 0.4s, 0.35s; animation-timing-function: ease-out, ease-out; }
 .ecard.crit-flash { animation-name: lungeRecoil, critFlash; animation-duration: 0.5s, 0.5s; }
 
+/* Boss art — shown in the bestiary's expanded detail view. 3:4 ratio matching the
+   source art (450x600), gold-bordered to match the game's existing boss framing
+   language. Falls back to the SVG archetype icon on a dark tinted background for
+   any boss without custom art yet, so this scales in gracefully over time. */
+.boss-art-frame {
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 3 / 4;
+  margin: 0 auto 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid var(--gold);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 20px color-mix(in srgb, var(--gold) 25%, transparent);
+  position: relative;
+}
+.boss-art-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.boss-art-fallback {
+  display: none;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, var(--bg-card), #0d0d13);
+}
+.boss-art-icon-fallback { width: 45%; }
+.boss-art-icon-fallback svg { width: 100%; height: 100%; }
+.boss-art-icon-fallback svg * { stroke: color-mix(in srgb, var(--arch-color, var(--arch-default)) 85%, white); fill: none; }
+.boss-art-icon-fallback svg .fill { fill: color-mix(in srgb, var(--arch-color, var(--arch-default)) 55%, var(--text)); stroke: none; }
+
 .combat-hud { display: flex; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 2px; margin-bottom: 12px; }
 .combat-hud-stat { flex: 1; text-align: center; padding: 0 4px; position: relative; }
 .combat-hud-stat:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 15%; bottom: 15%; width: 1px; background: var(--border); }

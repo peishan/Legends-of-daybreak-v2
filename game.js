@@ -15601,6 +15601,11 @@ function rBestiary(){
       if(isExpanded){
         h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;line-height:1.6;color:var(--text);">';
         if(bossEntry){
+          const artFallback = '<div class="boss-art-icon-fallback" style="--arch-color:'+ac(name)+';">'+es(name)+'</div>';
+          const artHtml = bossArtImg(name, artFallback);
+          if (bossArtFileName(name)) {
+            h+='<div class="boss-art-frame">'+artHtml+'</div>';
+          }
           h+='<div style="font-style:italic;margin-bottom:8px;">'+bossEntry.desc+'</div>';
           if(bossEntry.mechanic){
             const mechList = Array.isArray(bossEntry.mechanic) ? bossEntry.mechanic.join(', ') : bossEntry.mechanic;
@@ -17914,6 +17919,23 @@ function rCbt() {
 function portraitImg(fileName, fallbackBg, letter) {
   return '<img src="portraits/' + fileName + '.jpg" class="party-avatar-img" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' +
     '<span class="party-avatar-fallback" style="display:none;background:' + fallbackBg + ';">' + letter + '</span>';
+}
+
+// Custom boss art — falls back gracefully to the existing SVG archetype icon if no
+// art file exists yet for that boss, so this works incrementally: only Robin and Jeff
+// have art right now, and every other boss just keeps using its icon until more art
+// gets added, with zero code changes needed as that happens.
+function bossArtFileName(bossName) {
+  const n = bossName.toLowerCase();
+  if (n === 'robin c.') return 'robin';
+  if (n === "jeff, the sk* son-in-law") return 'jeff';
+  return null;
+}
+function bossArtImg(bossName, fallbackHtml) {
+  const fileName = bossArtFileName(bossName);
+  if (!fileName) return fallbackHtml;
+  return '<img src="bosses/' + fileName + '.jpg" class="boss-art-img" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' +
+    '<span class="boss-art-fallback">' + fallbackHtml + '</span>';
 }
 
 
