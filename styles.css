@@ -189,6 +189,36 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
   50% { box-shadow: 0 0 18px var(--shadow-danger), 0 0 4px var(--danger); }
 }
 
+/* Idle breathing — a subtle, slow scale/opacity pulse so enemies read as alive
+   between combat ticks rather than being a completely frozen photo. Staggered
+   slightly per-card via nth-child so a whole row doesn't breathe in lockstep. */
+@keyframes idleBreathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.045); opacity: 0.92; }
+}
+.eicon-medallion:not(.compact) { animation: idleBreathe 3.4s ease-in-out infinite; }
+.eicon-medallion.compact { animation: idleBreathe 3.1s ease-in-out infinite; }
+.ecard:nth-child(2n) .eicon-medallion { animation-delay: 0.6s; }
+.ecard:nth-child(3n) .eicon-medallion { animation-delay: 1.2s; }
+.ecard.dead .eicon-medallion { animation: none; } /* dead things don't breathe */
+
+/* Selected target — real visual hierarchy, not just a border-color swap. The
+   current target should visibly stand out from the rest of the row. */
+.ecard.sel { transform: scale(1.08); z-index: 2; }
+.ecard.sel .eicon-medallion { animation: none; box-shadow: 0 0 14px color-mix(in srgb, var(--danger) 55%, transparent), inset 0 0 10px color-mix(in srgb, var(--danger) 40%, transparent); }
+
+/* Lunge/recoil on hit — pairs with .hit-flash/.crit-flash, giving actual
+   directional movement instead of flashing in place. */
+@keyframes lungeRecoil {
+  0% { transform: translateX(0) scale(1); }
+  20% { transform: translateX(-6px) scale(0.96); }
+  45% { transform: translateX(4px) scale(1.03); }
+  70% { transform: translateX(-2px) scale(1); }
+  100% { transform: translateX(0) scale(1); }
+}
+.ecard.hit-flash, .ecard.crit-flash { animation-name: lungeRecoil, hitFlash; animation-duration: 0.4s, 0.35s; animation-timing-function: ease-out, ease-out; }
+.ecard.crit-flash { animation-name: lungeRecoil, critFlash; animation-duration: 0.5s, 0.5s; }
+
 .combat-hud { display: flex; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 2px; margin-bottom: 12px; }
 .combat-hud-stat { flex: 1; text-align: center; padding: 0 4px; position: relative; }
 .combat-hud-stat:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 15%; bottom: 15%; width: 1px; background: var(--border); }
