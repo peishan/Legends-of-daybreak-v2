@@ -17966,6 +17966,13 @@ function bossArtFileName(bossName) {
   const n = bossName.toLowerCase();
   if (n === 'robin c.') return 'robin';
   if (n === "jeff, the sk* son-in-law") return 'jeff';
+  if (n === 'frost queen') return 'frostqueen';
+  if (n === 'sister wren, the last believer') return 'sisterwren';
+  if (n === 'the foreman') return 'theforeman';
+  if (n === 'the veilshaper') return 'theveilshaper';
+  if (n === 'the hollow prophet') return 'thehollowprophet';
+  if (n === 'the infernal tyrant') return 'theinfernaltyrant';
+  if (n === 'elder dragon') return 'elderdragon';
   return null;
 }
 function bossArtImg(bossName, fallbackHtml) {
