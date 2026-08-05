@@ -13340,13 +13340,22 @@ function renderLogPanel() {
 }
 
 function lg(msg){
-  G.log.push(msg); if(G.log.length>50)G.log.shift();
+  G.log.push(msg); if(G.log.length>200)G.log.shift();
   const highlightEl = document.querySelector('.log-highlight .lh-text');
   const highlightWrap = document.querySelector('.log-highlight');
   const tickerEl = document.getElementById('log');
   if (highlightEl) highlightEl.innerHTML = boldNumbers(getLogHighlight());
   if (highlightWrap) highlightWrap.className = 'log-highlight ' + getLogElementClass(getLogHighlight());
-  if (tickerEl) tickerEl.innerHTML = G.log.slice(-12).reverse().map(m => '<div class="le ' + getLogElementClass(m) + '">' + boldNumbers(m) + '</div>').join('');
+  if (tickerEl) {
+    // Preserve scroll position across re-renders — innerHTML replacement resets
+    // scrollTop to 0 by default, which would yank the view back to the newest
+    // entry on every single combat tick if the user had scrolled down to read
+    // older lines, making it impossible to actually catch up mid-fight.
+    const wasAtTop = tickerEl.scrollTop <= 4;
+    const prevScrollTop = tickerEl.scrollTop;
+    tickerEl.innerHTML = G.log.slice(-40).reverse().map(m => '<div class="le ' + getLogElementClass(m) + '">' + boldNumbers(m) + '</div>').join('');
+    tickerEl.scrollTop = wasAtTop ? 0 : prevScrollTop;
+  }
 }
 
 function setS(s){
