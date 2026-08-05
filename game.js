@@ -13530,16 +13530,26 @@ const ENEMY_ICON_SVGS = {
 function getEnemyArchetype(name) {
   const n = name.toLowerCase();
   if (n === 'robin c.') return 'knight'; // a corrupted-authority reading — he sees himself as righteously defending the firm
-  if (/wolf|hound|dog/.test(n)) return 'beast';
+  // The old-world reckoning arc — Robin, Jeff, and all six wraiths — share one visual
+  // identity on purpose: they are all the same kind of thing, old-world authority and
+  // control figures being confronted, and the knight archetype (already used for
+  // Robin) reads as "corrupted authority" rather than heroism.
+  if (/jeff, the sk\* son-in-law|the ex-mother-in-law|the ex-husband|the village ex|the brunei ex|the stepfather/.test(n)) return 'knight';
+  if (n === 'sister wren, the last believer') return 'flying'; // a wren is a bird — a small, deliberate, personal distinction from the rest of the Closed Eye cult, fitting someone who was ultimately separate from them
+  if (/brother vess, the first blind|the closed choir|brother iss, the unraveled/.test(n)) return 'eye'; // Cult of the Closed Eye
+  if (/the veilshaper|the unmade|what alone becomes|before it wears through|what was almost enough|the line neither could hold alone/.test(n)) return 'eye'; // the Fraying's own embodiments — reality unraveling, same family as void/rift/fracture
+  if (n === 'frost queen') return 'knight'; // royal authority
+  if (n === 'the last vigil') return 'construct'; // a guardian in every sense but name
+  if (/wolf|hound|dog|\brat\b/.test(n)) return 'beast';
   if (/dragon|drake|wyrm/.test(n)) return 'dragon';
-  if (/skeleton|zombie|bone|undead|lich|revenant|wraith|phantom|specter|ghost|echo|shade/.test(n)) return 'undead';
+  if (/skeleton|zombie|bone|undead|lich|revenant|wraith|phantom|specter|ghost|echo|shade|remnant|husk|ember|recruit|rustbound/.test(n)) return 'undead';
   if (/golem|construct|automaton|titan|guardian|sentinel/.test(n)) return 'construct';
   if (/spider|arachnid/.test(n)) return 'arachnid';
-  if (/serpent|snake/.test(n)) return 'serpent';
+  if (/serpent|snake|basilisk|undertow|riptide|tidereaver|drowned/.test(n)) return 'serpent';
   if (/bat\b|wisp|drifter|fairy|mote/.test(n)) return 'flying';
-  if (/goblin|knight|guard\b|warden|king|lord|tyrant|foreman|keeper|collector|enforcer|peddler|looter|scavenger|watcher|mourner|auditor|sailor|highwayman|thug|bandit|captain|scout/.test(n)) return 'knight';
-  if (/imp|slime|elemental|beast|horror|demon|hollow|stalker|weaver|leviathan|kraken|behemoth/.test(n)) return 'elemental';
-  if (/planarch|devourer|astral|nexus|void|reality|fragment|rift|dimensional|chronomancer|arbiter|architect|fracture/.test(n)) return 'eye';
+  if (/goblin|knight|guard\b|warden|king|lord|tyrant|foreman|keeper|collector|enforcer|peddler|looter|scavenger|watcher|mourner|auditor|sailor|highwayman|thug|bandit|captain|scout|wayfinder|ledgerbound|sovereign|archon|incarnate/.test(n)) return 'knight';
+  if (/imp|slime|elemental|beast|horror|demon|hollow|stalker|weaver|leviathan|kraken|behemoth|root|bramble|sprite|elder|heart|sunreach|verdant/.test(n)) return 'elemental';
+  if (/planarch|devourer|astral|nexus|void|reality|fragment|rift|dimensional|chronomancer|arbiter|architect|fracture|current|vessel|corrosion|deepfray|breaker|eater|acolyte|zealot|weight|habit|\bfear\b|last shadow|familiar|agitator|walker|unbound|tired|splinter|unmended|relapse|question|unity|vanished|first break/.test(n)) return 'eye';
   return 'default';
 }
 
