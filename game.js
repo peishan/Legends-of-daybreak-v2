@@ -23,6 +23,24 @@ installWrap.appendChild(installBtn);
 installWrap.appendChild(installDismissBtn);
 document.body.appendChild(installWrap);
 
+// Session Recap — detects meaningful away-time (tab backgrounded, e.g. asleep or at
+// work with the music running) and surfaces a "while you were away" summary rather
+// than trying to make the live combat log hold hours of history. Threshold set at
+// 10 minutes hidden so brief app-switches don't trigger it, only genuine breaks.
+const SESSION_RECAP_THRESHOLD_MS = 10 * 60 * 1000;
+document.addEventListener('visibilitychange', () => {
+  if (typeof G === 'undefined' || !G.sessionRecap) return;
+  if (document.hidden) {
+    G.sessionRecap.hiddenAt = Date.now();
+  } else if (G.sessionRecap.hiddenAt > 0) {
+    const awayMs = Date.now() - G.sessionRecap.hiddenAt;
+    G.sessionRecap.hiddenAt = 0;
+    if (awayMs >= SESSION_RECAP_THRESHOLD_MS && typeof showSessionRecap === 'function') {
+      showSessionRecap();
+    }
+  }
+});
+
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   if (localStorage.getItem(PWA_INSTALL_DISMISSED_KEY) === 'true') return; // user already said no thanks
@@ -3835,6 +3853,8 @@ storyJournal: {
   currentDialogue: null,
   ambushWarning: null,
   bestiary: {},
+  sessionRecap: { startLevel: 0, bosses: [], legendaryDrops: [], chapters: [], hiddenAt: 0 },
+  showingSessionRecap: false,
   bestiaryExpanded: null,
   story: { active: true, chapter: 0, scene: 0, shown: false },
   storyChapters: [
@@ -4536,6 +4556,9 @@ function addLootFromCombat(zoneName) {
   if (item) {
     addI(item);
     lg('🎁 Loot: ' + item.n + ' (' + ITEM_RARITY[item.r].name + ')!');
+    if (item.r === 'legendary' || item.r === 'epic') {
+      G.sessionRecap.legendaryDrops.push(item.n + ' (' + ITEM_RARITY[item.r].name + ')');
+    }
   }
 
   // Companion gear: separate, smaller chance so it doesn't crowd out San's own drops
@@ -6145,6 +6168,7 @@ function checkJournalLevelUnlocks() {
   for (let entry of G.storyJournal.entries) {
     if (entry.unlockType === 'level' && G.p.lvl >= entry.unlockAt && !G.storyJournal.unlocked.includes(entry.id)) {
       G.storyJournal.unlocked.push(entry.id);
+      G.sessionRecap.chapters.push(entry.title);
       lg('📖 Journal unlocked: ' + entry.title + '!');
       showToast('📖 New story chapter unlocked!', 'gold');
     }
@@ -10066,11 +10090,13 @@ function handleVictory() {
    checkDailyQuests('kill', G.cbt.en.length); 
     if (G.party.filter(p => p.on).length >= 3) checkDailyQuests('full_party_battle', 1); 
   if (G.currentBoss) { G.p.bossKills = (G.p.bossKills || 0) + 1; }
+  if (G.currentBoss) { G.sessionRecap.bosses.push(G.currentBoss.n); }
   if (G.currentBoss && G.currentBoss.defeatLine) { lg('💬 ' + G.currentBoss.defeatLine); }
     // Check boss-based journal unlocks
   for (let entry of G.storyJournal.entries) {
     if (entry.unlockType === 'boss' && G.currentBoss && G.currentBoss.n === entry.unlockAt && !G.storyJournal.unlocked.includes(entry.id)) {
       G.storyJournal.unlocked.push(entry.id);
+      G.sessionRecap.chapters.push(entry.title);
       lg('📖 Journal unlocked: ' + entry.title + '!');
       showToast('📖 New story chapter unlocked!', 'gold');
     }
@@ -13188,7 +13214,6 @@ function cf(){if(ft)clearInterval(ft);setS('menu');lg('Focus cancelled.');render
 // Floating damage number over a specific DOM element (an enemy card, San's HP bar, etc.)
 // Purely cosmetic — never touches game state, safe to call from anywhere damage resolves.
 function showFloatingDamage(el, amount, opts = {}) {
-  if (!G.dragonHunt.active) return; // scoped to the Dragon Hunt only, per the original request
   if (!el) return;
   if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
   const span = document.createElement('div');
@@ -13196,6 +13221,14 @@ function showFloatingDamage(el, amount, opts = {}) {
   span.textContent = (opts.heal ? '+' : '-') + amount;
   el.appendChild(span);
   setTimeout(() => span.remove(), 900);
+
+  // Hit-flash on the card itself — was previously missing entirely, everywhere.
+  const card = el.closest('.ecard, .party-avatar-circle, .hdr-r');
+  if (card && !opts.heal) {
+    card.classList.remove('hit-flash', 'crit-flash');
+    void card.offsetWidth; // force reflow so the animation restarts on rapid consecutive hits
+    card.classList.add(opts.crit ? 'crit-flash' : 'hit-flash');
+  }
 }
 
 // Enemy took damage — finds that enemy's card by its position in G.cbt.en.
@@ -13337,6 +13370,75 @@ function renderLogPanel() {
   h += tickerLines.map(m => '<div class="le ' + getLogElementClass(m) + '">' + boldNumbers(m) + '</div>').join('');
   h += '</div>';
   return h;
+}
+
+function renderSessionRecap() {
+  const a = document.getElementById('app'); if (!a) return;
+  const r = G.sessionRecap;
+  const levelsGained = G.p.lvl - (r.startLevel || G.p.lvl);
+
+  let h = '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:var(--bg);">';
+  h += '<div style="font-size:32px;margin-bottom:8px;">🌙</div>';
+  h += '<div style="font-size:20px;font-weight:700;color:var(--gold);margin-bottom:4px;">Welcome back</div>';
+  h += '<div style="font-size:12px;color:var(--text-dim);margin-bottom:20px;text-align:center;">Here\'s what happened while you were away</div>';
+
+  h += '<div style="width:100%;max-width:340px;">';
+
+  if (levelsGained > 0) {
+    h += '<div class="panel panel-gold" style="text-align:center;margin-bottom:10px;">';
+    h += '<div style="font-size:24px;font-weight:700;color:var(--gold);">Level ' + r.startLevel + ' \u2192 ' + G.p.lvl + '</div>';
+    h += '<div class="btn-hint">+' + levelsGained + ' level' + (levelsGained > 1 ? 's' : '') + ' gained</div>';
+    h += '</div>';
+  }
+
+  if (r.bosses.length > 0) {
+    const counts = {};
+    for (let b of r.bosses) counts[b] = (counts[b] || 0) + 1;
+    h += '<div class="panel" style="margin-bottom:10px;">';
+    h += '<div class="panel-title" style="margin-bottom:6px;">⚔️ Bosses Defeated (' + r.bosses.length + ')</div>';
+    for (let [name, count] of Object.entries(counts)) {
+      h += '<div class="btn-hint">' + name + (count > 1 ? ' \u00d7' + count : '') + '</div>';
+    }
+    h += '</div>';
+  }
+
+  if (r.legendaryDrops.length > 0) {
+    h += '<div class="panel" style="margin-bottom:10px;">';
+    h += '<div class="panel-title" style="margin-bottom:6px;">✨ Notable Drops (' + r.legendaryDrops.length + ')</div>';
+    for (let drop of r.legendaryDrops) {
+      h += '<div class="btn-hint" style="color:var(--gold);">' + drop + '</div>';
+    }
+    h += '</div>';
+  }
+
+  if (r.chapters.length > 0) {
+    h += '<div class="panel" style="margin-bottom:10px;">';
+    h += '<div class="panel-title" style="margin-bottom:6px;">📖 New Chapters</div>';
+    for (let ch of r.chapters) {
+      h += '<div class="btn-hint">' + ch + '</div>';
+    }
+    h += '</div>';
+  }
+
+  h += '<button onclick="dismissSessionRecap()" class="abtn" style="width:100%;margin-top:8px;">Continue</button>';
+  h += '</div></div>';
+
+  a.innerHTML = h;
+}
+
+function showSessionRecap() {
+  const r = G.sessionRecap;
+  const levelsGained = G.p.lvl - (r.startLevel || G.p.lvl);
+  const hasContent = levelsGained > 0 || r.bosses.length > 0 || r.legendaryDrops.length > 0 || r.chapters.length > 0;
+  if (!hasContent) return; // nothing worth interrupting the player for
+  G.showingSessionRecap = true;
+  render();
+}
+
+function dismissSessionRecap() {
+  G.showingSessionRecap = false;
+  G.sessionRecap = { startLevel: G.p.lvl, bosses: [], legendaryDrops: [], chapters: [], hiddenAt: 0 };
+  render();
 }
 
 function lg(msg){
@@ -14713,6 +14815,14 @@ function rAchievements() {
 }
 
 function render(){
+  // Session Recap takes priority over everything else, including the lightweight
+  // AFK bypass paths below — the whole point is surfacing this the moment the user
+  // actually returns, which is exactly when AFK mode is most likely to be active.
+  if (G.showingSessionRecap) {
+    renderSessionRecap();
+    return;
+  }
+
   // Auto-combat kick-start safety net. toggleAutoCombat() has always explicitly
   // called doAutoCombatTick() the moment it turns auto-combat on — but since
   // auto-combat can now start already-true by default (rather than only being
@@ -18815,6 +18925,7 @@ function rRest() {
 
 document.addEventListener('DOMContentLoaded', function() {
   const hasSave = loadGame();
+  G.sessionRecap.startLevel = G.p.lvl;
   if (!hasSave) {
     lg('Welcome to Legends of Daybreak, San.');
     lg('Tap Adventure to start your journey!');
