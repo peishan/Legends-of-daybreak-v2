@@ -3548,6 +3548,28 @@ storyJournal: {
           { speaker: 'San', text: '"We would like that," you say, and Soel, pressed warm against your side, seems to agree completely.' },
         ]
       }
+,{
+        id: 'journal_098',
+        title: 'Fifty Levels of Choosing It',
+        chapter: 98,
+        unlockType: 'level',
+        unlockAt: 150,
+        icon: '🔥',
+        summary: 'A quiet milestone, fifty levels past the beginning — San, Joel, and Iris realize the practice stopped being extraordinary a long time ago, and that is not a loss. That is what it looks like when a chosen thing finally becomes an ordinary life.',
+        scenes: [
+          { speaker: 'Narrator', text: 'There is no particular line to find today, no fresh tracks, no waterskin left behind. Just an ordinary evening, fifty levels past the one where all of this actually started, and the strange, quiet realization that it has started to feel less like a quest and more like a life.' },
+          { speaker: 'San', text: '"Do you remember when this felt like something enormous?" you ask, watching the fire. "Going looking. Every line an event. Now it is just Tuesday."' },
+          { speaker: 'Joel', text: '"I remember," Joel says, something warm in it rather than wistful. "I do not think that is a loss, though. I think that is what it looks like when a thing you choose on purpose finally just becomes part of how you live."' },
+          { speaker: 'Iris', text: 'Iris looks up from where she is mending a strap, Ash curled warm against her side. "It stopped being extraordinary for me a long time ago too," she says. "I did not realize how much I missed it being ordinary with other people, instead of ordinary alone."' },
+          { speaker: 'San', text: '"Fifty levels," you say, turning the number over. "I do not think I could tell you most of what happened in them individually anymore. Just that we kept going. Kept finding ground worth tending. Kept coming back for each other, and for whoever else needed the backup."' },
+          { speaker: 'Joel', text: '"That might be the actual measure of it," Joel says. "Not any single line held, or any one thing defeated. Just that it never stopped being something we chose, fifty levels of choosing it, one ordinary day at a time."' },
+          { speaker: 'Narrator', text: 'You think, briefly, of the person you were the night you stood at the edge of everything mapped and called it a beginning. You did not know yet what the beginning would actually be made of — mostly this. Mostly small, unremarkable evenings, chosen on purpose, again and again, until they added up to something that stopped needing to prove itself.' },
+          { speaker: 'San', text: '"I am glad it got boring," you say, and mean it completely, watching Joel\'s face do something soft at the word. "Boring, safe, chosen. I spent a long time not knowing that was even an option."' },
+          { speaker: 'Iris', text: '"To boring," Iris says, lifting nothing in particular in a mock toast, and Ash huffs out something that might be a laugh if a fox could laugh.' },
+          { speaker: 'Joel', text: '"To boring," you all echo, and the fire keeps burning, and nothing dramatic happens at all, and that turns out to be exactly enough.' },
+        ]
+      }
+
 
     ]
   },
@@ -3690,6 +3712,7 @@ storyJournal: {
   guildRepBalance: 0, // spendable reputation currency for the Guild Shop
   dragonHunt: { active: false, currentId: null, cleared: {} }, // legendary optional superbosses, repeatable; cleared keyed by dragon id
   bossRush: { active: false, streak: 0, bestStreak: 0 }, // chained boss fights, escalating reward + difficulty, no rest between
+  frayingFrontier: { active: false, streak: 0, bestStreak: 0 }, // endless mode, level 100+, bosses scale off current player level indefinitely
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
@@ -7764,6 +7787,43 @@ function retreatBossRush() {
   render();
 }
 
+function startFrayingFrontier() {
+  if (G.p.lvl < 100) { lg('🔒 The Fraying Frontier only opens past Level 100.'); return; }
+  G.frayingFrontier.active = true;
+  G.frayingFrontier.streak = 0;
+  spawnFrayingFrontierEncounter();
+}
+
+function spawnFrayingFrontierEncounter() {
+  const streak = G.frayingFrontier.streak;
+  const boss = generateFrontierBoss(G.p.lvl, streak);
+
+  G.cbt.on = true;
+  G.cbt.turn = 0;
+  G.cbt.en = [];
+  G.state = 'combat';
+  G.cbt.autoCombat = isAutoCombatPreferred();
+
+  G.currentBoss = boss;
+  G.cbt.en.push(boss);
+
+  lg('🌫️ The Fraying Frontier [Streak ' + streak + ']: ' + boss.n + ' appears!' + (streak > 0 ? ' (+' + Math.floor(streak * 6) + '% tougher)' : ''));
+  render();
+}
+
+function continueFrayingFrontier() {
+  if (!G.frayingFrontier.active) return;
+  spawnFrayingFrontierEncounter();
+}
+
+function retreatFrayingFrontier() {
+  lg('🏳️ Retreat — the frontier run ends at a streak of ' + G.frayingFrontier.streak + '. Everything earned is kept.');
+  G.frayingFrontier.active = false;
+  G.currentBoss = null;
+  G.state = 'menu';
+  render();
+}
+
 // === CHAIN QUESTS ===
 // A one-time, non-repeatable story descent rather than a repeatable raid or grind —
 // structurally in the BG2/IWD2 tradition of an optional deep vault (Watcher's Keep-style):
@@ -8103,6 +8163,81 @@ const RAIDS = [
 // Raid bosses hit harder than their solo zone-encounter versions — a raid should feel
 // like a real escalation, not the same fight you've already had elsewhere.
 const RAID_BOSS_BUFF = { hpMult: 1.35, atkMult: 1.25, defMult: 1.15 };
+
+// === THE FRAYING FRONTIER — endless mode, level 100+ ===
+// The hand-authored zones (95-100) have a real ceiling on how fast new content can be
+// written. This is the answer: a single endless zone whose bosses scale their stats
+// dynamically off the player's CURRENT level at the moment of the fight, using
+// polynomial (not compounding/exponential) growth so it never risks the same overflow
+// the old XP curve had, no matter how high level climbs. Variety comes from a pool of
+// pre-written boss identities rather than infinite unique authorship — the numbers
+// scale forever, but who you're actually fighting still varies.
+// === THE KINDLING NETWORK ===
+// A registry of other Kindled pairs met along the way — the counterweight to the
+// endless Frontier's pure mechanical scaling. Where the Frontier is bottomless
+// numbers, this is the part that stays a story: who you've actually met, and what
+// became of them, tracked as an ongoing thread rather than a one-off chapter beat.
+const KINDLING_NETWORK = [
+  {
+    id: 'iris_ash',
+    name: 'Iris & Ash',
+    familiarType: 'a fox',
+    metChapter: 97,
+    unlockType: 'level',
+    unlockAt: 100,
+    status: 'Traveling with you',
+    desc: "Ash chose her during her own worst night, same as Soel chose Joel — she just never knew there was a name for it, or anyone else doing the same thing, until you found her holding a line alone. Asked to travel on with you afterward. Still does."
+  }
+];
+
+const FRAYING_FRONTIER_IDENTITIES = [
+  { n: 'A Line Still Being Tested', mechanic: 'phase', phases: 3,
+    desc: "Not broken yet. Not close to broken. Just testing, patiently, exactly how much pressure this particular stretch of ground can actually take before something gives." },
+  { n: 'What Patience Wears Down', mechanic: 'crush', crushTurn: 5,
+    desc: "It does not attack so much as it simply continues existing, the way erosion continues existing — nothing dramatic in any single moment, everything dramatic in the accumulation." },
+  { n: 'The Unmaking, Concentrated', mechanic: 'cosmic',
+    desc: "A denser pocket of the same thing that swallowed the rest of the Thinning, drawn tight enough in one place that even standing near it costs something." },
+  { n: 'Something That Forgot Where It Started', mechanic: 'resurrect', resurrectHp: 0.15,
+    desc: "It does not remember being anything before this. It just keeps reforming, patient and unbothered, the way water finds its way back into a shape no matter how many times you scatter it." },
+  { n: 'The Gap Between Two Held Lines', mechanic: ['billable_hours', 'freeze'],
+    billableDmg: 90, billableMsg: "The gap widens another inch, quietly, whether anyone is watching or not.",
+    freezeChance: 0.2, freezeMsg: "\uD83C\uDF2B\uFE0F The gap swallows a step you were certain you had already taken \u2014 you lose your footing!",
+    desc: "Ground that fell between two lines someone else is holding, too far from either to get backup in time. It knows exactly how isolated it has you, and it is not in any hurry." },
+  { n: 'What the Frontier Keeps Producing', mechanic: 'rampage', rampageTurn: 4, rampageDmg: 130,
+    desc: "The Fraying does not run out of these. That is the actual shape of the problem, out here — not one great enemy to finish, just an endless, patient supply of smaller ones." },
+  { n: 'An Old Fraying, Grown Patient', mechanic: 'phase', phases: 4,
+    desc: "Old enough that it stopped being in a hurry a long time ago. It has learned that patience costs it nothing and eventually wins nearly everything, unless someone actually shows up to interrupt it." },
+  { n: 'The Line That Keeps Almost Breaking', mechanic: 'crush', crushTurn: 4,
+    desc: "Somewhere between held and lost, permanently, the exact tipping point stretched out indefinitely. It has been almost-breaking for longer than it can remember not almost-breaking." }
+];
+
+function getFrayingFrontierScaledStats(playerLevel) {
+  // Anchored to the real, hand-authored level-100 boss (340,000 HP) — polynomial
+  // growth from there, safe indefinitely, no compounding risk at any level.
+  const hpBase = 1704.04;
+  const hp = Math.floor(hpBase * Math.pow(Math.max(playerLevel, 100), 1.15));
+  const atk = Math.floor(hp * 0.00244); // ratio matches the level-100 boss (830 atk / 340,000 hp)
+  const def = Math.floor(hp * 0.00146); // ratio matches the level-100 boss (495 def / 340,000 hp)
+  const xp = Math.floor(hp * 0.485);    // ratio matches the level-100 boss (165,000 xp / 340,000 hp)
+  const g = Math.floor(hp * 0.347);     // ratio matches the level-100 boss (118,000 g / 340,000 hp)
+  return { hp, atk, def, xp, g };
+}
+
+function generateFrontierBoss(playerLevel, streak) {
+  const identity = FRAYING_FRONTIER_IDENTITIES[Math.floor(Math.random() * FRAYING_FRONTIER_IDENTITIES.length)];
+  const stats = getFrayingFrontierScaledStats(playerLevel);
+  const streakMult = 1 + (streak || 0) * 0.06; // gentler per-encounter growth than Boss Rush, since base stats already scale with level
+  const boss = JSON.parse(JSON.stringify(identity));
+  boss.zone = 'The Fraying Frontier';
+  boss.hp = Math.floor(stats.hp * streakMult);
+  boss.mhp = boss.hp;
+  boss.atk = Math.floor(stats.atk * streakMult);
+  boss.def = Math.floor(stats.def * streakMult);
+  boss.xp = Math.floor(stats.xp * streakMult);
+  boss.g = Math.floor(stats.g * streakMult);
+  boss.id = 99;
+  return boss;
+}
 
 // Generates an elite trash-wave enemy, reusing the existing 'elite' stat template and
 // pulling elemental typing from ENEMY_REGISTRY when the name is already registered there,
@@ -12407,6 +12542,57 @@ handleDefeat = function() {
   }
 };
 
+const _originalHandleVictoryForFrayingFrontier = handleVictory;
+handleVictory = function() {
+  if (G.frayingFrontier.active) {
+    const defeatedName = G.currentBoss ? G.currentBoss.n : 'It';
+    const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
+    const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * getPrestigeGoldMult());
+    G.p.xp += txp;
+    G.p.gold += tg2;
+    G.p.bossKills = (G.p.bossKills || 0) + 1;
+    checkBountyKill(defeatedName, true);
+    G.frayingFrontier.streak++;
+    if (G.frayingFrontier.streak > (G.frayingFrontier.bestStreak || 0)) G.frayingFrontier.bestStreak = G.frayingFrontier.streak;
+    checkAchievements();
+    lg('🎉 ' + defeatedName + ' falls! +' + txp + ' XP, +' + tg2 + 'G');
+
+    G.currentBoss = null;
+    G.cbt.autoCombat = isAutoCombatPreferred();
+    G.cbt.on = false;
+
+    // Partial recovery between encounters, same spirit as Boss Rush — enough to keep going
+    G.p.hp = Math.min(G.p.mhp, G.p.hp + Math.floor(G.p.mhp * BOSS_RUSH_RECOVERY_PCT));
+    G.p.mp = Math.min(G.p.mmp, G.p.mp + Math.floor(G.p.mmp * BOSS_RUSH_RECOVERY_PCT));
+    for (let p of G.party) {
+      if (p.on && p.hp > 0) p.hp = Math.min(p.mhp, p.hp + Math.floor(p.mhp * BOSS_RUSH_RECOVERY_PCT));
+    }
+    G.state = 'fraying_frontier_room';
+    lvlup();
+    render();
+  } else {
+    _originalHandleVictoryForFrayingFrontier();
+  }
+};
+
+const _originalHandleDefeatForFrayingFrontier = handleDefeat;
+handleDefeat = function() {
+  if (G.frayingFrontier.active) {
+    if (checkSecondWind()) { render(); return; }
+    lg('💀 The frontier run ends here \u2014 final streak: ' + G.frayingFrontier.streak + '. Everything earned along the way is kept.');
+    G.p.hp = 1;
+    for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
+    G.cbt.autoCombat = isAutoCombatPreferred();
+    G.cbt.on = false;
+    G.frayingFrontier.active = false;
+    G.currentBoss = null;
+    G.state = 'menu';
+    render();
+  } else {
+    _originalHandleDefeatForFrayingFrontier();
+  }
+};
+
 const _originalHandleVictoryForChainQuest = handleVictory;
 handleVictory = function() {
   if (G.activeChainQuestId && getChainProgress(G.activeChainQuestId).active) handleChainQuestVictory();
@@ -14611,7 +14797,10 @@ function render(){
   else if(G.state=='dragon_hunt')h+=rDragonHunt();
   else if(G.state=='prestige')h+=rPrestige();
   else if(G.state=='boss_rush')h+=rBossRush();
+  else if(G.state=='fraying_frontier')h+=rFrayingFrontier();
+  else if(G.state=='kindling_network')h+=rKindlingNetwork();
   else if(G.state=='boss_rush_room')h+=rBossRushRoom();
+  else if(G.state=='fraying_frontier_room')h+=rFrayingFrontierRoom();
   else if(G.state=='chain_quest')h+=rChainQuest();
   else if(G.state=='event_deck')h+=rEventDeck();
   else if(G.state=='sync')h+=rSyncScreen();
@@ -14652,6 +14841,8 @@ function attachEvents() {
     else if(a=='dragon_hunt')setS('dragon_hunt');
     else if(a=='prestige')setS('prestige');
     else if(a=='boss_rush')setS('boss_rush');
+    else if(a=='fraying_frontier')setS('fraying_frontier');
+    else if(a=='kindling_network')setS('kindling_network');
     else if(a=='chain_quest')setS('chain_quest');
     else if(a=='event_deck')setS('event_deck');
     else if(a=='sync')setS('sync');
@@ -16398,6 +16589,59 @@ function rBossRush() {
   return h;
 }
 
+function rKindlingNetwork() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">🦊 The Kindling Network</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Other Kindled pairs, met along the way. Not a system to grind \u2014 just a record of who you have actually found out there.</div>';
+
+  const knownEntries = KINDLING_NETWORK.filter(k => {
+    const chEntry = G.storyJournal.entries.find(e => e.chapter === k.metChapter);
+    return chEntry && G.storyJournal.unlocked.includes(chEntry.id);
+  });
+
+  if (knownEntries.length === 0) {
+    h += '<div style="text-align:center;padding:40px;color:var(--text-dim);">No other Kindled pairs met yet.<br>The practice is bigger than you know. You just have not found the rest of it.</div>';
+  } else {
+    for (let k of knownEntries) {
+      h += '<div class="zcard" style="border-color:var(--gold);">';
+      h += '<div class="zh"><span class="zn">🦊 ' + k.name + '</span><span class="zl" style="color:var(--gold);">' + k.status + '</span></div>';
+      h += '<div style="font-size:11px;color:var(--text-dim);margin:4px 0;">Bonded to ' + k.familiarType + ' \u00b7 Met in Chapter ' + k.metChapter + '</div>';
+      h += '<div style="font-size:12px;line-height:1.6;color:var(--text);margin-top:6px;">' + k.desc + '</div>';
+      h += '</div>';
+    }
+    h += '<div class="btn-hint" style="text-align:center;margin-top:12px;">' + knownEntries.length + ' of ' + KINDLING_NETWORK.length + ' known pairs found so far.</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function rFrayingFrontier() {
+  const unlocked = G.p.lvl >= 100;
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">🌫️ The Fraying Frontier</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">The hand-mapped ground runs out somewhere. This does not. Bosses out here scale to whatever level you actually are, forever \u2014 there is no ceiling to eventually run past. Push until you fall, or walk away with what you\'ve banked.</div>';
+
+  h += '<div class="panel panel-gold" style="text-align:center;">';
+  h += '<div class="panel-title" style="color:var(--gold);">Best Streak</div>';
+  h += '<div style="font-size:24px;font-weight:700;margin:8px 0;color:var(--gold);">' + (G.frayingFrontier.bestStreak || 0) + '</div>';
+  h += '</div>';
+
+  h += '<div class="panel">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">How It Scales</div>';
+  h += '<div class="btn-hint" style="line-height:1.6;">Base boss strength always matches your current level, not a fixed zone \u2014 so this stays a real fight at level 150 or level 1500. Each streak win adds roughly +6% further on top.<br>' + Math.floor(BOSS_RUSH_RECOVERY_PCT * 100) + '% HP/MP recovery between fights \u2014 no full heals.</div>';
+  h += '</div>';
+
+  if (unlocked) {
+    h += '<button onclick="startFrayingFrontier()" class="abtn" style="width:100%;background:var(--el-void);">🌫️ Enter the Frontier</button>';
+  } else {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🔒 Unlocks at Level 100 (currently Level ' + G.p.lvl + ')</div></div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
 function rBossRushRoom() {
   const streak = G.bossRush.streak;
   const nextRewardMult = Math.min(BOSS_RUSH_REWARD_MULT_CAP, 1 + streak * BOSS_RUSH_REWARD_MULT_PER_KILL);
@@ -16414,6 +16658,25 @@ function rBossRushRoom() {
 
   h += '<button onclick="continueBossRush()" class="abtn" style="width:100%;margin-bottom:10px;">⚔️ Continue the Rush</button>';
   h += '<button onclick="retreatBossRush()" class="btn-outline-ghost" style="width:100%;">🏳️ Retreat (keep everything earned)</button>';
+
+  h += '</div>';
+  return h;
+}
+
+function rFrayingFrontierRoom() {
+  const streak = G.frayingFrontier.streak;
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">🌫️ The Fraying Frontier</div>';
+
+  h += '<div class="panel panel-gold" style="text-align:center;">';
+  h += '<div class="panel-title" style="color:var(--gold);">Streak: ' + streak + '</div>';
+  h += '<div class="btn-hint">Bosses here scale off your current level, indefinitely \u2014 the frontier does not run out. Each win in this streak makes the next one \u2248' + Math.floor((streak + 1) * 6) + '% tougher.</div>';
+  h += '</div>';
+
+  h += '<div class="btn-hint" style="text-align:center;margin:10px 0 16px;">The party got a brief recovery, not a full rest. Keep pushing, or bank what you\'ve got.</div>';
+
+  h += '<button onclick="continueFrayingFrontier()" class="abtn" style="width:100%;margin-bottom:10px;">🌫️ Push the Frontier Further</button>';
+  h += '<button onclick="retreatFrayingFrontier()" class="btn-outline-ghost" style="width:100%;">🏳️ Retreat (keep everything earned)</button>';
 
   h += '</div>';
   return h;
@@ -16886,6 +17149,8 @@ function rMenu(){
     { title: '🐉 Legendary Hunts', items: [
       {i:'🐉',l:'Dragon Hunt',a:'dragon_hunt'},
       {i:'💀',l:'Boss Rush',a:'boss_rush'},
+      {i:'🌫️',l:'The Fraying Frontier',a:'fraying_frontier'},
+      {i:'🦊',l:'The Kindling Network',a:'kindling_network'},
       {i:'📜',l:'The Sunken Archive',a:'chain_quest'},
       {i:'🌟',l:'Prestige',a:'prestige'},
     ]},
