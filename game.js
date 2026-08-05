@@ -12729,33 +12729,31 @@ function playLevelUpSound() {
 
 function xpNeededForLevel(targetLvl) {
   let xpN = 100, lvl = 1;
-  while (lvl < targetLvl) {
+  while (lvl < targetLvl && lvl < 500) {
     lvl++;
     if (lvl < 15) xpN = Math.floor(xpN * 1.5);
     else if (lvl <= 50) xpN = Math.floor(xpN * 1.18);
     else xpN = Math.floor(xpN * 1.025);
   }
-  return xpN;
+  if (targetLvl <= 500) return xpN;
+  // Past level 500, switch from compounding (exponential) growth to a polynomial
+  // power-law formula. Exponential compounding, even at a tiny rate, always
+  // eventually overflows given enough levels — the original curve broke past
+  // safe-integer range by level 1000. Polynomial growth has no such runaway
+  // risk, stays safe through at least level 10,000, and still meaningfully
+  // increases the XP requirement each level rather than flattening out.
+  const baseAt500 = xpN;
+  return Math.floor(baseAt500 * Math.pow(targetLvl / 500, 3));
 }
 
 function lvlup(){
   const startLvl = G.p.lvl;
   while(G.p.xp>=G.p.xpN){
     G.p.xp-=G.p.xpN; G.p.lvl++;
-    // XP CURVE (rebalanced): 1.5x through Lv 14 stays as-is — early levels felt right.
-    // Previously 1.35x from 15-50 then 1.06x forever after was still compounding hard
-    // enough that the reward curve (which only grows roughly linearly per zone, ~15xp
-    // at zone 1 up to ~3000xp by zone 56) could never keep pace — by level 56 a single
-    // level required 1.3 BILLION xp against ~3,000xp per kill, i.e. hundreds of
-    // thousands of kills for one level. Softened so level 95 lands around ~650M
-    // cumulative XP instead of ~205 billion — a long grind, but a finishable one.
-    if(G.p.lvl < 15){
-      G.p.xpN=Math.floor(G.p.xpN*1.5);
-    } else if(G.p.lvl <= 50){
-      G.p.xpN=Math.floor(G.p.xpN*1.18);
-    } else {
-      G.p.xpN=Math.floor(G.p.xpN*1.025);
-    }
+    // XP curve lives in xpNeededForLevel() — routed through that single shared
+    // function rather than duplicating the formula here, after discovering this
+    // exact spot had drifted out of sync with a fix made to the shared version.
+    G.p.xpN = xpNeededForLevel(G.p.lvl);
     G.p.mhp+=10; G.p.mmp+=15; G.p.hp=G.p.mhp; G.p.mp=G.p.mmp;
     G.p.stats.int+=2; G.p.stats.con+=1;
     lg('LEVEL UP! Now Level '+G.p.lvl+'!');
