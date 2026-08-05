@@ -3855,6 +3855,7 @@ storyJournal: {
   bestiary: {},
   sessionRecap: { startLevel: 0, bosses: [], legendaryDrops: [], chapters: [], hiddenAt: 0 },
   showingSessionRecap: false,
+  enemyIconStyle: 'svg', // 'svg' or 'emoji' — player-toggleable in combat
   bestiaryExpanded: null,
   story: { active: true, chapter: 0, scene: 0, shown: false },
   storyChapters: [
@@ -13591,6 +13592,19 @@ function es(n){
   return '<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
 }
 
+// Picks SVG line-art or plain emoji per the player's preference — both map to the
+// same archetype, so switching styles never changes which "kind" of icon an enemy
+// gets, just how it's drawn.
+function enemyIcon(n){
+  return G.enemyIconStyle === 'emoji' ? ee(n) : es(n);
+}
+
+function toggleEnemyIconStyle(){
+  G.enemyIconStyle = G.enemyIconStyle === 'emoji' ? 'svg' : 'emoji';
+  saveGame();
+  render();
+}
+
 function re(r){const m={'Tank':'🛡️','Rogue':'🗡️','Mage':'🔮','Healer':'💚','Ranger':'🏹','Warrior':'⚔️','Support':'🍀'};return m[r]||'👤';}
 function ie(i){if(i.t=='pot')return i.eff=='heal'?'🧪':'💧';if(i.t=='food')return'🍽️';if(i.t=='drink')return'🥤';if(i.t=='revive')return'🔥';if(i.t=='wep')return'⚔️';if(i.t=='arm')return'🛡️';if(i.t=='acc')return'💍';if(i.t=='book')return'📖';if(i.t=='mat')return'💎';return'📦';}
 
@@ -13634,6 +13648,7 @@ function saveGame() {
       storyJournal: { unlocked: G.storyJournal.unlocked, read: G.storyJournal.read },
       knownRecipes: G.knownRecipes || [],
       migrations: G.migrations || {},
+      enemyIconStyle: G.enemyIconStyle || 'svg',
 
       // Add these inside the saveData object, alongside other fields:
     
@@ -13947,6 +13962,7 @@ function loadGame() {
     G.statBooster = data.statBooster || null;
     G.knownRecipes = data.knownRecipes || [];
     G.migrations = (data.player && data.player.migrations) || {};
+    G.enemyIconStyle = (data.player && data.player.enemyIconStyle) || 'svg';
     G.guildRepBalance = data.guildRepBalance !== undefined ? data.guildRepBalance : 0;
     if (data.guildContracts) {
       for (let c of G.guildContracts) {
@@ -17753,6 +17769,7 @@ function rCbt() {
   h += '<div class="combat-top-strip">';
   h += '<button id="btn-auto" class="icon-btn" style="flex:0 0 auto;border-color:' + (G.cbt.autoCombat ? 'var(--success)' : 'var(--border)') + ';background:' + (G.cbt.autoCombat ? 'color-mix(in srgb, var(--success) 15%, transparent)' : 'var(--bg-card)') + ';color:' + (G.cbt.autoCombat ? 'var(--success)' : 'var(--text-dim)') + ';font-size:12px;padding:6px 10px;gap:6px;" title="' + (G.cbt.autoCombat ? 'Auto-Combat ON — tap to take control' : 'Let the AI fight for you') + '">🤖 ' + (G.cbt.autoCombat ? 'AUTO ON' : 'Auto') + '</button>';
   h += '<button onclick="togglePotionMenu()" class="icon-btn" style="flex:0 0 auto;border-color:' + (usablePotions.length > 0 ? 'var(--success)' : 'var(--border)') + ';background:var(--bg-card);color:' + (usablePotions.length > 0 ? 'var(--success)' : 'var(--disabled)') + ';font-size:12px;padding:6px 10px;gap:6px;cursor:' + (usablePotions.length > 0 ? 'pointer' : 'not-allowed') + ';" title="Potions">🧪 ' + usablePotions.length + '</button>';
+  h += '<button onclick="toggleEnemyIconStyle()" class="icon-btn" style="flex:0 0 auto;border-color:var(--border);background:var(--bg-card);color:var(--text-dim);font-size:12px;padding:6px 10px;gap:6px;" title="Switch between line-art and emoji enemy icons">' + (G.enemyIconStyle === 'emoji' ? '🎨 Art' : '😀 Emoji') + '</button>';
   for (let b of badges) {
     h += '<span class="combat-badge" style="border-color:' + b.color + ';color:' + b.color + ';margin:0;" title="' + b.full.replace(/"/g, '&quot;') + '">' + b.icon + (b.text ? ' ' + b.text : '') + '</span>';
   }
@@ -17816,7 +17833,7 @@ function rCbt() {
     const lowHp = !d && hpPct <= 0.3;
 
     h += '<div class="ecard ecard-compact ' + (d ? 'dead' : '') + ' ' + s + (isBoss ? ' boss' : '') + '" data-i="' + i + '" style="--e-elem:' + elemVar + ';" title="' + e.n + (isBoss ? ' (Boss)' : '') + '">';
-    h += '<div class="eicon eicon-compact"><span class="eicon-medallion compact" style="--arch-color:' + (d ? 'var(--arch-undead)' : ac(e.n)) + ';">' + (d ? es('skeleton') : es(e.n)) + (isBoss && !d ? '<span class="boss-crown">👑</span>' : '') + '</span></div>';
+    h += '<div class="eicon eicon-compact"><span class="eicon-medallion compact" style="--arch-color:' + (d ? 'var(--arch-undead)' : ac(e.n)) + ';">' + (d ? enemyIcon('skeleton') : enemyIcon(e.n)) + (isBoss && !d ? '<span class="boss-crown">👑</span>' : '') + '</span></div>';
     h += '<div class="ename ename-compact">' + e.n + '</div>';
     h += (d ? '<div class="dt">DEAD</div>' : '<div class="hps' + (lowHp ? ' low' : '') + '"><div class="bf bf-hp" style="width:' + (hpPct * 100) + '%"></div></div><div class="hpt">' + e.hp + '/' + e.mhp + '</div>');
     h += '</div>';
