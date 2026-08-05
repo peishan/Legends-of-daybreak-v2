@@ -3856,6 +3856,7 @@ storyJournal: {
   sessionRecap: { startLevel: 0, bosses: [], legendaryDrops: [], chapters: [], hiddenAt: 0 },
   showingSessionRecap: false,
   enemyIconStyle: 'svg', // 'svg' or 'emoji' — player-toggleable in combat
+  bossRevealShownFor: null, // tracks which G.currentBoss object was last revealed, by reference
   bestiaryExpanded: null,
   story: { active: true, chapter: 0, scene: 0, shown: false },
   storyChapters: [
@@ -13427,6 +13428,30 @@ function renderSessionRecap() {
   a.innerHTML = h;
 }
 
+function renderBossReveal() {
+  const a = document.getElementById('app'); if (!a) return;
+  const boss = G.currentBoss;
+  const fileName = bossArtFileName(boss.n);
+
+  let h = '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:#000;">';
+  h += '<div style="width:100%;max-width:320px;">';
+  h += '<div style="text-align:center;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--danger);margin-bottom:10px;">\u26A0\uFE0F Boss Encounter</div>';
+  h += '<div style="width:100%;aspect-ratio:3/4;border-radius:16px;overflow:hidden;border:3px solid var(--gold);box-shadow:0 8px 32px rgba(0,0,0,0.7),0 0 40px color-mix(in srgb, var(--gold) 30%, transparent);margin-bottom:16px;">';
+  h += '<img src="bosses/' + fileName + '.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">';
+  h += '</div>';
+  h += '<div style="text-align:center;font-family:\'Cinzel\',serif;font-size:22px;font-weight:700;color:var(--gold);margin-bottom:6px;">' + boss.n + '</div>';
+  h += '<div style="text-align:center;font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:20px;font-style:italic;">' + boss.desc + '</div>';
+  h += '<button onclick="engageBossReveal()" class="abtn" style="width:100%;background:var(--danger);">\u2694\uFE0F Engage</button>';
+  h += '</div></div>';
+
+  a.innerHTML = h;
+}
+
+function engageBossReveal() {
+  G.bossRevealShownFor = G.currentBoss;
+  render();
+}
+
 function showSessionRecap() {
   const r = G.sessionRecap;
   const levelsGained = G.p.lvl - (r.startLevel || G.p.lvl);
@@ -14846,6 +14871,18 @@ function render(){
   // actually returns, which is exactly when AFK mode is most likely to be active.
   if (G.showingSessionRecap) {
     renderSessionRecap();
+    return;
+  }
+
+  // Boss reveal — a one-time, full-screen "boss appears" moment shown before the
+  // fight actually starts, but only for bosses with real custom art. Uses object
+  // identity rather than a plain boolean: every combat-start function across every
+  // mode (exploration, raid, chain quest, boss rush, dragon hunt, etc.) already
+  // creates a fresh G.currentBoss object, so comparing it against the last-revealed
+  // reference naturally detects a new fight without touching any of those 8+
+  // separate combat-start locations.
+  if (G.state === 'combat' && G.currentBoss && bossArtFileName(G.currentBoss.n) && G.currentBoss !== G.bossRevealShownFor) {
+    renderBossReveal();
     return;
   }
 
