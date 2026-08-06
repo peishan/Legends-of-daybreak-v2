@@ -15117,6 +15117,8 @@ function render(){
   else if(G.state=='boss_rush')h+=rBossRush();
   else if(G.state=='fraying_frontier')h+=rFrayingFrontier();
   else if(G.state=='zone_map_starting_lands')h+=rZoneMapStartingLands();
+  else if(G.state=='zone_map_arcane_ascent')h+=rZoneMapArcaneAscent();
+  else if(G.state=='zone_map_elemental_wars')h+=rZoneMapElementalWars();
   else if(G.state=='kindling_network')h+=rKindlingNetwork();
   else if(G.state=='boss_rush_room')h+=rBossRushRoom();
   else if(G.state=='fraying_frontier_room')h+=rFrayingFrontierRoom();
@@ -16954,6 +16956,69 @@ function rKindlingNetwork() {
 // so they scale with the image regardless of screen size), not pixel-exact. Labels
 // are real HTML text overlaid on tap, not relying on the generated image's own
 // baked-in text, since AI-generated map labels are sometimes garbled.
+const ELEMENTAL_WARS_HOTSPOTS = [
+  { name: 'Infernal Crucible', zi: 22, x: 50, y: 12 },
+  { name: 'The Scorched Vein', zi: 25, x: 28, y: 27 },
+  { name: 'Tidal Abyss', zi: 26, x: 76, y: 27 },
+  { name: 'The Shattered Crown', zi: 27, x: 50, y: 42 },
+  { name: 'The Hollow Throne', zi: 28, x: 28, y: 55 },
+  { name: 'The Final Spire', zi: 29, x: 76, y: 55 },
+  { name: 'The Apex', zi: 30, x: 32, y: 78 },
+  { name: 'The Breaking', zi: 31, x: 73, y: 78 }
+];
+
+function rZoneMapElementalWars() {
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'explore\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Back to Zone List</button>';
+  h += '<div class="st" style="text-align:center;">The Elemental Wars</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:12px;">Levels 23\u201330 \u2014 tap a marker to head there directly.</div>';
+  h += '<div style="position:relative;width:100%;border-radius:14px;overflow:hidden;border:2px solid var(--border);">';
+  h += '<img src="maps/elemental-wars.jpg" style="width:100%;display:block;">';
+  for (const spot of ELEMENTAL_WARS_HOTSPOTS) {
+    h += '<div class="map-hotspot" onclick="sc(' + spot.zi + ')" style="left:' + spot.x + '%;top:' + spot.y + '%;" title="' + spot.name + '">';
+    h += '<div class="map-hotspot-dot"></div>';
+    h += '<div class="map-hotspot-label">' + spot.name + '</div>';
+    h += '</div>';
+  }
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
+const ARCANE_ASCENT_HOTSPOTS = [
+  { name: 'Starlight Spire', zi: 9, x: 32, y: 18 },
+  { name: 'Arcane Planar Tower', zi: 10, x: 32, y: 27 },
+  { name: 'The Shattered Veil', zi: 11, x: 32, y: 38 },
+  { name: 'Emberfall Dimension', zi: 12, x: 32, y: 48 },
+  { name: 'Frostbound Eternity', zi: 13, x: 32, y: 58 },
+  { name: "Stormcaller's Cradle", zi: 14, x: 32, y: 70 },
+  { name: 'The Void Between', zi: 15, x: 82, y: 15 },
+  { name: 'Chronos Spire', zi: 16, x: 82, y: 25 },
+  { name: 'Aetherium Gardens', zi: 17, x: 82, y: 35 },
+  { name: 'The Convergence', zi: 18, x: 82, y: 45 },
+  { name: 'The Nexus', zi: 19, x: 76, y: 56 },
+  { name: 'The Fractured Veil', zi: 20, x: 82, y: 66 },
+  { name: 'The Astral Maelstrom', zi: 21, x: 82, y: 77 }
+];
+
+function rZoneMapArcaneAscent() {
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'explore\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Back to Zone List</button>';
+  h += '<div class="st" style="text-align:center;">The Arcane Ascent</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:12px;">Levels 10\u201322 \u2014 tap a marker to head there directly.</div>';
+  h += '<div style="position:relative;width:100%;border-radius:14px;overflow:hidden;border:2px solid var(--border);">';
+  h += '<img src="maps/arcane-ascent.jpg" style="width:100%;display:block;">';
+  for (const spot of ARCANE_ASCENT_HOTSPOTS) {
+    h += '<div class="map-hotspot" onclick="sc(' + spot.zi + ')" style="left:' + spot.x + '%;top:' + spot.y + '%;" title="' + spot.name + '">';
+    h += '<div class="map-hotspot-dot"></div>';
+    h += '<div class="map-hotspot-label">' + spot.name + '</div>';
+    h += '</div>';
+  }
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
 const STARTING_LANDS_HOTSPOTS = [
   { name: 'Whispering Woods', zi: 0, x: 18, y: 34 },
   { name: 'Cursed Catacombs', zi: 1, x: 38, y: 44 },
@@ -17740,7 +17805,9 @@ function rZoneMapTabs() {
   }
   h += '</div>';
   if (G.exploreMapTab === 0 && !hasEnteredVerdantReach()) {
-    h += '<button onclick="setS(\'zone_map_starting_lands\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F View Illustrated Map (Levels 1\u20139)</button>';
+    h += '<button onclick="setS(\'zone_map_starting_lands\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F Starting Lands Map (1\u20139)</button>';
+    h += '<button onclick="setS(\'zone_map_arcane_ascent\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F Arcane Ascent Map (10\u201322)</button>';
+    h += '<button onclick="setS(\'zone_map_elemental_wars\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F Elemental Wars Map (23\u201330)</button>';
   }
   if (hasEnteredVerdantReach()) {
     h += '<div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;">Everywhere before this is still there \u2014 Zul just drives now.</div>';
