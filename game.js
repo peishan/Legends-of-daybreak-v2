@@ -745,6 +745,12 @@ const G = {
     { id: 'b50', n: "Someone Else's Kindling", d: 'Defeat What Was Almost Enough', t: 'kill_specific', target: 'What Was Almost Enough', c: 0, need: 1, rw: { xp: 29000, g: 21500 }, done: false, refreshDay: 0, minLv: 99, maxLv: 999 },
     { id: 'b51', n: 'Two Lines, One Fight', d: 'Defeat The Line Neither Could Hold Alone', t: 'kill_specific', target: 'The Line Neither Could Hold Alone', c: 0, need: 1, rw: { xp: 34000, g: 25000 }, done: false, refreshDay: 0, minLv: 100, maxLv: 999 },
 
+    // Materials for the Vision Machine — Varel Farseer's request. Not gated by minLv;
+    // a player who already cleared both dragons for the Dragon Hunt just finds these
+    // waiting complete when they meet him, which reads as earned rather than a bug.
+    { id: 80, n: "The Farseer's Request I: A Splinter of the Horizon", d: 'Defeat Skarrowyn, the Split Horizon, and recover a splinter of scale for the Vision Machine', t: 'boss_specific', target: 'Skarrowyn, the Split Horizon', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
+    { id: 81, n: "The Farseer's Request II: A Thread of the Wound", d: 'Defeat Nyxathorne, the Unmended Wound, and recover a thread for the Vision Machine', t: 'boss_specific', target: 'Nyxathorne, the Unmended Wound', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
+
   ],
 
   // Guild Contracts — bigger, rarer versions of bounties, refreshing weekly instead of
@@ -1058,6 +1064,10 @@ const G = {
       d: 'Once the last true believer of a doctrine built on a lie, now tending something small and honest instead. She knows the difference between real devotion and performed devotion better than almost anyone alive \u2014 and knows exactly what that knowledge cost her.',
       ability: 'Hard-Won Faith: +8% Temple standing gained from every source.',
       unlocked: false, ul: 62 },
+    { n: 'Varel Farseer', t: 'ally', title: 'The One Who Watches the Distance', icon: '🔮', col: '#0ea5e9',
+      d: "A hermit scryer who has kept watch over the boundary between here and everywhere else for longer than he has bothered counting. He found Mimi's Dreamsight the way he finds most things worth finding \u2014 by accident, mid-conversation, and immediately recognized raw instinct that had never once been given any actual discipline. He does not perform wisdom. He mostly just says the true thing, at whatever volume it happens to arrive in, and lets you decide what to do with it.",
+      ability: "Steady Sight: keeps the Vision Machine's window from ever fully closing.",
+      unlocked: false, ul: 150 },
     { n: 'Amad', t: 'trader', title: 'Brunei Food Merchant', icon: '🍜', col: '#16a34a', zone: 'Whispering Woods', zoneLv: 1,
       d: "A warm-hearted vendor from Bandar Seri Begawan who used to bring lunch straight to San's office floor, regular as anything — until he simply stopped showing up, months before the world ended, for reasons San never found out and still cannot ask him about directly, not in a way that would not feel strange. Out here he is exactly as warm as he always was. She has decided, for now, not to need the rest of the answer. He will buy anything you have — drops, loot, used gear — at fair prices.",
       stock: [
@@ -2158,7 +2168,9 @@ storyJournal: {
           { speaker: 'Joel', text: '"What kind of person does not wait?" Joel asks, quiet, not rhetorical — he actually wants to know what you decided.' },
           { speaker: 'San', text: '"A tired one," you say. "A person who was already drowning and found somebody who could actually hold weight. I do not think that needed their permission. I just used to think it did."' },
           { speaker: 'Narrator', text: 'You are quiet for a moment, and Joel lets the quiet sit, because he has learned by now that your silences are not empty either — they are you deciding how much further into this you want to go tonight.' },
-          { speaker: 'San', text: '"My father has three daughters," you say, eventually. "All three of us have been divorced. I came close enough to it myself before things went the way they did that it barely counts as an exception. I think somewhere in him, watching that pattern, he stopped trusting that any relationship holds. Not because he does not love us. Because loving us and watching us get hurt, three times over, taught him to brace before anything even starts going wrong."' },
+          { speaker: 'San', text: '"My father had three daughters," you say, eventually.' },
+          { speaker: 'Narrator', text: 'A quiet pause, the fire doing most of the talking for a moment.' },
+          { speaker: 'San', text: '"All three of us watched our marriages fall apart," you say. "I think somewhere in him, watching that same shape happen three times over, he stopped trusting that any relationship holds. Not because he does not love us. Because loving us and watching us get hurt, three times over, taught him to brace before anything even starts going wrong."' },
           { speaker: 'San', text: '"And then I brought him you," you say, almost smiling, almost not. "Filipino, when our whole family is ethnic Chinese, roots going back through Brunei and Malaysia for generations. I do not think he is unkind about it. I think he is just — unsure. One more variable, stacked on top of a pattern that already scared him. He has never said a cruel word about it. He also has never quite said it is fine."' },
           { speaker: 'Joel', text: '"Does that hurt?" Joel asks, direct, the way he asks the questions that actually matter.' },
           { speaker: 'San', text: '"It used to," you admit. "I used to think if I just explained it well enough — the workplace, my father, all of it — someone would finally say the thing I wanted to hear. That I made the right call. That I am not the reckless daughter, the one who could not wait, the one who complicated an already-scared father\'s year."' },
@@ -3612,8 +3624,86 @@ storyJournal: {
       }
 ,{
         id: 'journal_100',
-        title: 'The Door, Finally',
+        title: 'The One Who Watches the Distance',
         chapter: 100,
+        unlockType: 'level',
+        unlockAt: 148,
+        icon: '🔮',
+        summary: "A hermit scryer finds Mimi's Dreamsight the way he finds most things — by accident — and offers to help her point it somewhere it has never reached before. It will cost more than patience.",
+        scenes: [
+          { speaker: 'Narrator', text: "He is already sitting at your camp when you arrive, uninvited and entirely unbothered about it, like the fire has simply always had one more person around it than you remembered inviting. Soel does not hiss. Soel almost never approves of strangers this fast." },
+          { speaker: 'Varel Farseer', text: '"You are the one with the office friend who already knows things," he says, not quite a question, nodding at Mimi without looking up from whatever he is doing to the fire. "I felt her from three valleys over. Untrained. Loud, in the way things are loud when nobody ever taught them to whisper."' },
+          { speaker: 'Mimi', text: '"Untrained," Mimi repeats, testing the word like it might bite. "I have always known things. Nobody taught me. It was just already there."' },
+          { speaker: 'Varel Farseer', text: '"That is exactly the problem," he says, entirely unbothered by how that lands. "A gift nobody trained is a door nobody learned to open on purpose. It opens anyway, sometimes, whenever it wants to. Never where you actually need it to."' },
+          { speaker: 'San', text: '"And you can train it," you say, already feeling the shape of where this is going, already half-afraid to hope out loud.' },
+          { speaker: 'Varel Farseer', text: '"I can teach her the discipline. I have kept watch on the boundary between here and everywhere else for longer than I have bothered counting." He finally looks up, and his eyes are the particular unsettling kind that seem to be looking at something several minutes in either direction from now. "Discipline is not power. She has more raw power than I ever had. I just know how to point."' },
+          { speaker: 'Joel', text: '"Point at what," Joel asks, careful, already guessing.' },
+          { speaker: 'Varel Farseer', text: '"At whatever the two of you have been carrying and not saying out loud," Varel says, entirely without cruelty, the way a man states weather. "The old world. The parents you cannot reach. The daughter you send letters into silence for. I do not need you to tell me. I only need to watch you both not talk about it for one evening to know exactly what it is."' },
+          { speaker: 'San', text: 'The fire pops. Nobody says anything for a moment, because he is simply right, and there is no dignified way to argue with correct.' },
+          { speaker: 'Varel Farseer', text: '"A window," he says. "Not a door. I want to be exact about that before either of you get your hopes arranged wrong. A window does not let anything through. It only lets you see. That is the honest limit of what any of this can ever be, and I would rather tell you that now than let you find out the hard way later."' },
+          { speaker: 'San', text: '"A window is more than we have had this entire time," you say, and your voice comes out steadier than you expected. "A window is not nothing."' },
+          { speaker: 'Varel Farseer', text: '"No," Varel agrees, something almost gentle under the flatness. "It is not nothing. It will also not be easy, or cheap, or quick. Building a frame strong enough to hold a window between two entire worlds takes more than good intentions and an untrained gift. It takes materials most people never go looking for, because most people never have a reason to."' },
+          { speaker: 'Mimi', text: '"Tell us where to look," Mimi says, already standing, already done deliberating. "I have spent this whole journey knowing things two floors away. I would like, for once, to know something that actually matters this much."' },
+          { speaker: 'Varel Farseer', text: '"Two things," Varel says. "A splinter off Skarrowyn, the Split Horizon \u2014 that dragon has spent its whole unnatural life being two things looking at each other across a line that should not exist. That is exactly the property a window needs. And a thread off Nyxathorne, the Unmended Wound \u2014 a wound that never closed knows more about looking at what is missing than anything else alive. Bring me both, and I will teach Mimi how to hold the rest steady."' },
+          { speaker: 'Joel', text: '"We already know where both of those are," Joel says, and for the first time since Varel sat down, something in his voice sounds almost like hope trying not to get ahead of itself. "We have fought worse for less."' },
+          { speaker: 'Varel Farseer', text: '"I know," Varel says, and for just a moment the strange, elsewhere-focused look in his eyes settles fully on the present, on all of you, warmer than anything he has said so far. "That is rather why I offered."' },
+        ]
+      }
+,{
+        id: 'journal_101',
+        title: 'What It Takes to Build a Window',
+        chapter: 101,
+        unlockType: 'level',
+        unlockAt: 149,
+        icon: '🪞',
+        summary: 'Skarrowyn and Nyxathorne both fall, and Varel and Mimi build the frame together — his discipline, her untrained sight, and one honest warning about the cost.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The splinter off Skarrowyn does not look like much once the fight is over \u2014 a sliver of scale still holding two colors that refuse to agree with each other, fire bleeding into cosmic dark along one thin seam. Nyxathorne\'s thread is worse to look at directly, a strand of something that was clearly once whole and is now permanently, deliberately not.' },
+          { speaker: 'San', text: '"This is what a window is made of," you say, turning the splinter over in your hand, unable to quite reconcile how something this small held a fight that hard.' },
+          { speaker: 'Varel Farseer', text: '"Everything worth building is made of something that cost more than it looks like," Varel says, taking both pieces from you with more care than you expected from someone who found you three valleys away by accident. "Now. The actual work."' },
+          { speaker: 'Narrator', text: 'He sets both pieces at the center of a circle he has clearly drawn a hundred times before, in a hundred other places, and gestures Mimi forward without ceremony.' },
+          { speaker: 'Varel Farseer', text: '"Give me your hand. Not your gift \u2014 your hand. The gift will follow on its own. It always does, once it finally has somewhere real to go."' },
+          { speaker: 'Mimi', text: 'Mimi kneels across from him, and for the first time since you have known her, she looks genuinely uncertain \u2014 not about the danger, about whether she is actually capable of the thing being asked of her.' },
+          { speaker: 'Mimi', text: '"What if I am not strong enough," she says, quiet, the question she has clearly been sitting on since the tower.' },
+          { speaker: 'Varel Farseer', text: '"You already reached a coworker\'s exhaustion two floors down through a wall, in a world that did not even believe in magic yet," Varel says, flat, certain. "Strength was never the missing piece. Aim was. I am not lending you power tonight. I am only teaching you where to point what you already have."' },
+          { speaker: 'Narrator', text: 'The splinter and the thread begin to turn between them, slow, then faster, then not moving at all in any way you can actually track \u2014 just present, differently, like something has been persuaded rather than built.' },
+          { speaker: 'Varel Farseer', text: '"One more thing, before this finishes," he says, not looking up, voice steady even as the light between his hands and Mimi\'s gets harder to look at directly. "This will not be free to use, once it exists. Not in materials \u2014 those are spent already, tonight. In cost. A window this size, held open between two worlds that were never meant to touch, takes more than either of you will want to pay every single time. Gold, mostly. An enormous, deliberately unreasonable amount of it."' },
+          { speaker: 'Joel', text: '"Why deliberately," Joel asks.' },
+          { speaker: 'Varel Farseer', text: '"Because if it were easy, you would use it every day, and stop actually living the life you are trying to check in on," Varel says, and for once there is no strangeness in his voice at all, just plain, unhurried honesty. "This should cost enough that you only ever open it because you truly mean to. Not out of habit. Out of love, spent on purpose."' },
+          { speaker: 'San', text: '"That is fair," you say, and mean it, even as something in your chest aches at the size of what he is describing. "We are not exactly short on gold these days."' },
+          { speaker: 'Varel Farseer', text: '"No," Varel agrees, the faintest, rare smile finally showing. "I rather assumed as much. That was, admittedly, part of the plan." He looks between you both, then finally at Mimi, whose hands have stopped shaking. "It is ready. Whenever the two of you are."' },
+        ]
+      }
+,{
+        id: 'journal_102',
+        title: 'The First Vision',
+        chapter: 102,
+        unlockType: 'level',
+        unlockAt: 150,
+        icon: '👁️',
+        summary: 'The Vision Machine opens for the first time. Not a door. A window \u2014 and it is enough.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The frame stands finished at the edge of the Mended Grove now, unassuming, more like a tall mirror missing its glass than anything you expected from a night of dragon splinters and unmended thread. Varel has already made himself comfortable beside it, like he has been sitting there for years rather than hours.' },
+          { speaker: 'Varel Farseer', text: '"Whenever you are ready," he says. "Both of you, if you like. It answers to intent, not to a single hand."' },
+          { speaker: 'Joel', text: 'Joel goes first, without needing to be asked twice \u2014 a folded letter already in hand, the same care in his fingers you have watched him carry into every letter since the Crucible. He does not read it aloud. He simply holds it to the frame, and the frame simply takes it, the way a held breath finally gets let out.' },
+          { speaker: 'Joel', text: '"For my mother," he says, quiet, to no one in particular. "Same as always. Just \u2014 further, this time. Actually further."' },
+          { speaker: 'San', text: 'Then it is your turn, and you find you have no letter, nothing prepared, nothing rehearsed \u2014 just your own two hands, and an ache that has been waiting a very long time for somewhere to actually go.' },
+          { speaker: 'Varel Farseer', text: '"You do not need words for this part," Varel says, gentler than you have heard him yet. "Just look."' },
+          { speaker: 'Narrator', text: 'The window does not open like a door. It simply stops being a frame around nothing, and becomes a frame around somewhere \u2014 a small kitchen you would know with your eyes closed, afternoon light through a curtain you helped choose years ago, your mother\'s hands moving through some small, unremarkable task exactly the way they always have.' },
+          { speaker: 'San', text: '"She is fine," you say, and your voice breaks on the second word, all the air you had been holding for this finally let go at once. "She is just \u2014 she is making tea. She is fine."' },
+          { speaker: 'Narrator', text: 'You do not know if she is fine in every way that matters. You will never fully know that, not through a window that only shows and never tells. But she is upright, and moving, and humming something under her breath the way she always has, and for tonight that is not almost enough. It is enough.' },
+          { speaker: 'Aisyah', text: '"Is that Mum\'s kitchen," Aisyah asks from behind you, voice gone very small, and you realize she followed without either of you noticing \u2014 of course she did.' },
+          { speaker: 'San', text: '"It is," you say, and step aside so she can see too, because some things were never meant to be carried by only one of you.' },
+          { speaker: 'Varel Farseer', text: '"It will not stay open," he says, careful, the warning arriving exactly on time rather than early enough to spoil anything. "It never does, for long. And it will cost the same, every single time you choose to open it again. I am not sorry about that. I built it that way on purpose."' },
+          { speaker: 'San', text: '"I understand," you say, and you do, fully, the way you have learned to understand most hard things lately \u2014 not as unfair, just as true. "Thank you. For all of it. For pointing something that has been loud and untrained her whole life somewhere it could finally actually matter."' },
+          { speaker: 'Mimi', text: '"Two floors away, my whole life," Mimi says, quiet, watching the window finally begin to fade. "And this is the first time it ever felt like enough."' },
+          { speaker: 'Narrator', text: 'The frame goes still, glassless and ordinary again, waiting at the edge of the grove for the next time either of you can bear the cost \u2014 gold, and hope, spent on purpose, exactly the way Varel intended.' },
+        ]
+      }
+,{
+        id: 'journal_103',
+        title: 'The Door, Finally',
+        chapter: 103,
         unlockType: 'level',
         unlockAt: 210,
         icon: '🚪',
@@ -3634,9 +3724,9 @@ storyJournal: {
         ]
       }
 ,{
-        id: 'journal_101',
+        id: 'journal_104',
         title: 'Not the Old World',
-        chapter: 101,
+        chapter: 104,
         unlockType: 'level',
         unlockAt: 225,
         icon: '🌀',
@@ -3657,9 +3747,9 @@ storyJournal: {
         ]
       }
 ,{
-        id: 'journal_102',
+        id: 'journal_105',
         title: 'Beyond the Horizon',
-        chapter: 102,
+        chapter: 105,
         unlockType: 'level',
         unlockAt: 240,
         icon: '🌅',
@@ -3822,6 +3912,7 @@ storyJournal: {
   frayingFrontier: { active: false, streak: 0, bestStreak: 0 }, // endless mode, level 100+, bosses scale off current player level indefinitely
   guildWar: { active: false, streak: 0, bestStreak: 0, fielded: [] }, // squad gauntlet vs rival guilds, unlocks after Iris & Ash (journal_097) + Lv 105
   guildRoster: { recruited: [] }, // ids from GUILD_MEMBERS who've actually joined the Guild War roster
+  visionMachine: { lastUseDay: -1, joelLetterCount: 0 }, // Varel Farseer's window — once per real day, 1M gold
   kindlingCommissions: { linesToday: 0, checksToday: 0, refreshDay: 0 }, // bounded daily ritual — 3 lines, 2 checks, resets once per game day
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
@@ -6626,7 +6717,12 @@ const TEMPLE_TRINKETS = [
 const TEMPLE_CONSUMABLES = [
   { n: 'Vial of Cleansing', t: 'pot', eff: 'cure_ailment', minRank: 1, cost: 60, r: 'uncommon', d: 'A portable version of the temple\'s own cure \u2014 no need to travel back for a single affliction.' },
   { n: 'Draught of Steady Hands', t: 'pot', eff: 'bless', minRank: 5, cost: 140, r: 'rare', d: 'Temple Chosen only. A blessing you can carry into the field instead of waiting for one.' },
-  { n: 'Elixir of Swift Growth', t: 'pot', eff: 'xp_boost', v: 30, boostPct: 0.5, minRank: 2, cost: 250, r: 'rare', d: '+50% XP for 30 real minutes. Only one can be active at a time \u2014 the Temple will not sell you a second bottle while the first still glows.' }
+  { n: 'Elixir of Swift Growth', t: 'pot', eff: 'xp_boost', v: 30, boostPct: 0.5, minRank: 2, cost: 250, r: 'rare', d: '+50% XP for 30 real minutes. Only one can be active at a time \u2014 the Temple will not sell you a second bottle while the first still glows.' },
+  { n: 'Elixir of Swift Growth (2 Hour)', t: 'pot', eff: 'xp_boost', v: 120, boostPct: 0.5, minRank: 2, cost: 900, r: 'rare', d: '+50% XP for 2 real hours. Same blessing, longer bottle. Only one growth elixir can be active at a time.' },
+  { n: 'Elixir of Swift Growth (4 Hour)', t: 'pot', eff: 'xp_boost', v: 240, boostPct: 0.5, minRank: 3, cost: 1600, r: 'epic', d: '+50% XP for 4 real hours. The Temple only trusts this size bottle to Chosen who have actually stuck around a while. Only one growth elixir can be active at a time.' },
+  { n: 'Elixir of Swift Growth (8 Hour)', t: 'pot', eff: 'xp_boost', v: 480, boostPct: 0.5, minRank: 4, cost: 2800, r: 'epic', d: '+50% XP for 8 real hours \u2014 long enough to just leave it running in the background of a whole session. Only one growth elixir can be active at a time.' },
+  { n: 'Elixir of Swift Growth (10 Hour)', t: 'pot', eff: 'xp_boost', v: 600, boostPct: 0.5, minRank: 4, cost: 3300, r: 'epic', d: '+50% XP for 10 real hours. Only one growth elixir can be active at a time.' },
+  { n: 'Elixir of Swift Growth (12 Hour)', t: 'pot', eff: 'xp_boost', v: 720, boostPct: 0.5, minRank: 5, cost: 3800, r: 'legendary', d: '+50% XP for a full 12 real hours. Temple Chosen only \u2014 the biggest bottle they keep behind the counter. Only one growth elixir can be active at a time.' }
 ];
 
 function getGuildRank() {
@@ -7619,6 +7715,78 @@ function isAllyUnlocked(name) {
   const npc = G.npcs.find(n => n.n === name && n.t === 'ally');
   return npc ? npc.unlocked : false;
 }
+
+// === THE VISION MACHINE ===
+// Varel Farseer + Mimi's trained Dreamsight, built at the Mended Grove after journal_102.
+// Deliberately expensive and deliberately once-per-real-day — a window, not a door, and
+// never meant to become infrastructure. San's side stays strictly one-directional (a
+// vision, never a conversation) to keep the "no certainty" arc from the Cellphone chapters
+// intact. Joel's side rides his own already-established letter-writing thread instead, and
+// can rarely surface a small reply from his mother the more letters he's sent through it.
+const VISION_MACHINE_COST = 1000000;
+
+const VISION_VIGNETTES = [
+  "Your mother is in the kitchen, mid-afternoon light through the curtain, humming something you cannot quite place. She sets the kettle down and does not look toward the window. She has no reason to.",
+  "Your father is asleep in the good chair, a blanket someone else must have draped over him, the television on low with the sound turned down further than it needs to be. He looks tired. He also looks, for now, at rest.",
+  "Both your parents are on the porch, not talking, just sitting the way people do after decades of not needing to fill every silence. Your mother is peeling something into a bowl. Your father is watching her do it.",
+  "Your mother is on the phone, laughing at something, one hand braced on the counter. You cannot hear who she is talking to. You decide, for tonight, that it does not matter — only that she is laughing.",
+  "Your father is slower getting up from the chair than he used to be. He makes it anyway, unhurried, and pauses to steady himself against the doorframe for exactly as long as he needs to, then keeps going.",
+  "Your mother is fussing over a pot that clearly does not need fussing over, the exact same way she always has, muttering at it under her breath like it might argue back.",
+  "One of your sisters is there too, sitting across from your mother at the small table, the two of them going through something — bills, maybe, or nothing important at all. You cannot tell which, and for once it is a relief not to know.",
+  "Your father is in the garden, crouched slower than he used to crouch, tending something green that is doing better than it has any right to. He straightens up, presses a hand to his back, and keeps going anyway.",
+  "The house is quiet, mid-morning, nobody visibly in frame — just light through familiar windows, a ceiling fan turning, a kettle steaming on the stove that someone will come back for in a moment. Ordinary. Undramatic. Still standing.",
+  "Your mother is folding laundry on the bed, the same unhurried rhythm she has always folded laundry in, and for just a moment she pauses, mid-fold, and looks toward the window — and you will never know if she felt anything at all, or if it was nothing, just a mother pausing in an ordinary afternoon."
+];
+
+const JOEL_LETTER_REPLIES = [
+  "The window holds a moment longer than usual. Something comes back through with it this time — his mother's handwriting, familiar even distorted through whatever this is. \"I keep them all,\" it says. \"Every one. I do not need you to come home to know you are still my son.\"",
+  "A reply, brief, unmistakably hers: \"Your daughter asked about you today. I told her the truth — that you are far away, and that you write, and that far away has never once meant gone.\"",
+  "This time something answers: \"Stop apologizing in every letter. I forgave you before you ever thought to ask. A mother does not keep score the way you are afraid I do.\"",
+  "Her handwriting again, shorter than usual: \"She drew you a picture today. I do not have a way to send it to you. I am keeping it anyway, for whenever that changes.\""
+];
+
+function isVisionMachineUnlocked() {
+  return G.storyJournal.read.includes('journal_102');
+}
+
+function canUseVisionMachine() {
+  return isVisionMachineUnlocked() && G.visionMachine.lastUseDay !== G.gameDay && G.p.gold >= VISION_MACHINE_COST;
+}
+
+function useVisionMachine() {
+  if (!isVisionMachineUnlocked()) { lg('🔮 The Vision Machine has not been built yet.'); return; }
+  if (G.visionMachine.lastUseDay === G.gameDay) { lg('🔮 The window already opened once today. It needs to rest before it can hold that much again.'); return; }
+  if (G.p.gold < VISION_MACHINE_COST) { lg('🔮 Varel: "It is not stubbornness. The frame genuinely needs that much to hold open. Come back when you have it."'); return; }
+
+  G.p.gold -= VISION_MACHINE_COST;
+  G.visionMachine.lastUseDay = G.gameDay;
+  G.visionMachine.joelLetterCount = (G.visionMachine.joelLetterCount || 0) + 1;
+
+  const vignette = VISION_VIGNETTES[Math.floor(Math.random() * VISION_VIGNETTES.length)];
+  lg('👁️ ' + vignette);
+
+  lg('✉️ Joel sends another letter through. "For my mother," he says, same as always.');
+  if (G.visionMachine.joelLetterCount >= 3 && Math.random() < 0.15) {
+    const reply = JOEL_LETTER_REPLIES[Math.floor(Math.random() * JOEL_LETTER_REPLIES.length)];
+    lg('   ' + reply);
+  }
+
+  render();
+}
+
+const VAREL_BANTER = [
+  'Varel Farseer: "You are allowed to just sit here without opening it, you know. It does not mind waiting."',
+  'Varel Farseer: "Most people who find me are looking for a way to fix something. Watching is not fixing. I have made my peace with that. You may need longer."',
+  'Varel Farseer: "Discipline is not the same as certainty. I have been doing this a very long time and I still do not know most of what I am looking at."',
+  'Varel Farseer: "Mimi asks better questions than I did, at her age. I was mostly just trying to make the noise stop."',
+  'Varel Farseer: "A window shows you a moment. It does not show you tomorrow. People forget that, and then are surprised when tomorrow still worries them."',
+  'Varel Farseer: "I do not charge that much because I am cruel. I charge that much because I want you to actually mean it, every time you choose to look."',
+  'Varel Farseer: "Soel does not trust me yet. Good. That cat has better instincts than most people I have met."',
+  'Varel Farseer: "The Split Horizon and the Unmended Wound. Strange, is it not, how the materials that build a window are always something that broke first."',
+  'Varel Farseer: "You do not have to open it today. Loving someone from a distance does not require proof on a schedule."',
+  'Varel Farseer: "I watched a great many boundaries in my life before I ever met either of you. This is the first one I have actually cared what was on the other side of."'
+];
+
 function getAllyXpBonus() {
   return (isAllyUnlocked('Mimi') ? 0.08 : 0) + getGuildWarFieldBonus('xpPct');
 }
@@ -14329,6 +14497,8 @@ function saveGame() {
     bossRushBestStreak: G.bossRush.bestStreak || 0,
     guildWarBestStreak: G.guildWar.bestStreak || 0,
     guildRosterRecruited: G.guildRoster.recruited || [],
+    visionMachineLastUseDay: G.visionMachine.lastUseDay,
+    visionMachineJoelLetterCount: G.visionMachine.joelLetterCount || 0,
     chainQuests: G.chainQuests || {},
     strongholdCosmetics: G.strongholdCosmetics,
     bondingSeenScenes: G.bonding.seenScenes,
@@ -14598,6 +14768,8 @@ function loadGame() {
     G.bossRush.bestStreak = data.bossRushBestStreak || 0;
     G.guildWar.bestStreak = data.guildWarBestStreak || 0;
     G.guildRoster.recruited = data.guildRosterRecruited || [];
+    G.visionMachine.lastUseDay = data.visionMachineLastUseDay !== undefined ? data.visionMachineLastUseDay : -1;
+    G.visionMachine.joelLetterCount = data.visionMachineJoelLetterCount || 0;
     G.chainQuests = data.chainQuests || {};
     // Any chain that was mid-fight when the save happened resumes from its saved floor,
     // not stuck mid-combat — active gets cleared, stageIndex (the real progress) doesn't.
@@ -18100,6 +18272,23 @@ function rStrongholds() {
     h += '<div class="panel-title">' + def.icon + ' ' + def.name + '</div>';
     h += '<div class="btn-hint" style="margin:6px 0;">' + def.desc + '</div>';
     h += '</div>';
+    if (id === 'mendedGrove' && isAllyUnlocked('Varel Farseer')) {
+      h += '<div class="panel panel-gold">';
+      h += '<div class="panel-title" style="color:var(--gold);">🔮 Varel Farseer</div>';
+      const banter = VAREL_BANTER[Math.floor(Math.random() * VAREL_BANTER.length)];
+      h += '<div class="btn-hint" style="margin:6px 0;font-style:italic;">' + banter + '</div>';
+      h += '<div style="border-top:1px solid var(--border);margin:10px 0;padding-top:10px;">';
+      h += '<div style="font-size:12px;font-weight:600;margin-bottom:6px;">The Vision Machine</div>';
+      if (G.visionMachine.lastUseDay === G.gameDay) {
+        h += '<div class="btn-hint">🔮 The window opened once today. Come back tomorrow.</div>';
+      } else if (G.p.gold < VISION_MACHINE_COST) {
+        h += '<div class="btn-hint">🔮 Costs ' + VISION_MACHINE_COST.toLocaleString() + 'G to open. You have ' + Math.floor(G.p.gold).toLocaleString() + 'G.</div>';
+      } else {
+        h += '<button onclick="useVisionMachine()" class="abtn" style="width:100%;">🔮 Open the Window (' + VISION_MACHINE_COST.toLocaleString() + 'G)</button>';
+      }
+      h += '</div>';
+      h += '</div>';
+    }
     h += rSiegeBanner(id);
     h += rGuildHallPanel(id);
     h += '<button onclick="setS(\'rest\')" class="btn-outline-ghost" style="width:100%;margin-bottom:16px;">💤 Visit Rest Sites</button>';
