@@ -18777,6 +18777,14 @@ function bossArtFileName(bossName) {
   if (n === 'corvenna, the root that waited') return 'corvenna';
   if (n === 'skarrowyn, the split horizon') return 'skarrowyn';
   if (n === 'aetherum, the last question') return 'aetherum';
+  if (n === 'echo of joel') return 'echoofjoel';
+  if (n === 'the vanished guide') return 'thevanishedguide';
+  if (n === 'hollow eliz') return 'holloweliz';
+  if (n === 'rustbound zaki') return 'rustboundzaki';
+  if (n === 'mezstorm unbound') return 'mezstormunbound';
+  if (n === 'the fading familiar') return 'thefadingfamiliar';
+  if (n === 'echo of aisyah') return 'echoofaisyah';
+  if (n === 'the tired version') return 'thetiredversion';
   return null;
 }
 function bossArtImg(bossName, fallbackHtml) {
