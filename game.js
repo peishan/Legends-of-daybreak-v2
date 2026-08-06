@@ -16809,6 +16809,12 @@ function rDragonHunt() {
     const clearedCount = (G.dragonHunt.cleared && G.dragonHunt.cleared[dragon.id]) || 0;
 
     h += '<div class="panel' + (unlocked ? ' panel-gold' : '') + '" style="text-align:center;">';
+    const dragonArtFile = bossArtFileName(dragon.n);
+    if (dragonArtFile) {
+      h += '<div style="width:100%;max-width:220px;aspect-ratio:3/4;margin:0 auto 10px;border-radius:12px;overflow:hidden;border:2px solid ' + (unlocked ? 'var(--gold)' : 'var(--border)') + ';' + (unlocked ? '' : 'filter:grayscale(0.6) brightness(0.5);') + '">';
+      h += '<img src="bosses/' + dragonArtFile + '.jpg" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.style.display=\'none\';">';
+      h += '</div>';
+    }
     h += '<div class="panel-title" style="' + (unlocked ? 'color:var(--gold);' : '') + '">' + dragon.n + '</div>';
     h += '<div class="btn-hint" style="margin:10px 0;line-height:1.5;">' + dragon.desc + '</div>';
     if (clearedCount > 0) {
@@ -18312,6 +18318,12 @@ function bossArtFileName(bossName) {
   if (n === 'the hollow prophet') return 'thehollowprophet';
   if (n === 'the infernal tyrant') return 'theinfernaltyrant';
   if (n === 'elder dragon') return 'elderdragon';
+  if (n === 'vaelithorn, the ancient wyrm') return 'vaelithorn';
+  if (n === 'thessarune, the endless maw') return 'thessarune';
+  if (n === 'nyxathorne, the unmended wound') return 'nyxathorne';
+  if (n === 'corvenna, the root that waited') return 'corvenna';
+  if (n === 'skarrowyn, the split horizon') return 'skarrowyn';
+  if (n === 'aetherum, the last question') return 'aetherum';
   return null;
 }
 function bossArtImg(bossName, fallbackHtml) {
