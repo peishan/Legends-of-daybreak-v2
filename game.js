@@ -18317,8 +18317,19 @@ function hasEnteredVerdantReach() {
   return G.storyJournal.read.includes(VERDANT_REACH_BRIDGE_CHAPTER);
 }
 
+// Explore-tab-specific gate: the Verdant Reach tab should only REPLACE the low-level
+// tabs while your current level actually justifies it. hasEnteredVerdantReach() alone
+// is a permanent, one-way story flag — correct for retiring old-world strongholds
+// forever, but wrong here, since Prestige resets G.p.lvl back to 1 without un-reading
+// the bridge chapter. Without this extra level check, a post-prestige player at Lv 1
+// would only ever see the Verdant Reach tab (56-200) with every single zone locked,
+// and no tab left that shows anything they can actually reach.
+function isInVerdantReachTabMode() {
+  return hasEnteredVerdantReach() && G.p.lvl >= 56;
+}
+
 function getActiveZoneMapTabs() {
-  return hasEnteredVerdantReach() ? [VERDANT_REACH_TAB] : ZONE_MAP_TABS;
+  return isInVerdantReachTabMode() ? [VERDANT_REACH_TAB] : ZONE_MAP_TABS;
 }
 
 function setExploreMapTab(idx) {
@@ -18344,15 +18355,15 @@ function rZoneMapTabs() {
     h += '<button onclick="setExploreMapTab(' + i + ')" class="tier-btn' + (sel ? ' sel' : '') + '" style="flex-shrink:0;">' + tab.label + '</button>';
   }
   h += '</div>';
-  if (G.exploreMapTab === 0 && !hasEnteredVerdantReach()) {
+  if (G.exploreMapTab === 0 && !isInVerdantReachTabMode()) {
     h += '<button onclick="setS(\'zone_map_starting_lands\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F Starting Lands Map (1\u20139)</button>';
     h += '<button onclick="setS(\'zone_map_arcane_ascent\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F Arcane Ascent Map (10\u201322)</button>';
     h += '<button onclick="setS(\'zone_map_elemental_wars\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F Elemental Wars Map (23\u201330)</button>';
   }
-  if (!hasEnteredVerdantReach() && G.exploreMapTab >= 1 && G.exploreMapTab <= 5) {
+  if (!isInVerdantReachTabMode() && G.exploreMapTab >= 1 && G.exploreMapTab <= 5) {
     h += '<button onclick="setS(\'zone_map_aftermath_roads\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F The Aftermath Roads Map (30\u201355)</button>';
   }
-  if (hasEnteredVerdantReach()) {
+  if (isInVerdantReachTabMode()) {
     h += '<div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;">Everywhere before this is still there \u2014 Zul just drives now.</div>';
     h += '<button onclick="setS(\'zone_map_verdant_reach\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F The Verdant Reach Map (56\u201395)</button>';
   }
