@@ -3610,8 +3610,73 @@ storyJournal: {
           { speaker: 'Narrator', text: 'Soel shifts against your side, warm and unbothered, and somewhere past the ridge a line is being held by someone who once needed finding and now does the finding herself. None of it needs to resolve into anything larger than exactly what it already is.' },
         ]
       }
-
-
+,{
+        id: 'journal_100',
+        title: 'The Door, Finally',
+        chapter: 100,
+        unlockType: 'level',
+        unlockAt: 210,
+        icon: '🚪',
+        summary: "Jorvin's salvaged instruments and Mimi's Dreamsight both catch the same thing at once — not another one-way arrival like every transmigrator San has ever met, but something that might, for the first time, actually pull both directions.",
+        scenes: [
+          { speaker: 'Narrator', text: "Jorvin finds you before Mimi does, which is how you know it is serious — Jorvin never leads with anything, usually lets the fix speak for itself. Not this time. He is holding a salvaged reader with both hands like it might stop working if he lets go." },
+          { speaker: 'Jorvin', text: '"I have been picking up crossings for years," he says, no preamble. "Every transmigrant who ever came through, Robin, Jeff, me, Dr. AA, all of it, always the same shape — a pull toward here, one direction, done. This is not that. This is holding steady. Both ways."' },
+          { speaker: 'San', text: '"Both ways," you repeat, and the two words take a moment to actually land, the way something can be exactly the sentence you have been braced to eventually hear and still knock the wind out of you regardless.' },
+          { speaker: 'Narrator', text: 'Mimi arrives a minute later, unsurprised to find you both already talking about it — of course she already knew, in whatever way Mimi always already knows. "It is not finished deciding what it is," she says, settling in like she is describing weather rather than a hole in the world. "That is the honest answer. Not a door yet. Something that might become one."' },
+          { speaker: 'Joel', text: '"Not for us. Not yet," Joel says slowly, and you both hear it at the same moment \u2014 Mimi\'s own words, thrown back at you from a conversation that must be close to a hundred levels old by now. "Does \'not yet\' still hold?"' },
+          { speaker: 'Mimi', text: '"I do not know," Mimi admits, and there is no performance in the not-knowing, which is somehow worse than if she had simply guessed. "I have never once had to say that about anything before. I do not love how it feels."' },
+          { speaker: 'San', text: '"Where is it," you ask, already aware of the answer before Jorvin finishes gesturing east, past the edge of every hand-drawn map you own, past even the Frontier\'s own unmapped edge.' },
+          { speaker: 'Jorvin', text: '"Past the Reach. Past the Thinning. Past whatever the Frontier even means by \'past.\'" He shrugs, an engineer running fully out of engineering vocabulary. "Somewhere the actual map just stops being able to say anything useful."' },
+          { speaker: 'Aisy', text: 'Aisy, quiet until now, finally speaks. "I am used to things arriving. Robin. Jeff. You two, once. Never once, in all this time, something that might be able to leave."' },
+          { speaker: 'Joel', text: '"What does it even mean, if it opens," Joel says, careful, watching you the exact way he watches you whenever the ground under a conversation gets uncertain. "Going back? Going somewhere else? Nobody actually knows what is on the other side of a thing like that."' },
+          { speaker: 'San', text: '"Nobody has to decide tonight," you say, and mean it, surprising yourself with how easily the patience comes after a hundred levels of practicing exactly this. "We mark it. We go look, properly, when we are ready to. That is all tonight actually needs to be."' },
+          { speaker: 'Narrator', text: 'You sleep on it, all of you, the practice already too deeply worn into how you live for even something this large to skip the step. Whatever it is, it has apparently been waiting. It can wait one more night.' },
+        ]
+      }
+,{
+        id: 'journal_101',
+        title: 'Not the Old World',
+        chapter: 101,
+        unlockType: 'level',
+        unlockAt: 225,
+        icon: '🌀',
+        summary: 'The party finally goes to look properly, and Jorvin confirms the one thing nobody had actually said out loud yet: whatever is on the other side of the pull is not the world any of the transmigrants came from. It is somewhere none of you have ever heard of.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It takes three days of hard travel to actually reach it \u2014 past the Reach, past the last hand-placed marker on any map you own, out to ground the Frontier itself has never bothered giving a name. And there it is: not a door, exactly, the way Mimi warned you, but close enough to one that the difference stops mattering the moment you see it.' },
+          { speaker: 'Jorvin', text: 'Jorvin has his reader out before you have even stopped walking. He is quiet for a long time, turning it in his hands, and when he finally speaks his voice has lost every trace of the confidence he walked in with. "This is not the pull I know. Every crossing I have ever read \u2014 mine included \u2014 has the same signature. Home. This does not."' },
+          { speaker: 'San', text: '"What does that mean," you ask, already suspecting you will not love the answer.' },
+          { speaker: 'Jorvin', text: '"It means whatever is on the other side of this is not where Robin came from. Not where I came from. Not the old world at all." He looks up, and for once looks genuinely lost rather than merely puzzled. "I do not know what this actually is. I have never once had to say that about a crossing before."' },
+          { speaker: 'Joel', text: '"So it is not a way home," Joel says slowly, working through it out loud. "For anyone. Robin does not get his old firm back through this. I do not get the old warehouse back. It is not that kind of door."' },
+          { speaker: 'San', text: '"No," you agree, something in your chest unclenching in a way you did not expect it to, relief arriving from a direction you had not braced for. "It is not a way back to anything. It is just... somewhere else. Somewhere new."' },
+          { speaker: 'Narrator', text: 'You think, standing at the edge of it, of every rival guild muster you have fought since Guild War opened up \u2014 how more than one of them mentioned, in passing, ground out past their own territory that "does not behave right anymore." Nobody had put the pieces together yet. You are fairly sure, now, that everyone has been circling the same discovery from different directions.' },
+          { speaker: 'Aisy', text: '"That actually changes things," Aisy says, and there is something almost like excitement under the careful flatness she always keeps. "Not going backward. Just going further than anyone standing here has ever actually been."' },
+          { speaker: 'Mimi', text: '"I still cannot tell you what is over there," Mimi admits. "For the first time since I have known any of you, I genuinely have no idea. I find I do not mind it as much as I expected to."' },
+          { speaker: 'San', text: '"We are not going through tonight," you say, and nobody argues, the decision landing the same unhurried way every large decision has landed for a very long time now. "But we are not walking away from it either. We go looking, properly, when we are ready. Same as everything else out here has ever worked."' },
+          { speaker: 'Joel', text: '"However long that takes," Joel says, and it is not a question, and you both hear exactly what he is doing \u2014 handing the words right back to you, a hundred levels later, still true.' },
+          { speaker: 'San', text: '"However long that takes," you agree, and mean it completely, watching the not-quite-a-door hold perfectly steady against a sky that has no name yet for what is on the other side of it.' },
+        ]
+      }
+,{
+        id: 'journal_102',
+        title: 'Beyond the Horizon',
+        chapter: 102,
+        unlockType: 'level',
+        unlockAt: 240,
+        icon: '🌅',
+        summary: 'Not an ending \u2014 the story was never built to need one. Just the morning the party finally steps toward the edge of everything mapped, the same way they once stepped toward the beginning, and keeps walking.',
+        scenes: [
+          { speaker: 'Narrator', text: 'You do not announce it. There is no ceremony, no gathered crowd, no final speech \u2014 that was never how any of this worked, not once, not from the very first line held to whatever this turns out to be. Just an ordinary morning, packs checked the way Zaki still checks his, and the whole party walking, together, toward ground that has no name yet.' },
+          { speaker: 'Joel', text: '"Feels like the first morning all over again," Joel says, watching the not-quite-a-door hold steady ahead of you, patient as it has been every single time you have come to look at it since. "Standing at the edge of everything mapped. Calling it a beginning."' },
+          { speaker: 'San', text: '"It is not, though," you say, and the correction comes easy, certain in a way the old fear never once let you be. "A beginning assumes there was nothing before it. This has a hundred levels of before. All of it is coming with us."' },
+          { speaker: 'Narrator', text: 'Iris and Ash are already waiting at the threshold when you arrive \u2014 not summoned, never summoned, just there, the way she has learned to simply be wherever the next line is forming. Mimi and Aisy stand a little apart, together, the exact same way they have stood next to each other since the old office, before either of you had a name for any of this.' },
+          { speaker: 'Iris', text: '"Figured you would actually go through with it eventually," Iris says, something warm and unguarded in it. "Ash and I are coming. Somebody has to keep finding the next line, wherever this one leads."' },
+          { speaker: 'Mimi', text: '"I still cannot tell you what is over there," Mimi says, and for once there is no performance of certainty covering the gap. "I find I have gotten better at that, somewhere along the way. Not knowing. Going anyway."' },
+          { speaker: 'Aisy', text: '"Somebody has to notice what is worth noticing on the other side," Aisy adds. "May as well be someone who has had a lot of practice at not being noticed first."' },
+          { speaker: 'San', text: '"We are not going to solve it today," you say, to all of them, to yourself as much as anyone. "We are just going to go look. Properly, this time. However long that actually takes."' },
+          { speaker: 'Joel', text: '"However long that takes," Joel echoes, and takes your hand, the same steady grip he has offered you since the very first storm, and together you step toward the edge of the only map that has ever mattered.' },
+          { speaker: 'Narrator', text: 'The world does not end here. It never was going to. It just keeps being worth walking further into \u2014 one more horizon, one more line worth finding, one more morning chosen on purpose, the same practice it always was, carried now by more hands than you ever once thought to hope for. Somewhere ahead, past everything anyone has mapped yet, daybreak is still doing exactly what daybreak has always done. It is still coming. You go to meet it.' },
+        ]
+      }
 
     ]
   },
@@ -3755,6 +3820,8 @@ storyJournal: {
   dragonHunt: { active: false, currentId: null, cleared: {} }, // legendary optional superbosses, repeatable; cleared keyed by dragon id
   bossRush: { active: false, streak: 0, bestStreak: 0 }, // chained boss fights, escalating reward + difficulty, no rest between
   frayingFrontier: { active: false, streak: 0, bestStreak: 0 }, // endless mode, level 100+, bosses scale off current player level indefinitely
+  guildWar: { active: false, streak: 0, bestStreak: 0, fielded: [] }, // squad gauntlet vs rival guilds, unlocks after Iris & Ash (journal_097) + Lv 105
+  guildRoster: { recruited: [] }, // ids from GUILD_MEMBERS who've actually joined the Guild War roster
   kindlingCommissions: { linesToday: 0, checksToday: 0, refreshDay: 0 }, // bounded daily ritual — 3 lines, 2 checks, resets once per game day
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
@@ -5595,6 +5662,7 @@ function checkNPCUnlocks() {
       lg('🌟 ' + npc.n + ' ' + npc.title + ' has joined as an ally!');
     }
   }
+  checkGuildRecruitment();
 }
 
 function getZulTeleportCost(zoneLv) {
@@ -7463,7 +7531,7 @@ function getExpBoosterMult() {
   }
   return 1;
 }
-function getPrestigeGoldMult() { return 1 + (G.prestige.goldBonusPct || 0) / 100 + getPrestigeMilestoneBonus('goldBonusFlat'); }
+function getPrestigeGoldMult() { return 1 + (G.prestige.goldBonusPct || 0) / 100 + getPrestigeMilestoneBonus('goldBonusFlat') + getGuildWarFieldBonus('goldPct'); }
 
 // Mimi and Aisy — restored as passive, always-on bonuses once unlocked, rather than
 // the chance-based Dreamsight/Shadow Step flavor text that was never actually wired
@@ -7476,10 +7544,10 @@ function isAllyUnlocked(name) {
   return npc ? npc.unlocked : false;
 }
 function getAllyXpBonus() {
-  return isAllyUnlocked('Mimi') ? 0.08 : 0;
+  return (isAllyUnlocked('Mimi') ? 0.08 : 0) + getGuildWarFieldBonus('xpPct');
 }
 function getAllyAtkBonus() {
-  return isAllyUnlocked('Aisy') ? 0.08 : 0;
+  return (isAllyUnlocked('Aisy') ? 0.08 : 0) + getGuildWarFieldBonus('atkPct');
 }
 function getAllyTempleRepBonus() {
   return isAllyUnlocked('Sister Wren') ? 0.08 : 0;
@@ -8359,6 +8427,251 @@ function generateFrontierBoss(playerLevel, streak) {
   boss.g = Math.floor(stats.g * streakMult);
   boss.id = 99;
   return boss;
+}
+
+// === THE GUILD (recruitable roster) & GUILD WAR ===
+// Unlocked after the party learns it's not alone anymore — gated on having actually
+// met Iris & Ash (journal_097) plus a level floor, same "story beat before number"
+// pattern the Verdant Reach transition already uses. Pulled specifically from people
+// who already have real history with San or Joel (old office, Joel's dorm-mates, or
+// already-established allies) rather than the flavor-only shop NPCs — narrative-first
+// by design. No separate leveling/gear system: each member just adds a small, fixed
+// combat bonus while actively fielded for a muster, on top of whatever they already
+// give as a shop/ally (Mimi/Aisy/Sister Wren's existing always-on bonuses are
+// untouched — this stacks an ADDITIONAL bonus only while fielded).
+const GUILD_WAR_MIN_LEVEL = 105;
+const GUILD_WAR_UNLOCK_CHAPTER = 'journal_097'; // Iris & Ash join
+const GUILD_WAR_MAX_FIELDED = 3;
+
+const GUILD_MEMBERS = [
+  { id: 'mimi', npcName: 'Mimi', role: 'Scout', icon: '🦋',
+    recruitReq: { type: 'ally' },
+    fieldBuff: { xpPct: 0.04 },
+    recruitLine: "Mimi already knew you'd ask before you finished asking. \"Guild business? I'm in. I've always wanted an official reason to know things before everyone else does.\"",
+    barks: [
+      'Mimi: "That one\'s favoring its left side. Just so you know."',
+      'Mimi: "I already knew this was coming. Doesn\'t make it less annoying."',
+      'Mimi: "Two floors away, I\'d have heard about this fight before it started."'
+    ] },
+  { id: 'aisy', npcName: 'Aisy', role: 'Rogue', icon: '🌙',
+    recruitReq: { type: 'ally' },
+    fieldBuff: { critPct: 0.03 },
+    recruitLine: "Aisy just appears at your side, like she'd already decided before you asked. \"Nobody ever notices me leave a room. Let's see what they make of me showing up to one.\"",
+    barks: [
+      'Aisy: "They didn\'t see me. They still don\'t."',
+      'Aisy: "I was standing right there. The whole time."',
+      'Aisy: "Some habits from the old office never really left."'
+    ] },
+  { id: 'sister_wren', npcName: 'Sister Wren', role: 'Support', icon: '🕯️',
+    recruitReq: { type: 'ally' },
+    fieldBuff: { atkPct: 0.03 },
+    recruitLine: "Sister Wren doesn't hesitate. \"I spent a long time devoted to something that was never real. I know real when I finally get to stand next to it.\"",
+    barks: [
+      'Sister Wren: "Hold the line. I\'ve seen worse hold longer."',
+      'Sister Wren: "Faith was never the problem. I just aimed it wrong once."',
+      'Sister Wren: "Steady. That\'s all this ever takes."'
+    ] },
+  { id: 'dudin', npcName: 'Dudin', role: 'Frontline', icon: '🎖️',
+    recruitReq: { type: 'trader_visits', visits: 10 },
+    fieldBuff: { atkPct: 0.05 },
+    recruitLine: "Dudin sets down the ration crate he's been rebuilding all week. \"Joel already told me you'd ask eventually. Wasn't going to say no to backing up my old dorm-mate's whole family.\"",
+    barks: [
+      'Dudin: "Eat first, fight second. Same rule as always."',
+      'Dudin: "I fed a whole barracks on less than this. This is nothing."',
+      'Dudin: "Joel taught me that too — feed everyone first, then hit hard."'
+    ] },
+  { id: 'jorvin', npcName: 'Jorvin', role: 'Engineer', icon: '🔧',
+    recruitReq: { type: 'trader_visits', visits: 10 },
+    fieldBuff: { critPct: 0.03 },
+    recruitLine: "Jorvin wipes his hands on a rag that hasn't been clean in years. \"Same admin desk, different apocalypse. Sure, I'll come find the weak point in whatever this is.\"",
+    barks: [
+      'Jorvin: "Everything has a weak point. Even this."',
+      'Jorvin: "Same principle as the phone. Just bigger, angrier parts."',
+      'Jorvin: "There. Right there. That\'s the seam."'
+    ] },
+  { id: 'wahyu', npcName: 'Wahyu', role: 'Utility', icon: '👕',
+    recruitReq: { type: 'trader_visits', visits: 10 },
+    fieldBuff: { goldPct: 0.04 },
+    recruitLine: "Wahyu grins, already measuring you for something. \"Guild work? Sure. Somebody's got to notice what's actually worth grabbing off this thing once it's down.\"",
+    barks: [
+      'Wahyu: "Custom fit, custom timing. I\'ll know when to move."',
+      'Wahyu: "That\'s definitely worth something. Grab it after."',
+      'Wahyu: "Extra room in the seams. Extra room to work with."'
+    ] },
+  { id: 'jonathan', npcName: 'Jonathan', role: 'Striker', icon: '⚙️',
+    recruitReq: { type: 'trader_visits', visits: 10 },
+    fieldBuff: { atkPct: 0.04 },
+    recruitLine: "Jonathan's already halfway to yes before you finish asking. \"Been chasing whatever's trending since the old office. This is definitely trending.\"",
+    barks: [
+      'Jonathan: "Never done this professionally before. Great time to start!"',
+      'Jonathan: "Nobody\'s here to tell me it\'s not my job. Love that for me."',
+      'Jonathan: "Same energy as fixing a car nobody asked me to fix."'
+    ] },
+  { id: 'lewis', npcName: 'Lewis', role: 'Opportunist', icon: '🧳',
+    recruitReq: { type: 'trader_visits', visits: 10 },
+    fieldBuff: { goldPct: 0.05 },
+    recruitLine: "Lewis is already calculating margins before you've explained the mission. \"Guild work pays in reputation. Reputation's worth something eventually. I'm in.\"",
+    barks: [
+      'Lewis: "I could sell this thing\'s teeth. Probably. Later, though."',
+      'Lewis: "Two rows from San\'s desk, forever loyal, terrible instincts. Let\'s go."',
+      'Lewis: "Whatever this drops, I get first look."'
+    ] },
+  { id: 'dr_aa', npcName: 'Dr. AA', role: 'Healer', icon: '🩺',
+    recruitReq: { type: 'trader_visits', visits: 10 },
+    fieldBuff: { xpPct: 0.04 },
+    recruitLine: "Dr. AA is already packing the cart. \"Guild work. Good. I've got a new ghost story and nobody to tell it to on the way there.\"",
+    barks: [
+      'Dr. AA: "Take with food. Not that anyone ever does."',
+      'Dr. AA: "This reminds me of a story. Later, though — fight first."',
+      'Dr. AA: "Vitamins and ghost stories. Works every time."'
+    ] },
+  { id: 'iris', npcName: 'Iris', role: 'Scout', icon: '🦊',
+    recruitReq: { type: 'kindling' },
+    fieldBuff: { critPct: 0.04 },
+    recruitLine: "Iris and Ash don't need asking twice. \"Guild work. Finally, something with actual structure. Ash has opinions about structure.\"",
+    barks: [
+      'Iris: "Ash smells something. Ash is usually right."',
+      'Iris: "I held a line alone for years. This is so much better."',
+      'Iris: "Ash says hello. Ash means \'attack now.\'"'
+    ] }
+];
+
+function getGuildMemberDef(id) { return GUILD_MEMBERS.find(m => m.id === id); }
+function isGuildMemberRecruited(id) { return G.guildRoster.recruited.includes(id); }
+
+function recruitGuildMember(id) {
+  if (isGuildMemberRecruited(id)) return;
+  const def = getGuildMemberDef(id);
+  if (!def) return;
+  G.guildRoster.recruited.push(id);
+  lg('🛡️ ' + def.npcName + ' has joined the Guild roster! ' + def.recruitLine);
+}
+
+// Checked from checkNPCUnlocks() so it rides the same call sites (level-up, load,
+// render init) without needing its own separate polling loop.
+function checkGuildRecruitment() {
+  for (let def of GUILD_MEMBERS) {
+    if (isGuildMemberRecruited(def.id)) continue;
+    if (def.recruitReq.type === 'ally') {
+      const npc = G.npcs.find(n => n.n === def.npcName && n.t === 'ally');
+      if (npc && npc.unlocked) recruitGuildMember(def.id);
+    } else if (def.recruitReq.type === 'trader_visits') {
+      const npc = G.npcs.find(n => n.n === def.npcName && n.t === 'trader');
+      if (npc && npc.unlocked && (npc.visitCount || 0) >= def.recruitReq.visits && G.p.lvl >= 100) recruitGuildMember(def.id);
+    } else if (def.recruitReq.type === 'kindling') {
+      if (G.storyJournal.read.includes('journal_097')) recruitGuildMember(def.id);
+    }
+  }
+}
+
+function isGuildWarUnlocked() {
+  return G.p.lvl >= GUILD_WAR_MIN_LEVEL && G.storyJournal.read.includes(GUILD_WAR_UNLOCK_CHAPTER);
+}
+
+function toggleGuildWarField(id) {
+  if (!isGuildMemberRecruited(id)) return;
+  const idx = G.guildWar.fielded.indexOf(id);
+  if (idx >= 0) {
+    G.guildWar.fielded.splice(idx, 1);
+  } else {
+    if (G.guildWar.fielded.length >= GUILD_WAR_MAX_FIELDED) { lg('🛡️ Only ' + GUILD_WAR_MAX_FIELDED + ' guild members can be fielded per muster.'); return; }
+    G.guildWar.fielded.push(id);
+  }
+  render();
+}
+
+// Sums a fieldBuff stat across whoever is actually fielded right now — this is the
+// single thing every combat-facing hook below reads from.
+function getGuildWarFieldBonus(statKey) {
+  if (!G.guildWar.active) return 0;
+  let total = 0;
+  for (let id of G.guildWar.fielded) {
+    const def = getGuildMemberDef(id);
+    if (def && def.fieldBuff[statKey]) total += def.fieldBuff[statKey];
+  }
+  return total;
+}
+
+function guildWarBark() {
+  if (!G.guildWar.active || G.guildWar.fielded.length === 0) return;
+  const id = G.guildWar.fielded[Math.floor(Math.random() * G.guildWar.fielded.length)];
+  const def = getGuildMemberDef(id);
+  if (!def || !def.barks || def.barks.length === 0) return;
+  lg(def.barks[Math.floor(Math.random() * def.barks.length)]);
+}
+
+// Rival guilds — other survivor groups who found their own version of the same
+// practice and now treat this as structured, competitive musters rather than
+// anything actually hostile. Same mechanic vocabulary as the Frontier's identity
+// pool, since that's already proven safe at any scaled stat range.
+const GUILD_WAR_RIVALS = [
+  { n: 'The Emberwatch Vanguard', mechanic: 'rampage', rampageTurn: 4, rampageDmg: 110,
+    desc: "A muster out of a fire-scarred outpost past the Aftermath Roads. They lead with everything they have, every single time, on principle." },
+  { n: 'The Ledger Reclaimers', mechanic: 'phase', phases: 3,
+    desc: "Former accountants, of all things, who turned precision into a fighting style. Three exact, escalating phases, because sloppy is the one thing this crew refuses to be." },
+  { n: 'The Static Chorus', mechanic: 'crush', crushTurn: 5,
+    desc: "Salvagers running old-world tech nobody else figured out how to keep alive. Nothing dramatic in any one hit — just relentless, and it adds up." },
+  { n: 'The Kindling Rivals', mechanic: 'resurrect', resurrectHp: 0.15,
+    desc: "Another pair-guild, out here doing the exact same thing you are, who've decided a friendly muster is the fastest way to actually meet you. They keep getting back up. So do you." },
+  { n: 'The Root Wardens', mechanic: 'devour', devourTurn: 4,
+    desc: "Verdant Reach natives, patient and territorial about ground they've spent years mending. They don't rampage. They wait, then reach for exactly one of you at a time." },
+  { n: 'The Last Ledger', mechanic: 'apocalypse', apocalypseTurn: 6,
+    desc: "The oldest, toughest guild anyone's found out here. Everyone survives to turn six, or almost no one does — and they've never once lost that bet." }
+];
+
+function getGuildWarScaledStats(playerLevel) {
+  // Same anchor formula as the Frontier — proven safe at any level, and Guild War
+  // opens at a similar band of the game (Lv 105+) so no separate curve is needed.
+  return getFrayingFrontierScaledStats(Math.max(playerLevel, 100));
+}
+
+function startGuildWar() {
+  if (!isGuildWarUnlocked()) { lg('🔒 Guild War unlocks at Level ' + GUILD_WAR_MIN_LEVEL + ', after meeting Iris & Ash.'); return; }
+  G.guildWar.active = true;
+  G.guildWar.streak = 0;
+  spawnGuildWarEncounter();
+}
+
+function spawnGuildWarEncounter() {
+  const identity = GUILD_WAR_RIVALS[Math.floor(Math.random() * GUILD_WAR_RIVALS.length)];
+  const streak = G.guildWar.streak;
+  const stats = getGuildWarScaledStats(G.p.lvl);
+  const streakMult = 1 + streak * 0.06;
+
+  G.cbt.on = true;
+  G.cbt.turn = 0;
+  G.cbt.en = [];
+  G.state = 'combat';
+  G.cbt.autoCombat = isAutoCombatPreferred();
+
+  const rival = JSON.parse(JSON.stringify(identity));
+  rival.zone = 'Guild War';
+  rival.id = 99;
+  rival.hp = Math.floor(stats.hp * streakMult);
+  rival.mhp = rival.hp;
+  rival.atk = Math.floor(stats.atk * streakMult);
+  rival.def = Math.floor(stats.def * streakMult);
+  rival.xp = Math.floor(stats.xp * streakMult);
+  rival.g = Math.floor(stats.g * streakMult);
+  G.currentBoss = rival;
+  G.cbt.en.push(rival);
+
+  lg('⚔️ Guild War [Streak ' + streak + ']: ' + rival.n + ' musters against you!' + (streak > 0 ? ' (+' + Math.floor(streak * 6) + '% tougher)' : ''));
+  guildWarBark();
+  render();
+}
+
+function continueGuildWar() {
+  if (!G.guildWar.active) return;
+  spawnGuildWarEncounter();
+}
+
+function retreatGuildWar() {
+  lg('🏳️ Retreat — the muster ends at a streak of ' + G.guildWar.streak + '. Everything earned is kept.');
+  G.guildWar.active = false;
+  G.currentBoss = null;
+  G.state = 'menu';
+  render();
 }
 
 // Generates an elite trash-wave enemy, reusing the existing 'elite' stat template and
@@ -10493,6 +10806,13 @@ function pa(si, ti, isFreeCast) {
   if (!isCrit && getGuildBonus('critBonus') > 0 && Math.random() < getGuildBonus('critBonus')) {
     isCrit = true;
     lg('🛡️ Guild-honed instincts! ' + sk.n + ' strikes true!');
+  }
+
+  // Guild War fielded members' crit bonus — Aisy/Jorvin/Iris/etc, only while actually fielded.
+  const guildWarCritBonus = getGuildWarFieldBonus('critPct');
+  if (!isCrit && guildWarCritBonus > 0 && Math.random() < guildWarCritBonus) {
+    isCrit = true;
+    lg('🛡️ The guild finds the opening! ' + sk.n + ' strikes true!');
   }
 
   // Prestige Milestone "The Reborn" — permanent crit bonus that persists across resets.
@@ -12722,6 +13042,41 @@ handleVictory = function() {
   }
 };
 
+const _originalHandleVictoryForGuildWar = handleVictory;
+handleVictory = function() {
+  if (G.guildWar.active) {
+    const defeatedName = G.currentBoss ? G.currentBoss.n : 'The rival guild';
+    const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
+    const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * getPrestigeGoldMult());
+    const rep = 50 + G.guildWar.streak * 10;
+    G.p.xp += txp;
+    G.p.gold += tg2;
+    if (G.guildJoined) { G.guildRep += rep; G.guildRepBalance += rep; }
+    G.p.bossKills = (G.p.bossKills || 0) + 1;
+    checkBountyKill(defeatedName, true);
+    G.guildWar.streak++;
+    if (G.guildWar.streak > (G.guildWar.bestStreak || 0)) G.guildWar.bestStreak = G.guildWar.streak;
+    checkAchievements();
+    lg('🎉 ' + defeatedName + ' stands down! +' + txp + ' XP, +' + tg2 + 'G' + (G.guildJoined ? ', +' + rep + ' Guild Rep' : ''));
+    guildWarBark();
+
+    G.currentBoss = null;
+    G.cbt.autoCombat = isAutoCombatPreferred();
+    G.cbt.on = false;
+
+    G.p.hp = Math.min(G.p.mhp, G.p.hp + Math.floor(G.p.mhp * BOSS_RUSH_RECOVERY_PCT));
+    G.p.mp = Math.min(G.p.mmp, G.p.mp + Math.floor(G.p.mmp * BOSS_RUSH_RECOVERY_PCT));
+    for (let p of G.party) {
+      if (p.on && p.hp > 0) p.hp = Math.min(p.mhp, p.hp + Math.floor(p.mhp * BOSS_RUSH_RECOVERY_PCT));
+    }
+    G.state = 'guild_war_room';
+    lvlup();
+    render();
+  } else {
+    _originalHandleVictoryForGuildWar();
+  }
+};
+
 const _originalHandleDefeatForKindlingCommission = handleDefeat;
 handleDefeat = function() {
   if (G.cbt.en.length === 1 && G.cbt.en[0].isKindlingCommission) {
@@ -12754,6 +13109,24 @@ handleDefeat = function() {
     render();
   } else {
     _originalHandleDefeatForFrayingFrontier();
+  }
+};
+
+const _originalHandleDefeatForGuildWar = handleDefeat;
+handleDefeat = function() {
+  if (G.guildWar.active) {
+    if (checkSecondWind()) { render(); return; }
+    lg('💀 The muster ends here \u2014 final streak: ' + G.guildWar.streak + '. Everything earned along the way is kept.');
+    G.p.hp = 1;
+    for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
+    G.cbt.autoCombat = isAutoCombatPreferred();
+    G.cbt.on = false;
+    G.guildWar.active = false;
+    G.currentBoss = null;
+    G.state = 'menu';
+    render();
+  } else {
+    _originalHandleDefeatForGuildWar();
   }
 };
 
@@ -13878,6 +14251,8 @@ function saveGame() {
     prestigeXpBonusPct: G.prestige.xpBonusPct || 0,
     prestigeGoldBonusPct: G.prestige.goldBonusPct || 0,
     bossRushBestStreak: G.bossRush.bestStreak || 0,
+    guildWarBestStreak: G.guildWar.bestStreak || 0,
+    guildRosterRecruited: G.guildRoster.recruited || [],
     chainQuests: G.chainQuests || {},
     strongholdCosmetics: G.strongholdCosmetics,
     bondingSeenScenes: G.bonding.seenScenes,
@@ -14145,6 +14520,8 @@ function loadGame() {
     G.prestige.xpBonusPct = data.prestigeXpBonusPct || 0;
     G.prestige.goldBonusPct = data.prestigeGoldBonusPct || 0;
     G.bossRush.bestStreak = data.bossRushBestStreak || 0;
+    G.guildWar.bestStreak = data.guildWarBestStreak || 0;
+    G.guildRoster.recruited = data.guildRosterRecruited || [];
     G.chainQuests = data.chainQuests || {};
     // Any chain that was mid-fight when the save happened resumes from its saved floor,
     // not stuck mid-combat — active gets cleared, stageIndex (the real progress) doesn't.
@@ -15124,6 +15501,8 @@ function render(){
   else if(G.state=='kindling_network')h+=rKindlingNetwork();
   else if(G.state=='boss_rush_room')h+=rBossRushRoom();
   else if(G.state=='fraying_frontier_room')h+=rFrayingFrontierRoom();
+  else if(G.state=='guild_war')h+=rGuildWar();
+  else if(G.state=='guild_war_room')h+=rGuildWarRoom();
   else if(G.state=='chain_quest')h+=rChainQuest();
   else if(G.state=='event_deck')h+=rEventDeck();
   else if(G.state=='sync')h+=rSyncScreen();
@@ -15166,6 +15545,7 @@ function attachEvents() {
     else if(a=='boss_rush')setS('boss_rush');
     else if(a=='fraying_frontier')setS('fraying_frontier');
     else if(a=='kindling_network')setS('kindling_network');
+    else if(a=='guild_war')setS('guild_war');
     else if(a=='chain_quest')setS('chain_quest');
     else if(a=='event_deck')setS('event_deck');
     else if(a=='sync')setS('sync');
@@ -17203,6 +17583,78 @@ function rFrayingFrontierRoom() {
   return h;
 }
 
+function rGuildWar() {
+  const unlocked = isGuildWarUnlocked();
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">⚔️ Guild War</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Structured musters against other survivor guilds \u2014 competitive, not hostile. Field up to ' + GUILD_WAR_MAX_FIELDED + ' recruited Guild members before you start; each one adds a small, permanent-for-the-run bonus and a line or two along the way.</div>';
+
+  if (!unlocked) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🔒 Unlocks at Level ' + GUILD_WAR_MIN_LEVEL + ', after meeting Iris & Ash out past the Frontier.</div></div>';
+    h += '</div>';
+    return h;
+  }
+
+  h += '<div class="panel panel-gold" style="text-align:center;">';
+  h += '<div class="panel-title" style="color:var(--gold);">Best Streak</div>';
+  h += '<div style="font-size:24px;font-weight:700;margin:8px 0;color:var(--gold);">' + (G.guildWar.bestStreak || 0) + '</div>';
+  h += '</div>';
+
+  h += '<div class="panel-title" style="margin:14px 0 8px;">Guild Roster (' + G.guildWar.fielded.length + '/' + GUILD_WAR_MAX_FIELDED + ' fielded)</div>';
+  for (let def of GUILD_MEMBERS) {
+    const recruited = isGuildMemberRecruited(def.id);
+    const fielded = G.guildWar.fielded.includes(def.id);
+    h += '<div class="panel' + (fielded ? ' panel-gold' : '') + '" style="text-align:left;' + (recruited ? '' : 'opacity:0.5;') + '">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    h += '<div><span style="font-size:16px;">' + def.icon + '</span> <span style="font-weight:700;' + (fielded ? 'color:var(--gold);' : '') + '">' + def.npcName + '</span> <span style="font-size:11px;color:var(--text-dim);">' + def.role + '</span></div>';
+    if (recruited) {
+      h += '<button onclick="toggleGuildWarField(\'' + def.id + '\')" class="' + (fielded ? 'abtn' : 'btn-outline-ghost') + '" style="margin:0;padding:4px 10px;font-size:11px;">' + (fielded ? 'Fielded' : 'Field') + '</button>';
+    } else {
+      h += '<span style="font-size:11px;color:var(--text-dim);">🔒 Not yet recruited</span>';
+    }
+    h += '</div>';
+    const buffKey = Object.keys(def.fieldBuff)[0];
+    const buffLabel = buffKey === 'atkPct' ? '+' + Math.floor(def.fieldBuff[buffKey]*100) + '% ATK when fielded'
+      : buffKey === 'critPct' ? '+' + Math.floor(def.fieldBuff[buffKey]*100) + '% Crit when fielded'
+      : buffKey === 'xpPct' ? '+' + Math.floor(def.fieldBuff[buffKey]*100) + '% XP when fielded'
+      : '+' + Math.floor(def.fieldBuff[buffKey]*100) + '% Gold when fielded';
+    h += '<div style="font-size:10.5px;color:var(--text-dim);margin-top:4px;">' + buffLabel + '</div>';
+    h += '</div>';
+  }
+
+  if (G.guildWar.fielded.length > 0) {
+    h += '<button onclick="startGuildWar()" class="abtn" style="width:100%;margin-top:12px;">⚔️ Muster the Guild</button>';
+  } else {
+    h += '<div class="btn-hint" style="text-align:center;margin-top:12px;">Field at least one Guild member to start a muster.</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function rGuildWarRoom() {
+  const streak = G.guildWar.streak;
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">⚔️ Guild War</div>';
+
+  h += '<div class="panel panel-gold" style="text-align:center;">';
+  h += '<div class="panel-title" style="color:var(--gold);">Streak: ' + streak + '</div>';
+  h += '<div class="btn-hint">Rival guild strength scales with your level, same as the Frontier. Each win in this streak makes the next one \u2248' + Math.floor((streak + 1) * 6) + '% tougher.</div>';
+  h += '</div>';
+
+  if (G.guildWar.fielded.length > 0) {
+    h += '<div class="btn-hint" style="text-align:center;margin:8px 0;">Fielded: ' + G.guildWar.fielded.map(id => getGuildMemberDef(id).icon + ' ' + getGuildMemberDef(id).npcName).join(', ') + '</div>';
+  }
+
+  h += '<div class="btn-hint" style="text-align:center;margin:10px 0 16px;">The party got a brief recovery, not a full rest. Keep pushing, or bank what you\'ve got.</div>';
+
+  h += '<button onclick="continueGuildWar()" class="abtn" style="width:100%;margin-bottom:10px;">⚔️ Muster Again</button>';
+  h += '<button onclick="retreatGuildWar()" class="btn-outline-ghost" style="width:100%;">🏳️ Retreat (keep everything earned)</button>';
+
+  h += '</div>';
+  return h;
+}
+
 function rStrongholdCosmeticsShop() {
   const prestige = getStrongholdPrestige();
   let h = '<div class="panel panel-gold">';
@@ -17672,6 +18124,7 @@ function rMenu(){
       {i:'💀',l:'Boss Rush',a:'boss_rush'},
       {i:'🌫️',l:'The Fraying Frontier',a:'fraying_frontier'},
       {i:'🦊',l:'The Kindling Network',a:'kindling_network'},
+      {i:'⚔️',l:'Guild War',a:'guild_war'},
       {i:'📜',l:'The Sunken Archive',a:'chain_quest'},
       {i:'🌟',l:'Prestige',a:'prestige'},
     ]},
