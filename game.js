@@ -15119,6 +15119,8 @@ function render(){
   else if(G.state=='zone_map_starting_lands')h+=rZoneMapStartingLands();
   else if(G.state=='zone_map_arcane_ascent')h+=rZoneMapArcaneAscent();
   else if(G.state=='zone_map_elemental_wars')h+=rZoneMapElementalWars();
+  else if(G.state=='zone_map_aftermath_roads')h+=rZoneMapAftermathRoads();
+  else if(G.state=='zone_map_verdant_reach')h+=rZoneMapVerdantReach();
   else if(G.state=='kindling_network')h+=rKindlingNetwork();
   else if(G.state=='boss_rush_room')h+=rBossRushRoom();
   else if(G.state=='fraying_frontier_room')h+=rFrayingFrontierRoom();
@@ -17050,6 +17052,85 @@ function rZoneMapStartingLands() {
   return h;
 }
 
+const AFTERMATH_ROADS_HOTSPOTS = [
+  { name: 'The Breaking', zi: 31, x: 7, y: 37 },
+  { name: 'The Silent Ruin', zi: 32, x: 35, y: 12 },
+  { name: 'Ashfall Market', zi: 33, x: 48, y: 8 },
+  { name: 'The Drowned Ledger', zi: 34, x: 67, y: 8 },
+  { name: 'Rustbound Docks', zi: 35, x: 85, y: 8 },
+  { name: "The Widow's Watch", zi: 36, x: 30, y: 23 },
+  { name: 'Forgotten Pemmican Roads', zi: 37, x: 48, y: 22 },
+  { name: 'The Quiet Nursery', zi: 38, x: 67, y: 24 },
+  { name: 'Bladeless Barracks', zi: 39, x: 88, y: 24 },
+  { name: 'The Storm That Stayed', zi: 40, x: 33, y: 35 },
+  { name: "Embercat's Grave", zi: 41, x: 51, y: 35 },
+  { name: 'The Empty Ledger', zi: 42, x: 68, y: 34 },
+  { name: 'The Static Fields', zi: 44, x: 71, y: 38 },
+  { name: 'The Weight You Carry', zi: 43, x: 92, y: 38 },
+  { name: "The Architect's Chamber", zi: 45, x: 25, y: 46 },
+  { name: 'What Remains United', zi: 46, x: 43, y: 46 },
+  { name: 'Where the Break Began', zi: 47, x: 63, y: 48 },
+  { name: 'The First Repair', zi: 48, x: 21, y: 58 },
+  { name: 'What Almost Broke Again', zi: 49, x: 37, y: 58 },
+  { name: 'The Fear After the Storm', zi: 50, x: 56, y: 58 },
+  { name: 'Everyone, Together', zi: 51, x: 72, y: 58 },
+  { name: 'Daybreak', zi: 52, x: 48, y: 77 },
+  { name: 'The Unmapped Road', zi: 53, x: 22, y: 82 },
+  { name: 'The Borrowed Coast', zi: 54, x: 38, y: 86 },
+  { name: 'The Salt Debt', zi: 55, x: 56, y: 86 },
+  { name: 'The Quiet Uprising', zi: 56, x: 72, y: 82 },
+  { name: 'Where the Walk Leads', zi: 57, x: 88, y: 74 }
+];
+
+function rZoneMapAftermathRoads() {
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'explore\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Back to Zone List</button>';
+  h += '<div class="st" style="text-align:center;">The Aftermath Roads</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:12px;">Levels 30\u201355 \u2014 tap a marker to head there directly.</div>';
+  h += '<div style="position:relative;width:100%;border-radius:14px;overflow:hidden;border:2px solid var(--border);">';
+  h += '<img src="maps/aftermath-roads.jpg" style="width:100%;display:block;">';
+  for (const spot of AFTERMATH_ROADS_HOTSPOTS) {
+    h += '<div class="map-hotspot" onclick="sc(' + spot.zi + ')" style="left:' + spot.x + '%;top:' + spot.y + '%;" title="' + spot.name + '">';
+    h += '<div class="map-hotspot-dot"></div>';
+    h += '<div class="map-hotspot-label">' + spot.name + '</div>';
+    h += '</div>';
+  }
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
+// Verdant Reach illustrated map only carries the six hand-placed settlements shown on
+// the commissioned art (56, 60, 65, 75, 82, 95) — the Lv 96-100 Thinning-arc zones sit
+// past the mapped edge of the Reach entirely and stay reachable only through the
+// regular zone list / winding-path view, same as the frontier always has been.
+const VERDANT_REACH_HOTSPOTS = [
+  { name: 'The Unbroken Vale', zi: 58, x: 48, y: 12 },
+  { name: "The Retainer's Hollow", zi: 59, x: 27, y: 25 },
+  { name: 'The Verdant Choir', zi: 60, x: 69, y: 29 },
+  { name: 'Sunreach Fields', zi: 61, x: 46, y: 45 },
+  { name: 'The Treeline Detail', zi: 62, x: 78, y: 52 },
+  { name: 'The Rootbound Sanctuary', zi: 63, x: 38, y: 71 }
+];
+
+function rZoneMapVerdantReach() {
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'explore\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Back to Zone List</button>';
+  h += '<div class="st" style="text-align:center;">The Verdant Reach</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:12px;">Levels 56\u201395 \u2014 tap a marker to head there directly. Lv 96+ lies past the mapped edge.</div>';
+  h += '<div style="position:relative;width:100%;border-radius:14px;overflow:hidden;border:2px solid var(--border);">';
+  h += '<img src="maps/verdant-reach.jpg" style="width:100%;display:block;">';
+  for (const spot of VERDANT_REACH_HOTSPOTS) {
+    h += '<div class="map-hotspot" onclick="sc(' + spot.zi + ')" style="left:' + spot.x + '%;top:' + spot.y + '%;" title="' + spot.name + '">';
+    h += '<div class="map-hotspot-dot"></div>';
+    h += '<div class="map-hotspot-label">' + spot.name + '</div>';
+    h += '</div>';
+  }
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
 function rFrayingFrontier() {
   const unlocked = G.p.lvl >= 100;
   let h = '<div class="content">';
@@ -17809,8 +17890,12 @@ function rZoneMapTabs() {
     h += '<button onclick="setS(\'zone_map_arcane_ascent\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F Arcane Ascent Map (10\u201322)</button>';
     h += '<button onclick="setS(\'zone_map_elemental_wars\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F Elemental Wars Map (23\u201330)</button>';
   }
+  if (!hasEnteredVerdantReach() && G.exploreMapTab >= 1 && G.exploreMapTab <= 5) {
+    h += '<button onclick="setS(\'zone_map_aftermath_roads\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F The Aftermath Roads Map (30\u201355)</button>';
+  }
   if (hasEnteredVerdantReach()) {
     h += '<div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;">Everywhere before this is still there \u2014 Zul just drives now.</div>';
+    h += '<button onclick="setS(\'zone_map_verdant_reach\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F The Verdant Reach Map (56\u201395)</button>';
   }
   return h;
 }
