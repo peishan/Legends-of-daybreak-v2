@@ -412,17 +412,17 @@ const G = {
   autoCombatHeartbeat: 0,
 
   zones: [
-    { n: 'Whispering Woods', lv: 1, d: 'Mossy paths where goblins lurk.', en: ['Goblin','Wolf','Slime'], loot: ['Herb Bundle','Goblin Tooth','Health Potion'], xp: 15, dg: 'low' },
-    { n: 'Cursed Catacombs', lv: 2, d: 'Ancient tombs filled with restless dead.', en: ['Skeleton','Zombie','Ghost'], loot: ['Iron Ore','Bone Shard','Mana Potion'], xp: 30, dg: 'medium' },
+    { n: 'Whispering Woods', lv: 1, d: 'Mossy paths where goblins lurk.', en: ['Goblin','Wolf','Slime'], loot: ['Herb Bundle','Goblin Tooth','Forest Sap'], xp: 15, dg: 'low' },
+    { n: 'Cursed Catacombs', lv: 2, d: 'Ancient tombs filled with restless dead.', en: ['Skeleton','Zombie','Ghost'], loot: ['Iron Ore','Bone Shard','Grave Dust'], xp: 30, dg: 'medium' },
     { n: 'Crystal Caverns', lv: 3, d: 'Shimmering caves where crystal spiders weave.', en: ['Crystal Spider','Gem Golem','Shimmer Bat'], loot: ['Crystal Shard','Silk Thread','Gem Dust'], xp: 45, dg: 'medium' },
-    { n: 'Ember Peak', lv: 4, d: 'Volcanic caves with fire elementals.', en: ['Fire Imp','Lava Slug','Ash Wraith'], loot: ['Fire Essence','Obsidian','Phoenix Feather'], xp: 60, dg: 'high' },
+    { n: 'Ember Peak', lv: 4, d: 'Volcanic caves with fire elementals.', en: ['Fire Imp','Lava Slug','Ash Wraith'], loot: ['Fire Essence','Obsidian','Cinder Fragment'], xp: 60, dg: 'high' },
     { n: 'Stormhold', lv: 5, d: 'A crumbling fortress lashed by eternal lightning.', en: ['Storm Wraith','Lightning Hound','Thunder Knight'], loot: ['Storm Core','Conductive Wire','Static Orb'], xp: 80, dg: 'high' },
     { n: 'Frostspire Ruins', lv: 6, d: 'Frozen castle of a fallen ice lord.', en: ['Ice Elemental','Frost Wolf','Frozen Knight'], loot: ['Ice Crystal','Frost Gem','Glacial Staff'], xp: 100, dg: 'very high' },
     { n: 'Sunken Temple', lv: 7, d: 'An underwater ruin swallowed by the sea.', en: ['Drowned Sailor','Sea Serpent','Coral Golem'], loot: ['Pearl','Coral Branch','Aqua Pearl'], xp: 130, dg: 'very high' },
     { n: 'Abyssal Depths', lv: 8, d: 'The void between worlds. Only the brave enter.', en: ['Void Beast','Shadow Demon','Abyssal Horror'], loot: ['Void Essence','Dark Crystal','Abyssal Robe'], xp: 200, dg: 'extreme' },
     { n: "Dragon's Maw", lv: 9, d: 'The lair of an ancient dragon. Ash falls like snow.', en: ['Dragon Whelp','Ash Drake','Elder Wyrm'], loot: ['Dragon Scale','Wyrm Tooth','Ember Heart'], xp: 280, dg: 'extreme' },
     { n: 'Starlight Spire', lv: 10, d: 'A tower that touches the sky. The final challenge.', en: ['Star Sentinel','Celestial Knight','Astral Lord'], loot: ['Star Fragment','Celestial Dust','Astral Core'], xp: 400, dg: 'impossible' },
-    { n: 'Arcane Planar Tower', lv: 11, d: 'A spire torn between dimensions. Reality frays here — gravity shifts, time stutters, and the walls breathe with planar magic.', en: ['Planar Wisp','Rift Stalker','Aether Golem','Chronomancer','Void Weaver','Planar Leviathan'], loot: ['Planar Essence','Aether Shard','Chrono Sand','Void Thread','Reality Anchor'], xp: 500, dg: 'impossible' },
+    { n: 'Arcane Planar Tower', lv: 11, d: 'A spire torn between dimensions. Reality frays here — gravity shifts, time stutters, and the walls breathe with planar magic.', en: ['Planar Wisp','Rift Stalker','Aether Golem','Chronomancer','Void Weaver','Planar Leviathan'], loot: ['Planar Essence','Aether Shard','Chrono Sand','Void Thread','Rift Splinter'], xp: 500, dg: 'impossible' },
     // PHASE 2: PLANAR REALMS (Lv 12-20)
     { n: 'The Shattered Veil', lv: 12, elem: 'arcane', d: 'Reality tears at the seams. Fragments of dead worlds float in crystalline silence.', en: ['Veil Wraith','Shardling','Echo Walker'], loot: ['Planar Essence','Aether Shard','Reality Fragment'], xp: 180, dg: 'impossible' },
     { n: 'Emberfall Dimension', lv: 13, elem: 'fire', d: 'A realm where gravity pulls downward into an infinite inferno. Ash rains upward.', en: ['Ember Drake','Ash Titan','Flame Serpent'], loot: ['Ember Core','Ash Crystal','Inferno Gem'], xp: 220, dg: 'impossible' },
@@ -437,7 +437,7 @@ const G = {
         // === EXPANSION: LV 21+ ZONES ===
     { n: 'The Fractured Veil', lv: 21, elem: 'arcane', d: 'Reality tears at the seams. Fragments of dead worlds float in crystalline silence.', en: ['Veil Wraith','Shardling','Echo Walker','Fracture Hound'], loot: ['Planar Essence','Aether Shard','Reality Fragment'], xp: 550, dg: 'impossible' },
         // === PHASE 1 EXPANSION: LV 22-23 ZONES ===
-    { n: 'The Astral Maelstrom', lv: 22, elem: 'arcane', d: 'A storm of raw planar energy where dimensions collide and unravel. Reality here is a suggestion, not a rule.', en: ['Astral Construct','Void Hound','Phase Walker','Rift Rat','Reality Weaver'], loot: ['Astral Dust','Void Fragment','Planar Essence','Reality Anchor'], xp: 600, dg: 'impossible' },
+    { n: 'The Astral Maelstrom', lv: 22, elem: 'arcane', d: 'A storm of raw planar energy where dimensions collide and unravel. Reality here is a suggestion, not a rule.', en: ['Astral Construct','Void Hound','Phase Walker','Rift Rat','Reality Weaver'], loot: ['Astral Dust','Void Fragment','Planar Essence','Rift Splinter'], xp: 600, dg: 'impossible' },
         { n: 'Infernal Crucible', lv: 23, elem: 'fire', d: 'The forge where stars are born and die. Magma rivers flow upward into a sky of eternal flame.', en: ['Ember Wraith','Ash Phantom','Flame Serpent','Magma Titan'], loot: ['Inferno Gem','Ash Crystal','Ember Core','Phoenix Ash'], xp: 680, dg: 'impossible' },
 
     // === GAP FILLERS ===
@@ -5765,15 +5765,16 @@ function sellToAmad(invIndex) {
 }
 
 // Returns { index, item, price }[] for gear sitting in the bag that's strictly not worth
-// keeping: equipment (not companion-specific gear — that's handled from the Party screen)
-// that's a Downgrade or Sidegrade versus whatever's already equipped in that slot. Used by
-// the Sell Stash button so a whole run of junk drops can be cleared in one tap.
+// keeping: equipment (not companion-specific gear — that's its own stash below) that's a
+// Downgrade or Sidegrade versus whatever's already equipped in that slot. Used by the Sell
+// Stash button so a whole run of junk drops can be cleared in one tap.
 function getJunkStashItems() {
   const results = [];
   for (let i = 0; i < G.p.inv.length; i++) {
     const item = G.p.inv[i];
     const isEquip = item.slot && item.slot !== 'mat' && item.slot !== 'pot' && item.slot !== 'revive' && item.t !== 'food' && item.t !== 'drink';
     if (!isEquip) continue;
+    if (item.forCompanion) continue; // handled by getJunkCompanionGearItems() instead
     const cmp = getEquipComparisonForOwner(item);
     if (!cmp || cmp.better) continue; // keep upgrades and anything that fills an empty slot
     let sellPrice = 0;
@@ -5781,6 +5782,44 @@ function getJunkStashItems() {
     else sellPrice = Math.floor((item.ilvl || 1) * 4);
     sellPrice = Math.max(1, sellPrice);
     results.push({ index: i, item, price: sellPrice });
+  }
+  return results;
+}
+
+// Same idea as getJunkStashItems(), but scoped specifically to companion-signature gear
+// that's a Downgrade or Sidegrade for whichever companion it's flagged for — a separate
+// bucket since these clutter the bag differently (picked up for a specific party member,
+// not the player) and deserve their own clearly-labeled stash rather than being buried
+// in the general equipment pile.
+function getJunkCompanionGearItems() {
+  const results = [];
+  for (let i = 0; i < G.p.inv.length; i++) {
+    const item = G.p.inv[i];
+    if (!item.slot || !item.forCompanion) continue;
+    const cmp = getEquipComparisonForOwner(item);
+    if (!cmp || cmp.better) continue; // keep upgrades and anything that fills an empty slot
+    let sellPrice = 0;
+    if (item.value) sellPrice = Math.floor(item.value * 0.5);
+    else sellPrice = Math.floor((item.ilvl || 1) * 4);
+    sellPrice = Math.max(1, sellPrice);
+    results.push({ index: i, item, price: sellPrice });
+  }
+  return results;
+}
+
+// Raw material clutter — Herb Bundle, Iron Ore, and the like. Unlike equipment, materials
+// have no "better/worse" comparison, so there's no smart filtering here: this is every mat
+// currently in the bag, sold in one tap for whoever just wants the pile gone. Recipe
+// ingredients are cheap to re-farm, so this is a deliberate "clear it out" action, not a
+// selective one — same spirit as Sell Stash, just for the item type that actually piles up
+// the fastest and has the least individual identity once you have more than a couple of each.
+function getMatStashItems() {
+  const results = [];
+  for (let i = 0; i < G.p.inv.length; i++) {
+    const item = G.p.inv[i];
+    if (item.t !== 'mat') continue;
+    const sellPrice = Math.max(1, Math.floor((item.ilvl || 1) * 3 + 2));
+    results.push({ index: i, item, price: sellPrice * (item.q || 1) });
   }
   return results;
 }
@@ -5804,6 +5843,42 @@ function sellStashToAmad() {
   render();
 }
 
+function sellCompanionGearStashToAmad() {
+  const npc = G.npcs.find(n => n.n === 'Amad');
+  if (!npc || !npc.unlocked || npc.t !== 'trader') return;
+  const junk = getJunkCompanionGearItems();
+  if (junk.length === 0) { lg('💰 No outgrown companion gear to sell right now.'); return; }
+
+  let total = 0;
+  const sorted = [...junk].sort((a, b) => b.index - a.index);
+  for (let entry of sorted) {
+    total += entry.price;
+    G.p.inv.splice(entry.index, 1);
+  }
+  G.p.gold += total;
+  lg('💰 Sold ' + junk.length + ' outgrown companion item' + (junk.length > 1 ? 's' : '') + ' to Amad for ' + total + 'G!');
+  lg('   "Your family\'s old gear? I know someone who\'ll want it."');
+  render();
+}
+
+function sellMatsToAmad() {
+  const npc = G.npcs.find(n => n.n === 'Amad');
+  if (!npc || !npc.unlocked || npc.t !== 'trader') return;
+  const mats = getMatStashItems();
+  if (mats.length === 0) { lg('💰 No materials to sell right now.'); return; }
+
+  let total = 0;
+  const sorted = [...mats].sort((a, b) => b.index - a.index);
+  for (let entry of sorted) {
+    total += entry.price;
+    G.p.inv.splice(entry.index, 1);
+  }
+  G.p.gold += total;
+  lg('💰 Sold ' + mats.length + ' material stack' + (mats.length > 1 ? 's' : '') + ' to Amad for ' + total + 'G!');
+  lg('   "Good, good. Less to carry, more to cook with." Amad laughs.');
+  render();
+}
+
 
 // ============================================================
 // GAME TIME & DAILY SYSTEM
@@ -5812,6 +5887,7 @@ function sellStashToAmad() {
 function getRealDay() {
   return Math.floor(Date.now() / (1000 * 60 * 60 * 24));
 }
+
 
 const MAX_STREAK_FREEZES = 3; // stockpile cap — earned automatically, never bought
 
@@ -15174,9 +15250,19 @@ function rNPC() {
             h += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">';
             h += '<div style="font-size:12px;font-weight:600;color:#fbbf24;margin-bottom:8px;">💰 Sell to Amad (50% value)</div>';
             const junk = getJunkStashItems();
+            const companionJunk = getJunkCompanionGearItems();
+            const mats = getMatStashItems();
             if (junk.length > 0) {
               const junkTotal = junk.reduce((s, j) => s + j.price, 0);
-              h += '<button id="btn-sell-stash" class="abtn" style="width:100%;margin-bottom:10px;background:var(--danger);">🗑️ Sell Stash — ' + junk.length + ' junk item' + (junk.length > 1 ? 's' : '') + ' (' + junkTotal + 'G)</button>';
+              h += '<button id="btn-sell-stash" class="abtn" style="width:100%;margin-bottom:8px;background:var(--danger);">🗑️ Sell Stash — ' + junk.length + ' junk item' + (junk.length > 1 ? 's' : '') + ' (' + junkTotal + 'G)</button>';
+            }
+            if (companionJunk.length > 0) {
+              const companionJunkTotal = companionJunk.reduce((s, j) => s + j.price, 0);
+              h += '<button id="btn-sell-companion-stash" class="abtn" style="width:100%;margin-bottom:8px;background:var(--danger);">🧝 Sell Companion Gear Stash — ' + companionJunk.length + ' outgrown item' + (companionJunk.length > 1 ? 's' : '') + ' (' + companionJunkTotal + 'G)</button>';
+            }
+            if (mats.length > 0) {
+              const matsTotal = mats.reduce((s, j) => s + j.price, 0);
+              h += '<button id="btn-sell-mats" class="abtn" style="width:100%;margin-bottom:10px;background:var(--danger);">💎 Sell All Materials — ' + mats.length + ' stack' + (mats.length > 1 ? 's' : '') + ' (' + matsTotal + 'G)</button>';
             }
             h += '<div style="display:flex;flex-direction:column;gap:6px;">';
             for (let j = 0; j < G.p.inv.length; j++) {
@@ -15740,6 +15826,10 @@ if(btnVnAdvance)btnVnAdvance.addEventListener('click',()=>{ advanceJournalVn(); 
   });
   const btnSellStash=document.getElementById('btn-sell-stash');
   if(btnSellStash)btnSellStash.addEventListener('click',sellStashToAmad);
+  const btnSellCompanionStash=document.getElementById('btn-sell-companion-stash');
+  if(btnSellCompanionStash)btnSellCompanionStash.addEventListener('click',sellCompanionGearStashToAmad);
+  const btnSellMats=document.getElementById('btn-sell-mats');
+  if(btnSellMats)btnSellMats.addEventListener('click',sellMatsToAmad);
   document.querySelectorAll('.tr-btn:not(.dis)').forEach(el=>{
     el.addEventListener('click',(e)=>{
       e.stopPropagation();
