@@ -519,6 +519,48 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
   100% { filter: brightness(1); }
 }
 .crit-flash { animation: critFlash 0.5s ease-out; }
+
+/* Interactive zone map hotspots — percent-positioned so they scale with the image
+   at any screen size. Pulsing dot always visible, label appears on hover/tap. */
+.map-hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 10;
+}
+.map-hotspot-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid #000;
+  box-shadow: 0 0 8px var(--gold), 0 0 0 4px rgba(245,215,110,0.25);
+  animation: hotspotPulse 2s ease-in-out infinite;
+}
+@keyframes hotspotPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+}
+.map-hotspot-label {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.85);
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.map-hotspot:hover .map-hotspot-label,
+.map-hotspot:active .map-hotspot-label {
+  opacity: 1;
+}
 @keyframes critFlash {
   0% { filter: brightness(1) drop-shadow(0 0 0 var(--gold)); transform: scale(1); }
   20% { filter: brightness(2.5) drop-shadow(0 0 12px var(--gold)); transform: scale(1.08); }

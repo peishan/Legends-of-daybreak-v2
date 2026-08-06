@@ -15116,6 +15116,7 @@ function render(){
   else if(G.state=='prestige')h+=rPrestige();
   else if(G.state=='boss_rush')h+=rBossRush();
   else if(G.state=='fraying_frontier')h+=rFrayingFrontier();
+  else if(G.state=='zone_map_starting_lands')h+=rZoneMapStartingLands();
   else if(G.state=='kindling_network')h+=rKindlingNetwork();
   else if(G.state=='boss_rush_room')h+=rBossRushRoom();
   else if(G.state=='fraying_frontier_room')h+=rFrayingFrontierRoom();
@@ -16948,6 +16949,42 @@ function rKindlingNetwork() {
   return h;
 }
 
+// Interactive zone maps — illustrated background image with clickable hotspots
+// positioned over each zone marker. Coordinates are visual estimates (percent-based,
+// so they scale with the image regardless of screen size), not pixel-exact. Labels
+// are real HTML text overlaid on tap, not relying on the generated image's own
+// baked-in text, since AI-generated map labels are sometimes garbled.
+const STARTING_LANDS_HOTSPOTS = [
+  { name: 'Whispering Woods', zi: 0, x: 18, y: 34 },
+  { name: 'Cursed Catacombs', zi: 1, x: 38, y: 44 },
+  { name: 'Crystal Caverns', zi: 2, x: 44, y: 27 },
+  { name: 'Ember Peak', zi: 3, x: 53, y: 14 },
+  { name: 'Stormhold', zi: 4, x: 79, y: 17 },
+  { name: 'Frostspire Ruins', zi: 5, x: 79, y: 41 },
+  { name: 'Sunken Temple', zi: 6, x: 52, y: 51 },
+  { name: 'Abyssal Depths', zi: 7, x: 27, y: 71 },
+  { name: "Dragon's Maw", zi: 8, x: 52, y: 77 },
+  { name: "Serpent's Coil", zi: 23, x: 78, y: 79 }
+];
+
+function rZoneMapStartingLands() {
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'explore\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Back to Zone List</button>';
+  h += '<div class="st" style="text-align:center;">The Starting Lands</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:12px;">Levels 1\u20139 \u2014 tap a marker to head there directly.</div>';
+  h += '<div style="position:relative;width:100%;border-radius:14px;overflow:hidden;border:2px solid var(--border);">';
+  h += '<img src="maps/starting-lands.jpg" style="width:100%;display:block;">';
+  for (const spot of STARTING_LANDS_HOTSPOTS) {
+    h += '<div class="map-hotspot" onclick="sc(' + spot.zi + ')" style="left:' + spot.x + '%;top:' + spot.y + '%;" title="' + spot.name + '">';
+    h += '<div class="map-hotspot-dot"></div>';
+    h += '<div class="map-hotspot-label">' + spot.name + '</div>';
+    h += '</div>';
+  }
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
 function rFrayingFrontier() {
   const unlocked = G.p.lvl >= 100;
   let h = '<div class="content">';
@@ -17702,6 +17739,9 @@ function rZoneMapTabs() {
     h += '<button onclick="setExploreMapTab(' + i + ')" class="tier-btn' + (sel ? ' sel' : '') + '" style="flex-shrink:0;">' + tab.label + '</button>';
   }
   h += '</div>';
+  if (G.exploreMapTab === 0 && !hasEnteredVerdantReach()) {
+    h += '<button onclick="setS(\'zone_map_starting_lands\')" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;">\uD83D\uDDFA\uFE0F View Illustrated Map (Levels 1\u20139)</button>';
+  }
   if (hasEnteredVerdantReach()) {
     h += '<div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;">Everywhere before this is still there \u2014 Zul just drives now.</div>';
   }
