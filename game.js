@@ -3588,6 +3588,29 @@ storyJournal: {
           { speaker: 'Joel', text: '"To boring," you all echo, and the fire keeps burning, and nothing dramatic happens at all, and that turns out to be exactly enough.' },
         ]
       }
+,{
+        id: 'journal_099',
+        title: 'However Long That Takes',
+        chapter: 99,
+        unlockType: 'level',
+        unlockAt: 200,
+        icon: '🌙',
+        summary: 'A hundred levels past Iris and Ash, San and Joel sit with a question that used to matter and no longer does: how this ends. It doesn\'t need to. The practice was never about reaching a final line — just about how many more are worth going out to find.',
+        scenes: [
+          { speaker: 'Narrator', text: 'One hundred levels since Iris and Ash. You do not remember most of them individually anymore, the same way you stopped being able to name most of the fifty before that — just a long, accumulating certainty that the ground keeps being worth going out to find, and that you are never, anymore, the only ones looking.' },
+          { speaker: 'San', text: '"How many pairs do you think are out there now?" you ask Joel, watching the fire. "Ones we still have not met. Ones we never will."' },
+          { speaker: 'Joel', text: '"I stopped trying to guess a while ago," Joel says. "It stopped feeling like the kind of number that needed pinning down. Just a good one to know is bigger than us."' },
+          { speaker: 'Narrator', text: 'Iris is not with you tonight — off tending a line of her own, somewhere past the ridge, the way she does now on her own schedule as much as yours. That used to feel like something to track. It stopped being that a long time ago too.' },
+          { speaker: 'San', text: '"I used to think about how this ends," you admit. "Early on. Some final line, some last thing to hold, and then — done. Rest, maybe. I do not think about that anymore."' },
+          { speaker: 'Joel', text: '"Does it bother you?" Joel asks, careful, the way he still sometimes checks on the parts of you that used to need checking on. "Not having an ending in view?"' },
+          { speaker: 'San', text: '"No," you say, and mean it completely, surprising yourself a little with how easily it comes. "I think that was always the wrong shape to want. Looking for an ending made every single day about how far there was left to go. This does not ask that of me. It never really did, past the beginning."' },
+          { speaker: 'Narrator', text: 'You think of the version of yourself who first stood at the edge of everything mapped and called it a beginning, a hundred levels before this one, a hundred and five before that. She would not recognize how quiet this has become. You do not think she would mind.' },
+          { speaker: 'Joel', text: '"A hundred more, then," Joel says, not really a question, watching the same fire you are. "However long that takes."' },
+          { speaker: 'San', text: '"However long that takes," you agree. "I stopped needing to know the number a while ago too."' },
+          { speaker: 'Narrator', text: 'Soel shifts against your side, warm and unbothered, and somewhere past the ridge a line is being held by someone who once needed finding and now does the finding herself. None of it needs to resolve into anything larger than exactly what it already is.' },
+        ]
+      }
+
 
 
     ]
@@ -3732,6 +3755,7 @@ storyJournal: {
   dragonHunt: { active: false, currentId: null, cleared: {} }, // legendary optional superbosses, repeatable; cleared keyed by dragon id
   bossRush: { active: false, streak: 0, bestStreak: 0 }, // chained boss fights, escalating reward + difficulty, no rest between
   frayingFrontier: { active: false, streak: 0, bestStreak: 0 }, // endless mode, level 100+, bosses scale off current player level indefinitely
+  kindlingCommissions: { linesToday: 0, checksToday: 0, refreshDay: 0 }, // bounded daily ritual — 3 lines, 2 checks, resets once per game day
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
@@ -5763,6 +5787,9 @@ function checkDayAdvance() {
   if (G.focusHistory.length > 30) G.focusHistory = G.focusHistory.slice(-30);
 
   G.gameDay += daysPassed;
+
+  // Kindling Commissions reset on a new day — bounded, not accumulating.
+  G.kindlingCommissions = { linesToday: 0, checksToday: 0, refreshDay: G.gameDay };
 
   // Mercenary tier was scaling off a lifetime completed-contract count with no cap and
   // no reset — meaning difficulty only ever ratcheted up, disconnected from actual
@@ -8237,6 +8264,74 @@ const FRAYING_FRONTIER_IDENTITIES = [
   { n: 'The Line That Keeps Almost Breaking', mechanic: 'crush', crushTurn: 4,
     desc: "Somewhere between held and lost, permanently, the exact tipping point stretched out indefinitely. It has been almost-breaking for longer than it can remember not almost-breaking." }
 ];
+
+// Daily Kindling Commissions — bounded, ritual-style daily tasks distinct from the
+// Frontier's open-ended "push until you fall" structure. A small, fixed number of
+// quick things to do each day: 3 Tend a Line encounters (single quick fights, no
+// streak, no pressure) and 2 Check on a Pair moments (non-combat, just a small
+// reward and a short beat). The goal is a bounded daily ritual, not more grinding.
+function getKindlingCommissionEnemyStats(playerLevel) {
+  // Reuses the Frontier's proven-safe polynomial scaling, scaled down heavily since
+  // this is a quick regular encounter, not a boss fight. The old linear formula
+  // (generateEnemyStats) would produce absurdly weak enemies at very high levels —
+  // same failure mode already fixed once for loot this session.
+  const bossStats = getFrayingFrontierScaledStats(playerLevel);
+  return {
+    hp: Math.max(20, Math.floor(bossStats.hp / 15)),
+    atk: Math.max(3, Math.floor(bossStats.atk / 15)),
+    def: Math.max(1, Math.floor(bossStats.def / 15)),
+    xp: Math.max(10, Math.floor(bossStats.xp / 8)),
+    g: Math.max(5, Math.floor(bossStats.g / 8))
+  };
+}
+
+// Safety net — ensures the daily count is current regardless of exactly when this
+// gets checked, rather than relying solely on checkDayAdvance()'s own timing.
+function ensureKindlingCommissionsCurrent() {
+  if (G.kindlingCommissions.refreshDay !== G.gameDay) {
+    G.kindlingCommissions = { linesToday: 0, checksToday: 0, refreshDay: G.gameDay };
+  }
+}
+
+const KINDLING_LINE_NAMES = ['A Line Worth Tending', 'Ground Someone Left Undefended', 'A Small, Patient Fraying'];
+function tendAKindlingLine() {
+  ensureKindlingCommissionsCurrent();
+  if (G.kindlingCommissions.linesToday >= 3) { lg('🕯️ Already tended three lines today. Come back tomorrow.'); return; }
+  const stats = getKindlingCommissionEnemyStats(G.p.lvl);
+  const name = KINDLING_LINE_NAMES[Math.floor(Math.random() * KINDLING_LINE_NAMES.length)];
+  const enemy = { n: name, elem: 'void', hp: stats.hp, mhp: stats.hp, atk: stats.atk, def: stats.def, xp: stats.xp, g: stats.g, id: 99, isKindlingCommission: true };
+
+  G.cbt.on = true;
+  G.cbt.turn = 0;
+  G.cbt.en = [enemy];
+  G.state = 'combat';
+  G.cbt.autoCombat = isAutoCombatPreferred();
+  lg('🕯️ Tending a line: ' + name);
+  render();
+}
+
+const KINDLING_CHECK_LINES = [
+  "Iris sends word she's fine — a line held, nothing dramatic, just checking in the way you both do now.",
+  "You think of everyone still out there doing this without knowing anyone else is too, and hope, quietly, that someone finds them soon.",
+  "A short message from Iris: \"Quiet day. Good quiet.\" You send the same back.",
+  "Nothing needs fixing today. You check anyway. That's the whole point of the practice.",
+  "Ash sends nothing, being a fox, but Iris says he's been unusually pleased with himself all week."
+];
+function checkOnAKindlingPair() {
+  ensureKindlingCommissionsCurrent();
+  if (G.kindlingCommissions.checksToday >= 2) { lg('🦊 Already checked in twice today. Come back tomorrow.'); return; }
+  G.kindlingCommissions.checksToday++;
+  const stats = getKindlingCommissionEnemyStats(G.p.lvl);
+  const xp = Math.floor(stats.xp * 0.6);
+  const g = Math.floor(stats.g * 0.6);
+  G.p.xp += xp;
+  G.p.gold += g;
+  const line = KINDLING_CHECK_LINES[Math.floor(Math.random() * KINDLING_CHECK_LINES.length)];
+  lg('🦊 ' + line + ' (+' + xp + ' XP, +' + g + 'G)');
+  lvlup();
+  saveGame();
+  render();
+}
 
 function getFrayingFrontierScaledStats(playerLevel) {
   // Anchored to the real, hand-authored level-100 boss (340,000 HP) — polynomial
@@ -12571,6 +12666,29 @@ handleDefeat = function() {
   }
 };
 
+const _originalHandleVictoryForKindlingCommission = handleVictory;
+handleVictory = function() {
+  if (G.cbt.en.length === 1 && G.cbt.en[0].isKindlingCommission) {
+    ensureKindlingCommissionsCurrent();
+    G.kindlingCommissions.linesToday++;
+    const enemy = G.cbt.en[0];
+    const xp = Math.floor(enemy.xp * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
+    const g = Math.floor(enemy.g * getPrestigeGoldMult());
+    G.p.xp += xp;
+    G.p.gold += g;
+    lg('🕯️ Line held. +' + xp + ' XP, +' + g + 'G (' + G.kindlingCommissions.linesToday + '/3 today)');
+    G.cbt.on = false;
+    G.currentBoss = null;
+    G.cbt.autoCombat = isAutoCombatPreferred();
+    G.state = 'kindling_network';
+    lvlup();
+    saveGame();
+    render();
+  } else {
+    _originalHandleVictoryForKindlingCommission();
+  }
+};
+
 const _originalHandleVictoryForFrayingFrontier = handleVictory;
 handleVictory = function() {
   if (G.frayingFrontier.active) {
@@ -12601,6 +12719,23 @@ handleVictory = function() {
     render();
   } else {
     _originalHandleVictoryForFrayingFrontier();
+  }
+};
+
+const _originalHandleDefeatForKindlingCommission = handleDefeat;
+handleDefeat = function() {
+  if (G.cbt.en.length === 1 && G.cbt.en[0].isKindlingCommission) {
+    if (checkSecondWind()) { render(); return; }
+    lg('🕯️ This one got away. No cost — the line is still there whenever you\'re ready to try again.');
+    G.p.hp = 1;
+    for (let p of G.party) { if (p.hp <= 0) { p.hp = 1; p.on = true; } }
+    G.cbt.on = false;
+    G.currentBoss = null;
+    G.cbt.autoCombat = isAutoCombatPreferred();
+    G.state = 'kindling_network';
+    render();
+  } else {
+    _originalHandleDefeatForKindlingCommission();
   }
 };
 
@@ -16778,9 +16913,18 @@ function rBossRush() {
 }
 
 function rKindlingNetwork() {
+  ensureKindlingCommissionsCurrent();
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🦊 The Kindling Network</div>';
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Other Kindled pairs, met along the way. Not a system to grind \u2014 just a record of who you have actually found out there.</div>';
+
+  const linesLeft = 3 - G.kindlingCommissions.linesToday;
+  const checksLeft = 2 - G.kindlingCommissions.checksToday;
+  h += '<div class="panel" style="margin-bottom:16px;">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">Today\'s Small Practice</div>';
+  h += '<button onclick="tendAKindlingLine()" ' + (linesLeft <= 0 ? 'disabled' : '') + ' class="btn-outline-ghost" style="width:100%;margin-bottom:8px;' + (linesLeft <= 0 ? 'opacity:0.5;' : '') + '">🕯️ Tend a Line (' + Math.max(0,linesLeft) + '/3 left today)</button>';
+  h += '<button onclick="checkOnAKindlingPair()" ' + (checksLeft <= 0 ? 'disabled' : '') + ' class="btn-outline-ghost" style="width:100%;' + (checksLeft <= 0 ? 'opacity:0.5;' : '') + '">🦊 Check on a Pair (' + Math.max(0,checksLeft) + '/2 left today)</button>';
+  h += '</div>';
 
   const knownEntries = KINDLING_NETWORK.filter(k => {
     const chEntry = G.storyJournal.entries.find(e => e.chapter === k.metChapter);
