@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-07-27 14:30';
+const APP_VERSION = '2026-08-08 14:40 (Farseer quest recovery v2, Ser Aldric confirmed)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -680,6 +680,14 @@ const G = {
     { id: 78, n: "Someone Else's Watch", d: 'Defeat What Was Almost Enough and finish what someone else already started', t: 'boss_specific', target: 'What Was Almost Enough', c: 0, need: 1, rw: { xp: 128000, g: 94000 }, done: false },
     { id: 79, n: 'The Farthest Kindling', d: 'Defeat The Line Neither Could Hold Alone, together with whoever else is already fighting it', t: 'boss_specific', target: 'The Line Neither Could Hold Alone', c: 0, need: 1, rw: { xp: 165000, g: 118000 }, done: false },
 
+    // Materials for the Vision Machine — Varel Farseer's request. These belong here,
+    // in quests (boss_specific completion is checked against G.quests), not bounties —
+    // this exact misplacement has recurred more than once, so if you're reading this
+    // while investigating a "Farseer quest won't complete" report again, check first
+    // whether these two entries have drifted back into the bounties array below.
+    { id: 80, n: "The Farseer's Request I: A Splinter of the Horizon", d: 'Defeat Skarrowyn, the Split Horizon, and recover a splinter of scale for the Vision Machine', t: 'boss_specific', target: 'Skarrowyn, the Split Horizon', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
+    { id: 81, n: "The Farseer's Request II: A Thread of the Wound", d: 'Defeat Nyxathorne, the Unmended Wound, and recover a thread for the Vision Machine', t: 'boss_specific', target: 'Nyxathorne, the Unmended Wound', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
+
   ],
 
    bounties: [
@@ -745,11 +753,6 @@ const G = {
     { id: 'b50', n: "Someone Else's Kindling", d: 'Defeat What Was Almost Enough', t: 'kill_specific', target: 'What Was Almost Enough', c: 0, need: 1, rw: { xp: 29000, g: 21500 }, done: false, refreshDay: 0, minLv: 99, maxLv: 999 },
     { id: 'b51', n: 'Two Lines, One Fight', d: 'Defeat The Line Neither Could Hold Alone', t: 'kill_specific', target: 'The Line Neither Could Hold Alone', c: 0, need: 1, rw: { xp: 34000, g: 25000 }, done: false, refreshDay: 0, minLv: 100, maxLv: 999 },
 
-    // Materials for the Vision Machine — Varel Farseer's request. Not gated by minLv;
-    // a player who already cleared both dragons for the Dragon Hunt just finds these
-    // waiting complete when they meet him, which reads as earned rather than a bug.
-    { id: 80, n: "The Farseer's Request I: A Splinter of the Horizon", d: 'Defeat Skarrowyn, the Split Horizon, and recover a splinter of scale for the Vision Machine', t: 'boss_specific', target: 'Skarrowyn, the Split Horizon', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
-    { id: 81, n: "The Farseer's Request II: A Thread of the Wound", d: 'Defeat Nyxathorne, the Unmended Wound, and recover a thread for the Vision Machine', t: 'boss_specific', target: 'Nyxathorne, the Unmended Wound', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
 
   ],
 
@@ -1063,6 +1066,10 @@ const G = {
     { n: 'Sister Wren', t: 'ally', title: 'The Last Believer', icon: '🕯️', col: '#d97706',
       d: 'Once the last true believer of a doctrine built on a lie, now tending something small and honest instead. She knows the difference between real devotion and performed devotion better than almost anyone alive \u2014 and knows exactly what that knowledge cost her.',
       ability: 'Hard-Won Faith: +8% Temple standing gained from every source.',
+      unlocked: false, ul: 62 },
+    { n: 'Ser Aldric', t: 'ally', title: 'The One Who Finds', icon: '⚔️', col: '#7c8a99',
+      d: "Rescued from the Cult of the Closed Eye rather than lost to it — and instead of walking away from what nearly took him, chose to be the one who finishes what it left scattered. Spent a long time being found by things. Decided, deliberately, to try finding one for himself instead. Fights alongside Sister Wren more often than not, the two of them carrying a weight neither pretends is fully gone.",
+      ability: "Properly: +6% party defense while fielded, a little steadier for everyone standing near him.",
       unlocked: false, ul: 62 },
     { n: 'Varel Farseer', t: 'ally', title: 'The One Who Watches the Distance', icon: '🔮', col: '#0ea5e9',
       d: "A hermit scryer who has kept watch over the boundary between here and everywhere else for longer than he has bothered counting. He found Mimi's Dreamsight the way he finds most things worth finding \u2014 by accident, mid-conversation, and immediately recognized raw instinct that had never once been given any actual discipline. He does not perform wisdom. He mostly just says the true thing, at whatever volume it happens to arrive in, and lets you decide what to do with it.",
@@ -8762,6 +8769,15 @@ const GUILD_MEMBERS = [
       'Sister Wren: "Faith was never the problem. I just aimed it wrong once."',
       'Sister Wren: "Steady. That\'s all this ever takes."'
     ] },
+  { id: 'ser_aldric', npcName: 'Ser Aldric', role: 'Frontline', icon: '⚔️',
+    recruitReq: { type: 'ally' },
+    fieldBuff: { defPct: 0.04 },
+    recruitLine: 'Ser Aldric considers it for exactly as long as it takes to answer. "I spent a long time being found by things. This feels like the other version of that. Count me in."',
+    barks: [
+      'Ser Aldric: "Properly, this time. All the way through."',
+      'Ser Aldric: "I know exactly how long a person can keep going on nothing but momentum. Let\'s make sure it doesn\'t have to."',
+      'Ser Aldric: "Company. That\'s all I ever actually needed."'
+    ] },
   { id: 'dudin', npcName: 'Dudin', role: 'Frontline', icon: '🎖️',
     recruitReq: { type: 'trader_visits', visits: 10 },
     fieldBuff: { atkPct: 0.05 },
@@ -14437,6 +14453,11 @@ const SAVE_KEY = 'ldb_save_v5';
 
 // === CONTENT MIGRATION ===
 const CONTENT_VERSION = 4;
+// Separate from CONTENT_VERSION above (which only tracks save-data structure changes).
+// This tracks the actual game.js build itself — updated every time a new file is
+// deployed, so it's possible to visually confirm which version is actually loaded,
+// rather than guessing from behavior alone.
+const BUILD_ID = '2026-08-08.1';
 // =========================
 
 
@@ -18553,6 +18574,7 @@ function rMenu(){
     ]},
     { title: '⚙️ Settings', items: [
       {i:'💾',l:'Save & Sync',a:'sync'},
+      {i:'🔖',l:'Build ' + BUILD_ID,a:''},
     ]},
   ];
 
