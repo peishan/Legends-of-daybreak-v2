@@ -3627,7 +3627,7 @@ storyJournal: {
         title: 'The One Who Watches the Distance',
         chapter: 100,
         unlockType: 'level',
-        unlockAt: 148,
+        unlockAt: 55,
         icon: '🔮',
         summary: "A hermit scryer finds Mimi's Dreamsight the way he finds most things — by accident — and offers to help her point it somewhere it has never reached before. It will cost more than patience.",
         scenes: [
@@ -3653,8 +3653,8 @@ storyJournal: {
         id: 'journal_101',
         title: 'What It Takes to Build a Window',
         chapter: 101,
-        unlockType: 'level',
-        unlockAt: 149,
+        unlockType: 'boss',
+        unlockAt: 'Skarrowyn, the Split Horizon',
         icon: '🪞',
         summary: 'Skarrowyn and Nyxathorne both fall, and Varel and Mimi build the frame together — his discipline, her untrained sight, and one honest warning about the cost.',
         scenes: [
@@ -3678,8 +3678,8 @@ storyJournal: {
         id: 'journal_102',
         title: 'The First Vision',
         chapter: 102,
-        unlockType: 'level',
-        unlockAt: 150,
+        unlockType: 'boss',
+        unlockAt: 'Skarrowyn, the Split Horizon',
         icon: '👁️',
         summary: 'The Vision Machine opens for the first time. Not a door. A window \u2014 and it is enough.',
         scenes: [
