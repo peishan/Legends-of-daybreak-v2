@@ -680,6 +680,12 @@ const G = {
     { id: 78, n: "Someone Else's Watch", d: 'Defeat What Was Almost Enough and finish what someone else already started', t: 'boss_specific', target: 'What Was Almost Enough', c: 0, need: 1, rw: { xp: 128000, g: 94000 }, done: false },
     { id: 79, n: 'The Farthest Kindling', d: 'Defeat The Line Neither Could Hold Alone, together with whoever else is already fighting it', t: 'boss_specific', target: 'The Line Neither Could Hold Alone', c: 0, need: 1, rw: { xp: 165000, g: 118000 }, done: false },
 
+    // Materials for the Vision Machine — Varel Farseer's request. Not gated by minLv;
+    // a player who already cleared both dragons for the Dragon Hunt just finds these
+    // waiting complete when they meet him, which reads as earned rather than a bug.
+    { id: 80, n: "The Farseer's Request I: A Splinter of the Horizon", d: 'Defeat Skarrowyn, the Split Horizon, and recover a splinter of scale for the Vision Machine', t: 'boss_specific', target: 'Skarrowyn, the Split Horizon', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
+    { id: 81, n: "The Farseer's Request II: A Thread of the Wound", d: 'Defeat Nyxathorne, the Unmended Wound, and recover a thread for the Vision Machine', t: 'boss_specific', target: 'Nyxathorne, the Unmended Wound', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
+
   ],
 
    bounties: [
@@ -744,12 +750,6 @@ const G = {
     { id: 'b49', n: 'Arrived in Time', d: 'Defeat Before It Wears Through', t: 'kill_specific', target: 'Before It Wears Through', c: 0, need: 1, rw: { xp: 27000, g: 20000 }, done: false, refreshDay: 0, minLv: 98, maxLv: 999 },
     { id: 'b50', n: "Someone Else's Kindling", d: 'Defeat What Was Almost Enough', t: 'kill_specific', target: 'What Was Almost Enough', c: 0, need: 1, rw: { xp: 29000, g: 21500 }, done: false, refreshDay: 0, minLv: 99, maxLv: 999 },
     { id: 'b51', n: 'Two Lines, One Fight', d: 'Defeat The Line Neither Could Hold Alone', t: 'kill_specific', target: 'The Line Neither Could Hold Alone', c: 0, need: 1, rw: { xp: 34000, g: 25000 }, done: false, refreshDay: 0, minLv: 100, maxLv: 999 },
-
-    // Materials for the Vision Machine — Varel Farseer's request. Not gated by minLv;
-    // a player who already cleared both dragons for the Dragon Hunt just finds these
-    // waiting complete when they meet him, which reads as earned rather than a bug.
-    { id: 80, n: "The Farseer's Request I: A Splinter of the Horizon", d: 'Defeat Skarrowyn, the Split Horizon, and recover a splinter of scale for the Vision Machine', t: 'boss_specific', target: 'Skarrowyn, the Split Horizon', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
-    { id: 81, n: "The Farseer's Request II: A Thread of the Wound", d: 'Defeat Nyxathorne, the Unmended Wound, and recover a thread for the Vision Machine', t: 'boss_specific', target: 'Nyxathorne, the Unmended Wound', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
 
   ],
 
