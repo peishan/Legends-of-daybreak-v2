@@ -7665,10 +7665,20 @@ function exitSiegeDefense() {
 // quests, achievements, guild rep, mercenary tier, and dragon hunt clears are untouched;
 // this only resets the level/xp/base-stat track, since that's the part the curve problem
 // actually lives in.
-const PRESTIGE_MIN_LEVEL = 100;
+const PRESTIGE_MIN_LEVEL = 100; // Tier 1 requirement — the level needed for your very first prestige
+const PRESTIGE_TIER_INCREMENT = 50; // each subsequent prestige raises the bar by this much — Tier 2 needs 150, Tier 3 needs 200, and so on
 const PRESTIGE_XP_PCT_PER_LEVEL = 0.4;   // % permanent XP bonus banked per level at reset
 const PRESTIGE_GOLD_PCT_PER_LEVEL = 0.3; // % permanent gold bonus banked per level at reset
 const PRESTIGE_BONUS_CAP = 200;          // sanity ceiling so repeated resets can't run away
+
+// The tier a player is currently working toward — Tier 1 before their first prestige,
+// Tier 2 after their first, Tier 3 after their second, and so on indefinitely.
+function getPrestigeTier() {
+  return (G.prestige.count || 0) + 1;
+}
+function getPrestigeRequiredLevel() {
+  return PRESTIGE_MIN_LEVEL + (G.prestige.count || 0) * PRESTIGE_TIER_INCREMENT;
+}
 
 // Milestones tied to prestige COUNT specifically, not the stacking level-scaled bonus
 // above — without these, prestiging once versus ten times was mechanically identical
@@ -7798,17 +7808,19 @@ function getAllyTempleRepBonus() {
 }
 
 function isPrestigeUnlocked() {
-  return G.p.lvl >= PRESTIGE_MIN_LEVEL;
+  return G.p.lvl >= getPrestigeRequiredLevel();
 }
 
 function doPrestige() {
+  const requiredLevel = getPrestigeRequiredLevel();
   if (!isPrestigeUnlocked()) {
-    lg('🔒 Prestige unlocks at Level ' + PRESTIGE_MIN_LEVEL + '.');
+    lg('🔒 Tier ' + getPrestigeTier() + ' Prestige unlocks at Level ' + requiredLevel + '.');
     return;
   }
   const xpGain = +(G.p.lvl * PRESTIGE_XP_PCT_PER_LEVEL).toFixed(1);
   const goldGain = +(G.p.lvl * PRESTIGE_GOLD_PCT_PER_LEVEL).toFixed(1);
   const oldLvl = G.p.lvl;
+  const completedTier = getPrestigeTier();
 
   G.prestige.xpBonusPct = Math.min(PRESTIGE_BONUS_CAP, (G.prestige.xpBonusPct || 0) + xpGain);
   G.prestige.goldBonusPct = Math.min(PRESTIGE_BONUS_CAP, (G.prestige.goldBonusPct || 0) + goldGain);
@@ -7825,7 +7837,8 @@ function doPrestige() {
                              // whatever mercenary tier was built up pre-reset — backwards
                              // for what's supposed to be a fresh start.
 
-  lg('🌟 PRESTIGE! Level ' + oldLvl + ' banked into a permanent +' + xpGain + '% XP / +' + goldGain + '% gold.');
+  lg('🌟 TIER ' + completedTier + ' PRESTIGE! Level ' + oldLvl + ' banked into a permanent +' + xpGain + '% XP / +' + goldGain + '% gold.');
+  lg('   Next prestige (Tier ' + (completedTier + 1) + ') will require Level ' + getPrestigeRequiredLevel() + '.');
   lg('   Total bonus now: +' + G.prestige.xpBonusPct.toFixed(1) + '% XP, +' + G.prestige.goldBonusPct.toFixed(1) + '% gold.');
   lg('   Level reset to 1 — everything else (gear, gold, story, achievements) stays.');
   saveGame();
@@ -8520,10 +8533,18 @@ const RAIDS = [
       { type: 'elite', zoneLv: 82, enemies: ['Overtime Wraith', 'Off-Day Enforcer'] },
       { type: 'boss', name: 'Jeff, the SK* Son-in-Law' },
       { type: 'elite', zoneLv: 95, enemies: ['Root-Bound Elder', 'Elderwood Sentinel'] },
-      { type: 'boss', name: 'The Verdant Heart' }
+      { type: 'boss', name: 'The Verdant Heart' },
+      { type: 'elite', zoneLv: 96, enemies: ['Fraying Wisp', 'Unwoven Stalker'] },
+      { type: 'boss', name: 'The Unmade' },
+      { type: 'elite', zoneLv: 97, enemies: ['Line-Breaker', 'Corrosion Vessel'] },
+      { type: 'boss', name: 'What Alone Becomes' },
+      { type: 'elite', zoneLv: 98, enemies: ['Testing Current', 'Patience-Eater'] },
+      { type: 'boss', name: 'Before It Wears Through' },
+      { type: 'elite', zoneLv: 99, enemies: ['Remnant Current', 'Half-Won Vessel'] },
+      { type: 'boss', name: 'What Was Almost Enough' }
     ],
-    rw: { xp: 375000, gold: 290000 },
-    desc: "A community that kept growing things through the end of the world, and, deeper still, whatever is actually doing the mending. As close to the source of it as this family has ever gotten — and very little worth reaching this deep comes easily, least of all the parts that never had anything to do with the Vale at all." }
+    rw: { xp: 900000, gold: 700000 },
+    desc: "A community that kept growing things through the end of the world, and, deeper still, whatever is actually doing the mending. As close to the source of it as this family has ever gotten — and very little worth reaching this deep comes easily, least of all the parts that never had anything to do with the Vale at all. Beyond the Rootbound Sanctuary, the ground itself starts to thin — every line held here is one more line the Frontier never gets to take." }
 ];
 
 // Raid bosses hit harder than their solo zone-encounter versions — a raid should feel
@@ -17487,15 +17508,17 @@ function rPrestige() {
   const unlocked = isPrestigeUnlocked();
   const projXp = +(G.p.lvl * PRESTIGE_XP_PCT_PER_LEVEL).toFixed(1);
   const projGold = +(G.p.lvl * PRESTIGE_GOLD_PCT_PER_LEVEL).toFixed(1);
+  const currentTier = getPrestigeTier();
+  const requiredLevel = getPrestigeRequiredLevel();
 
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🌟 Prestige</div>';
-  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Bank your level into a permanent bonus, then start the climb again \u2014 faster this time.</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Bank your level into a permanent bonus, then start the climb again \u2014 faster this time. Each tier asks for more than the last.</div>';
 
   h += '<div class="panel panel-gold" style="text-align:center;">';
   h += '<div class="panel-title" style="color:var(--gold);">Current Permanent Bonus</div>';
   h += '<div style="font-size:24px;font-weight:700;margin:8px 0;color:var(--gold);">+' + (G.prestige.xpBonusPct || 0).toFixed(1) + '% XP &nbsp;\u00b7&nbsp; +' + (G.prestige.goldBonusPct || 0).toFixed(1) + '% Gold</div>';
-  h += '<div class="btn-hint">' + (G.prestige.count || 0) + ' prestige' + ((G.prestige.count || 0) === 1 ? '' : 's') + ' so far</div>';
+  h += '<div class="btn-hint">' + (G.prestige.count || 0) + ' prestige' + ((G.prestige.count || 0) === 1 ? '' : 's') + ' so far \u2014 working toward Tier ' + currentTier + ' (Level ' + requiredLevel + ')</div>';
   h += '</div>';
 
   h += '<div class="panel">';
@@ -17518,13 +17541,13 @@ function rPrestige() {
 
   if (unlocked) {
     h += '<div class="panel" style="text-align:center;">';
-    h += '<div class="btn-hint">Prestiging now at Level ' + G.p.lvl + ' banks:</div>';
+    h += '<div class="btn-hint">Prestiging now at Level ' + G.p.lvl + ' (Tier ' + currentTier + ') banks:</div>';
     h += '<div style="font-size:18px;font-weight:700;margin:6px 0;color:var(--accent);">+' + projXp + '% XP &nbsp;\u00b7&nbsp; +' + projGold + '% Gold</div>';
     h += '</div>';
-    h += '<button onclick="confirmPrestige()" class="abtn" style="width:100%;background:var(--danger);">🌟 Prestige Now (Level Resets to 1)</button>';
+    h += '<button onclick="confirmPrestige()" class="abtn" style="width:100%;background:var(--danger);">🌟 Tier ' + currentTier + ' Prestige (Level Resets to 1)</button>';
   } else {
     h += '<div class="panel" style="text-align:center;">';
-    h += '<div class="btn-hint">🔒 Unlocks at Level ' + PRESTIGE_MIN_LEVEL + ' (currently Level ' + G.p.lvl + ')</div>';
+    h += '<div class="btn-hint">🔒 Tier ' + currentTier + ' unlocks at Level ' + requiredLevel + ' (currently Level ' + G.p.lvl + ')</div>';
     h += '</div>';
   }
 
