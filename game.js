@@ -680,68 +680,62 @@ const G = {
     { id: 78, n: "Someone Else's Watch", d: 'Defeat What Was Almost Enough and finish what someone else already started', t: 'boss_specific', target: 'What Was Almost Enough', c: 0, need: 1, rw: { xp: 128000, g: 94000 }, done: false },
     { id: 79, n: 'The Farthest Kindling', d: 'Defeat The Line Neither Could Hold Alone, together with whoever else is already fighting it', t: 'boss_specific', target: 'The Line Neither Could Hold Alone', c: 0, need: 1, rw: { xp: 165000, g: 118000 }, done: false },
 
-    // Materials for the Vision Machine — Varel Farseer's request. Not gated by minLv;
-    // a player who already cleared both dragons for the Dragon Hunt just finds these
-    // waiting complete when they meet him, which reads as earned rather than a bug.
-    { id: 80, n: "The Farseer's Request I: A Splinter of the Horizon", d: 'Defeat Skarrowyn, the Split Horizon, and recover a splinter of scale for the Vision Machine', t: 'boss_specific', target: 'Skarrowyn, the Split Horizon', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
-    { id: 81, n: "The Farseer's Request II: A Thread of the Wound", d: 'Defeat Nyxathorne, the Unmended Wound, and recover a thread for the Vision Machine', t: 'boss_specific', target: 'Nyxathorne, the Unmended Wound', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
-
   ],
 
    bounties: [
     // === PHASE 1: EARLY GAME (Lv 1-9) ===
-    { id: 'b1', n: 'Goblin Slayer', d: 'Defeat 5 Goblins', t: 'kill_specific', target: 'Goblin', c: 0, need: 5, rw: { xp: 40, g: 25 }, done: false, refreshDay: 0, minLv: 1 , maxLv: 999 },
-    { id: 'b2', n: 'Bone Collector', d: 'Defeat 5 Skeletons', t: 'kill_specific', target: 'Skeleton', c: 0, need: 5, rw: { xp: 60, g: 35 }, done: false, refreshDay: 0, minLv: 2 , maxLv: 999 },
-    { id: 'b3', n: 'Wolf Hunter', d: 'Defeat 3 Wolves', t: 'kill_specific', target: 'Wolf', c: 0, need: 3, rw: { xp: 30, g: 20 }, done: false, refreshDay: 0, minLv: 1 , maxLv: 999 },
-    { id: 'b4', n: 'Ghost Buster', d: 'Defeat 3 Ghosts', t: 'kill_specific', target: 'Ghost', c: 0, need: 3, rw: { xp: 80, g: 50 }, done: false, refreshDay: 0, minLv: 2 , maxLv: 999 },
-    { id: 'b5', n: 'Fire Purge', d: 'Defeat 4 Fire Imps', t: 'kill_specific', target: 'Fire Imp', c: 0, need: 4, rw: { xp: 100, g: 60 }, done: false, refreshDay: 0, minLv: 4 , maxLv: 999 },
-    { id: 'b6', n: 'Crystal Breaker', d: 'Defeat 3 Crystal Spiders', t: 'kill_specific', target: 'Crystal Spider', c: 0, need: 3, rw: { xp: 70, g: 40 }, done: false, refreshDay: 0, minLv: 3 , maxLv: 999 },
-    { id: 'b7', n: 'Storm Chaser', d: 'Defeat 3 Storm Wraiths', t: 'kill_specific', target: 'Storm Wraith', c: 0, need: 3, rw: { xp: 120, g: 75 }, done: false, refreshDay: 0, minLv: 5 , maxLv: 999 },
-    { id: 'b8', n: 'Ice Breaker', d: 'Defeat 3 Ice Elementals', t: 'kill_specific', target: 'Ice Elemental', c: 0, need: 3, rw: { xp: 150, g: 90 }, done: false, refreshDay: 0, minLv: 6 , maxLv: 999 },
-    { id: 'b9', n: 'Void Hunter', d: 'Defeat 2 Void Beasts', t: 'kill_specific', target: 'Void Beast', c: 0, need: 2, rw: { xp: 200, g: 120 }, done: false, refreshDay: 0, minLv: 8 , maxLv: 999 },
-    { id: 'b10', n: 'Dragon Slayer', d: 'Defeat 1 Elder Wyrm', t: 'kill_specific', target: 'Elder Wyrm', c: 0, need: 1, rw: { xp: 500, g: 300 }, done: false, refreshDay: 0, minLv: 9 , maxLv: 999 },
+    { id: 'b1', n: 'Goblin Slayer', d: 'Defeat 5 Goblins', t: 'kill_specific', target: 'Goblin', c: 0, need: 5, rw: { xp: 40, g: 25 }, done: false, refreshDay: 0, minLv: 1 , maxLv: 13 },
+    { id: 'b2', n: 'Bone Collector', d: 'Defeat 5 Skeletons', t: 'kill_specific', target: 'Skeleton', c: 0, need: 5, rw: { xp: 60, g: 35 }, done: false, refreshDay: 0, minLv: 2 , maxLv: 14 },
+    { id: 'b3', n: 'Wolf Hunter', d: 'Defeat 3 Wolves', t: 'kill_specific', target: 'Wolf', c: 0, need: 3, rw: { xp: 30, g: 20 }, done: false, refreshDay: 0, minLv: 1 , maxLv: 13 },
+    { id: 'b4', n: 'Ghost Buster', d: 'Defeat 3 Ghosts', t: 'kill_specific', target: 'Ghost', c: 0, need: 3, rw: { xp: 80, g: 50 }, done: false, refreshDay: 0, minLv: 2 , maxLv: 14 },
+    { id: 'b5', n: 'Fire Purge', d: 'Defeat 4 Fire Imps', t: 'kill_specific', target: 'Fire Imp', c: 0, need: 4, rw: { xp: 100, g: 60 }, done: false, refreshDay: 0, minLv: 4 , maxLv: 16 },
+    { id: 'b6', n: 'Crystal Breaker', d: 'Defeat 3 Crystal Spiders', t: 'kill_specific', target: 'Crystal Spider', c: 0, need: 3, rw: { xp: 70, g: 40 }, done: false, refreshDay: 0, minLv: 3 , maxLv: 15 },
+    { id: 'b7', n: 'Storm Chaser', d: 'Defeat 3 Storm Wraiths', t: 'kill_specific', target: 'Storm Wraith', c: 0, need: 3, rw: { xp: 120, g: 75 }, done: false, refreshDay: 0, minLv: 5 , maxLv: 17 },
+    { id: 'b8', n: 'Ice Breaker', d: 'Defeat 3 Ice Elementals', t: 'kill_specific', target: 'Ice Elemental', c: 0, need: 3, rw: { xp: 150, g: 90 }, done: false, refreshDay: 0, minLv: 6 , maxLv: 18 },
+    { id: 'b9', n: 'Void Hunter', d: 'Defeat 2 Void Beasts', t: 'kill_specific', target: 'Void Beast', c: 0, need: 2, rw: { xp: 200, g: 120 }, done: false, refreshDay: 0, minLv: 8 , maxLv: 20 },
+    { id: 'b10', n: 'Dragon Slayer', d: 'Defeat 1 Elder Wyrm', t: 'kill_specific', target: 'Elder Wyrm', c: 0, need: 1, rw: { xp: 500, g: 300 }, done: false, refreshDay: 0, minLv: 9 , maxLv: 21 },
 
     // === PHASE 2: ARCANE PLANAR TOWER (Lv 11-15) ===
-    { id: 'b11', n: 'Planar Wisp Hunter', d: 'Defeat 5 Planar Wisps', t: 'kill_specific', target: 'Planar Wisp', c: 0, need: 5, rw: { xp: 250, g: 150 }, done: false, refreshDay: 0, minLv: 11 , maxLv: 999 },
-    { id: 'b12', n: 'Rift Stalker Slayer', d: 'Defeat 3 Rift Stalkers', t: 'kill_specific', target: 'Rift Stalker', c: 0, need: 3, rw: { xp: 300, g: 180 }, done: false, refreshDay: 0, minLv: 11 , maxLv: 999 },
-    { id: 'b13', n: 'Aether Golem Breaker', d: 'Defeat 3 Aether Golems', t: 'kill_specific', target: 'Aether Golem', c: 0, need: 3, rw: { xp: 350, g: 200 }, done: false, refreshDay: 0, minLv: 11 , maxLv: 999 },
-    { id: 'b14', n: 'Chronomancer Nemesis', d: 'Defeat 3 Chronomancers', t: 'kill_specific', target: 'Chronomancer', c: 0, need: 3, rw: { xp: 400, g: 220 }, done: false, refreshDay: 0, minLv: 12 , maxLv: 999 },
-    { id: 'b15', n: 'Void Weaver Hunter', d: 'Defeat 3 Void Weavers', t: 'kill_specific', target: 'Void Weaver', c: 0, need: 3, rw: { xp: 450, g: 250 }, done: false, refreshDay: 0, minLv: 13 , maxLv: 999 },
-    { id: 'b16', n: 'Planar Leviathan Slayer', d: 'Defeat 2 Planar Leviathans', t: 'kill_specific', target: 'Planar Leviathan', c: 0, need: 2, rw: { xp: 550, g: 300 }, done: false, refreshDay: 0, minLv: 14 , maxLv: 999 },
-    { id: 'b17', n: 'The Planarch', d: 'Defeat The Planarch', t: 'kill_specific', target: 'The Planarch', c: 0, need: 1, rw: { xp: 1000, g: 600 }, done: false, refreshDay: 0, minLv: 15 , maxLv: 999 },
+    { id: 'b11', n: 'Planar Wisp Hunter', d: 'Defeat 5 Planar Wisps', t: 'kill_specific', target: 'Planar Wisp', c: 0, need: 5, rw: { xp: 250, g: 150 }, done: false, refreshDay: 0, minLv: 11 , maxLv: 23 },
+    { id: 'b12', n: 'Rift Stalker Slayer', d: 'Defeat 3 Rift Stalkers', t: 'kill_specific', target: 'Rift Stalker', c: 0, need: 3, rw: { xp: 300, g: 180 }, done: false, refreshDay: 0, minLv: 11 , maxLv: 23 },
+    { id: 'b13', n: 'Aether Golem Breaker', d: 'Defeat 3 Aether Golems', t: 'kill_specific', target: 'Aether Golem', c: 0, need: 3, rw: { xp: 350, g: 200 }, done: false, refreshDay: 0, minLv: 11 , maxLv: 23 },
+    { id: 'b14', n: 'Chronomancer Nemesis', d: 'Defeat 3 Chronomancers', t: 'kill_specific', target: 'Chronomancer', c: 0, need: 3, rw: { xp: 400, g: 220 }, done: false, refreshDay: 0, minLv: 12 , maxLv: 24 },
+    { id: 'b15', n: 'Void Weaver Hunter', d: 'Defeat 3 Void Weavers', t: 'kill_specific', target: 'Void Weaver', c: 0, need: 3, rw: { xp: 450, g: 250 }, done: false, refreshDay: 0, minLv: 13 , maxLv: 25 },
+    { id: 'b16', n: 'Planar Leviathan Slayer', d: 'Defeat 2 Planar Leviathans', t: 'kill_specific', target: 'Planar Leviathan', c: 0, need: 2, rw: { xp: 550, g: 300 }, done: false, refreshDay: 0, minLv: 14 , maxLv: 26 },
+    { id: 'b17', n: 'The Planarch', d: 'Defeat The Planarch', t: 'kill_specific', target: 'The Planarch', c: 0, need: 1, rw: { xp: 1000, g: 600 }, done: false, refreshDay: 0, minLv: 15 , maxLv: 27 },
 
     // === PHASE 3: PLANAR REALMS (Lv 16-20) ===
-    { id: 'b18', n: 'Veil Wraith Hunter', d: 'Defeat 5 Veil Wraiths', t: 'kill_specific', target: 'Veil Wraith', c: 0, need: 5, rw: { xp: 400, g: 220 }, done: false, refreshDay: 0, minLv: 16 , maxLv: 999 },
-    { id: 'b19', n: 'Shardling Slayer', d: 'Defeat 5 Shardlings', t: 'kill_specific', target: 'Shardling', c: 0, need: 5, rw: { xp: 420, g: 230 }, done: false, refreshDay: 0, minLv: 16 , maxLv: 999 },
-    { id: 'b20', n: 'Ember Drake Hunter', d: 'Defeat 3 Ember Drakes', t: 'kill_specific', target: 'Ember Drake', c: 0, need: 3, rw: { xp: 480, g: 260 }, done: false, refreshDay: 0, minLv: 17 , maxLv: 999 },
-    { id: 'b21', n: 'Ash Titan Slayer', d: 'Defeat 2 Ash Titans', t: 'kill_specific', target: 'Ash Titan', c: 0, need: 2, rw: { xp: 520, g: 280 }, done: false, refreshDay: 0, minLv: 17 , maxLv: 999 },
-    { id: 'b22', n: 'Frost Lich Nemesis', d: 'Defeat 3 Frost Liches', t: 'kill_specific', target: 'Frost Lich', c: 0, need: 3, rw: { xp: 550, g: 300 }, done: false, refreshDay: 0, minLv: 18 , maxLv: 999 },
-    { id: 'b23', n: 'Glacial Behemoth Hunter', d: 'Defeat 2 Glacial Behemoths', t: 'kill_specific', target: 'Glacial Behemoth', c: 0, need: 2, rw: { xp: 600, g: 330 }, done: false, refreshDay: 0, minLv: 18 , maxLv: 999 },
-    { id: 'b24', n: 'The Nexus Planarch', d: 'Defeat The Nexus Planarch', t: 'kill_specific', target: 'The Nexus Planarch', c: 0, need: 1, rw: { xp: 2000, g: 1200 }, done: false, refreshDay: 0, minLv: 20 , maxLv: 999 },
+    { id: 'b18', n: 'Veil Wraith Hunter', d: 'Defeat 5 Veil Wraiths', t: 'kill_specific', target: 'Veil Wraith', c: 0, need: 5, rw: { xp: 400, g: 220 }, done: false, refreshDay: 0, minLv: 16 , maxLv: 28 },
+    { id: 'b19', n: 'Shardling Slayer', d: 'Defeat 5 Shardlings', t: 'kill_specific', target: 'Shardling', c: 0, need: 5, rw: { xp: 420, g: 230 }, done: false, refreshDay: 0, minLv: 16 , maxLv: 28 },
+    { id: 'b20', n: 'Ember Drake Hunter', d: 'Defeat 3 Ember Drakes', t: 'kill_specific', target: 'Ember Drake', c: 0, need: 3, rw: { xp: 480, g: 260 }, done: false, refreshDay: 0, minLv: 17 , maxLv: 29 },
+    { id: 'b21', n: 'Ash Titan Slayer', d: 'Defeat 2 Ash Titans', t: 'kill_specific', target: 'Ash Titan', c: 0, need: 2, rw: { xp: 520, g: 280 }, done: false, refreshDay: 0, minLv: 17 , maxLv: 29 },
+    { id: 'b22', n: 'Frost Lich Nemesis', d: 'Defeat 3 Frost Liches', t: 'kill_specific', target: 'Frost Lich', c: 0, need: 3, rw: { xp: 550, g: 300 }, done: false, refreshDay: 0, minLv: 18 , maxLv: 30 },
+    { id: 'b23', n: 'Glacial Behemoth Hunter', d: 'Defeat 2 Glacial Behemoths', t: 'kill_specific', target: 'Glacial Behemoth', c: 0, need: 2, rw: { xp: 600, g: 330 }, done: false, refreshDay: 0, minLv: 18 , maxLv: 30 },
+    { id: 'b24', n: 'The Nexus Planarch', d: 'Defeat The Nexus Planarch', t: 'kill_specific', target: 'The Nexus Planarch', c: 0, need: 1, rw: { xp: 2000, g: 1200 }, done: false, refreshDay: 0, minLv: 20 , maxLv: 32 },
         // === PHASE 1: LV 22-23 BOUNTIES ===
-    { id: 'b25', n: 'Reality Weaver Hunter', d: 'Defeat 5 Reality Weavers', t: 'kill_specific', target: 'Reality Weaver', c: 0, need: 5, rw: { xp: 500, g: 300 }, done: false, refreshDay: 0, minLv: 22 , maxLv: 999 },
-    { id: 'b26', n: 'Fracture Hound Slayer', d: 'Defeat 5 Fracture Hounds', t: 'kill_specific', target: 'Fracture Hound', c: 0, need: 5, rw: { xp: 520, g: 310 }, done: false, refreshDay: 0, minLv: 22 , maxLv: 999 },
-    { id: 'b27', n: 'Astral Devourer', d: 'Defeat The Astral Devourer', t: 'kill_specific', target: 'The Astral Devourer', c: 0, need: 1, rw: { xp: 1200, g: 700 }, done: false, refreshDay: 0, minLv: 22 , maxLv: 999 },
-    { id: 'b28', n: 'Ember Wraith Hunter', d: 'Defeat 5 Ember Wraiths', t: 'kill_specific', target: 'Ember Wraith', c: 0, need: 5, rw: { xp: 550, g: 330 }, done: false, refreshDay: 0, minLv: 23 , maxLv: 999 },
-    { id: 'b29', n: 'Ash Phantom Slayer', d: 'Defeat 5 Ash Phantoms', t: 'kill_specific', target: 'Ash Phantom', c: 0, need: 5, rw: { xp: 570, g: 340 }, done: false, refreshDay: 0, minLv: 23 , maxLv: 999 },
-    { id: 'b30', n: 'Infernal Tyrant', d: 'Defeat The Infernal Tyrant', t: 'kill_specific', target: 'The Infernal Tyrant', c: 0, need: 1, rw: { xp: 1400, g: 800 }, done: false, refreshDay: 0, minLv: 23 , maxLv: 999 },
+    { id: 'b25', n: 'Reality Weaver Hunter', d: 'Defeat 5 Reality Weavers', t: 'kill_specific', target: 'Reality Weaver', c: 0, need: 5, rw: { xp: 500, g: 300 }, done: false, refreshDay: 0, minLv: 22 , maxLv: 34 },
+    { id: 'b26', n: 'Fracture Hound Slayer', d: 'Defeat 5 Fracture Hounds', t: 'kill_specific', target: 'Fracture Hound', c: 0, need: 5, rw: { xp: 520, g: 310 }, done: false, refreshDay: 0, minLv: 22 , maxLv: 34 },
+    { id: 'b27', n: 'Astral Devourer', d: 'Defeat The Astral Devourer', t: 'kill_specific', target: 'The Astral Devourer', c: 0, need: 1, rw: { xp: 1200, g: 700 }, done: false, refreshDay: 0, minLv: 22 , maxLv: 34 },
+    { id: 'b28', n: 'Ember Wraith Hunter', d: 'Defeat 5 Ember Wraiths', t: 'kill_specific', target: 'Ember Wraith', c: 0, need: 5, rw: { xp: 550, g: 330 }, done: false, refreshDay: 0, minLv: 23 , maxLv: 35 },
+    { id: 'b29', n: 'Ash Phantom Slayer', d: 'Defeat 5 Ash Phantoms', t: 'kill_specific', target: 'Ash Phantom', c: 0, need: 5, rw: { xp: 570, g: 340 }, done: false, refreshDay: 0, minLv: 23 , maxLv: 35 },
+    { id: 'b30', n: 'Infernal Tyrant', d: 'Defeat The Infernal Tyrant', t: 'kill_specific', target: 'The Infernal Tyrant', c: 0, need: 1, rw: { xp: 1400, g: 800 }, done: false, refreshDay: 0, minLv: 23 , maxLv: 35 },
 
     // === PHASE 3: LV 24-29 BOUNTIES ===
-    { id: 'b31', n: 'Magma Serpent Hunter', d: 'Defeat 5 Magma Serpents', t: 'kill_specific', target: 'Magma Serpent', c: 0, need: 5, rw: { xp: 700, g: 400 }, done: false, refreshDay: 0, minLv: 24, maxLv: 999 },
-    { id: 'b32', n: 'Scorch Titan Slayer', d: 'Defeat 3 Scorch Titans', t: 'kill_specific', target: 'Scorch Titan', c: 0, need: 3, rw: { xp: 780, g: 440 }, done: false, refreshDay: 0, minLv: 24, maxLv: 999 },
-    { id: 'b33', n: 'Frozen Kraken Hunter', d: 'Defeat 3 Frozen Krakens', t: 'kill_specific', target: 'Frozen Kraken', c: 0, need: 3, rw: { xp: 850, g: 480 }, done: false, refreshDay: 0, minLv: 25, maxLv: 999 },
-    { id: 'b34', n: 'Storm Sovereign Hunt', d: 'Defeat 3 Storm Sovereign Remnants', t: 'kill_specific', target: 'Storm Sovereign Remnant', c: 0, need: 3, rw: { xp: 920, g: 520 }, done: false, refreshDay: 0, minLv: 26, maxLv: 999 },
-    { id: 'b35', n: 'Throne Keeper Purge', d: 'Defeat 3 Throne Keepers', t: 'kill_specific', target: 'Throne Keeper', c: 0, need: 3, rw: { xp: 1000, g: 570 }, done: false, refreshDay: 0, minLv: 27, maxLv: 999 },
-    { id: 'b36', n: 'Spire Archon Hunter', d: 'Defeat 3 Spire Archons', t: 'kill_specific', target: 'Spire Archon', c: 0, need: 3, rw: { xp: 1100, g: 620 }, done: false, refreshDay: 0, minLv: 28, maxLv: 999 },
-    { id: 'b37', n: 'Apex Warden Slayer', d: 'Defeat 3 Apex Wardens', t: 'kill_specific', target: 'Apex Warden', c: 0, need: 3, rw: { xp: 1200, g: 680 }, done: false, refreshDay: 0, minLv: 29, maxLv: 999 },
+    { id: 'b31', n: 'Magma Serpent Hunter', d: 'Defeat 5 Magma Serpents', t: 'kill_specific', target: 'Magma Serpent', c: 0, need: 5, rw: { xp: 700, g: 400 }, done: false, refreshDay: 0, minLv: 24, maxLv: 36 },
+    { id: 'b32', n: 'Scorch Titan Slayer', d: 'Defeat 3 Scorch Titans', t: 'kill_specific', target: 'Scorch Titan', c: 0, need: 3, rw: { xp: 780, g: 440 }, done: false, refreshDay: 0, minLv: 24, maxLv: 36 },
+    { id: 'b33', n: 'Frozen Kraken Hunter', d: 'Defeat 3 Frozen Krakens', t: 'kill_specific', target: 'Frozen Kraken', c: 0, need: 3, rw: { xp: 850, g: 480 }, done: false, refreshDay: 0, minLv: 25, maxLv: 37 },
+    { id: 'b34', n: 'Storm Sovereign Hunt', d: 'Defeat 3 Storm Sovereign Remnants', t: 'kill_specific', target: 'Storm Sovereign Remnant', c: 0, need: 3, rw: { xp: 920, g: 520 }, done: false, refreshDay: 0, minLv: 26, maxLv: 38 },
+    { id: 'b35', n: 'Throne Keeper Purge', d: 'Defeat 3 Throne Keepers', t: 'kill_specific', target: 'Throne Keeper', c: 0, need: 3, rw: { xp: 1000, g: 570 }, done: false, refreshDay: 0, minLv: 27, maxLv: 39 },
+    { id: 'b36', n: 'Spire Archon Hunter', d: 'Defeat 3 Spire Archons', t: 'kill_specific', target: 'Spire Archon', c: 0, need: 3, rw: { xp: 1100, g: 620 }, done: false, refreshDay: 0, minLv: 28, maxLv: 40 },
+    { id: 'b37', n: 'Apex Warden Slayer', d: 'Defeat 3 Apex Wardens', t: 'kill_specific', target: 'Apex Warden', c: 0, need: 3, rw: { xp: 1200, g: 680 }, done: false, refreshDay: 0, minLv: 29, maxLv: 41 },
 
     // === ACT 1: THE SHATTERED NOW (LV 30-35) BOUNTIES ===
-    { id: 'b38', n: 'Fracture Wisp Hunt', d: 'Defeat 5 Fracture Wisps', t: 'kill_specific', target: 'Fracture Wisp', c: 0, need: 5, rw: { xp: 1300, g: 750 }, done: false, refreshDay: 0, minLv: 30, maxLv: 999 },
-    { id: 'b39', n: 'Ruin Stalker Purge', d: 'Defeat 5 Ruin Stalkers', t: 'kill_specific', target: 'Ruin Stalker', c: 0, need: 5, rw: { xp: 1400, g: 800 }, done: false, refreshDay: 0, minLv: 31, maxLv: 999 },
-    { id: 'b40', n: 'Market Looter Sweep', d: 'Defeat 5 Market Looters', t: 'kill_specific', target: 'Market Looter', c: 0, need: 5, rw: { xp: 1500, g: 860 }, done: false, refreshDay: 0, minLv: 32, maxLv: 999 },
-    { id: 'b41', n: 'Ledger Wraith Hunt', d: 'Defeat 4 Ledger Wraiths', t: 'kill_specific', target: 'Ledger Wraith', c: 0, need: 4, rw: { xp: 1600, g: 920 }, done: false, refreshDay: 0, minLv: 33, maxLv: 999 },
-    { id: 'b42', n: 'Rust Automaton Scrap', d: 'Defeat 4 Rust Automatons', t: 'kill_specific', target: 'Rust Automaton', c: 0, need: 4, rw: { xp: 1700, g: 980 }, done: false, refreshDay: 0, minLv: 34, maxLv: 999 },
-    { id: 'b43', n: 'Watching Echo Purge', d: 'Defeat 4 Watching Echoes', t: 'kill_specific', target: 'Watching Echo', c: 0, need: 4, rw: { xp: 1800, g: 1050 }, done: false, refreshDay: 0, minLv: 35, maxLv: 999 },
+    { id: 'b38', n: 'Fracture Wisp Hunt', d: 'Defeat 5 Fracture Wisps', t: 'kill_specific', target: 'Fracture Wisp', c: 0, need: 5, rw: { xp: 1300, g: 750 }, done: false, refreshDay: 0, minLv: 30, maxLv: 42 },
+    { id: 'b39', n: 'Ruin Stalker Purge', d: 'Defeat 5 Ruin Stalkers', t: 'kill_specific', target: 'Ruin Stalker', c: 0, need: 5, rw: { xp: 1400, g: 800 }, done: false, refreshDay: 0, minLv: 31, maxLv: 43 },
+    { id: 'b40', n: 'Market Looter Sweep', d: 'Defeat 5 Market Looters', t: 'kill_specific', target: 'Market Looter', c: 0, need: 5, rw: { xp: 1500, g: 860 }, done: false, refreshDay: 0, minLv: 32, maxLv: 44 },
+    { id: 'b41', n: 'Ledger Wraith Hunt', d: 'Defeat 4 Ledger Wraiths', t: 'kill_specific', target: 'Ledger Wraith', c: 0, need: 4, rw: { xp: 1600, g: 920 }, done: false, refreshDay: 0, minLv: 33, maxLv: 45 },
+    { id: 'b42', n: 'Rust Automaton Scrap', d: 'Defeat 4 Rust Automatons', t: 'kill_specific', target: 'Rust Automaton', c: 0, need: 4, rw: { xp: 1700, g: 980 }, done: false, refreshDay: 0, minLv: 34, maxLv: 46 },
+    { id: 'b43', n: 'Watching Echo Purge', d: 'Defeat 4 Watching Echoes', t: 'kill_specific', target: 'Watching Echo', c: 0, need: 4, rw: { xp: 1800, g: 1050 }, done: false, refreshDay: 0, minLv: 35, maxLv: 47 },
     { id: 'b44', n: 'Another Shift, Another Soul', d: 'Defeat Jeff, the SK* Son-in-Law', t: 'kill_specific', target: 'Jeff, the SK* Son-in-Law', c: 0, need: 1, rw: { xp: 12000, g: 8500 }, done: false, refreshDay: 0, minLv: 80, maxLv: 999 },
     { id: 'b45', n: "Can't Break the Retainer", d: 'Defeat Robin C.', t: 'kill_specific', target: 'Robin C.', c: 0, need: 1, rw: { xp: 13000, g: 9000 }, done: false, refreshDay: 0, minLv: 58, maxLv: 999 },
     { id: 'b46', n: 'What the Roots Keep', d: 'Defeat The Verdant Heart', t: 'kill_specific', target: 'The Verdant Heart', c: 0, need: 1, rw: { xp: 18000, g: 13000 }, done: false, refreshDay: 0, minLv: 92, maxLv: 999 },
@@ -750,6 +744,12 @@ const G = {
     { id: 'b49', n: 'Arrived in Time', d: 'Defeat Before It Wears Through', t: 'kill_specific', target: 'Before It Wears Through', c: 0, need: 1, rw: { xp: 27000, g: 20000 }, done: false, refreshDay: 0, minLv: 98, maxLv: 999 },
     { id: 'b50', n: "Someone Else's Kindling", d: 'Defeat What Was Almost Enough', t: 'kill_specific', target: 'What Was Almost Enough', c: 0, need: 1, rw: { xp: 29000, g: 21500 }, done: false, refreshDay: 0, minLv: 99, maxLv: 999 },
     { id: 'b51', n: 'Two Lines, One Fight', d: 'Defeat The Line Neither Could Hold Alone', t: 'kill_specific', target: 'The Line Neither Could Hold Alone', c: 0, need: 1, rw: { xp: 34000, g: 25000 }, done: false, refreshDay: 0, minLv: 100, maxLv: 999 },
+
+    // Materials for the Vision Machine — Varel Farseer's request. Not gated by minLv;
+    // a player who already cleared both dragons for the Dragon Hunt just finds these
+    // waiting complete when they meet him, which reads as earned rather than a bug.
+    { id: 80, n: "The Farseer's Request I: A Splinter of the Horizon", d: 'Defeat Skarrowyn, the Split Horizon, and recover a splinter of scale for the Vision Machine', t: 'boss_specific', target: 'Skarrowyn, the Split Horizon', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
+    { id: 81, n: "The Farseer's Request II: A Thread of the Wound", d: 'Defeat Nyxathorne, the Unmended Wound, and recover a thread for the Vision Machine', t: 'boss_specific', target: 'Nyxathorne, the Unmended Wound', c: 0, need: 1, rw: { xp: 3000, g: 2500 }, done: false, chain: 'vision_machine' },
 
   ],
 
@@ -3546,8 +3546,8 @@ storyJournal: {
           { speaker: 'Joel', text: '"Whoever you are," Joel says to the empty clearing, to no one, to everyone, "thank you for getting here first. We will keep going too."' },
           { speaker: 'San', text: '"Wherever the next line is," you agree, "we are clearly not the only ones going looking for it. I think that might be the best thing we have learned out here yet."' },
         ]
-      }
-,{
+      },
+      {
         id: 'journal_097',
         title: 'Meant to Be Done Together',
         chapter: 97,
@@ -3578,8 +3578,8 @@ storyJournal: {
           { speaker: 'Iris', text: '"Mind if Ash and I come with you a while?" Iris asks, something hopeful under the careful casualness of it. "It has been a long time since going looking felt like something other than a solitary habit."' },
           { speaker: 'San', text: '"We would like that," you say, and Soel, pressed warm against your side, seems to agree completely.' },
         ]
-      }
-,{
+      },
+      {
         id: 'journal_098',
         title: 'Fifty Levels of Choosing It',
         chapter: 98,
@@ -3599,8 +3599,8 @@ storyJournal: {
           { speaker: 'Iris', text: '"To boring," Iris says, lifting nothing in particular in a mock toast, and Ash huffs out something that might be a laugh if a fox could laugh.' },
           { speaker: 'Joel', text: '"To boring," you all echo, and the fire keeps burning, and nothing dramatic happens at all, and that turns out to be exactly enough.' },
         ]
-      }
-,{
+      },
+      {
         id: 'journal_099',
         title: 'However Long That Takes',
         chapter: 99,
@@ -3621,8 +3621,8 @@ storyJournal: {
           { speaker: 'San', text: '"However long that takes," you agree. "I stopped needing to know the number a while ago too."' },
           { speaker: 'Narrator', text: 'Soel shifts against your side, warm and unbothered, and somewhere past the ridge a line is being held by someone who once needed finding and now does the finding herself. None of it needs to resolve into anything larger than exactly what it already is.' },
         ]
-      }
-,{
+      },
+      {
         id: 'journal_100',
         title: 'The One Who Watches the Distance',
         chapter: 100,
@@ -3648,8 +3648,8 @@ storyJournal: {
           { speaker: 'Joel', text: '"We already know where both of those are," Joel says, and for the first time since Varel sat down, something in his voice sounds almost like hope trying not to get ahead of itself. "We have fought worse for less."' },
           { speaker: 'Varel Farseer', text: '"I know," Varel says, and for just a moment the strange, elsewhere-focused look in his eyes settles fully on the present, on all of you, warmer than anything he has said so far. "That is rather why I offered."' },
         ]
-      }
-,{
+      },
+      {
         id: 'journal_101',
         title: 'What It Takes to Build a Window',
         chapter: 101,
@@ -3673,8 +3673,8 @@ storyJournal: {
           { speaker: 'San', text: '"That is fair," you say, and mean it, even as something in your chest aches at the size of what he is describing. "We are not exactly short on gold these days."' },
           { speaker: 'Varel Farseer', text: '"No," Varel agrees, the faintest, rare smile finally showing. "I rather assumed as much. That was, admittedly, part of the plan." He looks between you both, then finally at Mimi, whose hands have stopped shaking. "It is ready. Whenever the two of you are."' },
         ]
-      }
-,{
+      },
+      {
         id: 'journal_102',
         title: 'The First Vision',
         chapter: 102,
@@ -3699,11 +3699,44 @@ storyJournal: {
           { speaker: 'Mimi', text: '"Two floors away, my whole life," Mimi says, quiet, watching the window finally begin to fade. "And this is the first time it ever felt like enough."' },
           { speaker: 'Narrator', text: 'The frame goes still, glassless and ordinary again, waiting at the edge of the grove for the next time either of you can bear the cost \u2014 gold, and hope, spent on purpose, exactly the way Varel intended.' },
         ]
-      }
-,{
+      },
+      {
         id: 'journal_103',
-        title: 'The Door, Finally',
+        title: 'What the Window Chose First',
         chapter: 103,
+        unlockType: 'special',
+        unlockAt: 'first_vision_machine_use',
+        icon: '🌅',
+        summary: 'The Vision Machine\'s very first glimpse is small and ordinary — Mama, haggling over fruit at a market, alive and well and completely unaware she is being watched. It pulls San and Joel into remembering the week she visited Brunei, and the offer that came quietly, months later, once she was already back home.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The vision catches on something small before it catches on anything else — a woman at a market stall, turning over fruit she is deciding whether to buy, unremarkable in every way except that Joel goes completely still beside you the instant he sees her face.' },
+          { speaker: 'Joel', text: '"Mama," he says, just that, like the word has to be tested before he trusts it.' },
+          { speaker: 'Narrator', text: 'The window holds her a moment longer than it held anything else so far — ordinary, upright, arguing gently with a vendor over the price of something, exactly as unbothered as she has apparently always been. Then it fades, the way all of them do, and Joel sits back slowly, something loosened in his shoulders that you had not realized was tight.' },
+          { speaker: 'San', text: '"She looked well," you say quietly, and mean it as the whole comfort it is.' },
+          { speaker: 'Joel', text: '"She did," Joel agrees, and then, after a moment, quieter: "Do you remember the airport? When she first landed in Brunei?"' },
+          { speaker: 'Narrator', text: 'You do. You remember it with a clarity that surprises you, considering how much else has happened since — the exact way Mama\'s face changed the moment she saw you both waiting, not scanning you the way you had braced for, not assessing. Just glad.' },
+          { speaker: 'San', text: '"She hugged me before she hugged you," you say, and Joel laughs, soft and disbelieving even now. "I remember thinking, she does not even know me yet. And she was already glad I was there."' },
+          { speaker: 'Joel', text: '"She liked you before either of you said a word," Joel says. "I think she decided somewhere over the ocean."' },
+          { speaker: 'Narrator', text: 'You think of the week that followed, in pieces, the way memory actually works rather than the way stories usually tell it — no order, just weight. The night the two of you went out alone while Joel worked overtime, hot chocolate at some small place San picked because the name made Mama laugh, the two of you trying food neither of them had eaten before and pulling faces at each other over it like old friends rather than a woman and the mother of the man she loved.' },
+          { speaker: 'San', text: '"She never once asked about before you," you say. "Not the marriage. Not any of it. I kept waiting for the question, the same way I always used to. It never came."' },
+          { speaker: 'Joel', text: '"She told me later she did not need to ask," Joel says. "She said she could already tell what mattered, just from watching how you were with me."' },
+          { speaker: 'Narrator', text: 'The last morning surfaces clearest of all — the cruise finished, the whole week folding down toward an ending none of you were ready for. The four of you had breakfast together at the airport restaurant first, unhurried, like none of you wanted to be the one who noticed the time. The stepfather did not come any further than that. He said, simply, that he would cry too if he went to the gate, and stayed at the table instead.' },
+          { speaker: 'Narrator', text: 'Joel stayed too, when the moment finally came. He did not say why. He just did not get up.' },
+          { speaker: 'Narrator', text: 'So it was you who walked Mama the rest of the way — through security, right up to where family could not follow any further, the two of you pausing there just long enough for one photo before she had to go. You remember exactly how she held onto your arm the whole way, unhurried even then, like she still had all the time she needed.' },
+          { speaker: 'Narrator', text: 'When you got back to the table, you told Joel, plainly, that you had wanted to cry. You had held it together the entire walk back — you always could, in public, some old and well-worn discipline that never quite left you even now. It was only ever in private that it caught up with you at all.' },
+          { speaker: 'Joel', text: '"That is why I did not want to go," Joel says quietly, and you understand, finally, exactly what he had been protecting both of you from all along.' },
+          { speaker: 'Narrator', text: 'It was months later, long after she was home and the visit had settled into something you both just called a good memory, that the offer came — not in person, not with any of the weight you might have expected from something so large. Just Mama, over a call, saying plainly that if you ever wanted your own sons back with you properly, she would come stay, would help however was needed. She could not work in Brunei by then, past the age the permits allowed, and she offered anyway, like the inability to earn her keep had never once occurred to her as a reason not to help.' },
+          { speaker: 'San', text: '"She did not see herself as a guest," you say. "Or me as someone she needed a reason to be kind to."' },
+          { speaker: 'Joel', text: '"She never has," Joel says. "Not with anyone she has decided is family. That was never a performance for her. It was just how she actually is."' },
+          { speaker: 'Joel', text: 'He is quiet for a while after that, and when he speaks again his voice is unsteady in a way he does not try to hide. "She calls you her daughter now. You know that, do you not? Not my wife. Not my girlfriend. Her daughter."' },
+          { speaker: 'San', text: '"She greets me every morning," you say, something warm breaking open in your chest even now, months later, saying it out loud. "Every single day. I do not think I understood, before her, that this was even a thing I was allowed to want. A mother who chose me back."' },
+          { speaker: 'Narrator', text: 'The window is fully dark now, the vision long since faded, but neither of you moves to leave the frame just yet. Somewhere across all that distance, an ordinary woman is haggling over fruit, entirely unaware of how completely she rearranged what family was allowed to mean for the two people who love her.' },
+        ]
+      },
+      {
+        id: 'journal_104',
+        title: 'The Door, Finally',
+        chapter: 104,
         unlockType: 'level',
         unlockAt: 210,
         icon: '🚪',
@@ -3722,11 +3755,11 @@ storyJournal: {
           { speaker: 'San', text: '"Nobody has to decide tonight," you say, and mean it, surprising yourself with how easily the patience comes after a hundred levels of practicing exactly this. "We mark it. We go look, properly, when we are ready to. That is all tonight actually needs to be."' },
           { speaker: 'Narrator', text: 'You sleep on it, all of you, the practice already too deeply worn into how you live for even something this large to skip the step. Whatever it is, it has apparently been waiting. It can wait one more night.' },
         ]
-      }
-,{
-        id: 'journal_104',
+      },
+      {
+        id: 'journal_105',
         title: 'Not the Old World',
-        chapter: 104,
+        chapter: 105,
         unlockType: 'level',
         unlockAt: 225,
         icon: '🌀',
@@ -3745,11 +3778,11 @@ storyJournal: {
           { speaker: 'Joel', text: '"However long that takes," Joel says, and it is not a question, and you both hear exactly what he is doing \u2014 handing the words right back to you, a hundred levels later, still true.' },
           { speaker: 'San', text: '"However long that takes," you agree, and mean it completely, watching the not-quite-a-door hold perfectly steady against a sky that has no name yet for what is on the other side of it.' },
         ]
-      }
-,{
-        id: 'journal_105',
+      },
+      {
+        id: 'journal_106',
         title: 'Beyond the Horizon',
-        chapter: 105,
+        chapter: 106,
         unlockType: 'level',
         unlockAt: 240,
         icon: '🌅',
@@ -3767,7 +3800,6 @@ storyJournal: {
           { speaker: 'Narrator', text: 'The world does not end here. It never was going to. It just keeps being worth walking further into \u2014 one more horizon, one more line worth finding, one more morning chosen on purpose, the same practice it always was, carried now by more hands than you ever once thought to hope for. Somewhere ahead, past everything anyone has mapped yet, daybreak is still doing exactly what daybreak has always done. It is still coming. You go to meet it.' },
         ]
       }
-
     ]
   },
 
@@ -7398,9 +7430,9 @@ const STRONGHOLDS = {
     desc: 'The tower answers to you now. Its camp and tavern are yours — free, and always open — whenever you need them.',
     stipend: { xp: 40, gold: 60 },
     tasks: [
-      { id: 'st_tower_upkeep', n: 'Tower Upkeep', d: "Defeat 3 Planar Wisps to keep the tower's wards charged", t: 'kill_specific', target: 'Planar Wisp', c: 0, need: 3, rw: { xp: 90, g: 70 }, done: false, refreshDay: -1 },
-      { id: 'st_tower_rift_ward', n: 'Rift Ward', d: "Defeat 2 Rift Stalkers threatening the tower's seal", t: 'kill_specific', target: 'Rift Stalker', c: 0, need: 2, rw: { xp: 110, g: 85 }, done: false, refreshDay: -1 },
-      { id: 'st_tower_armory', n: 'Armory Watch', d: "Defeat 3 Aether Golems guarding the Tower Armory", t: 'kill_specific', target: 'Aether Golem', c: 0, need: 3, rw: { xp: 130, g: 100 }, done: false, refreshDay: -1, minGuildLevel: 2 }
+      { id: 'st_tower_upkeep', n: 'Tower Upkeep', d: "Defeat 3 Planar Wisps (found in Arcane Planar Tower) to keep the tower's wards charged", t: 'kill_specific', target: 'Planar Wisp', c: 0, need: 3, rw: { xp: 90, g: 70 }, done: false, refreshDay: -1 },
+      { id: 'st_tower_rift_ward', n: 'Rift Ward', d: "Defeat 2 Rift Stalkers (found in Arcane Planar Tower) threatening the tower's seal", t: 'kill_specific', target: 'Rift Stalker', c: 0, need: 2, rw: { xp: 110, g: 85 }, done: false, refreshDay: -1 },
+      { id: 'st_tower_armory', n: 'Armory Watch', d: "Defeat 3 Aether Golems (found in Arcane Planar Tower) guarding the Tower Armory", t: 'kill_specific', target: 'Aether Golem', c: 0, need: 3, rw: { xp: 130, g: 100 }, done: false, refreshDay: -1, minGuildLevel: 2 }
     ],
     // The Guild Hall is the core progression structure for this stronghold — everything
     // else added to it later checks the current level here. Level 1 is automatic on
@@ -7424,9 +7456,9 @@ const STRONGHOLDS = {
     desc: "Ground on the other side of everything that ever broke — the vale simply makes room for you, the way it apparently makes room for everyone who actually means to tend it instead of just passing through.",
     stipend: { xp: 400, gold: 500 },
     tasks: [
-      { id: 'st_grove_bramble', n: 'Bramble Watch', d: 'Defeat 3 Bramble Wardens to keep the grove\'s borders soft instead of hostile', t: 'kill_specific', target: 'Bramble Warden', c: 0, need: 3, rw: { xp: 900, g: 700 }, done: false, refreshDay: -1 },
-      { id: 'st_grove_thistle', n: 'Thistle Clearing', d: 'Defeat 2 Thistle Stalkers before they choke the new growth', t: 'kill_specific', target: 'Thistle Stalker', c: 0, need: 2, rw: { xp: 1100, g: 850 }, done: false, refreshDay: -1 },
-      { id: 'st_grove_harvest', n: "Harvest Escort", d: 'Defeat 3 Harvest Golems threatening the Sunreach trade road', t: 'kill_specific', target: 'Harvest Golem', c: 0, need: 3, rw: { xp: 1300, g: 1000 }, done: false, refreshDay: -1, minGuildLevel: 2 }
+      { id: 'st_grove_bramble', n: 'Bramble Watch', d: 'Defeat 3 Bramble Wardens (found in The Unbroken Vale) to keep the grove\'s borders soft instead of hostile', t: 'kill_specific', target: 'Bramble Warden', c: 0, need: 3, rw: { xp: 900, g: 700 }, done: false, refreshDay: -1 },
+      { id: 'st_grove_thistle', n: 'Thistle Clearing', d: 'Defeat 2 Thistle Stalkers (found in The Unbroken Vale) before they choke the new growth', t: 'kill_specific', target: 'Thistle Stalker', c: 0, need: 2, rw: { xp: 1100, g: 850 }, done: false, refreshDay: -1 },
+      { id: 'st_grove_harvest', n: "Harvest Escort", d: 'Defeat 3 Harvest Golems (found in Sunreach Fields) threatening the Sunreach trade road', t: 'kill_specific', target: 'Harvest Golem', c: 0, need: 3, rw: { xp: 1300, g: 1000 }, done: false, refreshDay: -1, minGuildLevel: 2 }
     ],
     guildHall: [
       { level: 1, name: 'Grove Tended', cost: 0, desc: 'Free rest and a daily stipend — the vale already trusts you with this much.' },
@@ -7447,9 +7479,9 @@ const STRONGHOLDS = {
     desc: "Past the deepest root of the Vale, the ground simply stops being mapped — not blocked, not broken, just quietly unfinished, the way a sentence trails off instead of ending. Something out here is still deciding what it wants to grow into next.",
     stipend: { xp: 900, gold: 1100 },
     tasks: [
-      { id: 'st_edge_elder', n: "The Elder's Patience", d: 'Defeat 3 Root-Bound Elders before their patience runs out entirely', t: 'kill_specific', target: 'Root-Bound Elder', c: 0, need: 3, rw: { xp: 2200, g: 1700 }, done: false, refreshDay: -1 },
-      { id: 'st_edge_keeper', n: 'What the Sanctuary Keeps', d: 'Defeat 2 Sanctuary Keepers guarding whatever comes next', t: 'kill_specific', target: 'Sanctuary Keeper', c: 0, need: 2, rw: { xp: 2600, g: 2000 }, done: false, refreshDay: -1 },
-      { id: 'st_edge_sentinel', n: 'The Elderwood Line', c: 0, d: 'Defeat 3 Elderwood Sentinels holding the actual edge of the map', t: 'kill_specific', target: 'Elderwood Sentinel', need: 3, rw: { xp: 3000, g: 2400 }, done: false, refreshDay: -1, minGuildLevel: 2 }
+      { id: 'st_edge_elder', n: "The Elder's Patience", d: 'Defeat 3 Root-Bound Elders (found in The Rootbound Sanctuary) before their patience runs out entirely', t: 'kill_specific', target: 'Root-Bound Elder', c: 0, need: 3, rw: { xp: 2200, g: 1700 }, done: false, refreshDay: -1 },
+      { id: 'st_edge_keeper', n: 'What the Sanctuary Keeps', d: 'Defeat 2 Sanctuary Keepers (found in The Rootbound Sanctuary) guarding whatever comes next', t: 'kill_specific', target: 'Sanctuary Keeper', c: 0, need: 2, rw: { xp: 2600, g: 2000 }, done: false, refreshDay: -1 },
+      { id: 'st_edge_sentinel', n: 'The Elderwood Line', c: 0, d: 'Defeat 3 Elderwood Sentinels (found in The Rootbound Sanctuary) holding the actual edge of the map', t: 'kill_specific', target: 'Elderwood Sentinel', need: 3, rw: { xp: 3000, g: 2400 }, done: false, refreshDay: -1, minGuildLevel: 2 }
     ],
     guildHall: [
       { level: 1, name: 'Edge Claimed', cost: 0, desc: 'Free rest and a daily stipend — the first foothold past everything that has ever been mapped.' },
@@ -7665,20 +7697,10 @@ function exitSiegeDefense() {
 // quests, achievements, guild rep, mercenary tier, and dragon hunt clears are untouched;
 // this only resets the level/xp/base-stat track, since that's the part the curve problem
 // actually lives in.
-const PRESTIGE_MIN_LEVEL = 100; // Tier 1 requirement — the level needed for your very first prestige
-const PRESTIGE_TIER_INCREMENT = 50; // each subsequent prestige raises the bar by this much — Tier 2 needs 150, Tier 3 needs 200, and so on
+const PRESTIGE_MIN_LEVEL = 100;
 const PRESTIGE_XP_PCT_PER_LEVEL = 0.4;   // % permanent XP bonus banked per level at reset
 const PRESTIGE_GOLD_PCT_PER_LEVEL = 0.3; // % permanent gold bonus banked per level at reset
 const PRESTIGE_BONUS_CAP = 200;          // sanity ceiling so repeated resets can't run away
-
-// The tier a player is currently working toward — Tier 1 before their first prestige,
-// Tier 2 after their first, Tier 3 after their second, and so on indefinitely.
-function getPrestigeTier() {
-  return (G.prestige.count || 0) + 1;
-}
-function getPrestigeRequiredLevel() {
-  return PRESTIGE_MIN_LEVEL + (G.prestige.count || 0) * PRESTIGE_TIER_INCREMENT;
-}
 
 // Milestones tied to prestige COUNT specifically, not the stacking level-scaled bonus
 // above — without these, prestiging once versus ten times was mechanically identical
@@ -7772,6 +7794,18 @@ function useVisionMachine() {
   G.visionMachine.lastUseDay = G.gameDay;
   G.visionMachine.joelLetterCount = (G.visionMachine.joelLetterCount || 0) + 1;
 
+  // Chapter 103 unlocks specifically on the very first use, not a level or boss —
+  // the window's first glimpse deserves to be earned by actually opening it, not
+  // handed out alongside the setup chapters.
+  if (G.visionMachine.joelLetterCount === 1) {
+    const ch103 = G.storyJournal.entries.find(e => e.chapter === 103);
+    if (ch103 && !G.storyJournal.unlocked.includes(ch103.id)) {
+      G.storyJournal.unlocked.push(ch103.id);
+      lg('📖 Journal unlocked: ' + ch103.title + '!');
+      showToast('📖 New story chapter unlocked!', 'gold');
+    }
+  }
+
   const vignette = VISION_VIGNETTES[Math.floor(Math.random() * VISION_VIGNETTES.length)];
   lg('👁️ ' + vignette);
 
@@ -7808,19 +7842,17 @@ function getAllyTempleRepBonus() {
 }
 
 function isPrestigeUnlocked() {
-  return G.p.lvl >= getPrestigeRequiredLevel();
+  return G.p.lvl >= PRESTIGE_MIN_LEVEL;
 }
 
 function doPrestige() {
-  const requiredLevel = getPrestigeRequiredLevel();
   if (!isPrestigeUnlocked()) {
-    lg('🔒 Tier ' + getPrestigeTier() + ' Prestige unlocks at Level ' + requiredLevel + '.');
+    lg('🔒 Prestige unlocks at Level ' + PRESTIGE_MIN_LEVEL + '.');
     return;
   }
   const xpGain = +(G.p.lvl * PRESTIGE_XP_PCT_PER_LEVEL).toFixed(1);
   const goldGain = +(G.p.lvl * PRESTIGE_GOLD_PCT_PER_LEVEL).toFixed(1);
   const oldLvl = G.p.lvl;
-  const completedTier = getPrestigeTier();
 
   G.prestige.xpBonusPct = Math.min(PRESTIGE_BONUS_CAP, (G.prestige.xpBonusPct || 0) + xpGain);
   G.prestige.goldBonusPct = Math.min(PRESTIGE_BONUS_CAP, (G.prestige.goldBonusPct || 0) + goldGain);
@@ -7837,8 +7869,7 @@ function doPrestige() {
                              // whatever mercenary tier was built up pre-reset — backwards
                              // for what's supposed to be a fresh start.
 
-  lg('🌟 TIER ' + completedTier + ' PRESTIGE! Level ' + oldLvl + ' banked into a permanent +' + xpGain + '% XP / +' + goldGain + '% gold.');
-  lg('   Next prestige (Tier ' + (completedTier + 1) + ') will require Level ' + getPrestigeRequiredLevel() + '.');
+  lg('🌟 PRESTIGE! Level ' + oldLvl + ' banked into a permanent +' + xpGain + '% XP / +' + goldGain + '% gold.');
   lg('   Total bonus now: +' + G.prestige.xpBonusPct.toFixed(1) + '% XP, +' + G.prestige.goldBonusPct.toFixed(1) + '% gold.');
   lg('   Level reset to 1 — everything else (gear, gold, story, achievements) stays.');
   saveGame();
@@ -8533,18 +8564,10 @@ const RAIDS = [
       { type: 'elite', zoneLv: 82, enemies: ['Overtime Wraith', 'Off-Day Enforcer'] },
       { type: 'boss', name: 'Jeff, the SK* Son-in-Law' },
       { type: 'elite', zoneLv: 95, enemies: ['Root-Bound Elder', 'Elderwood Sentinel'] },
-      { type: 'boss', name: 'The Verdant Heart' },
-      { type: 'elite', zoneLv: 96, enemies: ['Fraying Wisp', 'Unwoven Stalker'] },
-      { type: 'boss', name: 'The Unmade' },
-      { type: 'elite', zoneLv: 97, enemies: ['Line-Breaker', 'Corrosion Vessel'] },
-      { type: 'boss', name: 'What Alone Becomes' },
-      { type: 'elite', zoneLv: 98, enemies: ['Testing Current', 'Patience-Eater'] },
-      { type: 'boss', name: 'Before It Wears Through' },
-      { type: 'elite', zoneLv: 99, enemies: ['Remnant Current', 'Half-Won Vessel'] },
-      { type: 'boss', name: 'What Was Almost Enough' }
+      { type: 'boss', name: 'The Verdant Heart' }
     ],
-    rw: { xp: 900000, gold: 700000 },
-    desc: "A community that kept growing things through the end of the world, and, deeper still, whatever is actually doing the mending. As close to the source of it as this family has ever gotten — and very little worth reaching this deep comes easily, least of all the parts that never had anything to do with the Vale at all. Beyond the Rootbound Sanctuary, the ground itself starts to thin — every line held here is one more line the Frontier never gets to take." }
+    rw: { xp: 375000, gold: 290000 },
+    desc: "A community that kept growing things through the end of the world, and, deeper still, whatever is actually doing the mending. As close to the source of it as this family has ever gotten — and very little worth reaching this deep comes easily, least of all the parts that never had anything to do with the Vale at all." }
 ];
 
 // Raid bosses hit harder than their solo zone-encounter versions — a raid should feel
@@ -8706,18 +8729,7 @@ function generateFrontierBoss(playerLevel, streak) {
 // untouched — this stacks an ADDITIONAL bonus only while fielded).
 const GUILD_WAR_MIN_LEVEL = 105;
 const GUILD_WAR_UNLOCK_CHAPTER = 'journal_097'; // Iris & Ash join
-const GUILD_WAR_BASE_FIELDED = 3;
-// Field size scales with earned Guild Rank rather than level or streak — rank never
-// goes down, so this reads as trust genuinely earned over time rather than something
-// that could shrink after a bad run.
-function getGuildWarMaxFielded() {
-  const rank = getGuildRank();
-  let max = GUILD_WAR_BASE_FIELDED;
-  if (rank >= 4) max++;  // Guild Veteran
-  if (rank >= 7) max++;  // Guild Legend
-  if (rank >= 10) max++; // Guild Eternal
-  return max;
-}
+const GUILD_WAR_MAX_FIELDED = 3;
 
 const GUILD_MEMBERS = [
   { id: 'mimi', npcName: 'Mimi', role: 'Scout', icon: '🦋',
@@ -8850,7 +8862,7 @@ function toggleGuildWarField(id) {
   if (idx >= 0) {
     G.guildWar.fielded.splice(idx, 1);
   } else {
-    if (G.guildWar.fielded.length >= getGuildWarMaxFielded()) { lg('🛡️ Only ' + getGuildWarMaxFielded() + ' guild members can be fielded per muster.'); return; }
+    if (G.guildWar.fielded.length >= GUILD_WAR_MAX_FIELDED) { lg('🛡️ Only ' + GUILD_WAR_MAX_FIELDED + ' guild members can be fielded per muster.'); return; }
     G.guildWar.fielded.push(id);
   }
   render();
@@ -8866,48 +8878,6 @@ function getGuildWarFieldBonus(statKey) {
     if (def && def.fieldBuff[statKey]) total += def.fieldBuff[statKey];
   }
   return total;
-}
-
-// Fielded guild members were previously a purely passive stat bonus — no combat
-// presence of their own, no name ever appearing in the log. This gives each one an
-// actual, visible attack each turn, matching the same "Name hits Target for X" format
-// regular party members use. Scoped strictly to active guild war encounters (checked
-// by the caller), and damage is a fraction of the player's own attack rather than a
-// full independent stat block, since these members were designed narrative-first
-// without their own gear/leveling.
-function doGuildWarMemberAttack(memberDef) {
-  const aliveEnemies = G.cbt.en.filter(e => e.hp > 0);
-  if (aliveEnemies.length === 0) return;
-  const target = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
-
-  const eqStats = getEquippedStats();
-  const playerAtk = G.p.stats.str + (eqStats.atk || 0) + (eqStats.str || 0);
-  const abilityScore = Math.floor(playerAtk * 1.2); // a fielded member hits meaningfully, but noticeably lighter than San herself
-
-  const attackResult = DICE.attackRoll({
-    attackerLevel: G.p.lvl,
-    abilityScore: abilityScore,
-    proficiency: true,
-    bonus: 0,
-    targetAC: getEnemyAC(target),
-    advantage: 'normal'
-  });
-
-  if (!attackResult.hit) {
-    lg('❌ ' + memberDef.npcName + ' misses ' + target.n + ' (' + attackResult.d20.roll + ')');
-    return;
-  }
-
-  const damageResult = DICE.damageRoll({
-    diceExpr: '1d6',
-    abilityScore: abilityScore,
-    isCrit: attackResult.isCrit
-  });
-  const finalDamage = Math.max(1, damageResult.total - Math.floor((target.def || 0) / 3));
-  target.hp = Math.max(0, target.hp - finalDamage);
-
-  const critTag = attackResult.isCrit ? ' 💥 CRIT!' : '';
-  lg('⚔️ ' + memberDef.npcName + ' hits ' + target.n + ' for ' + finalDamage + critTag);
 }
 
 function guildWarBark() {
@@ -10753,15 +10723,6 @@ function finishPlayerTurn() {
   for (let p of G.party) {
     if (p.on && p.hp > 0) doPartyAttack(p);
   }
-
-  // Fielded guild members now actually attack each turn too, not just provide a
-  // passive stat bonus — scoped strictly to active guild war encounters.
-  if (G.guildWar.active) {
-    for (let id of G.guildWar.fielded) {
-      const def = getGuildMemberDef(id);
-      if (def) doGuildWarMemberAttack(def);
-    }
-  }
   
   eturn();
   // Soel's The Choice: if the whole party — San included — is on the brink at once,
@@ -11467,12 +11428,6 @@ function doAutoCombatTick() {
       lg('🤖 Auto-combat: No MP for attacks. Passing turn...');
       for (let p of G.party) {
         if (p.on && p.hp > 0) doPartyAttack(p);
-      }
-      if (G.guildWar.active) {
-        for (let id of G.guildWar.fielded) {
-          const def = getGuildMemberDef(id);
-          if (def) doGuildWarMemberAttack(def);
-        }
       }
       
       if (G.cbt.en.every(e => e.hp <= 0)) { handleVictory(); return; }
@@ -17576,17 +17531,15 @@ function rPrestige() {
   const unlocked = isPrestigeUnlocked();
   const projXp = +(G.p.lvl * PRESTIGE_XP_PCT_PER_LEVEL).toFixed(1);
   const projGold = +(G.p.lvl * PRESTIGE_GOLD_PCT_PER_LEVEL).toFixed(1);
-  const currentTier = getPrestigeTier();
-  const requiredLevel = getPrestigeRequiredLevel();
 
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🌟 Prestige</div>';
-  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Bank your level into a permanent bonus, then start the climb again \u2014 faster this time. Each tier asks for more than the last.</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Bank your level into a permanent bonus, then start the climb again \u2014 faster this time.</div>';
 
   h += '<div class="panel panel-gold" style="text-align:center;">';
   h += '<div class="panel-title" style="color:var(--gold);">Current Permanent Bonus</div>';
   h += '<div style="font-size:24px;font-weight:700;margin:8px 0;color:var(--gold);">+' + (G.prestige.xpBonusPct || 0).toFixed(1) + '% XP &nbsp;\u00b7&nbsp; +' + (G.prestige.goldBonusPct || 0).toFixed(1) + '% Gold</div>';
-  h += '<div class="btn-hint">' + (G.prestige.count || 0) + ' prestige' + ((G.prestige.count || 0) === 1 ? '' : 's') + ' so far \u2014 working toward Tier ' + currentTier + ' (Level ' + requiredLevel + ')</div>';
+  h += '<div class="btn-hint">' + (G.prestige.count || 0) + ' prestige' + ((G.prestige.count || 0) === 1 ? '' : 's') + ' so far</div>';
   h += '</div>';
 
   h += '<div class="panel">';
@@ -17609,13 +17562,13 @@ function rPrestige() {
 
   if (unlocked) {
     h += '<div class="panel" style="text-align:center;">';
-    h += '<div class="btn-hint">Prestiging now at Level ' + G.p.lvl + ' (Tier ' + currentTier + ') banks:</div>';
+    h += '<div class="btn-hint">Prestiging now at Level ' + G.p.lvl + ' banks:</div>';
     h += '<div style="font-size:18px;font-weight:700;margin:6px 0;color:var(--accent);">+' + projXp + '% XP &nbsp;\u00b7&nbsp; +' + projGold + '% Gold</div>';
     h += '</div>';
-    h += '<button onclick="confirmPrestige()" class="abtn" style="width:100%;background:var(--danger);">🌟 Tier ' + currentTier + ' Prestige (Level Resets to 1)</button>';
+    h += '<button onclick="confirmPrestige()" class="abtn" style="width:100%;background:var(--danger);">🌟 Prestige Now (Level Resets to 1)</button>';
   } else {
     h += '<div class="panel" style="text-align:center;">';
-    h += '<div class="btn-hint">🔒 Tier ' + currentTier + ' unlocks at Level ' + requiredLevel + ' (currently Level ' + G.p.lvl + ')</div>';
+    h += '<div class="btn-hint">🔒 Unlocks at Level ' + PRESTIGE_MIN_LEVEL + ' (currently Level ' + G.p.lvl + ')</div>';
     h += '</div>';
   }
 
@@ -17940,7 +17893,7 @@ function rGuildWar() {
   const unlocked = isGuildWarUnlocked();
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">⚔️ Guild War</div>';
-  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Structured musters against other survivor guilds \u2014 competitive, not hostile. Field up to ' + getGuildWarMaxFielded() + ' recruited Guild members before you start; each one adds a small, permanent-for-the-run bonus, fights alongside you each turn, and a line or two along the way. Fielding capacity grows with Guild Rank.</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Structured musters against other survivor guilds \u2014 competitive, not hostile. Field up to ' + GUILD_WAR_MAX_FIELDED + ' recruited Guild members before you start; each one adds a small, permanent-for-the-run bonus and a line or two along the way.</div>';
 
   if (!unlocked) {
     h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🔒 Unlocks at Level ' + GUILD_WAR_MIN_LEVEL + ', after meeting Iris & Ash out past the Frontier.</div></div>';
@@ -17953,7 +17906,7 @@ function rGuildWar() {
   h += '<div style="font-size:24px;font-weight:700;margin:8px 0;color:var(--gold);">' + (G.guildWar.bestStreak || 0) + '</div>';
   h += '</div>';
 
-  h += '<div class="panel-title" style="margin:14px 0 8px;">Guild Roster (' + G.guildWar.fielded.length + '/' + getGuildWarMaxFielded() + ' fielded)</div>';
+  h += '<div class="panel-title" style="margin:14px 0 8px;">Guild Roster (' + G.guildWar.fielded.length + '/' + GUILD_WAR_MAX_FIELDED + ' fielded)</div>';
   for (let def of GUILD_MEMBERS) {
     const recruited = isGuildMemberRecruited(def.id);
     const fielded = G.guildWar.fielded.includes(def.id);
