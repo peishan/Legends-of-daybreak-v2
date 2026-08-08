@@ -8739,7 +8739,18 @@ function generateFrontierBoss(playerLevel, streak) {
 // untouched — this stacks an ADDITIONAL bonus only while fielded).
 const GUILD_WAR_MIN_LEVEL = 105;
 const GUILD_WAR_UNLOCK_CHAPTER = 'journal_097'; // Iris & Ash join
-const GUILD_WAR_MAX_FIELDED = 3;
+const GUILD_WAR_BASE_FIELDED = 3;
+// Field size scales with earned Guild Rank rather than level or streak — rank never
+// goes down, so this reads as trust genuinely earned over time rather than something
+// that could shrink after a bad run.
+function getGuildWarMaxFielded() {
+  const rank = getGuildRank();
+  let max = GUILD_WAR_BASE_FIELDED;
+  if (rank >= 4) max++;  // Guild Veteran
+  if (rank >= 7) max++;  // Guild Legend
+  if (rank >= 10) max++; // Guild Eternal
+  return max;
+}
 
 const GUILD_MEMBERS = [
   { id: 'mimi', npcName: 'Mimi', role: 'Scout', icon: '🦋',
@@ -8881,7 +8892,7 @@ function toggleGuildWarField(id) {
   if (idx >= 0) {
     G.guildWar.fielded.splice(idx, 1);
   } else {
-    if (G.guildWar.fielded.length >= GUILD_WAR_MAX_FIELDED) { lg('🛡️ Only ' + GUILD_WAR_MAX_FIELDED + ' guild members can be fielded per muster.'); return; }
+    if (G.guildWar.fielded.length >= getGuildWarMaxFielded()) { lg('🛡️ Only ' + getGuildWarMaxFielded() + ' guild members can be fielded per muster.'); return; }
     G.guildWar.fielded.push(id);
   }
   render();
@@ -8897,6 +8908,48 @@ function getGuildWarFieldBonus(statKey) {
     if (def && def.fieldBuff[statKey]) total += def.fieldBuff[statKey];
   }
   return total;
+}
+
+// Fielded guild members were previously a purely passive stat bonus — no combat
+// presence of their own, no name ever appearing in the log. This gives each one an
+// actual, visible attack each turn, matching the same "Name hits Target for X" format
+// regular party members use. Scoped strictly to active guild war encounters (checked
+// by the caller), and damage is a fraction of the player's own attack rather than a
+// full independent stat block, since these members were designed narrative-first
+// without their own gear/leveling.
+function doGuildWarMemberAttack(memberDef) {
+  const aliveEnemies = G.cbt.en.filter(e => e.hp > 0);
+  if (aliveEnemies.length === 0) return;
+  const target = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
+
+  const eqStats = getEquippedStats();
+  const playerAtk = G.p.stats.str + (eqStats.atk || 0) + (eqStats.str || 0);
+  const abilityScore = Math.floor(playerAtk * 1.2); // a fielded member hits meaningfully, but noticeably lighter than San herself
+
+  const attackResult = DICE.attackRoll({
+    attackerLevel: G.p.lvl,
+    abilityScore: abilityScore,
+    proficiency: true,
+    bonus: 0,
+    targetAC: getEnemyAC(target),
+    advantage: 'normal'
+  });
+
+  if (!attackResult.hit) {
+    lg('❌ ' + memberDef.npcName + ' misses ' + target.n + ' (' + attackResult.d20.roll + ')');
+    return;
+  }
+
+  const damageResult = DICE.damageRoll({
+    diceExpr: '1d6',
+    abilityScore: abilityScore,
+    isCrit: attackResult.isCrit
+  });
+  const finalDamage = Math.max(1, damageResult.total - Math.floor((target.def || 0) / 3));
+  target.hp = Math.max(0, target.hp - finalDamage);
+
+  const critTag = attackResult.isCrit ? ' 💥 CRIT!' : '';
+  lg('⚔️ ' + memberDef.npcName + ' hits ' + target.n + ' for ' + finalDamage + critTag);
 }
 
 function guildWarBark() {
@@ -10742,6 +10795,15 @@ function finishPlayerTurn() {
   for (let p of G.party) {
     if (p.on && p.hp > 0) doPartyAttack(p);
   }
+
+  // Fielded guild members now actually attack each turn too, not just provide a
+  // passive stat bonus — scoped strictly to active guild war encounters.
+  if (G.guildWar.active) {
+    for (let id of G.guildWar.fielded) {
+      const def = getGuildMemberDef(id);
+      if (def) doGuildWarMemberAttack(def);
+    }
+  }
   
   eturn();
   // Soel's The Choice: if the whole party — San included — is on the brink at once,
@@ -11447,6 +11509,12 @@ function doAutoCombatTick() {
       lg('🤖 Auto-combat: No MP for attacks. Passing turn...');
       for (let p of G.party) {
         if (p.on && p.hp > 0) doPartyAttack(p);
+      }
+      if (G.guildWar.active) {
+        for (let id of G.guildWar.fielded) {
+          const def = getGuildMemberDef(id);
+          if (def) doGuildWarMemberAttack(def);
+        }
       }
       
       if (G.cbt.en.every(e => e.hp <= 0)) { handleVictory(); return; }
@@ -14457,7 +14525,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.1';
+const BUILD_ID = '2026-08-08.2';
 // =========================
 
 
@@ -17982,7 +18050,7 @@ function rGuildWar() {
   const unlocked = isGuildWarUnlocked();
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">⚔️ Guild War</div>';
-  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Structured musters against other survivor guilds \u2014 competitive, not hostile. Field up to ' + GUILD_WAR_MAX_FIELDED + ' recruited Guild members before you start; each one adds a small, permanent-for-the-run bonus and a line or two along the way.</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Structured musters against other survivor guilds \u2014 competitive, not hostile. Field up to ' + getGuildWarMaxFielded() + ' recruited Guild members before you start; each one adds a small, permanent-for-the-run bonus, fights alongside you each turn, and a line or two along the way. Fielding capacity grows with Guild Rank.</div>';
 
   if (!unlocked) {
     h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🔒 Unlocks at Level ' + GUILD_WAR_MIN_LEVEL + ', after meeting Iris & Ash out past the Frontier.</div></div>';
@@ -17995,7 +18063,7 @@ function rGuildWar() {
   h += '<div style="font-size:24px;font-weight:700;margin:8px 0;color:var(--gold);">' + (G.guildWar.bestStreak || 0) + '</div>';
   h += '</div>';
 
-  h += '<div class="panel-title" style="margin:14px 0 8px;">Guild Roster (' + G.guildWar.fielded.length + '/' + GUILD_WAR_MAX_FIELDED + ' fielded)</div>';
+  h += '<div class="panel-title" style="margin:14px 0 8px;">Guild Roster (' + G.guildWar.fielded.length + '/' + getGuildWarMaxFielded() + ' fielded)</div>';
   for (let def of GUILD_MEMBERS) {
     const recruited = isGuildMemberRecruited(def.id);
     const fielded = G.guildWar.fielded.includes(def.id);
