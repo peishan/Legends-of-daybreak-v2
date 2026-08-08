@@ -4073,6 +4073,7 @@ storyJournal: {
   enemyIconStyle: 'svg', // 'svg' or 'emoji' — player-toggleable in combat
   bossRevealShownFor: null, // tracks which G.currentBoss object was last revealed, by reference
   bestiaryExpanded: null,
+  bestiarySearch: '',
   story: { active: true, chapter: 0, scene: 0, shown: false },
   storyChapters: [
     { title: 'The Rain and the Kitten', unlockLevel: 1, scenes: [
@@ -16475,21 +16476,31 @@ function rStory(){
 
 function rBestiary(){
   let h='<div class="bestiary-view"><h2 class="st">📖 Bestiary</h2>';
-  const entries = Object.entries(G.bestiary).sort((a,b)=>b[1].kills-a[1].kills);
-  if(entries.length===0){
+  const allEntries = Object.entries(G.bestiary).sort((a,b)=>b[1].kills-a[1].kills);
+  const searchQuery = (G.bestiarySearch || '').toLowerCase().trim();
+  const entries = searchQuery ? allEntries.filter(([name]) => name.toLowerCase().includes(searchQuery)) : allEntries;
+
+  h += '<input type="text" id="bestiary-search-input" placeholder="🔍 Search by name..." value="' + (G.bestiarySearch || '').replace(/"/g,'&quot;') + '" oninput="G.bestiarySearch=this.value;render();var el=document.getElementById(\'bestiary-search-input\');if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length);}" class="bestiary-search-box" style="width:100%;padding:10px 12px;margin-bottom:12px;border-radius:10px;border:1px solid var(--border);background:var(--bg-card);color:var(--text);font-size:14px;">';
+
+  if(allEntries.length===0){
     h+='<div style="text-align:center;padding:40px;color:var(--text-dim);">No creatures catalogued yet.<br>Defeat enemies to fill the bestiary.</div>';
-  }else{
-    h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;">'+entries.length+' species discovered \u2014 tap any entry for its full record</div>';
+  } else if (entries.length === 0) {
+    h+='<div style="text-align:center;padding:40px;color:var(--text-dim);">No creatures match "' + (G.bestiarySearch || '') + '".</div>';
+  } else {
+    h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;">'+entries.length+(entries.length !== allEntries.length ? ' of ' + allEntries.length : '')+' species'+(entries.length !== allEntries.length ? ' matched' : ' discovered')+' \u2014 tap any entry for its full record</div>';
     h+='<div class="zlist">';
     for(let [name,data] of entries){
       const elemIcon = data.elem==='fire'?'🔥':data.elem==='ice'?'❄️':data.elem==='lightning'?'⚡':data.elem==='void'?'🌑':data.elem==='poison'?'☠️':'✦';
       const bossEntry = G.bosses.find(b => b.n === name);
       const isExpanded = G.bestiaryExpanded === name;
+      const locZone = findMonsterZone(name);
+      const locText = locZone ? (locZone.n + (locZone.lv ? ' (Lv.' + locZone.lv + ')' : '')) : 'Location unknown';
       h+='<div class="zcard bestiary-entry" data-bname="'+name.replace(/"/g,'&quot;')+'" style="cursor:pointer;'+(bossEntry?'border-color:var(--gold);':'')+'">';
       h+='<div class="zh"><span class="zn">'+ee(name)+' '+name+(bossEntry?' <span style="color:var(--gold);font-size:10px;">★ BOSS</span>':'')+'</span><span class="zl">'+data.kills+' kills</span></div>';
       h+='<div style="display:flex;gap:12px;font-size:12px;color:var(--text-dim);margin-top:6px;">';
       h+='<span>HP: '+data.mhp+'</span><span>ATK: '+data.atk+'</span><span>DEF: '+data.def+'</span><span>'+elemIcon+' '+data.elem+'</span>';
       h+='</div>';
+      h+='<div style="font-size:11px;color:var(--accent);margin-top:4px;">📍 '+locText+'</div>';
       h+='<div style="font-size:10px;color:var(--disabled);margin-top:4px;">First seen: '+new Date(data.firstSeen).toLocaleDateString()+'</div>';
       if(isExpanded){
         h+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;line-height:1.6;color:var(--text);">';
@@ -16537,6 +16548,14 @@ function rRunes(){
 
   let h='<div style="padding:16px;"><h2 class="st">💎 Rune Socketing</h2>';
 
+  // Combine button moved to the top — previously sat after the entire rune grid,
+  // requiring a scroll past every owned rune just to reach it.
+  if (G.runes.length > 0) {
+    h+='<button id="btn-combine" style="width:100%;padding:12px;border-radius:12px;border:2px solid var(--accent);background:linear-gradient(135deg,var(--accent),#6d28d9);color:white;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;box-shadow:0 2px 8px var(--shadow-accent);transition:transform 0.2s;" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'none\'">';
+    h+='🔮 Combine Runes';
+    h+='</button>';
+  }
+
   // Rune inventory with better visual cards
   h+='<div style="font-size:12px;font-weight:600;color:var(--accent-light);margin-bottom:10px;">Rune Inventory ('+G.runes.length+')</div>';
   if(G.runes.length===0){
@@ -16558,11 +16577,6 @@ function rRunes(){
       h+='</div>';
     }
     h+='</div>';
-
-    // Combine button — now opens modal
-    h+='<button id="btn-combine" style="width:100%;padding:12px;border-radius:12px;border:2px solid var(--accent);background:linear-gradient(135deg,var(--accent),#6d28d9);color:white;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;box-shadow:0 2px 8px var(--shadow-accent);transition:transform 0.2s;" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'none\'">';
-    h+='🔮 Combine Runes';
-    h+='</button>';
   }
 
   // Socketable gear with stat preview — covers inventory AND equipped gear (San's own
