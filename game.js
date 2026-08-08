@@ -15062,6 +15062,31 @@ function loadGame() {
       }
       saveGame();
     }
+
+    // Second, more reliable recovery pass — the above depends on old bounty save data
+    // that may have already been overwritten by a normal save cycle on an intermediate
+    // version, before this recovery code even existed, leaving nothing left to find.
+    // This uses journal_101 ("What It Takes to Build a Window") instead — its own
+    // unlock condition IS defeating Skarrowyn, and its summary explicitly states both
+    // dragons fell, so if it's unlocked, both quests are definitively already earned,
+    // independent of whatever the old bounty data does or doesn't still contain.
+    // Separate migration flag since farseerQuestRecovery above may already be marked
+    // done from a prior run that had nothing to recover.
+    if (!G.migrations.farseerQuestRecoveryV2) {
+      const ch101Unlocked = G.storyJournal.unlocked.includes('journal_101');
+      const quest80b = G.quests.find(q => q.id === 80);
+      const quest81b = G.quests.find(q => q.id === 81);
+      let recoveredV2 = false;
+      if (ch101Unlocked) {
+        if (quest80b && !quest80b.done) { quest80b.done = true; quest80b.c = quest80b.need; recoveredV2 = true; }
+        if (quest81b && !quest81b.done) { quest81b.done = true; quest81b.c = quest81b.need; recoveredV2 = true; }
+      }
+      G.migrations.farseerQuestRecoveryV2 = true;
+      if (recoveredV2) {
+        lg('🔧 Recovered Farseer quest progress, confirmed by the chapter you already unlocked \u2014 both dragons were already defeated, both quests are now correctly marked complete.');
+      }
+      saveGame();
+    }
     // Catch up any level/boss/zone-gated journal entries that should already be
     // unlocked but were missed — e.g. a boss defeated through a path that didn't
     // trigger the live in-combat check (Raid Mode, or before this system existed).
