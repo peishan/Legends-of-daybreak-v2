@@ -1395,6 +1395,16 @@ const G = {
     { n: 'The Line Neither Could Hold Alone', zone: 'The Farthest Kindling', hp: 340000, mhp: 340000, atk: 830, def: 495, xp: 165000, g: 118000,
       mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 85000,
       desc: "Too much for one pair. It was always going to be too much for one pair — that was never a flaw in anyone's practice, just an honest fact about how large the Fraying can grow when it is finally allowed to concentrate somewhere undefended long enough. It does not know yet that it is not fighting one pair anymore. That is about to become the whole problem it never accounted for." },
+    // The Endless Thinning's own boss — every zone boss above it is a fixed stat
+    // block, calibrated once and left to eventually fall behind the same way regular
+    // monsters used to. This one carries no hp/atk/def/xp/g of its own at all:
+    // `scaled: true` tells sc() to generate them fresh off the player's CURRENT level
+    // every single fight (see getEndlessThinningBossStats()), the same safe curve the
+    // Fraying Frontier already uses — so this fight never goes stale either, matching
+    // the zone's own "reads your level live" design instead of just its trash mobs.
+    { n: 'Whatever the Thinning Finally Grew', zone: 'The Endless Thinning', scaled: true,
+      mechanic: 'apocalypse', apocalypseTurn: 6,
+      desc: "Not sent here, not guarding anything, not defending a line the way everything else this deep has been. It grew here, out of however much was left over once the ground stopped bothering to have an edge — and it has never once stopped growing. It does not have a fixed size. It has whatever size meeting you required, exactly, and it made that decision the moment you walked in." },
 
     // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
     // These are dedicated Temple-quest hunt targets, not tied to any zone's normal
@@ -8250,10 +8260,24 @@ function spawnBossRushEncounter() {
 
   const boss = JSON.parse(JSON.stringify(bossDef));
   boss.id = 99;
-  boss.hp = Math.floor(boss.hp * RAID_BOSS_BUFF.hpMult * statMult);
-  boss.mhp = boss.hp;
-  boss.atk = Math.floor(boss.atk * RAID_BOSS_BUFF.atkMult * statMult);
-  boss.def = Math.floor(boss.def * RAID_BOSS_BUFF.defMult * statMult);
+  if (bossDef.scaled) {
+    // No baked-in hp/atk/def to multiply — this boss's stats don't exist until
+    // generated fresh off the player's current level (see sc()'s zone boss spawn).
+    // Skipping that here would leave hp/atk/def as undefined and silently break
+    // the whole encounter with NaN math.
+    const stats = getFrayingFrontierScaledStats(G.p.lvl);
+    boss.hp = Math.floor(stats.hp * RAID_BOSS_BUFF.hpMult * statMult);
+    boss.mhp = boss.hp;
+    boss.atk = Math.floor(stats.atk * RAID_BOSS_BUFF.atkMult * statMult);
+    boss.def = Math.floor(stats.def * RAID_BOSS_BUFF.defMult * statMult);
+    boss.xp = stats.xp;
+    boss.g = stats.g;
+  } else {
+    boss.hp = Math.floor(boss.hp * RAID_BOSS_BUFF.hpMult * statMult);
+    boss.mhp = boss.hp;
+    boss.atk = Math.floor(boss.atk * RAID_BOSS_BUFF.atkMult * statMult);
+    boss.def = Math.floor(boss.def * RAID_BOSS_BUFF.defMult * statMult);
+  }
   G.currentBoss = boss;
   G.cbt.en.push(boss);
 
@@ -12835,11 +12859,24 @@ function startGrindWave() {
       return zone && zone.lv <= maxZoneLv;
     });
     if (bossPool.length > 0) {
-      const boss = JSON.parse(JSON.stringify(bossPool[Math.floor(Math.random() * bossPool.length)]));
+      const bossDef = bossPool[Math.floor(Math.random() * bossPool.length)];
+      const boss = JSON.parse(JSON.stringify(bossDef));
       boss.id = 99;
-      boss.hp = Math.floor(boss.hp * diffMult * (1 + (wave / 50)));
-      boss.mhp = boss.hp;
-      boss.atk = Math.floor(boss.atk * diffMult * (1 + (wave / 50)));
+      if (bossDef.scaled) {
+        // Same reasoning as Boss Rush: no baked-in stats to multiply for a scaled
+        // boss — generate them fresh off the player's current level first.
+        const stats = getFrayingFrontierScaledStats(playerLv);
+        boss.hp = Math.floor(stats.hp * diffMult * (1 + (wave / 50)));
+        boss.mhp = boss.hp;
+        boss.atk = Math.floor(stats.atk * diffMult * (1 + (wave / 50)));
+        boss.def = stats.def;
+        boss.xp = stats.xp;
+        boss.g = stats.g;
+      } else {
+        boss.hp = Math.floor(boss.hp * diffMult * (1 + (wave / 50)));
+        boss.mhp = boss.hp;
+        boss.atk = Math.floor(boss.atk * diffMult * (1 + (wave / 50)));
+      }
       G.currentBoss = boss;
       G.cbt.en.push(boss);
       lg('⚠️ BOSS WAVE ' + wave + ': ' + boss.n + ' appears!');
@@ -13716,7 +13753,21 @@ function sc(zi, skipEvents) {
     const boss = G.bosses.find(b => b.zone === z.n);
     if (boss) {
       isBoss = true;
-      G.currentBoss = JSON.parse(JSON.stringify(boss));
+      if (boss.scaled) {
+        // No hp/atk/def/xp/g baked in — generated fresh every fight off the
+        // player's CURRENT level, via the same safe curve as the Fraying
+        // Frontier (and already anchored to match the other zone bosses at
+        // level 100), so this boss keeps pace no matter how far past 100
+        // leveling eventually goes.
+        const stats = getFrayingFrontierScaledStats(G.p.lvl);
+        G.currentBoss = Object.assign({}, boss, {
+          hp: stats.hp, mhp: stats.hp,
+          atk: stats.atk, def: stats.def,
+          xp: stats.xp, g: stats.g
+        });
+      } else {
+        G.currentBoss = JSON.parse(JSON.stringify(boss));
+      }
       G.currentBoss.id = 99;
       G.cbt.en.push(G.currentBoss);
       lg('⚠️ BOSS APPEARS: ' + boss.n + '!');
