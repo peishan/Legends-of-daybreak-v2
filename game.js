@@ -14807,7 +14807,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.4';
+const BUILD_ID = '2026-08-08.5';
 // =========================
 
 
@@ -15483,10 +15483,17 @@ function loadGame() {
       }
     }
     // Direct catch-up independent of quest state entirely: if the bestiary shows you've
-    // actually defeated The Planarch before, grant the stronghold regardless of whether
-    // the quest chain ever tracked it correctly.
+    // actually defeated a stronghold's unlock boss before, grant the stronghold
+    // regardless of whether the quest chain ever tracked it correctly — covers anyone
+    // who defeated the boss before the live claim hook existed at all.
     if (G.bestiary && G.bestiary['The Planarch'] && G.bestiary['The Planarch'].kills > 0) {
       claimStronghold('arcaneTower');
+    }
+    if (G.bestiary && G.bestiary['The Vale Warden'] && G.bestiary['The Vale Warden'].kills > 0) {
+      claimStronghold('mendedGrove');
+    }
+    if (G.bestiary && G.bestiary['The Verdant Heart'] && G.bestiary['The Verdant Heart'].kills > 0) {
+      claimStronghold('wakingEdge');
     }
     if (data.soelCommentCooldown !== undefined) {
       G.soelCommentCooldown = data.soelCommentCooldown;
@@ -18764,7 +18771,17 @@ function rStrongholds() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🗼 Strongholds</div>';
 
+  // Maps each stronghold to the boss that unlocks it — used only for the locked-state
+  // message below, since this isn't stored on the STRONGHOLDS definitions themselves.
+  const STRONGHOLD_UNLOCK_BOSS = {
+    arcaneTower: 'The Planarch, atop the Arcane Planar Tower',
+    mendedGrove: 'The Vale Warden, in The Unbroken Vale',
+    wakingEdge: 'The Verdant Heart'
+  };
+
   const claimedIds = Object.keys(G.strongholds).filter(id => G.strongholds[id]);
+  const allIds = Object.keys(STRONGHOLDS);
+
   if (claimedIds.length === 0) {
     h += '<div class="panel" style="text-align:center;">';
     h += '<div class="panel-title">🔒 No Stronghold Claimed Yet</div>';
@@ -18773,9 +18790,21 @@ function rStrongholds() {
     return h;
   }
 
-  for (let id of claimedIds) {
+  for (let id of allIds) {
     const def = STRONGHOLDS[id];
     if (!def) continue;
+
+    if (!G.strongholds[id]) {
+      // Previously, an unclaimed stronghold simply never appeared here at all — no
+      // indication it existed or what was needed, which read as a bug rather than
+      // a locked door. Now it shows plainly, same as any other locked content.
+      h += '<div class="panel" style="opacity:0.6;">';
+      h += '<div class="panel-title">🔒 ' + def.icon + ' ' + def.name + '</div>';
+      h += '<div class="btn-hint" style="margin-top:6px;">Defeat ' + (STRONGHOLD_UNLOCK_BOSS[id] || 'the appropriate boss') + ' to unlock.</div>';
+      h += '</div>';
+      continue;
+    }
+
     const retired = def.era === 'oldWorld' && hasEnteredVerdantReach();
     if (retired) {
       const level = getGuildHallLevel(id);
