@@ -3771,7 +3771,7 @@ storyJournal: {
           { speaker: 'Mimi', text: '"I do not know," Mimi admits, and there is no performance in the not-knowing, which is somehow worse than if she had simply guessed. "I have never once had to say that about anything before. I do not love how it feels."' },
           { speaker: 'San', text: '"Where is it," you ask, already aware of the answer before Jorvin finishes gesturing east, past the edge of every hand-drawn map you own, past even the Frontier\'s own unmapped edge.' },
           { speaker: 'Jorvin', text: '"Past the Reach. Past the Thinning. Past whatever the Frontier even means by \'past.\'" He shrugs, an engineer running fully out of engineering vocabulary. "Somewhere the actual map just stops being able to say anything useful."' },
-          { speaker: 'Aisy', text: 'Aisy, quiet until now, finally speaks. "I am used to things arriving. Robin. Jeff. You two, once. Never once, in all this time, something that might be able to leave."' },
+          { speaker: 'Aisyah', text: 'Aisyah, quiet until now, finally speaks. "I am used to things arriving. Robin. Jeff. You two, once. Never once, in all this time, something that might be able to leave."' },
           { speaker: 'Joel', text: '"What does it even mean, if it opens," Joel says, careful, watching you the exact way he watches you whenever the ground under a conversation gets uncertain. "Going back? Going somewhere else? Nobody actually knows what is on the other side of a thing like that."' },
           { speaker: 'San', text: '"Nobody has to decide tonight," you say, and mean it, surprising yourself with how easily the patience comes after a hundred levels of practicing exactly this. "We mark it. We go look, properly, when we are ready to. That is all tonight actually needs to be."' },
           { speaker: 'Narrator', text: 'You sleep on it, all of you, the practice already too deeply worn into how you live for even something this large to skip the step. Whatever it is, it has apparently been waiting. It can wait one more night.' },
@@ -3793,7 +3793,7 @@ storyJournal: {
           { speaker: 'Joel', text: '"So it is not a way home," Joel says slowly, working through it out loud. "For anyone. Robin does not get his old firm back through this. I do not get the old warehouse back. It is not that kind of door."' },
           { speaker: 'San', text: '"No," you agree, something in your chest unclenching in a way you did not expect it to, relief arriving from a direction you had not braced for. "It is not a way back to anything. It is just... somewhere else. Somewhere new."' },
           { speaker: 'Narrator', text: 'You think, standing at the edge of it, of every rival guild muster you have fought since Guild War opened up \u2014 how more than one of them mentioned, in passing, ground out past their own territory that "does not behave right anymore." Nobody had put the pieces together yet. You are fairly sure, now, that everyone has been circling the same discovery from different directions.' },
-          { speaker: 'Aisy', text: '"That actually changes things," Aisy says, and there is something almost like excitement under the careful flatness she always keeps. "Not going backward. Just going further than anyone standing here has ever actually been."' },
+          { speaker: 'Aisyah', text: '"That actually changes things," Aisyah says, and there is something almost like excitement under the careful flatness she always keeps. "Not going backward. Just going further than anyone standing here has ever actually been."' },
           { speaker: 'Mimi', text: '"I still cannot tell you what is over there," Mimi admits. "For the first time since I have known any of you, I genuinely have no idea. I find I do not mind it as much as I expected to."' },
           { speaker: 'San', text: '"We are not going through tonight," you say, and nobody argues, the decision landing the same unhurried way every large decision has landed for a very long time now. "But we are not walking away from it either. We go looking, properly, when we are ready. Same as everything else out here has ever worked."' },
           { speaker: 'Joel', text: '"However long that takes," Joel says, and it is not a question, and you both hear exactly what he is doing \u2014 handing the words right back to you, a hundred levels later, still true.' },
@@ -3815,10 +3815,103 @@ storyJournal: {
           { speaker: 'Narrator', text: 'Iris and Ash are already waiting at the threshold when you arrive \u2014 not summoned, never summoned, just there, the way she has learned to simply be wherever the next line is forming. Mimi and Aisy stand a little apart, together, the exact same way they have stood next to each other since the old office, before either of you had a name for any of this.' },
           { speaker: 'Iris', text: '"Figured you would actually go through with it eventually," Iris says, something warm and unguarded in it. "Ash and I are coming. Somebody has to keep finding the next line, wherever this one leads."' },
           { speaker: 'Mimi', text: '"I still cannot tell you what is over there," Mimi says, and for once there is no performance of certainty covering the gap. "I find I have gotten better at that, somewhere along the way. Not knowing. Going anyway."' },
-          { speaker: 'Aisy', text: '"Somebody has to notice what is worth noticing on the other side," Aisy adds. "May as well be someone who has had a lot of practice at not being noticed first."' },
+          { speaker: 'Aisyah', text: '"Somebody has to notice what is worth noticing on the other side," Aisyah adds. "May as well be someone who has had a lot of practice at not being noticed first."' },
           { speaker: 'San', text: '"We are not going to solve it today," you say, to all of them, to yourself as much as anyone. "We are just going to go look. Properly, this time. However long that actually takes."' },
           { speaker: 'Joel', text: '"However long that takes," Joel echoes, and takes your hand, the same steady grip he has offered you since the very first storm, and together you step toward the edge of the only map that has ever mattered.' },
           { speaker: 'Narrator', text: 'The world does not end here. It never was going to. It just keeps being worth walking further into \u2014 one more horizon, one more line worth finding, one more morning chosen on purpose, the same practice it always was, carried now by more hands than you ever once thought to hope for. Somewhere ahead, past everything anyone has mapped yet, daybreak is still doing exactly what daybreak has always done. It is still coming. You go to meet it.' },
+        ]
+      }
+,{
+        id: 'journal_107',
+        title: 'Kaya Kaya',
+        chapter: 107,
+        unlockType: 'level',
+        unlockAt: 240,
+        icon: '🐇',
+        summary: 'Before the party can even finish stepping through the not-quite-door, someone comes through from the other side first — a young man surrounded by rabbits, who takes one look at Aisyah and calls her by an old nickname nobody else here has ever heard. San explains its roots to Joel: a group chat, started for logistics, that became something neither of them expected.',
+        scenes: [
+          { speaker: 'Narrator', text: 'You have not even fully crossed the threshold when the not-quite-a-door does something none of you were braced for — it flickers, once, and something comes through from the other side before any of you get the chance to.' },
+          { speaker: 'Narrator', text: 'It is a young man, sprawled flat on his back in the dirt like he tripped through rather than walked, a cloud of actual live rabbits scattering in every direction around him like the world\'s least dignified honor guard.' },
+          { speaker: '???', text: '"Okay," he says, to no one, to the sky, still lying there. "That worked way better than I thought it would."' },
+          { speaker: 'Joel', text: 'Joel has a hand on his weapon before he has even finished processing what he is looking at. "Who — "' },
+          { speaker: 'Narrator', text: 'The stranger sits up, spots Aisyah standing frozen at the edge of the group, and his whole face rearranges itself into open, delighted disbelief.' },
+          { speaker: '???', text: '"AISYAH?" he says, like he has just won something. "No way. No way. Kaya kaya herself, standing right there."' },
+          { speaker: 'Aisyah', text: 'Aisyah does not move for a long moment. "KW Liang," she finally says, and it is not a question, and something in her voice is doing several things at once that she does not seem prepared for. "You are supposed to be — you were in the old world. You ran orders for me."' },
+          { speaker: 'San', text: '"You know him?" you ask, lowering your own guard slightly, reading Aisyah\'s face rather than the stranger\'s.' },
+          { speaker: 'Aisyah', text: '"He was my personal shopper," Aisyah says, still somewhere between stunned and something warmer. "Independent. Had real cash flow behind him, more than San or I ever had to work with \u2014 could front bigger orders than either of us could manage alone. Never once asked for more than what we agreed." A beat. ""Kaya kaya" is what he always called me. Rich, rich. Because I always had a new deal running."' },
+          { speaker: 'KW Liang', text: '"Because you DID," Liang says, delighted, getting to his feet and dusting off a coat that has, San notices immediately, entirely too many pockets for someone claiming to travel light. "I have never in my life met someone who could turn a spreadsheet into an actual small fortune the way you did. Kaya kaya. It just fits you."' },
+          { speaker: 'Narrator', text: 'The rabbits have not gone anywhere. There are, San counts, at least nine of them, orbiting Liang with the specific loyalty of animals that have decided, for reasons known only to them, that this particular human is theirs.' },
+          { speaker: 'San', text: '"The bunnies," you say, unable to help yourself, "are they — "' },
+          { speaker: 'KW Liang', text: '"Mine? Sort of? It is complicated," Liang says, with the easy, slightly-too-pleased tone of someone who has explained this exact thing many times and enjoys it every time. "I lead a group back home. We call ourselves the Bunnies. Long story. Mostly it just means I can call a lot of them, very fast, whenever running is the smarter option than fighting. Which, honestly, is most of the time."' },
+          { speaker: 'Joel', text: 'Joel, watching all of this with more amusement than suspicion now, finally lets his hand fall away from his weapon entirely. "You are really not much of a threat, are you."' },
+          { speaker: 'KW Liang', text: '"Absolutely not," Liang agrees immediately, cheerfully, no ego in it at all. "I am extremely fast at leaving. That is the whole skill set."' },
+          { speaker: 'Narrator', text: 'Something about the sheer, unbothered ease of him makes Joel laugh outright — a real laugh, no edge in it, no territory being quietly defended. Whatever San notices building between Aisyah and this stranger, Joel clearly has no intention of standing in the way of it.' },
+          { speaker: 'San', text: '"Wait," you say, something else catching your attention — the device half-visible in one of Liang\'s many pockets, familiar in a way nothing else about this new world has been. "Is that — "' },
+          { speaker: 'KW Liang', text: '"You recognize tech when you see it," Liang says, immediately brightening in an entirely different way than the Aisyah-directed teasing — sharper, more interested, an actual conversation opening up rather than a bit. "Not many people out here even ask."' },
+          { speaker: 'Narrator', text: 'The two of you fall, almost instantly, into a conversation that leaves everyone else several steps behind — components, salvage, what still runs and what does not and why, San forgetting for a full minute that she is standing at the edge of an entirely unmapped world talking shop with a stranger who arrived by falling through a hole in reality surrounded by rabbits.' },
+          { speaker: 'Joel', text: 'Later, once the introductions have settled and Liang has wandered off to reassure his rabbits about something, Joel finds a quiet moment to ask what has clearly been sitting with him. "You two fell into that like you had done it a hundred times before. All three of you, actually. Where does that come from?"' },
+          { speaker: 'San', text: '"A group chat," you say, and the memory arrives easier than you expected, warm rather than heavy. "Back home. My role in the business was small — I placed smaller orders myself, whatever I could manage around Claims. Liang had real cash flow behind him, could front bigger purchases than I ever could. I suggested making one so the three of us could coordinate directly instead of everything going through separate messages. That was the whole reason it existed, at first."' },
+          { speaker: 'Joel', text: '"At first," Joel repeats, catching exactly the word she wants him to catch.' },
+          { speaker: 'San', text: '"It stopped being about orders within a week," you admit, something fond in it. "The three of us just kept talking. About everything. Nothing to do with business at all, most days. I do not think I ever told you that part."' },
+          { speaker: 'Joel', text: '"You do not have to explain yourself to me," Joel says, gently, no jealousy anywhere in it, only genuine warmth. "I am glad she had that. I am glad you did too."' },
+          { speaker: 'San', text: '"I know," you say, and mean it, something settling easier in your chest than you expected it to. "I just wanted you to understand why it feels this easy already. It was always easy. This is just the first time you have gotten to actually see it."' },
+          { speaker: 'Aisyah', text: '"He does this," Aisyah says to Joel later, not quite hiding her own smile, nodding toward Liang mid-conversation with San about something neither of them can follow. "Give him thirty seconds and he will find the one person in any room who speaks his actual language."' },
+          { speaker: 'Joel', text: '"Seems like a good problem to have," Joel says, watching the two of them with open fondness rather than anything guarded.' },
+          { speaker: 'Narrator', text: 'It takes a while for Liang to notice the rest of the party actually watching him — really watching, the specific attention of people deciding in real time whether to trust someone. When he finally does, something in his easy confidence flickers, just slightly, young in a way the jokes had been covering for.' },
+          { speaker: 'KW Liang', text: '"I did not exactly think this through," he admits, quieter than anything he has said so far. "Came through, saw a familiar face, got excited. Did not really plan past that part."' },
+          { speaker: 'San', text: '"That is alright," you say, and mean it, recognizing something in the admission that the whole party has practiced answering a hundred times over by now. "Not everyone plans past the first step. Some of the best people we know did not either."' },
+          { speaker: 'Aisyah', text: '"You are going to have a lot to learn out here," Aisyah says, not unkindly, already sliding back into something like the old working rhythm the two of them clearly used to have. "This is not online shopping. People actually die out here."' },
+          { speaker: 'KW Liang', text: '"Noted," Liang says, and for once there is no joke riding underneath it. "I am a fast learner. Ask anyone. Well — ask Aisyah. She is the only one here who can actually vouch for that."' },
+          { speaker: 'Narrator', text: 'Aisyah looks at him for a long moment, something working behind her eyes that has nothing to do with old business at all — the particular, quiet relief of finding, entirely by accident, that the world she left behind sent her someone worth keeping.' },
+          { speaker: 'Aisyah', text: '"Kaya kaya," Aisyah says, soft, almost to herself, and for the first time since anyone has known her out here, she does not look like the one person in the room nobody quite notices.' },
+        ]
+      }
+,{
+        id: 'journal_108',
+        title: 'The Real Cost',
+        chapter: 108,
+        unlockType: 'level',
+        unlockAt: 245,
+        icon: '🩹',
+        summary: 'Liang\'s first real mistake in a fight costs Aisyah a wound that is not serious, but is real — and for the first time since he fell through the door, the actual weight of this world lands on him without a joke to soften it.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It happens fast, the way the real ones always do — Liang, three days into traveling with the party, sees an opening mid-fight and takes it without checking who else is standing in the space he is about to fill.' },
+          { speaker: 'Narrator', text: 'San\'s blade meant for the enemy behind him instead catches empty air, thrown off just enough that the enemy gets a free hit in on Aisyah instead — not a serious wound, but a real one, blood real and immediate against her sleeve.' },
+          { speaker: 'KW Liang', text: '"Aisyah — " Liang starts, already moving toward her, every ounce of his usual ease gone out of his voice entirely.' },
+          { speaker: 'Aisyah', text: '"I am fine," Aisyah says, and she is, mostly, already pressing a hand to it. "It is fine, Liang."' },
+          { speaker: 'Narrator', text: 'It is not fine, not to him, not right now — San can see it happening in real time, the exact moment the actual weight of this world lands on him for the first time since the rabbits and the jokes and the easy first afternoon.' },
+          { speaker: 'KW Liang', text: '"That is not — back home, if I misjudge a purchase, I am out some money, or someone\'s order shows up wrong," he says, quieter than San has heard him say anything. "That is the entire cost. I did not — I do not think I actually understood what "people die out here" meant. Not really. Not until right now."' },
+          { speaker: 'San', text: '"No," you agree, gently, not softening it more than it needs. "You did not. Most people do not, the first time. That is not an insult. It is just true."' },
+          { speaker: 'Aisyah', text: 'Aisyah, wound already tended, looks at him with something that is not quite forgiveness because there was never really anything to forgive — just recognition. "You are used to being the fastest person in the room. Out here, fast is not always the right instinct. Sometimes it is the one that gets someone else hurt."' },
+          { speaker: 'KW Liang', text: '"I do not want to be someone who gets people hurt," Liang says, and for the first time since he fell through the door surrounded by rabbits, there is nothing performing in his voice at all. "How do I actually learn this? Not the joke version. The real one."' },
+          { speaker: 'San', text: '"You watch," you say. "You ask, before you move, instead of after. You let the people who have been doing this longer than you tell you when to wait. It is not glamorous. It is mostly just patience."' },
+          { speaker: 'Aisyah', text: '"And you keep showing up," Aisyah adds. "Even on the days it is not fun. Especially those days."' },
+          { speaker: 'KW Liang', text: '"Kaya kaya," Liang says, and it comes out different this time — not the old joke, something closer to a promise wearing the joke\'s clothes because he does not yet have better words for it. "I am not going anywhere. I just need someone patient enough to actually teach me."' },
+          { speaker: 'Aisyah', text: '"I have taught worse," Aisyah says, and there is real warmth under the dry delivery, the specific fondness of someone deciding, quietly, that this one is worth the effort.' },
+        ]
+      }
+,{
+        id: 'journal_109',
+        title: 'A Deal Worth Honoring',
+        chapter: 109,
+        unlockType: 'level',
+        unlockAt: 250,
+        icon: '🐇',
+        summary: 'Weeks of watching, asking, and staying steady later, Liang asks to be part of this properly — not a guest passing through, but someone who means it. Aisyah welcomes him in for good.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Weeks pass — real ones, not the abstraction of levels ticking upward, but actual days of Liang watching before moving, asking before acting, the rabbits quieter now too, like even they have picked up on the shift in him.' },
+          { speaker: 'Joel', text: '"He has gotten better," Joel says to you one evening, watching Liang and Aisyah work through a drill together, patient in a way that would have looked nothing like him a month ago. "Genuinely. Not performing it. Actually better."' },
+          { speaker: 'San', text: '"He has," you agree, something quietly proud in it that surprises you, given how briefly you have actually known him. "Aisyah has been good for him. He has been good for her too, honestly. She laughs more than she used to."' },
+          { speaker: 'Joel', text: '"I noticed," Joel says, and there is no edge anywhere in it, only the same easy warmth he has had about this whole thing since the very first afternoon. "Good. She has earned that."' },
+          { speaker: 'Narrator', text: 'Liang finds you both later, the drill finished, something steadier in the way he carries himself now than the young man who fell through a hole in the world surrounded by panicked rabbits.' },
+          { speaker: 'KW Liang', text: '"I want to actually be part of this," he says, no preamble, none of the old deflecting humor covering it. "Not a guest. Not someone passing through until the next interesting thing happens. Part of it. If that is something I am allowed to ask for."' },
+          { speaker: 'San', text: '"It is not really a matter of being allowed," you say. "It is a matter of meaning it. Do you mean it?"' },
+          { speaker: 'KW Liang', text: '"I have never meant anything more," Liang says, steady, none of the old performance in it at all. "Kaya kaya taught me that some deals are worth honoring properly. This is the first one I have ever actually wanted to."' },
+          { speaker: 'Aisyah', text: 'Aisyah, arriving in time to catch the tail end of it, allows herself something rare — an actual, unguarded smile, the specific kind she has never quite let herself have out here before now. "Welcome in properly, then. About time."' },
+          { speaker: 'Narrator', text: 'The rabbits, San notices, have gathered close around him too, settled rather than scattered, the way animals do when they finally decide somewhere is safe enough to actually stay.' },
+          { speaker: 'KW Liang', text: '"So what happens now?" Liang asks, and there is real curiosity in it rather than the old bravado, someone genuinely ready to learn the shape of the answer.' },
+          { speaker: 'San', text: '"Now," you say, "you fight beside us. Properly. Same as everyone else who has ever chosen to stay."' },
+          { speaker: 'KW Liang', text: '"Kaya kaya," Liang says, one more time, and this time it does not sound like an old joke at all. It sounds like a name he has finally decided to grow into.' },
         ]
       }
     ]
@@ -8932,6 +9025,15 @@ const GUILD_MEMBERS = [
       'Aisy: "I was standing right there. The whole time."',
       'Aisy: "Some habits from the old office never really left."'
     ] },
+  { id: 'kw_liang', npcName: 'KW Liang', role: 'Scout', icon: '🐇',
+    recruitReq: { type: 'journal', journalId: 'journal_109' },
+    fieldBuff: { defPct: 0.04 },
+    recruitLine: "Liang doesn't hesitate for even a second. \"Kaya kaya taught me some deals are worth honoring properly. This is the first one I've ever actually wanted to.\"",
+    barks: [
+      'KW Liang: "Kaya kaya! Business is business, even out here."',
+      'KW Liang: "The bunnies and I have your exit covered. Always."',
+      'KW Liang: "Aisy taught me patience. San taught me to actually ask questions before I break something."'
+    ] },
   { id: 'sister_wren', npcName: 'Sister Wren', role: 'Support', icon: '🕯️',
     recruitReq: { type: 'ally' },
     fieldBuff: { atkPct: 0.03 },
@@ -9039,6 +9141,8 @@ function checkGuildRecruitment() {
       if (npc && npc.unlocked && (npc.visitCount || 0) >= def.recruitReq.visits && G.p.lvl >= 100) recruitGuildMember(def.id);
     } else if (def.recruitReq.type === 'kindling') {
       if (G.storyJournal.read.includes('journal_097')) recruitGuildMember(def.id);
+    } else if (def.recruitReq.type === 'journal') {
+      if (G.storyJournal.read.includes(def.recruitReq.journalId)) recruitGuildMember(def.id);
     }
   }
 }
@@ -14807,7 +14911,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.8';
+const BUILD_ID = '2026-08-08.11';
 // =========================
 
 
