@@ -8459,6 +8459,19 @@ function spawnChainQuestStage() {
       hp: scaled.hp, mhp: scaled.hp,
       atk: scaled.atk, def: scaled.def,
       xp: scaled.xp, g: scaled.g,
+      // Regular bosses carry a `desc` field that the combat screen's "Boss Ability"
+      // badge reads directly. This stage object only ever had `flavor` — leaving
+      // `desc` undefined crashed that badge's tooltip (undefined.replace()) partway
+      // through rendering the combat screen, which meant the screen never actually
+      // finished switching to combat even though the fight was running underneath.
+      desc: stage.flavor,
+      // The phase mechanic also needs currentPhase/phaseHp to actually fire (every
+      // other 'phase' boss in the file sets both) — the stage definition only had
+      // `phases`, so the 3-phase escalation was silently a no-op. phaseHp can't be
+      // hand-authored like it is elsewhere since this boss's HP is generated fresh
+      // off the player's level every fight, so it's derived here instead.
+      currentPhase: 1,
+      phaseHp: Math.floor(scaled.hp / (stage.phases || 3)),
       id: 97
     });
     G.currentBoss = boss;
@@ -19211,7 +19224,7 @@ function rCbt() {
   const riftStatus = getRiftStatus();
   if (riftStatus) badges.push({ icon: riftStatus.icon, text: riftStatus.name, full: riftStatus.desc + ' (' + riftStatus.fightsLeft + ' left)', color: riftStatus.color });
   if (zone && G.zoneHazards[zone.n]) badges.push({ icon: '⚠️', text: G.zoneHazards[zone.n].name, full: G.zoneHazards[zone.n].desc, color: '#f59e0b' });
-  if (G.currentBoss) badges.push({ icon: '🔥', text: 'Boss Ability', full: G.currentBoss.desc, color: 'var(--danger)' });
+  if (G.currentBoss) badges.push({ icon: '🔥', text: 'Boss Ability', full: G.currentBoss.desc || G.currentBoss.flavor || 'A dangerous foe.', color: 'var(--danger)' });
   for (let a of G.p.ailments) {
     const def = AILMENT_TYPES[a.type];
     badges.push({ icon: def.icon, text: a.n, full: a.n + ' \u2014 ATK/DEF weakened' + (def.dmgPerTurn ? ', ' + def.dmgPerTurn + ' HP/turn' : '') + '. Rest will not cure this \u2014 needs the Temple or a high-level Eliz.', color: 'var(--danger)' });
@@ -19231,7 +19244,7 @@ function rCbt() {
   h += '<button onclick="togglePotionMenu()" class="icon-btn" style="flex:0 0 auto;border-color:' + (usablePotions.length > 0 ? 'var(--success)' : 'var(--border)') + ';background:var(--bg-card);color:' + (usablePotions.length > 0 ? 'var(--success)' : 'var(--disabled)') + ';font-size:12px;padding:6px 10px;gap:6px;cursor:' + (usablePotions.length > 0 ? 'pointer' : 'not-allowed') + ';" title="Potions">🧪 ' + usablePotions.length + '</button>';
   h += '<button onclick="toggleEnemyIconStyle()" class="icon-btn" style="flex:0 0 auto;border-color:var(--border);background:var(--bg-card);color:var(--text-dim);font-size:12px;padding:6px 10px;gap:6px;" title="Switch between line-art and emoji enemy icons">' + (G.enemyIconStyle === 'emoji' ? '🎨 Art' : '😀 Emoji') + '</button>';
   for (let b of badges) {
-    h += '<span class="combat-badge" style="border-color:' + b.color + ';color:' + b.color + ';margin:0;" title="' + b.full.replace(/"/g, '&quot;') + '">' + b.icon + (b.text ? ' ' + b.text : '') + '</span>';
+    h += '<span class="combat-badge" style="border-color:' + b.color + ';color:' + b.color + ';margin:0;" title="' + (b.full || '').replace(/"/g, '&quot;') + '">' + b.icon + (b.text ? ' ' + b.text : '') + '</span>';
   }
   h += '</div>';
 
