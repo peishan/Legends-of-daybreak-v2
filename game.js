@@ -1078,7 +1078,7 @@ const G = {
     { n: 'Varel Farseer', t: 'ally', title: 'The One Who Watches the Distance', icon: '🔮', col: '#0ea5e9',
       d: "A hermit scryer who has kept watch over the boundary between here and everywhere else for longer than he has bothered counting. He found Mimi's Dreamsight the way he finds most things worth finding \u2014 by accident, mid-conversation, and immediately recognized raw instinct that had never once been given any actual discipline. He does not perform wisdom. He mostly just says the true thing, at whatever volume it happens to arrive in, and lets you decide what to do with it.",
       ability: "Steady Sight: keeps the Vision Machine's window from ever fully closing.",
-      unlocked: false, ul: 150 },
+      unlocked: false, ul: 55 },
     { n: 'Amad', t: 'trader', title: 'Brunei Food Merchant', icon: '🍜', col: '#16a34a', zone: 'Whispering Woods', zoneLv: 1,
       d: "A warm-hearted vendor from Bandar Seri Begawan who used to bring lunch straight to San's office floor, regular as anything — until he simply stopped showing up, months before the world ended, for reasons San never found out and still cannot ask him about directly, not in a way that would not feel strange. Out here he is exactly as warm as he always was. She has decided, for now, not to need the rest of the answer. He will buy anything you have — drops, loot, used gear — at fair prices.",
       stock: [
@@ -14807,7 +14807,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.6';
+const BUILD_ID = '2026-08-08.7';
 // =========================
 
 
