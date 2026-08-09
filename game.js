@@ -8727,10 +8727,18 @@ const RAIDS = [
       { type: 'elite', zoneLv: 82, enemies: ['Overtime Wraith', 'Off-Day Enforcer'] },
       { type: 'boss', name: 'Jeff, the SK* Son-in-Law' },
       { type: 'elite', zoneLv: 95, enemies: ['Root-Bound Elder', 'Elderwood Sentinel'] },
-      { type: 'boss', name: 'The Verdant Heart' }
+      { type: 'boss', name: 'The Verdant Heart' },
+      { type: 'elite', zoneLv: 96, enemies: ['Fraying Wisp', 'Unwoven Stalker'] },
+      { type: 'boss', name: 'The Unmade' },
+      { type: 'elite', zoneLv: 97, enemies: ['Line-Breaker', 'Corrosion Vessel'] },
+      { type: 'boss', name: 'What Alone Becomes' },
+      { type: 'elite', zoneLv: 98, enemies: ['Testing Current', 'Patience-Eater'] },
+      { type: 'boss', name: 'Before It Wears Through' },
+      { type: 'elite', zoneLv: 99, enemies: ['Remnant Current', 'Half-Won Vessel'] },
+      { type: 'boss', name: 'What Was Almost Enough' }
     ],
-    rw: { xp: 375000, gold: 290000 },
-    desc: "A community that kept growing things through the end of the world, and, deeper still, whatever is actually doing the mending. As close to the source of it as this family has ever gotten — and very little worth reaching this deep comes easily, least of all the parts that never had anything to do with the Vale at all." }
+    rw: { xp: 900000, gold: 700000 },
+    desc: "A community that kept growing things through the end of the world, and, deeper still, whatever is actually doing the mending. As close to the source of it as this family has ever gotten — and very little worth reaching this deep comes easily, least of all the parts that never had anything to do with the Vale at all. Beyond the Rootbound Sanctuary, the ground itself starts to thin — every line held here is one more line the Frontier never gets to take." }
 ];
 
 // Raid bosses hit harder than their solo zone-encounter versions — a raid should feel
@@ -9502,6 +9510,91 @@ function getCombineBatchMult(batchSize) {
 
 function openCombineModal() {
   G.runeCombineModal = { open: true, selected: [], batchSize: 3 };
+  render();
+}
+
+// Combines every possible matching batch across the whole inventory in one pass,
+// including cascading combines — since combining produces a new, higher-tier type
+// string, a freshly-created rune can itself become part of another combine if enough
+// matching ones already exist. Built specifically to avoid the manual tap-through-and-
+// scroll workflow, since that's what was causing the reported lag on large inventories.
+// Works on a value-based map rather than array indices, so nothing shifts mid-process.
+function autoCombineRunes() {
+  const batchSize = G.runeCombineModal.batchSize || 3;
+  let totalCombines = 0;
+  const producedCounts = {}; // name -> count, for the summary message
+
+  // Group by type AND rarity together, not type alone — a rune's `type` field does
+  // NOT change after being upgraded (a combined common "power" rune is still type
+  // "power", just rarity "uncommon"), so grouping by type only would incorrectly
+  // mix a freshly-upgraded rune back in with lower-rarity ones of the same type,
+  // undervaluing it in the next combine. Composite key prevents that entirely.
+  const groupKey = (r) => r.type + '|' + r.r;
+  let groups = new Map();
+  for (const rune of G.runes) {
+    const key = groupKey(rune);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(rune);
+  }
+
+  let keepGoing = true;
+  while (keepGoing) {
+    keepGoing = false;
+    for (const [key, runeList] of groups) {
+      if (runeList.length < batchSize) continue;
+
+      const batch = runeList.splice(0, batchSize);
+      const types = [...new Set(batch.map(r => r.type))];
+      if (types.length !== 1) continue; // shouldn't happen given the grouping, but stay safe
+
+      const base = RUNE_TYPES[types[0]];
+      if (!base) continue;
+      const tierJump = getCombineTierJump(batchSize);
+      // Use the ACTUAL rarity of the batch being combined, not the type's base
+      // definition rarity — otherwise an already-upgraded batch would incorrectly
+      // jump from the type's original tier instead of its current one.
+      const actualRarity = batch[0].r;
+      const currentTierIdx = RUNE_RARITY_ORDER.indexOf(actualRarity);
+      const upgradeRarity = RUNE_RARITY_ORDER[Math.min(RUNE_RARITY_ORDER.length - 1, currentTierIdx + tierJump)];
+      const baseMult = actualRarity === 'common' ? 1.5 : 2;
+      const mult = baseMult * getCombineBatchMult(batchSize);
+      const newName = base.name + ' +'.repeat(RUNE_RARITY_ORDER.indexOf(upgradeRarity));
+      const newRune = {
+        type: types[0],
+        name: newName,
+        icon: base.icon,
+        stat: base.stat,
+        val: Math.floor(batch.reduce((s, r) => s + r.val, 0) / batchSize * mult),
+        r: upgradeRarity,
+        color: base.color,
+        pct: base.pct ? Math.min(0.40, (batch[0].pct || base.pct) * mult) : null,
+        id: Date.now() + Math.random()
+      };
+
+      const newKey = groupKey(newRune);
+      if (!groups.has(newKey)) groups.set(newKey, []);
+      groups.get(newKey).push(newRune);
+
+      totalCombines++;
+      producedCounts[newRune.name] = (producedCounts[newRune.name] || 0) + 1;
+      keepGoing = true; // this group (or the new one) might have enough for another pass
+      break; // restart the for-loop scan since a new group may have just been created
+    }
+  }
+
+  if (totalCombines === 0) {
+    lg('🔮 No matching batches of ' + batchSize + ' found to combine.');
+    return;
+  }
+
+  // Flatten the final state of every group back into G.runes
+  G.runes = [];
+  for (const [, runeList] of groups) {
+    for (const r of runeList) G.runes.push(r);
+  }
+
+  const summary = Object.entries(producedCounts).map(([name, count]) => count + '× ' + name).join(', ');
+  lg('✨ Auto-combined ' + totalCombines + ' batch' + (totalCombines === 1 ? '' : 'es') + ': ' + summary + '!');
   render();
 }
 
@@ -14714,7 +14807,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.2';
+const BUILD_ID = '2026-08-08.4';
 // =========================
 
 
@@ -16854,8 +16947,25 @@ function rRunes(){
   // Combine button moved to the top — previously sat after the entire rune grid,
   // requiring a scroll past every owned rune just to reach it.
   if (G.runes.length > 0) {
-    h+='<button id="btn-combine" style="width:100%;padding:12px;border-radius:12px;border:2px solid var(--accent);background:linear-gradient(135deg,var(--accent),#6d28d9);color:white;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;box-shadow:0 2px 8px var(--shadow-accent);transition:transform 0.2s;" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'none\'">';
-    h+='🔮 Combine Runes';
+    const batchSize = G.runeCombineModal.batchSize || 3;
+
+    // Auto-combine — processes every possible matching batch across the whole
+    // inventory in one tap, including cascading combines. Built specifically so the
+    // manual tap-through-and-scroll flow (the source of the reported lag) can be
+    // skipped entirely. Batch size selector included right here so switching sizes
+    // never requires opening the laggier manual modal either.
+    h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:6px;">Batch size (bigger = better rarity jump + bonus):</div>';
+    h+='<div style="display:flex;gap:6px;margin-bottom:10px;">';
+    for (let size of RUNE_COMBINE_BATCH_SIZES) {
+      const isSel = batchSize === size;
+      h+='<button onclick="setCombineBatchSize(' + size + ')" class="tier-btn' + (isSel ? ' sel' : '') + '" style="flex:1;">' + size + '</button>';
+    }
+    h+='</div>';
+    h+='<button id="btn-auto-combine" onclick="autoCombineRunes()" style="width:100%;padding:12px;border-radius:12px;border:2px solid var(--gold);background:linear-gradient(135deg,var(--gold),#b8860b);color:#1a1a1a;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;box-shadow:0 2px 8px var(--shadow-accent);">';
+    h+='⚡ Auto-Combine All (batch of ' + batchSize + ')';
+    h+='</button>';
+    h+='<button id="btn-combine" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:12px;cursor:pointer;margin-bottom:16px;">';
+    h+='🔮 Manual Select Instead';
     h+='</button>';
   }
 
