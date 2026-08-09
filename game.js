@@ -506,6 +506,10 @@ const G = {
     { n: 'Where Others Still Hold', lv: 98, elem: 'void', d: "Found on purpose this time, not stumbled into — the party going looking specifically for ground that is still being defended alone. This one has not been fighting as long as the last. There is still time here. That is the entire difference this visit is trying to make.", en: ['Testing Current','Patience-Eater','Unmaking Vanguard'], loot: ['A Line Found in Time', 'Backup, Finally', 'Proof It Does Not Have to Wear Someone All the Way Down First'], xp: 33000, g: 23500, dg: 'impossible' },
     { n: "Someone Else's Watch", lv: 99, elem: 'void', d: "Tracks that are not yours, at a line none of you have visited before. Supplies left behind, tended, recent. Something was already here, already fighting, already doing exactly what you came out here to do — and for the first time since any of this started, that is not a disappointment. It is proof the practice was never just yours to begin with.", en: ['Remnant Current','Half-Won Vessel','Watching Sentinel'], loot: ["Someone Else's Kindling", 'Proof the Practice Spread', 'A Line Half-Won Already'], xp: 36000, g: 25500, dg: 'impossible' },
     { n: 'The Farthest Kindling', lv: 100, elem: 'void', d: "Deeper than tracks and waterskins this time — an actual camp, tended, occupied. Someone is here. Not gone, not glimpsed after the fact, not evidence of a visit already finished. Actually here, actually fighting, close enough to call out to. The practice just stopped being a rumor.", en: ['Deepfray Current','Warden of the Gap','Unmaking Herald'], loot: ['A Shared Kindling', 'Proof of Another Hand', 'What Two Lines Held Together'], xp: 45000, g: 32000, dg: 'impossible' },
+    // Unlike every zone before it, this one has no fixed ceiling — its enemies read the
+    // player's *current* level live (see sc() in the combat code) rather than a zoneLv
+    // baked into the registry, so it keeps pace no matter how far past 100 leveling goes.
+    { n: 'The Endless Thinning', lv: 100, elem: 'void', d: "Past even the farthest kindling, the ground stops bothering to have an edge at all. It does not get easier the longer you hold it, and it does not get harder because someone decided it should — it simply keeps matching whatever you actually bring to it, exactly, every single time. There is no farther than this. There is only however far you are each willing to keep going.", en: ['Unspooling Current', 'Whatever Keeps Arriving', 'A Ground Still Being Asked'], loot: ['A Thread With No End', 'Proof It Never Actually Stops', 'Something the Ground Kept Anyway'], xp: 45000, g: 32000, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -13725,8 +13729,17 @@ function sc(zi, skipEvents) {
     for(let i=0;i<ec;i++){
       const t=z.en[Math.floor(Math.random()*z.en.length)];
     let e={n:t,hp:0,mhp:0,atk:0,def:0,xp:0,g:0};
+    // The Endless Thinning reads the player's CURRENT level live, every single fight —
+    // unlike every other zone (including the 96-100 stretch right before it), which
+    // bakes a fixed zoneLv into the registry and simply stops getting harder once the
+    // player levels past it. This is the one zone built to never fall behind.
+    if (z.n === 'The Endless Thinning') {
+      const endlessTemplates = ['striker', 'balanced', 'tank'];
+      const tpl = endlessTemplates[z.en.indexOf(t) % endlessTemplates.length];
+      e = { ...e, ...generateEnemyStats(G.p.lvl, tpl, 'void') };
+    }
         // Check dynamic scaling first (Lv 21+ enemies)
-    const dynamicStats = getDynamicEnemyStats(t);
+    const dynamicStats = e.mhp > 0 ? null : getDynamicEnemyStats(t);
     if (dynamicStats) {
       e = { ...e, ...dynamicStats };
     }
