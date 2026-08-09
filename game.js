@@ -6795,8 +6795,9 @@ function checkGuildUnlock() {
 // announced these at all, so a player could hit 45 or 50 and have no idea Prestige,
 // all seven companion prestige paths, and San's Tier 4 capstones just became available.
 function checkPrestigeUnlockAnnouncements() {
-  if (G.p.lvl === PRESTIGE_MIN_LEVEL) {
-    lg('🌟 PRESTIGE UNLOCKED! Check the Prestige screen — bank a permanent bonus by resetting to Level 1.');
+  if (G.p.lvl === getPrestigeRequiredLevel()) {
+    const isFirst = (G.prestige.count || 0) === 0;
+    lg('🌟 PRESTIGE UNLOCKED! Check the Prestige screen — bank a permanent bonus by resetting to Level 1.' + (isFirst ? '' : ' (Tier ' + ((G.prestige.count || 0) + 1) + ')'));
     showToast('🌟 Prestige unlocked!', 'gold');
   }
   if (G.p.lvl === COMPANION_PRESTIGE_UNLOCK) {
@@ -7708,9 +7709,18 @@ function exitSiegeDefense() {
 // this only resets the level/xp/base-stat track, since that's the part the curve problem
 // actually lives in.
 const PRESTIGE_MIN_LEVEL = 100;
+const PRESTIGE_TIER_STEP = 50;           // each successive prestige requires 50 levels more than the last
 const PRESTIGE_XP_PCT_PER_LEVEL = 0.4;   // % permanent XP bonus banked per level at reset
 const PRESTIGE_GOLD_PCT_PER_LEVEL = 0.3; // % permanent gold bonus banked per level at reset
 const PRESTIGE_BONUS_CAP = 200;          // sanity ceiling so repeated resets can't run away
+
+// Tiered unlock — first prestige needs Level 100, then each subsequent one raises the
+// bar by PRESTIGE_TIER_STEP (150, 200, 250, ...), scaled off how many times the player
+// has already prestiged. Keeps prestige meaningful at high prestige counts instead of
+// letting every reset be re-earned at the same flat Level 100.
+function getPrestigeRequiredLevel() {
+  return PRESTIGE_MIN_LEVEL + (G.prestige.count || 0) * PRESTIGE_TIER_STEP;
+}
 
 // Milestones tied to prestige COUNT specifically, not the stacking level-scaled bonus
 // above — without these, prestiging once versus ten times was mechanically identical
@@ -7852,12 +7862,12 @@ function getAllyTempleRepBonus() {
 }
 
 function isPrestigeUnlocked() {
-  return G.p.lvl >= PRESTIGE_MIN_LEVEL;
+  return G.p.lvl >= getPrestigeRequiredLevel();
 }
 
 function doPrestige() {
   if (!isPrestigeUnlocked()) {
-    lg('🔒 Prestige unlocks at Level ' + PRESTIGE_MIN_LEVEL + '.');
+    lg('🔒 Prestige unlocks at Level ' + getPrestigeRequiredLevel() + '.');
     return;
   }
   const xpGain = +(G.p.lvl * PRESTIGE_XP_PCT_PER_LEVEL).toFixed(1);
@@ -7952,11 +7962,48 @@ const DRAGONS = [
     mechanic: 'apocalypse', apocalypseTurn: 6,
     desc: "Past the deepest root, past the reason the Vale was ever unbroken to begin with. It does not ask whether you are strong enough. It asks, once, at turn six, whether everything still standing behind you was worth what it cost to keep standing \u2014 and it does not wait politely for the answer.",
     hoardGoldMin: 260000, hoardGoldMax: 380000, itemLevel: 90
+  },
+  // === THE ELDER WYRM — endless-style dragon, level 100+ ===
+  // Every dragon above is a fixed, hand-authored stat block — eventually outlevelled
+  // by prestige stacking and endgame gear the same way the old 95-100 zones were,
+  // which is exactly the problem the Fraying Frontier was built to solve for regular
+  // encounters. This is that same fix applied to Dragon Hunt: no hp/atk/def/xp/g/hoard
+  // fields baked in here at all — `scaled: true` tells startDragonHunt and rDragonHunt
+  // to generate them fresh off the player's CURRENT level every single fight, via
+  // getElderDragonStats(), so this dragon never goes stale no matter how high level
+  // eventually climbs.
+  {
+    id: 'elder_dragon',
+    n: 'The Elder Wyrm',
+    unlockLevel: 100,
+    scaled: true,
+    mechanic: 'apocalypse', apocalypseTurn: 6,
+    desc: "Older than any hoard has ever had a name for. It does not have a fixed size \u2014 it has never once stopped growing, and it has no intention of starting now."
   }
 ];
 // Kept for backward compat — old code/save fields that only knew about one dragon.
 const DRAGON_HUNT_UNLOCK_LEVEL = DRAGONS[0].unlockLevel;
 const VAELITHORN = DRAGONS[0];
+
+// Reuses the Fraying Frontier's safe polynomial curve, then pads it further — a dragon
+// is still supposed to hit noticeably harder than an equivalent-level Frontier trash
+// mob, matching how every hand-authored dragon above already sits well above the
+// Frontier's own level-100 anchor (340,000 HP) at a comparable unlock level.
+const ELDER_DRAGON_MULT = 1.6;
+function getElderDragonStats(playerLevel) {
+  const base = getFrayingFrontierScaledStats(playerLevel);
+  const g = Math.floor(base.g * ELDER_DRAGON_MULT);
+  return {
+    hp: Math.floor(base.hp * ELDER_DRAGON_MULT),
+    atk: Math.floor(base.atk * ELDER_DRAGON_MULT),
+    def: Math.floor(base.def * ELDER_DRAGON_MULT),
+    xp: Math.floor(base.xp * ELDER_DRAGON_MULT),
+    g: g,
+    hoardGoldMin: Math.floor(g * 0.55),
+    hoardGoldMax: Math.floor(g * 0.9),
+    itemLevel: playerLevel
+  };
+}
 
 function getDragonById(id) {
   return DRAGONS.find(d => d.id === id);
@@ -7983,7 +8030,18 @@ function startDragonHunt(dragonId) {
   G.cbt.en = [];
   G.state = 'combat';
   G.cbt.autoCombat = isAutoCombatPreferred();
-  G.currentBoss = JSON.parse(JSON.stringify(dragon));
+  if (dragon.scaled) {
+    const stats = getElderDragonStats(G.p.lvl);
+    G.currentBoss = Object.assign({}, dragon, {
+      hp: stats.hp, mhp: stats.hp,
+      atk: stats.atk, def: stats.def,
+      xp: stats.xp, g: stats.g,
+      hoardGoldMin: stats.hoardGoldMin, hoardGoldMax: stats.hoardGoldMax,
+      itemLevel: stats.itemLevel
+    });
+  } else {
+    G.currentBoss = JSON.parse(JSON.stringify(dragon));
+  }
   G.currentBoss.id = 98;
   G.cbt.en.push(G.currentBoss);
   lg('🐉 ' + dragon.n + ' opens one eye. This will take everything you have.');
@@ -7993,6 +8051,11 @@ function startDragonHunt(dragonId) {
 
 function handleDragonHuntVictory() {
   const dragon = getDragonById(G.dragonHunt.currentId) || DRAGONS[0];
+  // Scaled dragons carry no static hoard/itemLevel of their own — pull the numbers
+  // that were actually generated for THIS fight off G.currentBoss instead.
+  const hoardMin = dragon.scaled ? G.currentBoss.hoardGoldMin : dragon.hoardGoldMin;
+  const hoardMax = dragon.scaled ? G.currentBoss.hoardGoldMax : dragon.hoardGoldMax;
+  const itemLvl = dragon.scaled ? G.currentBoss.itemLevel : dragon.itemLevel;
   const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
   const tg2 = Math.floor(G.cbt.en.reduce((s, e) => s + e.g, 0) * getPrestigeGoldMult());
   G.p.xp += txp;
@@ -8008,14 +8071,14 @@ function handleDragonHuntVictory() {
 
   // The massive hoard — a large flat gold bonus plus guaranteed high-rarity loot,
   // separate from and on top of the normal combat rewards above.
-  const hoardGold = dragon.hoardGoldMin + Math.floor(Math.random() * (dragon.hoardGoldMax - dragon.hoardGoldMin));
+  const hoardGold = hoardMin + Math.floor(Math.random() * (hoardMax - hoardMin));
   G.p.gold += hoardGold;
   lg('💰 HOARD: +' + hoardGold + 'G');
 
   const hoardSlots = ['weapon', 'armor', 'amulet'];
   showBattleRewardPopup(txp, tg2 + hoardGold, '🐉 ' + dragon.n + ' \u2014 Hoard claimed!');
   for (let slot of hoardSlots) {
-    const item = generateItem(slot, dragon.itemLevel, 'legendary');
+    const item = generateItem(slot, itemLvl, 'legendary');
     if (item) {
       addI(item);
       lg('✨ HOARD: ' + item.n + ' (Legendary)');
@@ -8023,7 +8086,7 @@ function handleDragonHuntVictory() {
   }
   const epicSlots = ['ring', 'head', 'hands'];
   const epicSlot = epicSlots[Math.floor(Math.random() * epicSlots.length)];
-  const epicItem = generateItem(epicSlot, dragon.itemLevel, 'epic');
+  const epicItem = generateItem(epicSlot, itemLvl, 'epic');
   if (epicItem) {
     addI(epicItem);
     lg('✨ HOARD: ' + epicItem.n + ' (Epic)');
@@ -8274,7 +8337,18 @@ const CHAIN_QUESTS = [
         rw: { xp: 26000, g: 17000 } },
       { title: 'What Was Sealed', type: 'boss', name: 'The Horizon Keeper',
         flavor: 'The last door. Whatever\'s behind it, the rest of this vault was built just to keep it there.',
-        rw: { xp: 60000, g: 38000 } }
+        rw: { xp: 60000, g: 38000 } },
+      // A sixth floor, well past what the original vault was ever mapped to have —
+      // gated on character level rather than the chain's own unlockLevel, so it stays
+      // closed to anyone who hasn't actually caught up to end-game, but keeps paying
+      // out a real fight to anyone descending again once they have. Stats scale off
+      // the player's current level using the same safe polynomial curve as the
+      // Fraying Frontier, rather than a second hand-authored number that would just
+      // go stale the same way the first five eventually will.
+      { title: 'The Floor With No Map', type: 'boss_scaled', name: 'What the Vault Kept Writing',
+        minLevel: 100,
+        flavor: 'Nobody sealed a sixth floor. Nobody built one, either \u2014 not on purpose. Something down here just kept going after the original wards stopped, and never noticed nobody was watching anymore.',
+        mechanic: 'phase', phases: 3 }
     ]
   },
   {
@@ -8282,6 +8356,9 @@ const CHAIN_QUESTS = [
     name: 'Where the Old Names Wait',
     icon: '🕯️',
     unlockLevel: 68,
+    repeatable: false, // a one-time closure, not a grind \u2014 once these five names are set
+                        // down they stay down. Unlike the Sunken Archive, there is
+                        // deliberately nothing left to "descend again" into afterward.
     intro: 'Not a place. Not really. Somewhere the Vale lets you go when you are finally ready to stop carrying something instead of setting it down \u2014 one old name at a time, until there are none left waiting.',
     stages: [
       { title: 'What Doesn\'t Stay Buried', type: 'boss', name: 'The Ex-Mother-in-Law',
@@ -8322,6 +8399,10 @@ function startChainQuest(chainId) {
   if (!isChainQuestUnlocked(chain)) { lg('🔒 ' + chain.name + ' unlocks at Level ' + chain.unlockLevel + '.'); return; }
   const prog = getChainProgress(chainId);
   if (prog.cleared) {
+    if (chain.repeatable === false) {
+      lg('🕯️ ' + chain.name + ' is finished. Some doors, once closed, stay closed.');
+      return;
+    }
     // Repeatable — reset to floor 1 for a fresh descent rather than blocking entirely.
     prog.stageIndex = 0;
     prog.cleared = false;
@@ -8337,6 +8418,17 @@ function spawnChainQuestStage() {
   const prog = getChainProgress(G.activeChainQuestId);
   const stage = chain.stages[prog.stageIndex];
   if (!stage) { lg('⚠️ Chain quest data error. Ending.'); prog.active = false; G.state = 'menu'; render(); return; }
+
+  // Level-gated floors (e.g. the Sunken Archive's scaled sixth floor) don't force a
+  // fight the player can't reasonably take — just hold the door shut and drop them
+  // back at the entrance, without consuming or advancing their progress.
+  if (stage.minLevel && G.p.lvl < stage.minLevel) {
+    lg('🔒 ' + stage.title + ' does not open yet \u2014 requires Level ' + stage.minLevel + ' (currently Level ' + G.p.lvl + ').');
+    prog.active = false;
+    G.state = 'menu';
+    render();
+    return;
+  }
 
   G.cbt.on = true;
   G.cbt.turn = 0;
@@ -8355,6 +8447,22 @@ function spawnChainQuestStage() {
     G.currentBoss.atk = Math.floor(G.currentBoss.atk * RAID_BOSS_BUFF.atkMult);
     G.currentBoss.def = Math.floor(G.currentBoss.def * RAID_BOSS_BUFF.defMult);
     G.cbt.en.push(G.currentBoss);
+  } else if (stage.type === 'boss_scaled') {
+    // Not a hand-authored stat block — generated fresh off the player's CURRENT level
+    // every time, same safe polynomial curve the Fraying Frontier uses, so this floor
+    // never goes stale the way a fixed number eventually would at higher levels.
+    const scaled = getFrayingFrontierScaledStats(G.p.lvl);
+    const boss = Object.assign({}, stage, {
+      n: stage.name,
+      zone: chain.name,
+      elem: stage.elem || 'arcane',
+      hp: scaled.hp, mhp: scaled.hp,
+      atk: scaled.atk, def: scaled.def,
+      xp: scaled.xp, g: scaled.g,
+      id: 97
+    });
+    G.currentBoss = boss;
+    G.cbt.en.push(boss);
   } else {
     G.currentBoss = null;
     for (let i = 0; i < stage.enemies.length; i++) {
@@ -8379,11 +8487,15 @@ function handleChainQuestVictory() {
   const prog = getChainProgress(G.activeChainQuestId);
   const stage = chain.stages[prog.stageIndex];
 
-  const txp = Math.floor(stage.rw.xp * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
-  const tg2 = Math.floor(stage.rw.g * getPrestigeGoldMult());
+  // Scaled floors have no fixed reward table — their payout was generated fresh, off
+  // the player's level, at spawn time and lives on the boss object itself.
+  const rewardXp = stage.type === 'boss_scaled' ? G.currentBoss.xp : stage.rw.xp;
+  const rewardGold = stage.type === 'boss_scaled' ? G.currentBoss.g : stage.rw.g;
+  const txp = Math.floor(rewardXp * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
+  const tg2 = Math.floor(rewardGold * getPrestigeGoldMult());
   G.p.xp += txp;
   G.p.gold += tg2;
-  if (stage.type === 'boss') {
+  if (stage.type === 'boss' || stage.type === 'boss_scaled') {
     G.p.bossKills = (G.p.bossKills || 0) + 1;
     if (stage.name) checkBountyKill(stage.name, true);
   } else if (stage.enemies) {
@@ -17499,13 +17611,16 @@ function rMercenary() {
 function rChainQuest() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">📜 Chain Quests</div>';
-  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Deliberate descents, not repeatable grinds \u2014 floor by floor, full recovery between each, ending in a payout bigger than anything else in the game. Leave and come back anytime; your floor is saved. Repeatable once cleared.</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Deliberate descents, not repeatable grinds \u2014 floor by floor, full recovery between each, ending in a payout bigger than anything else in the game. Leave and come back anytime; your floor is saved. Most can be run again once cleared; some are meant to close for good.</div>';
 
   for (let chain of CHAIN_QUESTS) {
     const unlocked = isChainQuestUnlocked(chain);
     const prog = getChainProgress(chain.id);
-    const totalXp = chain.stages.reduce((s, st) => s + st.rw.xp, 0);
-    const totalGold = chain.stages.reduce((s, st) => s + st.rw.g, 0);
+    // Scaled floors (rw is null — payout is generated fresh off player level each
+    // time) are excluded from this static total rather than crashing the reduce.
+    const totalXp = chain.stages.reduce((s, st) => s + (st.rw ? st.rw.xp : 0), 0);
+    const totalGold = chain.stages.reduce((s, st) => s + (st.rw ? st.rw.g : 0), 0);
+    const hasScaledFloor = chain.stages.some(st => st.type === 'boss_scaled');
 
     h += '<div class="panel' + (unlocked ? ' panel-gold' : '') + '">';
     h += '<div class="panel-title" style="' + (unlocked ? 'color:var(--gold);' : '') + '">' + chain.icon + ' ' + chain.name + '</div>';
@@ -17516,10 +17631,18 @@ function rChainQuest() {
       continue;
     }
 
+    if (prog.cleared && chain.repeatable === false) {
+      h += '<div style="font-size:12px;color:var(--gold);font-weight:600;margin:8px 0;">🕯️ Finished</div>';
+      h += '<div class="btn-hint" style="margin-bottom:10px;">' + chain.intro + '</div>';
+      h += '<div class="btn-hint" style="margin-bottom:10px;">Five names, set down for good. There is nothing left here to come back for \u2014 and that is the point.</div>';
+      h += '</div>';
+      continue;
+    }
+
     if (prog.cleared) {
       h += '<div style="font-size:12px;color:var(--gold);font-weight:600;margin:8px 0;">🏆 Complete \u2014 ' + (prog.clearCount || 1) + ' time' + ((prog.clearCount || 1) > 1 ? 's' : '') + '</div>';
       h += '<div class="btn-hint" style="margin-bottom:10px;">' + chain.intro + '</div>';
-      h += '<div class="btn-hint" style="margin-bottom:10px;">Total chain payout: ' + totalXp.toLocaleString() + ' XP, ' + totalGold.toLocaleString() + 'G across ' + chain.stages.length + ' floors, every time.</div>';
+      h += '<div class="btn-hint" style="margin-bottom:10px;">Total chain payout: ' + totalXp.toLocaleString() + ' XP, ' + totalGold.toLocaleString() + 'G across ' + chain.stages.length + ' floors, every time.' + (hasScaledFloor ? ' The last floor scales with your level \u2014 always a real fight, no matter how far you\'ve climbed.' : '') + '</div>';
       h += '<button onclick="startChainQuest(\'' + chain.id + '\')" class="abtn" style="width:100%;">📜 Descend Again</button>';
       h += '</div>';
       continue;
@@ -17529,9 +17652,11 @@ function rChainQuest() {
     h += '<div class="qp" style="margin:10px 0;"><div class="pbar"><div class="pfill" style="width:' + Math.floor((prog.stageIndex / chain.stages.length) * 100) + '%"></div></div><span class="ptxt">Floor ' + prog.stageIndex + '/' + chain.stages.length + '</span></div>';
 
     if (prog.stageIndex > 0) {
-      h += '<div class="btn-hint" style="margin-bottom:6px;">Next: ' + chain.stages[prog.stageIndex].title + '</div>';
+      const nextStage = chain.stages[prog.stageIndex];
+      const nextLocked = nextStage.minLevel && G.p.lvl < nextStage.minLevel;
+      h += '<div class="btn-hint" style="margin-bottom:6px;">Next: ' + nextStage.title + (nextLocked ? ' (requires Level ' + nextStage.minLevel + ')' : '') + '</div>';
     }
-    h += '<div class="btn-hint" style="margin-bottom:10px;">Total chain payout: ' + totalXp.toLocaleString() + ' XP, ' + totalGold.toLocaleString() + 'G across ' + chain.stages.length + ' floors.</div>';
+    h += '<div class="btn-hint" style="margin-bottom:10px;">Total chain payout: ' + totalXp.toLocaleString() + ' XP, ' + totalGold.toLocaleString() + 'G across ' + chain.stages.length + ' floors.' + (hasScaledFloor ? ' The last floor scales with your level.' : '') + '</div>';
 
     h += '<button onclick="startChainQuest(\'' + chain.id + '\')" class="abtn" style="width:100%;">' + (prog.stageIndex > 0 ? '📜 Continue the Descent' : '📜 Begin the Descent') + '</button>';
     h += '</div>';
@@ -17650,6 +17775,10 @@ function rDragonHunt() {
   for (let dragon of DRAGONS) {
     const unlocked = isDragonUnlocked(dragon);
     const clearedCount = (G.dragonHunt.cleared && G.dragonHunt.cleared[dragon.id]) || 0;
+    // Scaled dragons have no fixed hoard numbers — preview them live off the
+    // player's current level so the card isn't just showing "undefined".
+    const hoardMin = dragon.scaled ? getElderDragonStats(G.p.lvl).hoardGoldMin : dragon.hoardGoldMin;
+    const hoardMax = dragon.scaled ? getElderDragonStats(G.p.lvl).hoardGoldMax : dragon.hoardGoldMax;
 
     h += '<div class="panel' + (unlocked ? ' panel-gold' : '') + '" style="text-align:center;">';
     const dragonArtFile = bossArtFileName(dragon.n);
@@ -17670,7 +17799,7 @@ function rDragonHunt() {
       : dragon.mechanic === 'apocalypse'
       ? 'Everyone survives to turn ' + dragon.apocalypseTurn + ', or almost no one does \u2014 a single attack that drops the whole party to the edge of death at once.'
       : 'Breathes elemental devastation across the whole party every ' + dragon.rampageTurn + ' turns.';
-    h += '<div class="btn-hint" style="margin-bottom:10px;">' + mechanicDesc + ' Hoard on victory: ' + dragon.hoardGoldMin.toLocaleString() + '\u2013' + dragon.hoardGoldMax.toLocaleString() + 'G, 3 guaranteed Legendaries, 1 guaranteed Epic \u2014 on top of normal XP/gold.</div>';
+    h += '<div class="btn-hint" style="margin-bottom:10px;">' + mechanicDesc + ' Hoard on victory: ' + hoardMin.toLocaleString() + '\u2013' + hoardMax.toLocaleString() + 'G, 3 guaranteed Legendaries, 1 guaranteed Epic \u2014 on top of normal XP/gold.' + (dragon.scaled ? ' Scales with your level every fight \u2014 always a real fight, no matter how far you\'ve climbed.' : '') + '</div>';
 
     if (unlocked) {
       h += '<button onclick="startDragonHunt(\'' + dragon.id + '\')" class="abtn" style="width:100%;">🐉 Wake the Wyrm</button>';
@@ -17697,6 +17826,7 @@ function rPrestige() {
   h += '<div class="panel-title" style="color:var(--gold);">Current Permanent Bonus</div>';
   h += '<div style="font-size:24px;font-weight:700;margin:8px 0;color:var(--gold);">+' + (G.prestige.xpBonusPct || 0).toFixed(1) + '% XP &nbsp;\u00b7&nbsp; +' + (G.prestige.goldBonusPct || 0).toFixed(1) + '% Gold</div>';
   h += '<div class="btn-hint">' + (G.prestige.count || 0) + ' prestige' + ((G.prestige.count || 0) === 1 ? '' : 's') + ' so far</div>';
+  h += '<div class="btn-hint">Next prestige unlocks at Level ' + getPrestigeRequiredLevel() + '</div>';
   h += '</div>';
 
   h += '<div class="panel">';
@@ -17725,7 +17855,7 @@ function rPrestige() {
     h += '<button onclick="confirmPrestige()" class="abtn" style="width:100%;background:var(--danger);">🌟 Prestige Now (Level Resets to 1)</button>';
   } else {
     h += '<div class="panel" style="text-align:center;">';
-    h += '<div class="btn-hint">🔒 Unlocks at Level ' + PRESTIGE_MIN_LEVEL + ' (currently Level ' + G.p.lvl + ')</div>';
+    h += '<div class="btn-hint">🔒 Unlocks at Level ' + getPrestigeRequiredLevel() + ' (currently Level ' + G.p.lvl + ')</div>';
     h += '</div>';
   }
 
