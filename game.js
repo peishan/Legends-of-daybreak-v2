@@ -14807,7 +14807,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.5';
+const BUILD_ID = '2026-08-08.6';
 // =========================
 
 
@@ -15486,15 +15486,25 @@ function loadGame() {
     // actually defeated a stronghold's unlock boss before, grant the stronghold
     // regardless of whether the quest chain ever tracked it correctly — covers anyone
     // who defeated the boss before the live claim hook existed at all.
-    if (G.bestiary && G.bestiary['The Planarch'] && G.bestiary['The Planarch'].kills > 0) {
-      claimStronghold('arcaneTower');
-    }
-    if (G.bestiary && G.bestiary['The Vale Warden'] && G.bestiary['The Vale Warden'].kills > 0) {
-      claimStronghold('mendedGrove');
-    }
-    if (G.bestiary && G.bestiary['The Verdant Heart'] && G.bestiary['The Verdant Heart'].kills > 0) {
-      claimStronghold('wakingEdge');
-    }
+    //
+    // Also checks raid-clear progress alongside the bestiary — raid victories never
+    // call trackBestiary() at all (confirmed directly in handleRaidVictory), so a
+    // player who only ever defeated one of these bosses through a raid, never via
+    // direct exploration, would have no bestiary record and this catch-up would
+    // silently never fire for them. Clearing a raid requires defeating every one of
+    // its stages in sequence, so raidProgress.cleared is an equally reliable signal.
+    const defeatedPlanarch = (G.bestiary && G.bestiary['The Planarch'] && G.bestiary['The Planarch'].kills > 0)
+      || (G.raidProgress && G.raidProgress.cleared && G.raidProgress.cleared.includes('dragons_reckoning'));
+    if (defeatedPlanarch) claimStronghold('arcaneTower');
+
+    const defeatedValeWarden = (G.bestiary && G.bestiary['The Vale Warden'] && G.bestiary['The Vale Warden'].kills > 0)
+      || (G.raidProgress && G.raidProgress.cleared && G.raidProgress.cleared.includes('into_the_verdant_reach'));
+    if (defeatedValeWarden) claimStronghold('mendedGrove');
+
+    const defeatedVerdantHeart = (G.bestiary && G.bestiary['The Verdant Heart'] && G.bestiary['The Verdant Heart'].kills > 0)
+      || (G.raidProgress && G.raidProgress.cleared && G.raidProgress.cleared.includes('the_verdant_heart_raid'));
+    if (defeatedVerdantHeart) claimStronghold('wakingEdge');
+
     if (data.soelCommentCooldown !== undefined) {
       G.soelCommentCooldown = data.soelCommentCooldown;
     }
