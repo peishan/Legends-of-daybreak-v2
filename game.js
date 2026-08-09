@@ -14807,7 +14807,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.7';
+const BUILD_ID = '2026-08-08.8';
 // =========================
 
 
@@ -15234,7 +15234,7 @@ function loadGame() {
     }
 
     // Migrate old equipment format to new
-    const oldEq = data.player.equipment;
+    const oldEq = data.player.equipment || {};
     if (oldEq.w || oldEq.a || oldEq.acc) {
       // Old format detected - migrate
       G.p.eq = {
