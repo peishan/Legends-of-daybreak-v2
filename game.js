@@ -6167,7 +6167,16 @@ function sellMatsToAmad() {
 // ============================================================
 
 function getRealDay() {
-  return Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+  // Local-midnight-based, not raw UTC epoch division. The previous version
+  // (Math.floor(Date.now() / 86400000)) rolled over at UTC midnight regardless of the
+  // player's own timezone — for someone in UTC+8, that's 8 AM local, not midnight.
+  // Depending on when in the day an action happened, "24 hours later" could easily
+  // still fall inside the same UTC-day window, making daily resets feel unpredictable.
+  // Constructing the date from local year/month/day components (rather than UTC ones)
+  // makes the boundary track the player's actual calendar date correctly.
+  const now = new Date();
+  const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.floor(localMidnight.getTime() / (1000 * 60 * 60 * 24));
 }
 
 
@@ -15481,7 +15490,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.17';
+const BUILD_ID = '2026-08-08.18';
 // =========================
 
 
