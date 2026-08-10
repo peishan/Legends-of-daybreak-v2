@@ -4080,6 +4080,9 @@ storyJournal: {
   guildRoster: { recruited: [] }, // ids from GUILD_MEMBERS who've actually joined the Guild War roster
   visionMachine: { lastUseDay: -1, joelLetterCount: 0 }, // Varel Farseer's window — once per real day, 1M gold
   kindlingCommissions: { linesToday: 0, checksToday: 0, refreshDay: 0 }, // bounded daily ritual — 3 lines, 2 checks, resets once per game day
+  guildBoss: { tierIndex: 0, currentHp: 0, lastAttemptDay: 0 }, // persistent HP across days — the whole recruited roster chips away at it together
+  disciples: [], // active mentorship threads — each tracks its own trajectory independently, delayed outcomes checked once per day
+  activeDilemma: null, // { discipleId, dilemmaId } — which prompt is currently on screen awaiting a response
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
@@ -6210,6 +6213,9 @@ function checkDayAdvance() {
 
   G.gameDay += daysPassed;
 
+  // Resolve any disciple mentorship outcomes whose delay has now passed.
+  checkDiscipleOutcomes();
+
   // Kindling Commissions reset on a new day — bounded, not accumulating.
   G.kindlingCommissions = { linesToday: 0, checksToday: 0, refreshDay: G.gameDay };
 
@@ -6873,6 +6879,38 @@ const GUILD_RANKS = [
   { rank: 10, name: 'Guild Eternal', repReq: 75000, desc: 'The Guild has nothing left to teach you. Another +5% crit chance, and the Eternal Vault \u2014 the last tier of the shop \u2014 finally opens.', critBonus: 0.05 }
 ];
 
+// A true whole-guild siege — every recruited member attacks each turn, not just
+// whoever's fielded (Guild War caps that deliberately; this is the opposite: the
+// entire roster showing up at once). Persistent HP across days — one attempt per
+// day, remaining HP carries over until the guild actually brings it down together.
+// Escalates through a new, named opponent after each kill, tied to the same Guild
+// Rank ladder the game already has, rather than a single entity regenerating forever
+// (which would just get trivially easy against an ever-growing roster) or an endless
+// dynamically-scaled grind (which this isn't meant to be — it's a real, finite ladder
+// matching the fixed 10-rank progression that already exists).
+const GUILD_BOSS_TIERS = [
+  { rank: 1, n: "What the Initiates Face Together", hp: 2000000, xp: 400000, g: 300000,
+    desc: "Nobody's first guild siege is supposed to be easy. It is supposed to be survivable, and only because there are enough hands on it at once." },
+  { rank: 2, n: "The Associates' Reckoning", hp: 4500000, xp: 650000, g: 480000,
+    desc: "Bigger than anything any one of them signed up to face alone. That was rather the point of joining in the first place." },
+  { rank: 3, n: "What the Adventurers Carry", hp: 8000000, xp: 950000, g: 700000,
+    desc: "Every contract before this one was practice. This is the first thing that actually needed the whole roster to mean it." },
+  { rank: 4, n: "The Veterans' Line", hp: 13000000, xp: 1350000, g: 980000,
+    desc: "The kind of fight that separates who just wears the sigil from who actually shows up when the sigil is tested." },
+  { rank: 5, n: "What the Champions Hold", hp: 20000000, xp: 1850000, g: 1350000,
+    desc: "It does not care how many titles are standing against it. It only cares how many are still standing by the end." },
+  { rank: 6, n: "The Guildmaster's Trial", hp: 29000000, xp: 2500000, g: 1800000,
+    desc: "Every Guildmaster before this one faced something like it. None of them faced it alone, and neither will this one." },
+  { rank: 7, n: "What the Legends Actually Cost", hp: 40000000, xp: 3300000, g: 2400000,
+    desc: "Reputation this size was never free. This is simply the bill finally coming due, all at once, to everyone who helped earn it." },
+  { rank: 8, n: "The Paragons' Reckoning", hp: 54000000, xp: 4300000, g: 3100000,
+    desc: "Almost nothing left that challenges any one of them individually. This was built to need all of them at once instead." },
+  { rank: 9, n: "What the Mythic Guild Faces", hp: 71000000, xp: 5500000, g: 4000000,
+    desc: "The kind of threat that does not show up for guilds that never got this far. It showed up because they did." },
+  { rank: 10, n: "The Eternal Vigil", hp: 92000000, xp: 7000000, g: 5100000,
+    desc: "There is, technically, nothing left to prove. They fight it together anyway \u2014 not because they have to, but because that was always the actual point of any of this." }
+];
+
 const GUILD_SHOP = [
   { n: 'Guild Sigil', slot: 'amulet', minRank: 2, cost: 100, atk: 3, def: 3, r: 'rare', d: 'Marks you as a Guild Associate in good standing.' },
   { n: 'Guildmark Blade', slot: 'weapon', minRank: 3, cost: 250, atk: 12, int: 3, r: 'rare', d: 'Forged for Guild Adventurers who\'ve proven themselves.' },
@@ -6913,6 +6951,311 @@ const TEMPLE_CONSUMABLES = [
   { n: 'Elixir of Swift Growth (10 Hour)', t: 'pot', eff: 'xp_boost', v: 600, boostPct: 0.5, minRank: 4, cost: 3300, r: 'epic', d: '+50% XP for 10 real hours. Only one growth elixir can be active at a time.' },
   { n: 'Elixir of Swift Growth (12 Hour)', t: 'pot', eff: 'xp_boost', v: 720, boostPct: 0.5, minRank: 5, cost: 3800, r: 'legendary', d: '+50% XP for a full 12 real hours. Temple Chosen only \u2014 the biggest bottle they keep behind the counter. Only one growth elixir can be active at a time.' }
 ];
+
+// === TEACH A DISCIPLE — core logic ===
+function getActiveDiscipleCount() {
+  return G.disciples.filter(d => !d.graduated).length;
+}
+
+function recruitDisciple() {
+  if (getActiveDiscipleCount() >= DISCIPLE_MAX_SLOTS) {
+    lg('📚 Already mentoring ' + DISCIPLE_MAX_SLOTS + ' disciples. Wait for one to graduate first.');
+    return;
+  }
+  const usedNames = G.disciples.map(d => d.name);
+  const availableNames = DISCIPLE_NAME_POOL.filter(n => !usedNames.includes(n));
+  const name = availableNames.length > 0
+    ? availableNames[Math.floor(Math.random() * availableNames.length)]
+    : DISCIPLE_NAME_POOL[Math.floor(Math.random() * DISCIPLE_NAME_POOL.length)];
+
+  const disciple = {
+    id: 'disciple_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+    name: name,
+    confidence: 0,
+    independence: 0,
+    exchangeCount: 0,
+    usedDilemmaIds: [],
+    pendingOutcome: null,
+    graduated: false
+  };
+  G.disciples.push(disciple);
+  lg('📚 ' + name + ' has come to you asking to learn. A new mentorship begins.');
+  saveGame();
+}
+
+// Picks a dilemma this disciple hasn't seen yet — cycles back through the pool once
+// exhausted, since a single disciple's graduation only needs 6 of the 10 available.
+function getNextDiscipleDilemma(disciple) {
+  const unseen = DISCIPLE_DILEMMAS.filter(d => !disciple.usedDilemmaIds.includes(d.id));
+  const pool = unseen.length > 0 ? unseen : DISCIPLE_DILEMMAS;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// San responds to a dilemma. Nothing resolves immediately — the choice nudges both
+// axes and schedules a future outcome, checked once per day advance, same as every
+// other delayed system in this game.
+function respondToDiscipleDilemma(discipleId, dilemmaId, optionIndex) {
+  const disciple = G.disciples.find(d => d.id === discipleId);
+  if (!disciple || disciple.graduated) return;
+  if (disciple.pendingOutcome) { lg('📚 ' + disciple.name + ' is still waiting to hear how the last thing turned out.'); return; }
+
+  const dilemma = DISCIPLE_DILEMMAS.find(d => d.id === dilemmaId);
+  if (!dilemma) return;
+  const option = dilemma.options[optionIndex];
+  if (!option) return;
+
+  disciple.confidence += option.confidenceNudge;
+  disciple.independence += option.independenceNudge;
+  if (!disciple.usedDilemmaIds.includes(dilemmaId)) disciple.usedDilemmaIds.push(dilemmaId);
+
+  disciple.pendingOutcome = {
+    dilemmaId: dilemmaId,
+    optionIndex: optionIndex,
+    resolveDay: G.gameDay + option.delayDays
+  };
+
+  lg('📚 You told ' + disciple.name + ': "' + option.label + '." It will take some time to see how that actually plays out.');
+  saveGame();
+}
+
+// Checked once per real day advance (from checkDayAdvance). Resolves any disciple
+// whose pending outcome has come due, fires the vignette, and checks graduation.
+function checkDiscipleOutcomes() {
+  for (let disciple of G.disciples) {
+    if (disciple.graduated || !disciple.pendingOutcome) continue;
+    if (G.gameDay < disciple.pendingOutcome.resolveDay) continue;
+
+    const dilemma = DISCIPLE_DILEMMAS.find(d => d.id === disciple.pendingOutcome.dilemmaId);
+    const option = dilemma ? dilemma.options[disciple.pendingOutcome.optionIndex] : null;
+    if (option) {
+      lg('📚 ' + disciple.name + ': "' + option.outcome + '"');
+    }
+    disciple.exchangeCount++;
+    disciple.pendingOutcome = null;
+
+    if (disciple.exchangeCount >= DISCIPLE_EXCHANGES_TO_GRADUATE) {
+      graduateDisciple(disciple);
+    }
+  }
+}
+
+// Converts a disciple into a real, fieldable Guild Member. Shape depends on which
+// quadrant their trajectory actually landed in — different response patterns produce
+// genuinely different people, not just a "better" or "worse" version of the same one.
+function graduateDisciple(disciple) {
+  disciple.graduated = true;
+
+  const highConf = disciple.confidence >= 0;
+  const highIndep = disciple.independence >= 0;
+
+  let role, icon, fieldBuff, flavor;
+  if (highConf && highIndep) {
+    role = 'Frontline'; icon = '\u2694\ufe0f';
+    fieldBuff = { atkPct: 0.04 };
+    flavor = 'bold and self-reliant, the kind of person who trusts their own read on a room';
+  } else if (highConf && !highIndep) {
+    role = 'Support'; icon = '\ud83c\udf1f';
+    fieldBuff = { critPct: 0.03 };
+    flavor = 'confident but collaborative, always the first to bring others in rather than go it alone';
+  } else if (!highConf && highIndep) {
+    role = 'Scout'; icon = '\ud83c\udf3f';
+    fieldBuff = { defPct: 0.04 };
+    flavor = 'quiet but genuinely self-sufficient, steady in a way that never needed to be loud';
+  } else {
+    role = 'Support'; icon = '\ud83e\udd0d';
+    fieldBuff = { defPct: 0.03 };
+    flavor = 'cautious and deeply collaborative, the kind of person who makes everyone around them steadier too';
+  }
+
+  const memberDef = {
+    id: 'graduate_' + disciple.id,
+    npcName: disciple.name,
+    role: role,
+    icon: icon,
+    recruitReq: { type: 'always' }, // graduation itself is the recruitment condition — see checkGuildRecruitment
+    fieldBuff: fieldBuff,
+    recruitLine: disciple.name + " has finished learning everything San can teach for now. \"I am ready. Thank you \u2014 for all of it.\"",
+    barks: [
+      disciple.name + ': "San taught me to trust what I actually see, not just what I am told."',
+      disciple.name + ': "I remember every single one of those conversations."',
+      disciple.name + ': "Whatever I am now, I built it with her help."'
+    ],
+    isGraduate: true,
+    graduateFlavor: flavor
+  };
+
+  GUILD_MEMBERS.push(memberDef);
+  G.graduatedDisciples = G.graduatedDisciples || [];
+  G.graduatedDisciples.push(memberDef);
+  if (!G.guildRoster.recruited.includes(memberDef.id)) {
+    G.guildRoster.recruited.push(memberDef.id);
+  }
+
+  lg('\ud83c\udf93 ' + disciple.name + ' has graduated \u2014 ' + flavor + '. They have joined the guild roster for good.');
+  checkAchievements();
+  saveGame();
+}
+
+function showDiscipleDilemma(discipleId) {
+  const disciple = G.disciples.find(d => d.id === discipleId);
+  if (!disciple || disciple.graduated || disciple.pendingOutcome) return;
+  const dilemma = getNextDiscipleDilemma(disciple);
+  G.activeDilemma = { discipleId: discipleId, dilemmaId: dilemma.id };
+  render();
+}
+
+function submitDiscipleResponse(optionIndex) {
+  if (!G.activeDilemma) return;
+  respondToDiscipleDilemma(G.activeDilemma.discipleId, G.activeDilemma.dilemmaId, optionIndex);
+  G.activeDilemma = null;
+  render();
+}
+
+function rDisciples() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">📚 Teach a Disciple</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Nothing here resolves right away. What you tell them shapes who they become \u2014 you will not know how until you check back.</div>';
+
+  // Active dilemma prompt takes over the screen when one is showing
+  if (G.activeDilemma) {
+    const disciple = G.disciples.find(d => d.id === G.activeDilemma.discipleId);
+    const dilemma = DISCIPLE_DILEMMAS.find(d => d.id === G.activeDilemma.dilemmaId);
+    if (disciple && dilemma) {
+      h += '<div class="panel panel-gold">';
+      h += '<div class="panel-title" style="color:var(--gold);">' + disciple.name + ' asks:</div>';
+      h += '<div style="margin:10px 0;font-style:italic;">"' + dilemma.prompt + '"</div>';
+      for (let i = 0; i < dilemma.options.length; i++) {
+        h += '<button onclick="submitDiscipleResponse(' + i + ')" class="abtn" style="width:100%;margin-bottom:8px;text-align:left;">' + dilemma.options[i].label + '</button>';
+      }
+      h += '</div>';
+      h += '</div>';
+      return h;
+    }
+  }
+
+  if (G.disciples.length === 0) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">No disciples yet.</div></div>';
+  }
+
+  for (let disciple of G.disciples) {
+    if (disciple.graduated) continue;
+    h += '<div class="panel" style="margin-bottom:10px;">';
+    h += '<div class="panel-title">' + disciple.name + '</div>';
+    h += '<div class="btn-hint" style="margin:6px 0;">' + disciple.exchangeCount + ' / ' + DISCIPLE_EXCHANGES_TO_GRADUATE + ' exchanges toward graduating</div>';
+    if (disciple.pendingOutcome) {
+      const daysLeft = disciple.pendingOutcome.resolveDay - G.gameDay;
+      h += '<div class="btn-hint" style="color:var(--gold);">🕯️ Waiting to see how it turns out' + (daysLeft > 0 ? ' (' + daysLeft + ' day' + (daysLeft === 1 ? '' : 's') + ')' : ' \u2014 check back soon') + '</div>';
+    } else {
+      h += '<button onclick="showDiscipleDilemma(\'' + disciple.id + '\')" class="abtn" style="width:100%;">Hear what they have to ask</button>';
+    }
+    h += '</div>';
+  }
+
+  const graduated = G.disciples.filter(d => d.graduated);
+  if (graduated.length > 0) {
+    h += '<div class="panel-title" style="margin:16px 0 8px;">Graduated</div>';
+    for (let disciple of graduated) {
+      const memberDef = GUILD_MEMBERS.find(m => m.id === 'graduate_' + disciple.id);
+      h += '<div class="panel" style="margin-bottom:8px;opacity:0.85;">';
+      h += '<div class="panel-title">' + (memberDef ? memberDef.icon + ' ' : '') + disciple.name + '</div>';
+      h += '<div class="btn-hint">' + (memberDef ? memberDef.graduateFlavor : 'Graduated') + '. Fieldable in the Guild War roster now.</div>';
+      h += '</div>';
+    }
+  }
+
+  if (getActiveDiscipleCount() < DISCIPLE_MAX_SLOTS) {
+    h += '<button onclick="recruitDisciple()" class="abtn" style="width:100%;margin-top:8px;">📚 Take On a New Disciple</button>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+
+function getGuildBossTier() {
+  const idx = Math.min(G.guildBoss.tierIndex, GUILD_BOSS_TIERS.length - 1);
+  return GUILD_BOSS_TIERS[idx];
+}
+
+// Ensures currentHp is initialized to the active tier's max whenever it's ever zero
+// or unset — covers first-ever access and the moment right after a tier advances.
+function ensureGuildBossHp() {
+  const tier = getGuildBossTier();
+  if (!G.guildBoss.currentHp || G.guildBoss.currentHp <= 0) {
+    G.guildBoss.currentHp = tier.hp;
+  }
+}
+
+function canAttemptGuildBossToday() {
+  return G.guildBoss.lastAttemptDay !== G.gameDay;
+}
+
+// One attempt per day. Damage is a randomized percentage of the tier's OWN max HP,
+// not a flat dice-based number — a normal combat formula would be meaningless against
+// a multi-million HP pool. Every recruited member attacks (not just fielded — Guild
+// War already has the capped-slot version of this), so a fuller roster genuinely
+// speeds up the siege, which is the whole point of the "whole guild" framing.
+function startGuildBossAttempt() {
+  ensureGuildBossHp();
+  if (!canAttemptGuildBossToday()) { lg('⚔️ Already rallied the guild against this today. Come back tomorrow.'); return; }
+
+  const tier = getGuildBossTier();
+  G.guildBoss.lastAttemptDay = G.gameDay;
+
+  let totalDamage = 0;
+  const hits = [];
+
+  // San's own attack — slightly heavier than a single guild member's contribution
+  const playerPct = 0.010 + Math.random() * 0.007; // 1.0%–1.7% of max HP
+  const playerDmg = Math.floor(tier.hp * playerPct);
+  totalDamage += playerDmg;
+  hits.push('⚔️ San strikes for ' + playerDmg.toLocaleString() + '!');
+
+  // Every recruited member, not just fielded ones
+  for (let id of G.guildRoster.recruited) {
+    const def = getGuildMemberDef(id);
+    if (!def) continue;
+    const memberPct = 0.006 + Math.random() * 0.006; // 0.6%–1.2% of max HP each
+    const memberDmg = Math.floor(tier.hp * memberPct);
+    totalDamage += memberDmg;
+    hits.push('⚔️ ' + def.npcName + ' strikes for ' + memberDmg.toLocaleString() + '!');
+  }
+
+  G.guildBoss.currentHp = Math.max(0, G.guildBoss.currentHp - totalDamage);
+
+  for (const h of hits) lg(h);
+  lg('🛡️ ' + tier.n + ': ' + totalDamage.toLocaleString() + ' total damage. ' + G.guildBoss.currentHp.toLocaleString() + ' / ' + tier.hp.toLocaleString() + ' HP remaining.');
+
+  if (G.guildBoss.currentHp <= 0) {
+    handleGuildBossDefeat(tier);
+  }
+  saveGame();
+  render();
+}
+
+function handleGuildBossDefeat(tier) {
+  const xp = tier.xp;
+  const gold = tier.g;
+  G.p.xp += xp;
+  G.p.gold += gold;
+  if (G.guildJoined) { G.guildRep += 150; G.guildRepBalance += 150; }
+  lg('🎉 ' + tier.n + ' falls! The whole guild did this together. +' + xp.toLocaleString() + ' XP, +' + gold.toLocaleString() + 'G' + (G.guildJoined ? ', +150 Guild Rep' : ''));
+
+  if (G.guildBoss.tierIndex < GUILD_BOSS_TIERS.length - 1) {
+    G.guildBoss.tierIndex++;
+    const nextTier = getGuildBossTier();
+    G.guildBoss.currentHp = nextTier.hp;
+    lg('⚔️ A new threat rises to meet the guild: ' + nextTier.n + '.');
+  } else {
+    // Already at the final tier (Guild Eternal) — it doesn't escalate further, it
+    // just gets fought again. Matches the rank's own description: "nothing left to
+    // prove" — they keep showing up anyway, not because they have to.
+    G.guildBoss.currentHp = tier.hp;
+    lg('🕯️ The Eternal Vigil returns. Not because it has to be faced again \u2014 because the guild chooses to, every time.');
+  }
+  checkAchievements();
+}
+
 
 function getGuildRank() {
   let rank = 0;
@@ -9055,6 +9398,131 @@ function getGuildWarMaxFielded() {
   if (rank >= 10) max++; // Guild Eternal
   return max;
 }
+
+// === TEACH A DISCIPLE ===
+// A slower, delayed-consequence system distinct from every other daily mechanic —
+// San's choices don't resolve immediately. A response nudges a hidden trajectory, and
+// the actual outcome surfaces days or weeks later, the way real mentorship works. Two
+// disciple slots, drawing from a name pool kept fully separate from any existing NPC
+// or Guild Member name, since these are meant to stay their own people, not echoes of
+// anyone already established. Real-life-inspired characters (Liang, etc.) are
+// deliberately NOT part of this system — reserved for direct, personal storylines in
+// future seasons rather than diluted into a repeatable mechanic.
+const DISCIPLE_NAME_POOL = [
+  'Farah', 'Hakim', 'Dayang', 'Rizal', 'Sofea', 'Idris', 'Mardhiah', 'Zulkifli',
+  'Ainul', 'Firdaus', 'Nadhirah', 'Suhaimi', 'Qistina', 'Aznan', 'Hazwani', 'Rusydi',
+  'Fatimah', 'Kamarul', 'Adawiyah', 'Syafiq'
+];
+
+const DISCIPLE_MAX_SLOTS = 2;
+const DISCIPLE_EXCHANGES_TO_GRADUATE = 6;
+
+// Each dilemma has 2 response options. Every option nudges both axes (can be
+// negative), sets a resolution delay in days, and has its own outcome vignette.
+// Axes are intentionally not "good vs bad" — different combinations shape genuinely
+// different people, reflected in which fieldBuff a graduate ends up with.
+const DISCIPLE_DILEMMAS = [
+  {
+    id: 'client_story',
+    prompt: "A client's story doesn't add up, but pushing on it might unravel the whole case. What do I do?",
+    options: [
+      { label: 'Trust your own read on it', confidenceNudge: 3, independenceNudge: 2, delayDays: 2,
+        outcome: "You pushed, gently, the way I showed you how. It turned out to be nothing \u2014 just an old habit of leaving things half-explained. But you were right to check. That instinct is worth trusting." },
+      { label: "Bring it to me first, next time", confidenceNudge: -1, independenceNudge: -2, delayDays: 1,
+        outcome: "You waited, brought it to me before deciding anything. That's not a bad instinct either \u2014 knowing when a second set of eyes matters is its own kind of skill." }
+    ]
+  },
+  {
+    id: 'junior_mistake',
+    prompt: "Someone newer than me made a mistake I could have caught earlier. Do I say something, or let it go this once?",
+    options: [
+      { label: "Say something, kindly", confidenceNudge: 2, independenceNudge: 1, delayDays: 3,
+        outcome: "You said something. Careful, not sharp \u2014 exactly the way it needs to be said. They thanked you for it, later. That matters more than being right." },
+      { label: "Let it go, just this once", confidenceNudge: -1, independenceNudge: 0, delayDays: 5,
+        outcome: "You let it go. It came up again, a few weeks later, the same mistake. Not a disaster \u2014 just a reminder that kindness and silence aren't always the same thing." }
+    ]
+  },
+  {
+    id: 'overtime_request',
+    prompt: "I was asked to stay late again, off the books. Everyone else just does it without saying anything. Should I?",
+    options: [
+      { label: 'It is alright to say no', confidenceNudge: 3, independenceNudge: 3, delayDays: 1,
+        outcome: "You said no. Quietly, without making it a whole thing. Nobody pushed back the way you were afraid they would. Sometimes the fear is bigger than the actual moment." },
+      { label: "Just this once won't hurt", confidenceNudge: -2, independenceNudge: -1, delayDays: 7,
+        outcome: "You stayed. It became the expectation within a month, the way these things always do. I should have been clearer with you the first time it came up." }
+    ]
+  },
+  {
+    id: 'wrong_answer',
+    prompt: "A senior colleague gave a client the wrong information. I noticed. Do I correct it in front of everyone, or handle it quietly after?",
+    options: [
+      { label: 'Handle it quietly, after', confidenceNudge: 1, independenceNudge: 2, delayDays: 4,
+        outcome: "You waited, said it privately. They were grateful rather than embarrassed \u2014 you read the room correctly. That kind of judgment doesn't come from a manual." },
+      { label: "Correct it in the moment", confidenceNudge: 2, independenceNudge: -1, delayDays: 2,
+        outcome: "You corrected it right there. It was the right information, but it landed harder than it needed to. Being right and being kind about it are two different skills." }
+    ]
+  },
+  {
+    id: 'burnout_signs',
+    prompt: "I have not been sleeping well. I think I am close to something I do not want to admit out loud yet. What do I even say to you?",
+    options: [
+      { label: 'Just tell me, whatever it is', confidenceNudge: 1, independenceNudge: -2, delayDays: 3,
+        outcome: "You told me. It helped more than either of us expected \u2014 not because I fixed anything, but because you did not have to carry it alone for once." },
+      { label: 'I will figure it out myself first', confidenceNudge: 2, independenceNudge: 3, delayDays: 10,
+        outcome: "You worked through it on your own, mostly. It took longer than it needed to. I wish you had said something sooner \u2014 but you got there, and that matters too." }
+    ]
+  },
+  {
+    id: 'takes_credit',
+    prompt: "Someone took credit for something I actually did. Do I say anything, or let it go?",
+    options: [
+      { label: 'Say something, calmly', confidenceNudge: 3, independenceNudge: 1, delayDays: 5,
+        outcome: "You brought it up, evenly, no accusation in it. It got sorted out quietly. People noticed you handled it well \u2014 more than they noticed the credit itself." },
+      { label: "Let the work speak for itself", confidenceNudge: -1, independenceNudge: 2, delayDays: 14,
+        outcome: "You let it go. Weeks later, the pattern was clear enough that others noticed it without you having to say a word. Sometimes patience does the work anger can't." }
+    ]
+  },
+  {
+    id: 'new_responsibility',
+    prompt: "I've been offered something bigger than what I have done before. I am not sure I am actually ready.",
+    options: [
+      { label: 'You are more ready than you think', confidenceNudge: 3, independenceNudge: 2, delayDays: 6,
+        outcome: "You took it. It was hard, some days genuinely too hard, but you did not fall apart the way you were afraid you would. Neither did I, watching you." },
+      { label: 'It is alright to wait for the next one', confidenceNudge: 0, independenceNudge: -1, delayDays: 9,
+        outcome: "You waited. The next opportunity came, and this time you did not hesitate at all. Sometimes waiting is not the same as not being ready \u2014 it is just timing." }
+    ]
+  },
+  {
+    id: 'disagreement_with_san',
+    prompt: "I actually think you are wrong about something, but I am not sure I am allowed to say that to you.",
+    options: [
+      { label: 'You are always allowed to say that', confidenceNudge: 3, independenceNudge: 3, delayDays: 2,
+        outcome: "You said it. You were half right, as it turned out \u2014 and I told you so. That conversation mattered more than either of us being correct." },
+      { label: 'Trust that I have my reasons', confidenceNudge: -2, independenceNudge: -2, delayDays: 4,
+        outcome: "You held back. I found out what you had actually thought later, secondhand. I would rather you had told me directly \u2014 I hope you know that now." }
+    ]
+  },
+  {
+    id: 'family_emergency',
+    prompt: "Something came up at home. I do not know how to ask for time without it looking like I cannot handle the job.",
+    options: [
+      { label: 'Family comes first, always', confidenceNudge: 2, independenceNudge: 0, delayDays: 1,
+        outcome: "You asked. It was handled without a single question about whether you could do the job. I made sure of that much, at least." },
+      { label: 'I will manage both somehow', confidenceNudge: -2, independenceNudge: 1, delayDays: 8,
+        outcome: "You tried to manage both. It cost you more than it should have. I noticed, eventually \u2014 I wish I had noticed sooner." }
+    ]
+  },
+  {
+    id: 'someone_elses_mentee',
+    prompt: "Another mentor's disciple came to me instead of them, with something real. Do I help, or send them back?",
+    options: [
+      { label: 'Help them, this once', confidenceNudge: 1, independenceNudge: 1, delayDays: 5,
+        outcome: "You helped. It went well, and it did not step on anyone's toes the way you worried it might. Sometimes the door is just supposed to be open." },
+      { label: 'Gently point them back', confidenceNudge: 0, independenceNudge: -1, delayDays: 3,
+        outcome: "You sent them back, kindly. Their actual mentor thanked you for it, later \u2014 for trusting the process instead of just solving it yourself." }
+    ]
+  }
+];
 
 const GUILD_MEMBERS = [
   { id: 'mimi', npcName: 'Mimi', role: 'Scout', icon: '🦋',
@@ -14966,7 +15434,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.13';
+const BUILD_ID = '2026-08-08.15';
 // =========================
 
 
@@ -15056,6 +15524,9 @@ function saveGame() {
     raidProgress: G.raidProgress,
     strongholdTasks: G.strongholdTasks,
     guildHallLevel: G.guildHallLevel,
+    guildBoss: G.guildBoss,
+    disciples: G.disciples,
+    graduatedDisciples: G.graduatedDisciples || [],
     retroactiveGrowthApplied: G.retroactiveGrowthApplied,
     guildJoined: G.guildJoined,
     guildRep: G.guildRep,
@@ -15313,6 +15784,18 @@ function loadGame() {
     G.strongholds = data.strongholds || {};
     G.strongholdTasks = data.strongholdTasks || [];
     G.guildHallLevel = data.guildHallLevel || {};
+    G.guildBoss = data.guildBoss || { tierIndex: 0, currentHp: 0, lastAttemptDay: 0 };
+    G.disciples = data.disciples || [];
+    G.graduatedDisciples = data.graduatedDisciples || [];
+    // GUILD_MEMBERS is a code-level constant, reinitialized fresh from source on every
+    // page load — any graduate pushed into it during a previous session is gone unless
+    // re-added here from the persisted copy. Guard against duplicates in case this
+    // ever runs more than once in the same session.
+    for (const grad of G.graduatedDisciples) {
+      if (!GUILD_MEMBERS.find(m => m.id === grad.id)) {
+        GUILD_MEMBERS.push(grad);
+      }
+    }
     G.guildJoined = data.guildJoined || false;
     G.guildRep = data.guildRep || 0;
     G.templeRep = data.templeRep || 0;
@@ -16393,6 +16876,8 @@ function render(){
   else if(G.state=='raid_room')h+=rRaidRoom();
   else if(G.state=='guild')h+=rGuild();
   else if(G.state=='stronghold')h+=rStrongholds();
+  else if(G.state=='guild_boss')h+=rGuildBoss();
+  else if(G.state=='disciples')h+=rDisciples();
   else if(G.state=='dragon_hunt')h+=rDragonHunt();
   else if(G.state=='prestige')h+=rPrestige();
   else if(G.state=='boss_rush')h+=rBossRush();
@@ -16444,6 +16929,8 @@ function attachEvents() {
     else if(a=='journal')setS('journal');
     else if(a=='guild')setS('guild');
     else if(a=='stronghold')setS('stronghold');
+    else if(a=='guild_boss')setS('guild_boss');
+    else if(a=='disciples')setS('disciples');
     else if(a=='dragon_hunt')setS('dragon_hunt');
     else if(a=='prestige')setS('prestige');
     else if(a=='boss_rush')setS('boss_rush');
@@ -18936,6 +19423,43 @@ function startRoadAmbush(zone) {
   render();
 }
 
+function rGuildBoss() {
+  ensureGuildBossHp();
+  const tier = getGuildBossTier();
+  const canAttempt = canAttemptGuildBossToday();
+  const hpPct = Math.max(0, Math.min(100, (G.guildBoss.currentHp / tier.hp) * 100));
+  const rosterSize = (G.guildRoster && G.guildRoster.recruited) ? G.guildRoster.recruited.length : 0;
+
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">⚔️ Guild Boss</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">A true whole-guild siege \u2014 every recruited member attacks each day, not just whoever\'s fielded. Millions of HP, persistent across days, until the whole guild brings it down together.</div>';
+
+  h += '<div class="panel" style="text-align:center;">';
+  h += '<div class="panel-title" style="font-size:16px;">' + tier.n + '</div>';
+  h += '<div class="btn-hint" style="margin:8px 0;font-style:italic;">' + tier.desc + '</div>';
+  h += '<div style="background:var(--bg-hover);border-radius:10px;height:20px;overflow:hidden;margin:10px 0;border:1px solid var(--border);">';
+  h += '<div style="background:linear-gradient(90deg,var(--danger),var(--gold));height:100%;width:' + hpPct + '%;transition:width 0.3s;"></div>';
+  h += '</div>';
+  h += '<div style="font-weight:700;">' + G.guildBoss.currentHp.toLocaleString() + ' / ' + tier.hp.toLocaleString() + ' HP</div>';
+  h += '<div class="btn-hint" style="margin-top:8px;">Rank ' + tier.rank + ' of 10 \u2014 ' + rosterSize + ' guild member' + (rosterSize === 1 ? '' : 's') + ' will join today\'s attempt</div>';
+  h += '</div>';
+
+  if (canAttempt) {
+    h += '<button onclick="startGuildBossAttempt()" class="abtn" style="width:100%;background:var(--danger);">⚔️ Rally the Guild (Today\'s Attempt)</button>';
+  } else {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🕯️ The guild already rallied against this today. Come back tomorrow.</div></div>';
+  }
+
+  h += '<div class="panel" style="margin-top:12px;">';
+  h += '<div class="panel-title" style="margin-bottom:8px;">Reward on Defeat</div>';
+  h += '<div class="btn-hint">+' + tier.xp.toLocaleString() + ' XP &nbsp;\u00b7&nbsp; +' + tier.g.toLocaleString() + 'G' + (G.guildJoined ? ' &nbsp;\u00b7&nbsp; +150 Guild Rep' : '') + '</div>';
+  h += '</div>';
+
+  h += '</div>';
+  return h;
+}
+
+
 function rStrongholds() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🗼 Strongholds</div>';
@@ -19130,6 +19654,8 @@ function rMenu(){
     ]},
     { title: '🏰 Guild & Stronghold', items: [
       {i:'🛡️',l:'Guild',a:'guild'},
+      {i:'⚔️',l:'Guild Boss',a:'guild_boss'},
+      {i:'📚',l:'Teach a Disciple',a:'disciples'},
       {i:'🗼',l:'Stronghold',a:'stronghold'},
     ]},
     { title: '🧙 Character', items: [
