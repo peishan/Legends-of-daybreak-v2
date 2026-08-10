@@ -510,6 +510,16 @@ const G = {
     // player's *current* level live (see sc() in the combat code) rather than a zoneLv
     // baked into the registry, so it keeps pace no matter how far past 100 leveling goes.
     { n: 'The Endless Thinning', lv: 100, elem: 'void', d: "Past even the farthest kindling, the ground stops bothering to have an edge at all. It does not get easier the longer you hold it, and it does not get harder because someone decided it should — it simply keeps matching whatever you actually bring to it, exactly, every single time. There is no farther than this. There is only however far you are each willing to keep going.", en: ['Unspooling Current', 'Whatever Keeps Arriving', 'A Ground Still Being Asked'], loot: ['A Thread With No End', 'Proof It Never Actually Stops', 'Something the Ground Kept Anyway'], xp: 45000, g: 32000, dg: 'impossible' },
+
+    // === THE PORTAL WORLD — a third, separate world Liang came through alone, still
+    // actively collapsing, not post-collapse the way Aethon now is. Nothing magical
+    // here — failed automation, still running, with nobody left who can shut it off.
+    { n: 'The Threshold District', lv: 210, elem: 'none', d: "The first real look at where Liang came from — not ruins to pick through, but a city still actively falling, systems still running that were never meant to run this long unattended. Streetlights count down to crossings that will never have anyone standing at them again.", en: ['Idle Sentry Unit', 'Looping Announcement Drone', 'Unmanned Response Walker'], loot: ["Threshold District Access Card", 'A Loop That Never Resolved', "Sentry Unit Core"], xp: 2100, g: 1250, dg: 'impossible' },
+    { n: 'The Unpaid Ledger', lv: 220, elem: 'none', d: "A marketplace district, automated storefronts still processing orders nobody placed, payment systems still running on accounts long since emptied. Liang goes quiet here in a way San has not seen from him before \u2014 this was close to his old work, close enough that the wrongness of it actually lands.", en: ['Runaway Checkout Construct', 'Ghost Inventory Drone', 'Collections Enforcement Unit'], loot: ['A Receipt For Nothing', 'Frozen Account Ledger', "Enforcement Unit Directive"], xp: 2200, g: 1320, dg: 'impossible' },
+    { n: 'The Signal Dark', lv: 230, elem: 'none', d: "A collapsed relay complex, the actual source of half the district's malfunctioning systems finally starting to make sense \u2014 not malice, not even negligence exactly, just a failsafe that failed, cascading outward for longer than anyone left alive has been counting.", en: ['Cascading Failsafe', 'Relay Ghost', 'Static-Bound Sentinel'], loot: ['A Failsafe That Failed', 'Relay Core Fragment', "The Cascade's First Cause"], xp: 2300, g: 1380, dg: 'impossible' },
+    { n: 'Where the Bunnies Ran', lv: 240, elem: 'none', d: "The outer edge of it \u2014 makeshift shelter, tally marks, a supply cache someone maintained carefully and recently. Liang recognizes every single detail before he says a word. This is the first real trace of the people he left behind, not confirmation of anyone specific, just proof someone was still here.", en: ['Perimeter Drone', 'Salvage Construct', 'Abandoned Guard Unit'], loot: ['A Tally Someone Kept', "Liang's Old Cache Marker", 'Proof Someone Held This Line'], xp: 2400, g: 1440, dg: 'impossible' },
+    { n: 'The Last Warren', lv: 250, elem: 'none', d: "Deep inside it now, past every marker Liang half-remembers and several he clearly does not want to. Whatever actually happened here, it happened fast \u2014 and for the first time since the rabbits and the jokes, San watches him have to actually face it instead of talk around it.", en: ['Warren Sentinel', 'The Last Alarm', 'Something Still Guarding This'], loot: ['A Warren Left In A Hurry', "The Last Thing Anyone Wrote Down", 'Proof, Whatever It Turns Out To Mean'], xp: 2500, g: 1500, dg: 'impossible' },
+    { n: "The System That Won't Stop", lv: 260, elem: 'none', d: "The actual source, finally \u2014 not a villain, not a monster, just an automated core still executing an emergency protocol from a crisis that ended long ago and never got the order to stand down. It does not hate anyone. It is simply still running. That, somehow, makes it worse.", en: ['Emergency Protocol Drone', 'Directive Loop Construct', 'The System, In Pieces'], loot: ['A Protocol Nobody Cancelled', 'Core Access Fragment', 'The Order It Was Waiting For'], xp: 2600, g: 1560, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -1395,6 +1405,16 @@ const G = {
     { n: 'The Line Neither Could Hold Alone', zone: 'The Farthest Kindling', hp: 340000, mhp: 340000, atk: 830, def: 495, xp: 165000, g: 118000,
       mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 85000,
       desc: "Too much for one pair. It was always going to be too much for one pair — that was never a flaw in anyone's practice, just an honest fact about how large the Fraying can grow when it is finally allowed to concentrate somewhere undefended long enough. It does not know yet that it is not fighting one pair anymore. That is about to become the whole problem it never accounted for." },
+    // === THE PORTAL WORLD'S FINAL BOSS ===
+    // Not a villain — an emergency protocol from a crisis that ended, still executing
+    // because nobody left alive had the authority to cancel it. Fixed stat block, not
+    // scaled, since this is a one-time story climax at the end of a defined arc, not
+    // endless content. HP anchored against the same proven Frontier formula used
+    // elsewhere in this game (getFrayingFrontierScaledStats at level 265), so the
+    // number is grounded rather than picked arbitrarily.
+    { n: 'The Order That Never Stood Down', zone: "The System That Won't Stop", hp: 1040000, mhp: 1040000, atk: 2540, def: 1520, xp: 505000, g: 361000,
+      mechanic: 'phase', phases: 3, currentPhase: 1, phaseHp: 346667,
+      desc: "It does not hate anyone. It was never built to. Somewhere, a long time ago, something went wrong badly enough that this protocol was the correct answer — and it has simply never once been told the crisis is over. It is not malice. It is not even really a mind. It is just the last order still being followed, faithfully, by something that was only ever trying to help." },
     // The Endless Thinning's own boss — every zone boss above it is a fixed stat
     // block, calibrated once and left to eventually fall behind the same way regular
     // monsters used to. This one carries no hp/atk/def/xp/g of its own at all:
@@ -5327,6 +5347,26 @@ const ENEMY_REGISTRY = {
   'Warden of the Gap': { template: 'balanced', elem: 'void', zoneLv: 100 },
   'Unmaking Herald': { template: 'tank', elem: 'void', zoneLv: 100 },
 
+  // === THE PORTAL WORLD — tech-collapse, non-magical, still actively unfolding ===
+  'Idle Sentry Unit': { template: 'striker', elem: 'none', zoneLv: 210 },
+  'Looping Announcement Drone': { template: 'balanced', elem: 'none', zoneLv: 210 },
+  'Unmanned Response Walker': { template: 'tank', elem: 'none', zoneLv: 210 },
+  'Runaway Checkout Construct': { template: 'striker', elem: 'none', zoneLv: 220 },
+  'Ghost Inventory Drone': { template: 'balanced', elem: 'none', zoneLv: 220 },
+  'Collections Enforcement Unit': { template: 'tank', elem: 'none', zoneLv: 220 },
+  'Cascading Failsafe': { template: 'striker', elem: 'none', zoneLv: 230 },
+  'Relay Ghost': { template: 'balanced', elem: 'none', zoneLv: 230 },
+  'Static-Bound Sentinel': { template: 'tank', elem: 'none', zoneLv: 230 },
+  'Perimeter Drone': { template: 'striker', elem: 'none', zoneLv: 240 },
+  'Salvage Construct': { template: 'balanced', elem: 'none', zoneLv: 240 },
+  'Abandoned Guard Unit': { template: 'tank', elem: 'none', zoneLv: 240 },
+  'Warren Sentinel': { template: 'striker', elem: 'none', zoneLv: 250 },
+  'The Last Alarm': { template: 'balanced', elem: 'none', zoneLv: 250 },
+  'Something Still Guarding This': { template: 'tank', elem: 'none', zoneLv: 250 },
+  'Emergency Protocol Drone': { template: 'striker', elem: 'none', zoneLv: 260 },
+  'Directive Loop Construct': { template: 'balanced', elem: 'none', zoneLv: 260 },
+  'The System, In Pieces': { template: 'tank', elem: 'none', zoneLv: 260 },
+
   // === TEMPLE HUNTS: THE CULT OF THE CLOSED EYE ===
   'Closed Eye Acolyte': { template: 'striker', elem: 'void', zoneLv: 19 },
   'Closed Eye Zealot': { template: 'balanced', elem: 'void', zoneLv: 27 },
@@ -7819,14 +7859,24 @@ const PRESTIGE_MIN_LEVEL = 100;
 const PRESTIGE_TIER_STEP = 50;           // each successive prestige requires 50 levels more than the last
 const PRESTIGE_XP_PCT_PER_LEVEL = 0.4;   // % permanent XP bonus banked per level at reset
 const PRESTIGE_GOLD_PCT_PER_LEVEL = 0.3; // % permanent gold bonus banked per level at reset
-const PRESTIGE_BONUS_CAP = 200;          // sanity ceiling so repeated resets can't run away
+const PRESTIGE_BONUS_CAP = 50000;        // sanity ceiling so a genuine bug can't run away completely — not a realistic constraint at any tier a player would actually reach
 
 // Tiered unlock — first prestige needs Level 100, then each subsequent one raises the
-// bar by PRESTIGE_TIER_STEP (150, 200, 250, ...), scaled off how many times the player
-// has already prestiged. Keeps prestige meaningful at high prestige counts instead of
-// letting every reset be re-earned at the same flat Level 100.
+// bar further. Tiers 1-3 stay flat at PRESTIGE_TIER_STEP apart (100/150/200) since
+// those are already locked in and actively being worked toward. From Tier 4 onward,
+// the gap itself grows by 10 each additional tier (260, 330, 410, ...) — otherwise a
+// flat +50 forever becomes a proportionally smaller ask the higher prestige count
+// climbs, exactly backwards for a game explicitly designed to never end.
 function getPrestigeRequiredLevel() {
-  return PRESTIGE_MIN_LEVEL + (G.prestige.count || 0) * PRESTIGE_TIER_STEP;
+  const tier = (G.prestige.count || 0) + 1; // the tier being worked toward
+  if (tier <= 3) return PRESTIGE_MIN_LEVEL + (tier - 1) * PRESTIGE_TIER_STEP;
+  let level = PRESTIGE_MIN_LEVEL + 2 * PRESTIGE_TIER_STEP; // Tier 3's level = 200
+  let increment = PRESTIGE_TIER_STEP; // 50
+  for (let t = 4; t <= tier; t++) {
+    increment += 10;
+    level += increment;
+  }
+  return level;
 }
 
 // Milestones tied to prestige COUNT specifically, not the stacking level-scaled bonus
@@ -14832,6 +14882,11 @@ function getEnemyArchetype(name) {
   // Robin) reads as "corrupted authority" rather than heroism.
   if (/jeff, the sk\* son-in-law|the ex-mother-in-law|the ex-husband|the village ex|the brunei ex|the stepfather/.test(n)) return 'knight';
   if (n === 'sister wren, the last believer') return 'flying'; // a wren is a bird — a small, deliberate, personal distinction from the rest of the Closed Eye cult, fitting someone who was ultimately separate from them
+  // The portal world's automation-collapse enemies — checked before the generic
+  // keyword rules below, since several of these names would otherwise mismatch on
+  // unrelated substrings (e.g. "Ghost" reading as undead, "Walker" reading as eye,
+  // both wrong for what are meant to read as failed machines, not living things).
+  if (/idle sentry unit|looping announcement drone|unmanned response walker|runaway checkout construct|ghost inventory drone|collections enforcement unit|cascading failsafe|relay ghost|static-bound sentinel|perimeter drone|salvage construct|abandoned guard unit|warren sentinel|the last alarm|something still guarding this|emergency protocol drone|directive loop construct|the system, in pieces/.test(n)) return 'construct';
   if (/brother vess, the first blind|the closed choir|brother iss, the unraveled/.test(n)) return 'eye'; // Cult of the Closed Eye
   if (/the veilshaper|the unmade|what alone becomes|before it wears through|what was almost enough|the line neither could hold alone/.test(n)) return 'eye'; // the Fraying's own embodiments — reality unraveling, same family as void/rift/fracture
   if (n === 'frost queen') return 'knight'; // royal authority
@@ -14911,7 +14966,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.11';
+const BUILD_ID = '2026-08-08.13';
 // =========================
 
 
