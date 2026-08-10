@@ -20118,7 +20118,21 @@ const CHAPTER_ART = {
   "The Widow's Watch": 'chapter26-widows-watch.jpg',
   'journal_026': 'chapter26-widows-watch.jpg',
   'The Roads Senedra Walked': 'chapter27-roads-senedra-walked.jpg',
-  'journal_027': 'chapter27-roads-senedra-walked.jpg'
+  'journal_027': 'chapter27-roads-senedra-walked.jpg',
+  'The Room That Waited': 'chapter28-room-that-waited.jpg',
+  'journal_028': 'chapter28-room-that-waited.jpg',
+  'The Boy Who Stopped Checking': 'chapter29-boy-who-stopped-checking.jpg',
+  'journal_029': 'chapter29-boy-who-stopped-checking.jpg',
+  'The Storm That Never Broke': 'chapter30-storm-that-never-broke.jpg',
+  'journal_030': 'chapter30-storm-that-never-broke.jpg',
+  'What the Ember Remembers': 'chapter31-what-ember-remembers.jpg',
+  'journal_031': 'chapter31-what-ember-remembers.jpg',
+  'What the Ledger Never Said': 'chapter32-what-ledger-never-said.jpg',
+  'journal_032': 'chapter32-what-ledger-never-said.jpg',
+  'The Version That Stopped Pretending': 'chapter33-version-that-stopped-pretending.jpg',
+  'journal_033': 'chapter33-version-that-stopped-pretending.jpg',
+  'The Door Someone Built on Purpose': 'chapter34-door-built-on-purpose.jpg',
+  'journal_034': 'chapter34-door-built-on-purpose.jpg'
 };
 function getChapterArt(key) {
   const file = CHAPTER_ART[key];
