@@ -4081,6 +4081,7 @@ storyJournal: {
   visionMachine: { lastUseDay: -1, joelLetterCount: 0 }, // Varel Farseer's window — once per real day, 1M gold
   kindlingCommissions: { linesToday: 0, checksToday: 0, refreshDay: 0 }, // bounded daily ritual — 3 lines, 2 checks, resets once per game day
   guildBoss: { tierIndex: 0, currentHp: 0, lastAttemptDay: 0 }, // persistent HP across days — the whole recruited roster chips away at it together
+  guildBossSession: { active: false, endTime: 0, tapCount: 0, sessionDamage: 0 }, // the current day's 90-second battle, not persisted — resets fresh each attempt
   disciples: [], // active mentorship threads — each tracks its own trajectory independently, delayed outcomes checked once per day
   activeDilemma: null, // { discipleId, dilemmaId } — which prompt is currently on screen awaiting a response
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
@@ -7190,41 +7191,87 @@ function canAttemptGuildBossToday() {
   return G.guildBoss.lastAttemptDay !== G.gameDay;
 }
 
-// One attempt per day. Damage is a randomized percentage of the tier's OWN max HP,
-// not a flat dice-based number — a normal combat formula would be meaningless against
-// a multi-million HP pool. Every recruited member attacks (not just fielded — Guild
-// War already has the capped-slot version of this), so a fuller roster genuinely
-// speeds up the siege, which is the whole point of the "whole guild" framing.
-function startGuildBossAttempt() {
+// A real 90-second battle, not a single instant tap. San attacks by tapping
+// repeatedly; every recruited guild member (not just fielded ones) auto-attacks
+// every 5 seconds regardless of tapping, so the "whole guild fighting together" is
+// visibly happening even if San's own taps are slow. Total damage across a full
+// session is calibrated to land close to what the old single-tap version dealt, just
+// spread across active engagement instead of resolved instantly — active tapping is
+// rewarded with more damage, but a player who barely taps still makes real progress
+// purely from the auto-hits.
+let guildBossSessionInterval = null;
+
+function startGuildBossSession() {
   ensureGuildBossHp();
   if (!canAttemptGuildBossToday()) { lg('⚔️ Already rallied the guild against this today. Come back tomorrow.'); return; }
 
-  const tier = getGuildBossTier();
+  G.guildBossSession = { active: true, endTime: Date.now() + 90000, tapCount: 0, sessionDamage: 0 };
+  // Locked in immediately, not when the session ends — otherwise reloading mid-session
+  // (before the timer completes) would leave canAttemptGuildBossToday() still open,
+  // letting a single day's attempt be repeated indefinitely while keeping all damage
+  // already dealt.
   G.guildBoss.lastAttemptDay = G.gameDay;
+  lg('⚔️ The guild rallies. 90 seconds \u2014 attack!');
+  render();
 
-  let totalDamage = 0;
+  if (guildBossSessionInterval) clearInterval(guildBossSessionInterval);
+  guildBossSessionInterval = setInterval(() => {
+    if (!G.guildBossSession.active) { clearInterval(guildBossSessionInterval); guildBossSessionInterval = null; return; }
+
+    tickGuildBossAutoHits();
+
+    if (G.guildBoss.currentHp <= 0 || Date.now() >= G.guildBossSession.endTime) {
+      endGuildBossSession();
+      return;
+    }
+    render();
+  }, 5000);
+}
+
+// San's own attack — called each time the player taps during an active session.
+function tapGuildBossAttack() {
+  if (!G.guildBossSession.active) return;
+  const tier = getGuildBossTier();
+  const playerPct = 0.0005 + Math.random() * 0.00035; // ~0.05%–0.085% per tap
+  const dmg = Math.max(1, Math.floor(tier.hp * playerPct));
+  G.guildBoss.currentHp = Math.max(0, G.guildBoss.currentHp - dmg);
+  G.guildBossSession.tapCount++;
+  G.guildBossSession.sessionDamage += dmg;
+  lg('⚔️ San strikes for ' + dmg.toLocaleString() + '!');
+
+  if (G.guildBoss.currentHp <= 0) {
+    endGuildBossSession();
+    return;
+  }
+  render();
+}
+
+// Every recruited guild member auto-attacks once per 5-second tick, independent of
+// how much (or little) San has tapped — this is what keeps the "whole roster
+// fighting together" visible and real, not just a flavor line.
+function tickGuildBossAutoHits() {
+  const tier = getGuildBossTier();
   const hits = [];
-
-  // San's own attack — slightly heavier than a single guild member's contribution
-  const playerPct = 0.010 + Math.random() * 0.007; // 1.0%–1.7% of max HP
-  const playerDmg = Math.floor(tier.hp * playerPct);
-  totalDamage += playerDmg;
-  hits.push('⚔️ San strikes for ' + playerDmg.toLocaleString() + '!');
-
-  // Every recruited member, not just fielded ones
   for (let id of G.guildRoster.recruited) {
     const def = getGuildMemberDef(id);
     if (!def) continue;
-    const memberPct = 0.006 + Math.random() * 0.006; // 0.6%–1.2% of max HP each
-    const memberDmg = Math.floor(tier.hp * memberPct);
-    totalDamage += memberDmg;
-    hits.push('⚔️ ' + def.npcName + ' strikes for ' + memberDmg.toLocaleString() + '!');
+    const memberPct = 0.00035 + Math.random() * 0.00035; // ~0.035%–0.07% per tick
+    const dmg = Math.max(1, Math.floor(tier.hp * memberPct));
+    G.guildBoss.currentHp = Math.max(0, G.guildBoss.currentHp - dmg);
+    G.guildBossSession.sessionDamage += dmg;
+    hits.push('⚔️ ' + def.npcName + ' strikes for ' + dmg.toLocaleString() + '!');
+    if (G.guildBoss.currentHp <= 0) break;
   }
-
-  G.guildBoss.currentHp = Math.max(0, G.guildBoss.currentHp - totalDamage);
-
   for (const h of hits) lg(h);
-  lg('🛡️ ' + tier.n + ': ' + totalDamage.toLocaleString() + ' total damage. ' + G.guildBoss.currentHp.toLocaleString() + ' / ' + tier.hp.toLocaleString() + ' HP remaining.');
+}
+
+function endGuildBossSession() {
+  if (guildBossSessionInterval) { clearInterval(guildBossSessionInterval); guildBossSessionInterval = null; }
+  const tier = getGuildBossTier();
+  // lastAttemptDay is already locked in at session start, not here — see startGuildBossSession
+  G.guildBossSession.active = false;
+
+  lg('🛡️ ' + tier.n + ': ' + G.guildBossSession.sessionDamage.toLocaleString() + ' total damage this session (' + G.guildBossSession.tapCount + ' attacks). ' + G.guildBoss.currentHp.toLocaleString() + ' / ' + tier.hp.toLocaleString() + ' HP remaining.');
 
   if (G.guildBoss.currentHp <= 0) {
     handleGuildBossDefeat(tier);
@@ -15434,7 +15481,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.15';
+const BUILD_ID = '2026-08-08.17';
 // =========================
 
 
@@ -19429,6 +19476,7 @@ function rGuildBoss() {
   const canAttempt = canAttemptGuildBossToday();
   const hpPct = Math.max(0, Math.min(100, (G.guildBoss.currentHp / tier.hp) * 100));
   const rosterSize = (G.guildRoster && G.guildRoster.recruited) ? G.guildRoster.recruited.length : 0;
+  const sessionActive = G.guildBossSession && G.guildBossSession.active;
 
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">⚔️ Guild Boss</div>';
@@ -19441,11 +19489,19 @@ function rGuildBoss() {
   h += '<div style="background:linear-gradient(90deg,var(--danger),var(--gold));height:100%;width:' + hpPct + '%;transition:width 0.3s;"></div>';
   h += '</div>';
   h += '<div style="font-weight:700;">' + G.guildBoss.currentHp.toLocaleString() + ' / ' + tier.hp.toLocaleString() + ' HP</div>';
-  h += '<div class="btn-hint" style="margin-top:8px;">Rank ' + tier.rank + ' of 10 \u2014 ' + rosterSize + ' guild member' + (rosterSize === 1 ? '' : 's') + ' will join today\'s attempt</div>';
+  h += '<div class="btn-hint" style="margin-top:8px;">Rank ' + tier.rank + ' of 10 \u2014 ' + rosterSize + ' guild member' + (rosterSize === 1 ? '' : 's') + ' fighting alongside you</div>';
   h += '</div>';
 
-  if (canAttempt) {
-    h += '<button onclick="startGuildBossAttempt()" class="abtn" style="width:100%;background:var(--danger);">⚔️ Rally the Guild (Today\'s Attempt)</button>';
+  if (sessionActive) {
+    const secondsLeft = Math.max(0, Math.ceil((G.guildBossSession.endTime - Date.now()) / 1000));
+    h += '<div class="panel panel-gold" style="text-align:center;">';
+    h += '<div style="font-size:28px;font-weight:800;color:var(--gold);">' + secondsLeft + 's</div>';
+    h += '<div class="btn-hint" style="margin-bottom:10px;">Attack as many times as you can before the guild has to fall back!</div>';
+    h += '<button onclick="tapGuildBossAttack()" class="abtn" style="width:100%;font-size:18px;padding:16px;background:var(--danger);">⚔️ ATTACK</button>';
+    h += '<div class="btn-hint" style="margin-top:10px;">' + G.guildBossSession.tapCount + ' attacks \u00b7 ' + G.guildBossSession.sessionDamage.toLocaleString() + ' damage so far this session</div>';
+    h += '</div>';
+  } else if (canAttempt) {
+    h += '<button onclick="startGuildBossSession()" class="abtn" style="width:100%;background:var(--danger);">⚔️ Rally the Guild (90-Second Battle)</button>';
   } else {
     h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🕯️ The guild already rallied against this today. Come back tomorrow.</div></div>';
   }
