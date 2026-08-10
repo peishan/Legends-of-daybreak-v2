@@ -4084,6 +4084,7 @@ storyJournal: {
   guildBossSession: { active: false, endTime: 0, tapCount: 0, sessionDamage: 0 }, // the current day's 90-second battle, not persisted — resets fresh each attempt
   disciples: [], // active mentorship threads — each tracks its own trajectory independently, delayed outcomes checked once per day
   activeDilemma: null, // { discipleId, dilemmaId } — which prompt is currently on screen awaiting a response
+  logScreenFilter: 'all', // which category tab is active on the dedicated Combat Log screen
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
@@ -15195,6 +15196,24 @@ function boldNumbers(msg) {
 // this whole project (🔥 fire, ❄️ ice, ⚡ lightning, ☠️ poison, 🌑 void, 🙏 holy) — a
 // pure display-layer heuristic, so it needed zero changes to any of the 500+ existing
 // lg() call sites.
+// Categorizes log entries for the dedicated Combat Log screen — same pure
+// display-layer pattern-matching approach as LOG_ELEMENT_PATTERNS above, so it needs
+// zero changes to any existing lg() call site. Combat patterns checked first since
+// they're the highest-volume and most specific (⚔️/❌/💥/💀 are essentially unique to
+// actual combat turns throughout this codebase); everything else that isn't
+// quest/guild-related falls through to "system" by default.
+const LOG_CATEGORY_PATTERNS = [
+  { rx: /🔧/, cat: 'system' }, // migration/recovery messages — checked first so incidental keyword matches (e.g. "quest") below don't miscategorize them
+  { rx: /⚔️|❌.*misses|💥 CRIT|💀|hits .+ for \d|is defeated|is destroyed|is consumed|falls!/, cat: 'combat' },
+  { rx: /📜|🛡️|📚|🎓|🏆|🔒|Guild Rep|quest|Quest|contract|Contract|disciple|Disciple/, cat: 'quests' }
+];
+function getLogCategory(msg) {
+  for (const p of LOG_CATEGORY_PATTERNS) {
+    if (p.rx.test(msg)) return p.cat;
+  }
+  return 'system';
+}
+
 const LOG_ELEMENT_PATTERNS = [
   { rx: /🔥/, cls: 'elem-fire' },
   { rx: /❄️/, cls: 'elem-ice' },
@@ -15215,7 +15234,51 @@ function renderLogPanel() {
   h += '<div class="log-ticker" id="log">';
   h += tickerLines.map(m => '<div class="le ' + getLogElementClass(m) + '">' + boldNumbers(m) + '</div>').join('');
   h += '</div>';
+  h += '<div style="text-align:right;padding:2px 6px;"><span onclick="setS(\'combat_log\')" style="font-size:11px;color:var(--accent);cursor:pointer;">📜 Full Log</span></div>';
   return h;
+}
+
+// Dedicated, full-history view of the log — up to the full 200-entry buffer, filtered
+// by category (Combat / Quests & Guild / System). The always-visible ticker above only
+// ever shows the most recent 12 lines; this is where the rest of it actually lives.
+function rCombatLog() {
+  const filter = G.logScreenFilter || 'all';
+  const filtered = filter === 'all' ? G.log : G.log.filter(m => getLogCategory(m) === filter);
+  const entries = filtered.slice().reverse();
+
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">📜 Full Log</div>';
+
+  h += '<div style="display:flex;gap:6px;margin-bottom:12px;">';
+  const tabs = [
+    { key: 'all', label: 'All' },
+    { key: 'combat', label: '⚔️ Combat' },
+    { key: 'quests', label: '📜 Quests & Guild' },
+    { key: 'system', label: '⚙️ System' }
+  ];
+  for (const tab of tabs) {
+    const sel = filter === tab.key;
+    h += '<button onclick="setLogScreenFilter(\'' + tab.key + '\')" class="tier-btn' + (sel ? ' sel' : '') + '" style="flex:1;font-size:11px;padding:8px 4px;">' + tab.label + '</button>';
+  }
+  h += '</div>';
+
+  if (entries.length === 0) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">Nothing here yet in this category.</div></div>';
+  } else {
+    h += '<div style="max-height:65vh;overflow-y:auto;">';
+    for (const m of entries) {
+      h += '<div class="le ' + getLogElementClass(m) + '" style="padding:8px 10px;border-bottom:1px solid var(--border);">' + boldNumbers(m) + '</div>';
+    }
+    h += '</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function setLogScreenFilter(cat) {
+  G.logScreenFilter = cat;
+  render();
 }
 
 function renderSessionRecap() {
@@ -15490,7 +15553,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.18';
+const BUILD_ID = '2026-08-08.19';
 // =========================
 
 
@@ -16934,6 +16997,7 @@ function render(){
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='guild_boss')h+=rGuildBoss();
   else if(G.state=='disciples')h+=rDisciples();
+  else if(G.state=='combat_log')h+=rCombatLog();
   else if(G.state=='dragon_hunt')h+=rDragonHunt();
   else if(G.state=='prestige')h+=rPrestige();
   else if(G.state=='boss_rush')h+=rBossRush();
