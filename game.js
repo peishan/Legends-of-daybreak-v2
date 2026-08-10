@@ -8341,10 +8341,11 @@ const VISION_VIGNETTES = [
   "Your mother is on the phone, laughing at something, one hand braced on the counter. You cannot hear who she is talking to. You decide, for tonight, that it does not matter — only that she is laughing.",
   "Your father is slower getting up from the chair than he used to be. He makes it anyway, unhurried, and pauses to steady himself against the doorframe for exactly as long as he needs to, then keeps going.",
   "Your mother is fussing over a pot that clearly does not need fussing over, the exact same way she always has, muttering at it under her breath like it might argue back.",
-  "One of your sisters is there too, sitting across from your mother at the small table, the two of them going through something — bills, maybe, or nothing important at all. You cannot tell which, and for once it is a relief not to know.",
+  "One of your cousins is there too, sitting across from your mother at the small table, the two of them going through something \u2014 bills, maybe, or nothing important at all. You cannot tell which, and for once it is a relief not to know.",
   "Your father is in the garden, crouched slower than he used to crouch, tending something green that is doing better than it has any right to. He straightens up, presses a hand to his back, and keeps going anyway.",
   "The house is quiet, mid-morning, nobody visibly in frame — just light through familiar windows, a ceiling fan turning, a kettle steaming on the stove that someone will come back for in a moment. Ordinary. Undramatic. Still standing.",
-  "Your mother is folding laundry on the bed, the same unhurried rhythm she has always folded laundry in, and for just a moment she pauses, mid-fold, and looks toward the window — and you will never know if she felt anything at all, or if it was nothing, just a mother pausing in an ordinary afternoon."
+  "Your mother is folding laundry on the bed, the same unhurried rhythm she has always folded laundry in, and for just a moment she pauses, mid-fold, and looks toward the window — and you will never know if she felt anything at all, or if it was nothing, just a mother pausing in an ordinary afternoon.",
+  "An old friend of your father's has stopped by \u2014 someone from the old sales days, still telling the same stories he always told, still making your father laugh at the parts he has heard a hundred times already. Some friendships, apparently, never needed an occasion."
 ];
 
 const JOEL_LETTER_REPLIES = [
@@ -15553,7 +15554,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.19';
+const BUILD_ID = '2026-08-08.21';
 // =========================
 
 
