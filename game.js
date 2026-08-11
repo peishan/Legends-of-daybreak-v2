@@ -3495,8 +3495,119 @@ storyJournal: {
       },
       {
         id: 'journal_093',
-        title: 'What Nothing Kindles',
+        title: 'The One Who Watches the Distance',
         chapter: 93,
+        unlockType: 'level',
+        unlockAt: 55,
+        icon: '🔮',
+        summary: "A hermit scryer finds Mimi's Dreamsight the way he finds most things — by accident — and offers to help her point it somewhere it has never reached before. It will cost more than patience.",
+        scenes: [
+          { speaker: 'Narrator', text: "He is already sitting at your camp when you arrive, uninvited and entirely unbothered about it, like the fire has simply always had one more person around it than you remembered inviting. Soel does not hiss. Soel almost never approves of strangers this fast." },
+          { speaker: 'Varel Farseer', text: '"You are the one with the office friend who already knows things," he says, not quite a question, nodding at Mimi without looking up from whatever he is doing to the fire. "I felt her from three valleys over. Untrained. Loud, in the way things are loud when nobody ever taught them to whisper."' },
+          { speaker: 'Mimi', text: '"Untrained," Mimi repeats, testing the word like it might bite. "I have always known things. Nobody taught me. It was just already there."' },
+          { speaker: 'Varel Farseer', text: '"That is exactly the problem," he says, entirely unbothered by how that lands. "A gift nobody trained is a door nobody learned to open on purpose. It opens anyway, sometimes, whenever it wants to. Never where you actually need it to."' },
+          { speaker: 'San', text: '"And you can train it," you say, already feeling the shape of where this is going, already half-afraid to hope out loud.' },
+          { speaker: 'Varel Farseer', text: '"I can teach her the discipline. I have kept watch on the boundary between here and everywhere else for longer than I have bothered counting." He finally looks up, and his eyes are the particular unsettling kind that seem to be looking at something several minutes in either direction from now. "Discipline is not power. She has more raw power than I ever had. I just know how to point."' },
+          { speaker: 'Joel', text: '"Point at what," Joel asks, careful, already guessing.' },
+          { speaker: 'Varel Farseer', text: '"At whatever the two of you have been carrying and not saying out loud," Varel says, entirely without cruelty, the way a man states weather. "The old world. The parents you cannot reach. The daughter you send letters into silence for. I do not need you to tell me. I only need to watch you both not talk about it for one evening to know exactly what it is."' },
+          { speaker: 'San', text: 'The fire pops. Nobody says anything for a moment, because he is simply right, and there is no dignified way to argue with correct.' },
+          { speaker: 'Varel Farseer', text: '"A window," he says. "Not a door. I want to be exact about that before either of you get your hopes arranged wrong. A window does not let anything through. It only lets you see. That is the honest limit of what any of this can ever be, and I would rather tell you that now than let you find out the hard way later."' },
+          { speaker: 'San', text: '"A window is more than we have had this entire time," you say, and your voice comes out steadier than you expected. "A window is not nothing."' },
+          { speaker: 'Varel Farseer', text: '"No," Varel agrees, something almost gentle under the flatness. "It is not nothing. It will also not be easy, or cheap, or quick. Building a frame strong enough to hold a window between two entire worlds takes more than good intentions and an untrained gift. It takes materials most people never go looking for, because most people never have a reason to."' },
+          { speaker: 'Mimi', text: '"Tell us where to look," Mimi says, already standing, already done deliberating. "I have spent this whole journey knowing things two floors away. I would like, for once, to know something that actually matters this much."' },
+          { speaker: 'Varel Farseer', text: '"Two things," Varel says. "A splinter off Skarrowyn, the Split Horizon \u2014 that dragon has spent its whole unnatural life being two things looking at each other across a line that should not exist. That is exactly the property a window needs. And a thread off Nyxathorne, the Unmended Wound \u2014 a wound that never closed knows more about looking at what is missing than anything else alive. Bring me both, and I will teach Mimi how to hold the rest steady."' },
+          { speaker: 'Joel', text: '"We already know where both of those are," Joel says, and for the first time since Varel sat down, something in his voice sounds almost like hope trying not to get ahead of itself. "We have fought worse for less."' },
+          { speaker: 'Varel Farseer', text: '"I know," Varel says, and for just a moment the strange, elsewhere-focused look in his eyes settles fully on the present, on all of you, warmer than anything he has said so far. "That is rather why I offered."' },
+        ]
+      },
+      {
+        id: 'journal_094',
+        title: 'What It Takes to Build a Window',
+        chapter: 94,
+        unlockType: 'boss',
+        unlockAt: 'Skarrowyn, the Split Horizon',
+        icon: '🪞',
+        summary: 'Skarrowyn and Nyxathorne both fall, and Varel and Mimi build the frame together — his discipline, her untrained sight, and one honest warning about the cost.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The splinter off Skarrowyn does not look like much once the fight is over \u2014 a sliver of scale still holding two colors that refuse to agree with each other, fire bleeding into cosmic dark along one thin seam. Nyxathorne\'s thread is worse to look at directly, a strand of something that was clearly once whole and is now permanently, deliberately not.' },
+          { speaker: 'San', text: '"This is what a window is made of," you say, turning the splinter over in your hand, unable to quite reconcile how something this small held a fight that hard.' },
+          { speaker: 'Varel Farseer', text: '"Everything worth building is made of something that cost more than it looks like," Varel says, taking both pieces from you with more care than you expected from someone who found you three valleys away by accident. "Now. The actual work."' },
+          { speaker: 'Narrator', text: 'He sets both pieces at the center of a circle he has clearly drawn a hundred times before, in a hundred other places, and gestures Mimi forward without ceremony.' },
+          { speaker: 'Varel Farseer', text: '"Give me your hand. Not your gift \u2014 your hand. The gift will follow on its own. It always does, once it finally has somewhere real to go."' },
+          { speaker: 'Mimi', text: 'Mimi kneels across from him, and for the first time since you have known her, she looks genuinely uncertain \u2014 not about the danger, about whether she is actually capable of the thing being asked of her.' },
+          { speaker: 'Mimi', text: '"What if I am not strong enough," she says, quiet, the question she has clearly been sitting on since the tower.' },
+          { speaker: 'Varel Farseer', text: '"You already reached a coworker\'s exhaustion two floors down through a wall, in a world that did not even believe in magic yet," Varel says, flat, certain. "Strength was never the missing piece. Aim was. I am not lending you power tonight. I am only teaching you where to point what you already have."' },
+          { speaker: 'Narrator', text: 'The splinter and the thread begin to turn between them, slow, then faster, then not moving at all in any way you can actually track \u2014 just present, differently, like something has been persuaded rather than built.' },
+          { speaker: 'Varel Farseer', text: '"One more thing, before this finishes," he says, not looking up, voice steady even as the light between his hands and Mimi\'s gets harder to look at directly. "This will not be free to use, once it exists. Not in materials \u2014 those are spent already, tonight. In cost. A window this size, held open between two worlds that were never meant to touch, takes more than either of you will want to pay every single time. Gold, mostly. An enormous, deliberately unreasonable amount of it."' },
+          { speaker: 'Joel', text: '"Why deliberately," Joel asks.' },
+          { speaker: 'Varel Farseer', text: '"Because if it were easy, you would use it every day, and stop actually living the life you are trying to check in on," Varel says, and for once there is no strangeness in his voice at all, just plain, unhurried honesty. "This should cost enough that you only ever open it because you truly mean to. Not out of habit. Out of love, spent on purpose."' },
+          { speaker: 'San', text: '"That is fair," you say, and mean it, even as something in your chest aches at the size of what he is describing. "We are not exactly short on gold these days."' },
+          { speaker: 'Varel Farseer', text: '"No," Varel agrees, the faintest, rare smile finally showing. "I rather assumed as much. That was, admittedly, part of the plan." He looks between you both, then finally at Mimi, whose hands have stopped shaking. "It is ready. Whenever the two of you are."' },
+        ]
+      },
+      {
+        id: 'journal_095',
+        title: 'The First Vision',
+        chapter: 95,
+        unlockType: 'boss',
+        unlockAt: 'Skarrowyn, the Split Horizon',
+        icon: '👁️',
+        summary: 'The Vision Machine opens for the first time. Not a door. A window \u2014 and it is enough.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The frame stands finished at the edge of the Mended Grove now, unassuming, more like a tall mirror missing its glass than anything you expected from a night of dragon splinters and unmended thread. Varel has already made himself comfortable beside it, like he has been sitting there for years rather than hours.' },
+          { speaker: 'Varel Farseer', text: '"Whenever you are ready," he says. "Both of you, if you like. It answers to intent, not to a single hand."' },
+          { speaker: 'Joel', text: 'Joel goes first, without needing to be asked twice \u2014 a folded letter already in hand, the same care in his fingers you have watched him carry into every letter since the Crucible. He does not read it aloud. He simply holds it to the frame, and the frame simply takes it, the way a held breath finally gets let out.' },
+          { speaker: 'Joel', text: '"For my mother," he says, quiet, to no one in particular. "Same as always. Just \u2014 further, this time. Actually further."' },
+          { speaker: 'San', text: 'Then it is your turn, and you find you have no letter, nothing prepared, nothing rehearsed \u2014 just your own two hands, and an ache that has been waiting a very long time for somewhere to actually go.' },
+          { speaker: 'Varel Farseer', text: '"You do not need words for this part," Varel says, gentler than you have heard him yet. "Just look."' },
+          { speaker: 'Narrator', text: 'The window does not open like a door. It simply stops being a frame around nothing, and becomes a frame around somewhere \u2014 a small kitchen you would know with your eyes closed, afternoon light through a curtain you helped choose years ago, your mother\'s hands moving through some small, unremarkable task exactly the way they always have.' },
+          { speaker: 'San', text: '"She is fine," you say, and your voice breaks on the second word, all the air you had been holding for this finally let go at once. "She is just \u2014 she is making tea. She is fine."' },
+          { speaker: 'Narrator', text: 'You do not know if she is fine in every way that matters. You will never fully know that, not through a window that only shows and never tells. But she is upright, and moving, and humming something under her breath the way she always has, and for tonight that is not almost enough. It is enough.' },
+          { speaker: 'Aisyah', text: '"Is that Mum\'s kitchen," Aisyah asks from behind you, voice gone very small, and you realize she followed without either of you noticing \u2014 of course she did.' },
+          { speaker: 'San', text: '"It is," you say, and step aside so she can see too, because some things were never meant to be carried by only one of you.' },
+          { speaker: 'Varel Farseer', text: '"It will not stay open," he says, careful, the warning arriving exactly on time rather than early enough to spoil anything. "It never does, for long. And it will cost the same, every single time you choose to open it again. I am not sorry about that. I built it that way on purpose."' },
+          { speaker: 'San', text: '"I understand," you say, and you do, fully, the way you have learned to understand most hard things lately \u2014 not as unfair, just as true. "Thank you. For all of it. For pointing something that has been loud and untrained her whole life somewhere it could finally actually matter."' },
+          { speaker: 'Mimi', text: '"Two floors away, my whole life," Mimi says, quiet, watching the window finally begin to fade. "And this is the first time it ever felt like enough."' },
+          { speaker: 'Narrator', text: 'The frame goes still, glassless and ordinary again, waiting at the edge of the grove for the next time either of you can bear the cost \u2014 gold, and hope, spent on purpose, exactly the way Varel intended.' },
+        ]
+      },
+      {
+        id: 'journal_096',
+        title: 'What the Window Chose First',
+        chapter: 96,
+        unlockType: 'special',
+        unlockAt: 'first_vision_machine_use',
+        icon: '🌅',
+        summary: 'The Vision Machine\'s very first glimpse is small and ordinary — Mama, haggling over fruit at a market, alive and well and completely unaware she is being watched. It pulls San and Joel into remembering the week she visited Brunei, and the offer that came quietly, months later, once she was already back home.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The vision catches on something small before it catches on anything else — a woman at a market stall, turning over fruit she is deciding whether to buy, unremarkable in every way except that Joel goes completely still beside you the instant he sees her face.' },
+          { speaker: 'Joel', text: '"Mama," he says, just that, like the word has to be tested before he trusts it.' },
+          { speaker: 'Narrator', text: 'The window holds her a moment longer than it held anything else so far — ordinary, upright, arguing gently with a vendor over the price of something, exactly as unbothered as she has apparently always been. Then it fades, the way all of them do, and Joel sits back slowly, something loosened in his shoulders that you had not realized was tight.' },
+          { speaker: 'San', text: '"She looked well," you say quietly, and mean it as the whole comfort it is.' },
+          { speaker: 'Joel', text: '"She did," Joel agrees, and then, after a moment, quieter: "Do you remember the airport? When she first landed in Brunei?"' },
+          { speaker: 'Narrator', text: 'You do. You remember it with a clarity that surprises you, considering how much else has happened since — the exact way Mama\'s face changed the moment she saw you both waiting, not scanning you the way you had braced for, not assessing. Just glad.' },
+          { speaker: 'San', text: '"She hugged me before she hugged you," you say, and Joel laughs, soft and disbelieving even now. "I remember thinking, she does not even know me yet. And she was already glad I was there."' },
+          { speaker: 'Joel', text: '"She liked you before either of you said a word," Joel says. "I think she decided somewhere over the ocean."' },
+          { speaker: 'Narrator', text: 'You think of the week that followed, in pieces, the way memory actually works rather than the way stories usually tell it — no order, just weight. The night the two of you went out alone while Joel worked overtime, hot chocolate at some small place San picked because the name made Mama laugh, the two of you trying food neither of them had eaten before and pulling faces at each other over it like old friends rather than a woman and the mother of the man she loved.' },
+          { speaker: 'San', text: '"She never once asked about before you," you say. "Not the marriage. Not any of it. I kept waiting for the question, the same way I always used to. It never came."' },
+          { speaker: 'Joel', text: '"She told me later she did not need to ask," Joel says. "She said she could already tell what mattered, just from watching how you were with me."' },
+          { speaker: 'Narrator', text: 'The last morning surfaces clearest of all — the cruise finished, the whole week folding down toward an ending none of you were ready for. The four of you had breakfast together at the airport restaurant first, unhurried, like none of you wanted to be the one who noticed the time. The stepfather did not come any further than that. He said, simply, that he would cry too if he went to the gate, and stayed at the table instead.' },
+          { speaker: 'Narrator', text: 'Joel stayed too, when the moment finally came. He did not say why. He just did not get up.' },
+          { speaker: 'Narrator', text: 'So it was you who walked Mama the rest of the way — through security, right up to where family could not follow any further, the two of you pausing there just long enough for one photo before she had to go. You remember exactly how she held onto your arm the whole way, unhurried even then, like she still had all the time she needed.' },
+          { speaker: 'Narrator', text: 'When you got back to the table, you told Joel, plainly, that you had wanted to cry. You had held it together the entire walk back — you always could, in public, some old and well-worn discipline that never quite left you even now. It was only ever in private that it caught up with you at all.' },
+          { speaker: 'Joel', text: '"That is why I did not want to go," Joel says quietly, and you understand, finally, exactly what he had been protecting both of you from all along.' },
+          { speaker: 'Narrator', text: 'It was months later, long after she was home and the visit had settled into something you both just called a good memory, that the offer came — not in person, not with any of the weight you might have expected from something so large. Just Mama, over a call, saying plainly that if you ever wanted your own sons back with you properly, she would come stay, would help however was needed. She could not work in Brunei by then, past the age the permits allowed, and she offered anyway, like the inability to earn her keep had never once occurred to her as a reason not to help.' },
+          { speaker: 'San', text: '"She did not see herself as a guest," you say. "Or me as someone she needed a reason to be kind to."' },
+          { speaker: 'Joel', text: '"She never has," Joel says. "Not with anyone she has decided is family. That was never a performance for her. It was just how she actually is."' },
+          { speaker: 'Joel', text: 'He is quiet for a while after that, and when he speaks again his voice is unsteady in a way he does not try to hide. "She calls you her daughter now. You know that, do you not? Not my wife. Not my girlfriend. Her daughter."' },
+          { speaker: 'San', text: '"She greets me every morning," you say, something warm breaking open in your chest even now, months later, saying it out loud. "Every single day. I do not think I understood, before her, that this was even a thing I was allowed to want. A mother who chose me back."' },
+          { speaker: 'Narrator', text: 'The window is fully dark now, the vision long since faded, but neither of you moves to leave the frame just yet. Somewhere across all that distance, an ordinary woman is haggling over fruit, entirely unaware of how completely she rearranged what family was allowed to mean for the two people who love her.' },
+        ]
+      },
+      {
+        id: 'journal_097',
+        title: 'What Nothing Kindles',
+        chapter: 97,
         unlockType: 'level',
         unlockAt: 96,
         icon: '🌫️',
@@ -3513,9 +3624,9 @@ storyJournal: {
         ]
       },
       {
-        id: 'journal_094',
+        id: 'journal_098',
         title: 'What the Line Never Had',
-        chapter: 94,
+        chapter: 98,
         unlockType: 'level',
         unlockAt: 97,
         icon: '🛡️',
@@ -3538,9 +3649,9 @@ storyJournal: {
         ]
       },
       {
-        id: 'journal_095',
+        id: 'journal_099',
         title: 'Before It Gets That Bad',
-        chapter: 95,
+        chapter: 99,
         unlockType: 'level',
         unlockAt: 98,
         icon: '🔦',
@@ -3563,9 +3674,9 @@ storyJournal: {
         ]
       },
       {
-        id: 'journal_096',
+        id: 'journal_100',
         title: 'Not the Exception',
-        chapter: 96,
+        chapter: 100,
         unlockType: 'level',
         unlockAt: 99,
         icon: '👣',
@@ -3589,9 +3700,9 @@ storyJournal: {
         ]
       },
       {
-        id: 'journal_097',
+        id: 'journal_101',
         title: 'Meant to Be Done Together',
-        chapter: 97,
+        chapter: 101,
         unlockType: 'level',
         unlockAt: 100,
         icon: '🦊',
@@ -3621,9 +3732,9 @@ storyJournal: {
         ]
       },
       {
-        id: 'journal_098',
+        id: 'journal_102',
         title: 'Fifty Levels of Choosing It',
-        chapter: 98,
+        chapter: 102,
         unlockType: 'level',
         unlockAt: 150,
         icon: '🔥',
@@ -3642,9 +3753,9 @@ storyJournal: {
         ]
       },
       {
-        id: 'journal_099',
+        id: 'journal_103',
         title: 'However Long That Takes',
-        chapter: 99,
+        chapter: 103,
         unlockType: 'level',
         unlockAt: 200,
         icon: '🌙',
@@ -3661,117 +3772,6 @@ storyJournal: {
           { speaker: 'Joel', text: '"A hundred more, then," Joel says, not really a question, watching the same fire you are. "However long that takes."' },
           { speaker: 'San', text: '"However long that takes," you agree. "I stopped needing to know the number a while ago too."' },
           { speaker: 'Narrator', text: 'Soel shifts against your side, warm and unbothered, and somewhere past the ridge a line is being held by someone who once needed finding and now does the finding herself. None of it needs to resolve into anything larger than exactly what it already is.' },
-        ]
-      },
-      {
-        id: 'journal_100',
-        title: 'The One Who Watches the Distance',
-        chapter: 100,
-        unlockType: 'level',
-        unlockAt: 55,
-        icon: '🔮',
-        summary: "A hermit scryer finds Mimi's Dreamsight the way he finds most things — by accident — and offers to help her point it somewhere it has never reached before. It will cost more than patience.",
-        scenes: [
-          { speaker: 'Narrator', text: "He is already sitting at your camp when you arrive, uninvited and entirely unbothered about it, like the fire has simply always had one more person around it than you remembered inviting. Soel does not hiss. Soel almost never approves of strangers this fast." },
-          { speaker: 'Varel Farseer', text: '"You are the one with the office friend who already knows things," he says, not quite a question, nodding at Mimi without looking up from whatever he is doing to the fire. "I felt her from three valleys over. Untrained. Loud, in the way things are loud when nobody ever taught them to whisper."' },
-          { speaker: 'Mimi', text: '"Untrained," Mimi repeats, testing the word like it might bite. "I have always known things. Nobody taught me. It was just already there."' },
-          { speaker: 'Varel Farseer', text: '"That is exactly the problem," he says, entirely unbothered by how that lands. "A gift nobody trained is a door nobody learned to open on purpose. It opens anyway, sometimes, whenever it wants to. Never where you actually need it to."' },
-          { speaker: 'San', text: '"And you can train it," you say, already feeling the shape of where this is going, already half-afraid to hope out loud.' },
-          { speaker: 'Varel Farseer', text: '"I can teach her the discipline. I have kept watch on the boundary between here and everywhere else for longer than I have bothered counting." He finally looks up, and his eyes are the particular unsettling kind that seem to be looking at something several minutes in either direction from now. "Discipline is not power. She has more raw power than I ever had. I just know how to point."' },
-          { speaker: 'Joel', text: '"Point at what," Joel asks, careful, already guessing.' },
-          { speaker: 'Varel Farseer', text: '"At whatever the two of you have been carrying and not saying out loud," Varel says, entirely without cruelty, the way a man states weather. "The old world. The parents you cannot reach. The daughter you send letters into silence for. I do not need you to tell me. I only need to watch you both not talk about it for one evening to know exactly what it is."' },
-          { speaker: 'San', text: 'The fire pops. Nobody says anything for a moment, because he is simply right, and there is no dignified way to argue with correct.' },
-          { speaker: 'Varel Farseer', text: '"A window," he says. "Not a door. I want to be exact about that before either of you get your hopes arranged wrong. A window does not let anything through. It only lets you see. That is the honest limit of what any of this can ever be, and I would rather tell you that now than let you find out the hard way later."' },
-          { speaker: 'San', text: '"A window is more than we have had this entire time," you say, and your voice comes out steadier than you expected. "A window is not nothing."' },
-          { speaker: 'Varel Farseer', text: '"No," Varel agrees, something almost gentle under the flatness. "It is not nothing. It will also not be easy, or cheap, or quick. Building a frame strong enough to hold a window between two entire worlds takes more than good intentions and an untrained gift. It takes materials most people never go looking for, because most people never have a reason to."' },
-          { speaker: 'Mimi', text: '"Tell us where to look," Mimi says, already standing, already done deliberating. "I have spent this whole journey knowing things two floors away. I would like, for once, to know something that actually matters this much."' },
-          { speaker: 'Varel Farseer', text: '"Two things," Varel says. "A splinter off Skarrowyn, the Split Horizon \u2014 that dragon has spent its whole unnatural life being two things looking at each other across a line that should not exist. That is exactly the property a window needs. And a thread off Nyxathorne, the Unmended Wound \u2014 a wound that never closed knows more about looking at what is missing than anything else alive. Bring me both, and I will teach Mimi how to hold the rest steady."' },
-          { speaker: 'Joel', text: '"We already know where both of those are," Joel says, and for the first time since Varel sat down, something in his voice sounds almost like hope trying not to get ahead of itself. "We have fought worse for less."' },
-          { speaker: 'Varel Farseer', text: '"I know," Varel says, and for just a moment the strange, elsewhere-focused look in his eyes settles fully on the present, on all of you, warmer than anything he has said so far. "That is rather why I offered."' },
-        ]
-      },
-      {
-        id: 'journal_101',
-        title: 'What It Takes to Build a Window',
-        chapter: 101,
-        unlockType: 'boss',
-        unlockAt: 'Skarrowyn, the Split Horizon',
-        icon: '🪞',
-        summary: 'Skarrowyn and Nyxathorne both fall, and Varel and Mimi build the frame together — his discipline, her untrained sight, and one honest warning about the cost.',
-        scenes: [
-          { speaker: 'Narrator', text: 'The splinter off Skarrowyn does not look like much once the fight is over \u2014 a sliver of scale still holding two colors that refuse to agree with each other, fire bleeding into cosmic dark along one thin seam. Nyxathorne\'s thread is worse to look at directly, a strand of something that was clearly once whole and is now permanently, deliberately not.' },
-          { speaker: 'San', text: '"This is what a window is made of," you say, turning the splinter over in your hand, unable to quite reconcile how something this small held a fight that hard.' },
-          { speaker: 'Varel Farseer', text: '"Everything worth building is made of something that cost more than it looks like," Varel says, taking both pieces from you with more care than you expected from someone who found you three valleys away by accident. "Now. The actual work."' },
-          { speaker: 'Narrator', text: 'He sets both pieces at the center of a circle he has clearly drawn a hundred times before, in a hundred other places, and gestures Mimi forward without ceremony.' },
-          { speaker: 'Varel Farseer', text: '"Give me your hand. Not your gift \u2014 your hand. The gift will follow on its own. It always does, once it finally has somewhere real to go."' },
-          { speaker: 'Mimi', text: 'Mimi kneels across from him, and for the first time since you have known her, she looks genuinely uncertain \u2014 not about the danger, about whether she is actually capable of the thing being asked of her.' },
-          { speaker: 'Mimi', text: '"What if I am not strong enough," she says, quiet, the question she has clearly been sitting on since the tower.' },
-          { speaker: 'Varel Farseer', text: '"You already reached a coworker\'s exhaustion two floors down through a wall, in a world that did not even believe in magic yet," Varel says, flat, certain. "Strength was never the missing piece. Aim was. I am not lending you power tonight. I am only teaching you where to point what you already have."' },
-          { speaker: 'Narrator', text: 'The splinter and the thread begin to turn between them, slow, then faster, then not moving at all in any way you can actually track \u2014 just present, differently, like something has been persuaded rather than built.' },
-          { speaker: 'Varel Farseer', text: '"One more thing, before this finishes," he says, not looking up, voice steady even as the light between his hands and Mimi\'s gets harder to look at directly. "This will not be free to use, once it exists. Not in materials \u2014 those are spent already, tonight. In cost. A window this size, held open between two worlds that were never meant to touch, takes more than either of you will want to pay every single time. Gold, mostly. An enormous, deliberately unreasonable amount of it."' },
-          { speaker: 'Joel', text: '"Why deliberately," Joel asks.' },
-          { speaker: 'Varel Farseer', text: '"Because if it were easy, you would use it every day, and stop actually living the life you are trying to check in on," Varel says, and for once there is no strangeness in his voice at all, just plain, unhurried honesty. "This should cost enough that you only ever open it because you truly mean to. Not out of habit. Out of love, spent on purpose."' },
-          { speaker: 'San', text: '"That is fair," you say, and mean it, even as something in your chest aches at the size of what he is describing. "We are not exactly short on gold these days."' },
-          { speaker: 'Varel Farseer', text: '"No," Varel agrees, the faintest, rare smile finally showing. "I rather assumed as much. That was, admittedly, part of the plan." He looks between you both, then finally at Mimi, whose hands have stopped shaking. "It is ready. Whenever the two of you are."' },
-        ]
-      },
-      {
-        id: 'journal_102',
-        title: 'The First Vision',
-        chapter: 102,
-        unlockType: 'boss',
-        unlockAt: 'Skarrowyn, the Split Horizon',
-        icon: '👁️',
-        summary: 'The Vision Machine opens for the first time. Not a door. A window \u2014 and it is enough.',
-        scenes: [
-          { speaker: 'Narrator', text: 'The frame stands finished at the edge of the Mended Grove now, unassuming, more like a tall mirror missing its glass than anything you expected from a night of dragon splinters and unmended thread. Varel has already made himself comfortable beside it, like he has been sitting there for years rather than hours.' },
-          { speaker: 'Varel Farseer', text: '"Whenever you are ready," he says. "Both of you, if you like. It answers to intent, not to a single hand."' },
-          { speaker: 'Joel', text: 'Joel goes first, without needing to be asked twice \u2014 a folded letter already in hand, the same care in his fingers you have watched him carry into every letter since the Crucible. He does not read it aloud. He simply holds it to the frame, and the frame simply takes it, the way a held breath finally gets let out.' },
-          { speaker: 'Joel', text: '"For my mother," he says, quiet, to no one in particular. "Same as always. Just \u2014 further, this time. Actually further."' },
-          { speaker: 'San', text: 'Then it is your turn, and you find you have no letter, nothing prepared, nothing rehearsed \u2014 just your own two hands, and an ache that has been waiting a very long time for somewhere to actually go.' },
-          { speaker: 'Varel Farseer', text: '"You do not need words for this part," Varel says, gentler than you have heard him yet. "Just look."' },
-          { speaker: 'Narrator', text: 'The window does not open like a door. It simply stops being a frame around nothing, and becomes a frame around somewhere \u2014 a small kitchen you would know with your eyes closed, afternoon light through a curtain you helped choose years ago, your mother\'s hands moving through some small, unremarkable task exactly the way they always have.' },
-          { speaker: 'San', text: '"She is fine," you say, and your voice breaks on the second word, all the air you had been holding for this finally let go at once. "She is just \u2014 she is making tea. She is fine."' },
-          { speaker: 'Narrator', text: 'You do not know if she is fine in every way that matters. You will never fully know that, not through a window that only shows and never tells. But she is upright, and moving, and humming something under her breath the way she always has, and for tonight that is not almost enough. It is enough.' },
-          { speaker: 'Aisyah', text: '"Is that Mum\'s kitchen," Aisyah asks from behind you, voice gone very small, and you realize she followed without either of you noticing \u2014 of course she did.' },
-          { speaker: 'San', text: '"It is," you say, and step aside so she can see too, because some things were never meant to be carried by only one of you.' },
-          { speaker: 'Varel Farseer', text: '"It will not stay open," he says, careful, the warning arriving exactly on time rather than early enough to spoil anything. "It never does, for long. And it will cost the same, every single time you choose to open it again. I am not sorry about that. I built it that way on purpose."' },
-          { speaker: 'San', text: '"I understand," you say, and you do, fully, the way you have learned to understand most hard things lately \u2014 not as unfair, just as true. "Thank you. For all of it. For pointing something that has been loud and untrained her whole life somewhere it could finally actually matter."' },
-          { speaker: 'Mimi', text: '"Two floors away, my whole life," Mimi says, quiet, watching the window finally begin to fade. "And this is the first time it ever felt like enough."' },
-          { speaker: 'Narrator', text: 'The frame goes still, glassless and ordinary again, waiting at the edge of the grove for the next time either of you can bear the cost \u2014 gold, and hope, spent on purpose, exactly the way Varel intended.' },
-        ]
-      },
-      {
-        id: 'journal_103',
-        title: 'What the Window Chose First',
-        chapter: 103,
-        unlockType: 'special',
-        unlockAt: 'first_vision_machine_use',
-        icon: '🌅',
-        summary: 'The Vision Machine\'s very first glimpse is small and ordinary — Mama, haggling over fruit at a market, alive and well and completely unaware she is being watched. It pulls San and Joel into remembering the week she visited Brunei, and the offer that came quietly, months later, once she was already back home.',
-        scenes: [
-          { speaker: 'Narrator', text: 'The vision catches on something small before it catches on anything else — a woman at a market stall, turning over fruit she is deciding whether to buy, unremarkable in every way except that Joel goes completely still beside you the instant he sees her face.' },
-          { speaker: 'Joel', text: '"Mama," he says, just that, like the word has to be tested before he trusts it.' },
-          { speaker: 'Narrator', text: 'The window holds her a moment longer than it held anything else so far — ordinary, upright, arguing gently with a vendor over the price of something, exactly as unbothered as she has apparently always been. Then it fades, the way all of them do, and Joel sits back slowly, something loosened in his shoulders that you had not realized was tight.' },
-          { speaker: 'San', text: '"She looked well," you say quietly, and mean it as the whole comfort it is.' },
-          { speaker: 'Joel', text: '"She did," Joel agrees, and then, after a moment, quieter: "Do you remember the airport? When she first landed in Brunei?"' },
-          { speaker: 'Narrator', text: 'You do. You remember it with a clarity that surprises you, considering how much else has happened since — the exact way Mama\'s face changed the moment she saw you both waiting, not scanning you the way you had braced for, not assessing. Just glad.' },
-          { speaker: 'San', text: '"She hugged me before she hugged you," you say, and Joel laughs, soft and disbelieving even now. "I remember thinking, she does not even know me yet. And she was already glad I was there."' },
-          { speaker: 'Joel', text: '"She liked you before either of you said a word," Joel says. "I think she decided somewhere over the ocean."' },
-          { speaker: 'Narrator', text: 'You think of the week that followed, in pieces, the way memory actually works rather than the way stories usually tell it — no order, just weight. The night the two of you went out alone while Joel worked overtime, hot chocolate at some small place San picked because the name made Mama laugh, the two of you trying food neither of them had eaten before and pulling faces at each other over it like old friends rather than a woman and the mother of the man she loved.' },
-          { speaker: 'San', text: '"She never once asked about before you," you say. "Not the marriage. Not any of it. I kept waiting for the question, the same way I always used to. It never came."' },
-          { speaker: 'Joel', text: '"She told me later she did not need to ask," Joel says. "She said she could already tell what mattered, just from watching how you were with me."' },
-          { speaker: 'Narrator', text: 'The last morning surfaces clearest of all — the cruise finished, the whole week folding down toward an ending none of you were ready for. The four of you had breakfast together at the airport restaurant first, unhurried, like none of you wanted to be the one who noticed the time. The stepfather did not come any further than that. He said, simply, that he would cry too if he went to the gate, and stayed at the table instead.' },
-          { speaker: 'Narrator', text: 'Joel stayed too, when the moment finally came. He did not say why. He just did not get up.' },
-          { speaker: 'Narrator', text: 'So it was you who walked Mama the rest of the way — through security, right up to where family could not follow any further, the two of you pausing there just long enough for one photo before she had to go. You remember exactly how she held onto your arm the whole way, unhurried even then, like she still had all the time she needed.' },
-          { speaker: 'Narrator', text: 'When you got back to the table, you told Joel, plainly, that you had wanted to cry. You had held it together the entire walk back — you always could, in public, some old and well-worn discipline that never quite left you even now. It was only ever in private that it caught up with you at all.' },
-          { speaker: 'Joel', text: '"That is why I did not want to go," Joel says quietly, and you understand, finally, exactly what he had been protecting both of you from all along.' },
-          { speaker: 'Narrator', text: 'It was months later, long after she was home and the visit had settled into something you both just called a good memory, that the offer came — not in person, not with any of the weight you might have expected from something so large. Just Mama, over a call, saying plainly that if you ever wanted your own sons back with you properly, she would come stay, would help however was needed. She could not work in Brunei by then, past the age the permits allowed, and she offered anyway, like the inability to earn her keep had never once occurred to her as a reason not to help.' },
-          { speaker: 'San', text: '"She did not see herself as a guest," you say. "Or me as someone she needed a reason to be kind to."' },
-          { speaker: 'Joel', text: '"She never has," Joel says. "Not with anyone she has decided is family. That was never a performance for her. It was just how she actually is."' },
-          { speaker: 'Joel', text: 'He is quiet for a while after that, and when he speaks again his voice is unsteady in a way he does not try to hide. "She calls you her daughter now. You know that, do you not? Not my wife. Not my girlfriend. Her daughter."' },
-          { speaker: 'San', text: '"She greets me every morning," you say, something warm breaking open in your chest even now, months later, saying it out loud. "Every single day. I do not think I understood, before her, that this was even a thing I was allowed to want. A mother who chose me back."' },
-          { speaker: 'Narrator', text: 'The window is fully dark now, the vision long since faded, but neither of you moves to leave the frame just yet. Somewhere across all that distance, an ordinary woman is haggling over fruit, entirely unaware of how completely she rearranged what family was allowed to mean for the two people who love her.' },
         ]
       },
       {
@@ -3840,8 +3840,8 @@ storyJournal: {
           { speaker: 'Joel', text: '"However long that takes," Joel echoes, and takes your hand, the same steady grip he has offered you since the very first storm, and together you step toward the edge of the only map that has ever mattered.' },
           { speaker: 'Narrator', text: 'The world does not end here. It never was going to. It just keeps being worth walking further into \u2014 one more horizon, one more line worth finding, one more morning chosen on purpose, the same practice it always was, carried now by more hands than you ever once thought to hope for. Somewhere ahead, past everything anyone has mapped yet, daybreak is still doing exactly what daybreak has always done. It is still coming. You go to meet it.' },
         ]
-      }
-,{
+      },
+      {
         id: 'journal_107',
         title: 'Kaya Kaya',
         chapter: 107,
@@ -3885,8 +3885,8 @@ storyJournal: {
           { speaker: 'Narrator', text: 'Aisyah looks at him for a long moment, something working behind her eyes that has nothing to do with old business at all — the particular, quiet relief of finding, entirely by accident, that the world she left behind sent her someone worth keeping.' },
           { speaker: 'Aisyah', text: '"Kaya kaya," Aisyah says, soft, almost to herself, and for the first time since anyone has known her out here, she does not look like the one person in the room nobody quite notices.' },
         ]
-      }
-,{
+      },
+      {
         id: 'journal_108',
         title: 'The Real Cost',
         chapter: 108,
@@ -3909,8 +3909,8 @@ storyJournal: {
           { speaker: 'KW Liang', text: '"Kaya kaya," Liang says, and it comes out different this time — not the old joke, something closer to a promise wearing the joke\'s clothes because he does not yet have better words for it. "I am not going anywhere. I just need someone patient enough to actually teach me."' },
           { speaker: 'Aisyah', text: '"I have taught worse," Aisyah says, and there is real warmth under the dry delivery, the specific fondness of someone deciding, quietly, that this one is worth the effort.' },
         ]
-      }
-,{
+      },
+      {
         id: 'journal_109',
         title: 'A Deal Worth Honoring',
         chapter: 109,
@@ -4076,7 +4076,7 @@ storyJournal: {
   dragonHunt: { active: false, currentId: null, cleared: {} }, // legendary optional superbosses, repeatable; cleared keyed by dragon id
   bossRush: { active: false, streak: 0, bestStreak: 0 }, // chained boss fights, escalating reward + difficulty, no rest between
   frayingFrontier: { active: false, streak: 0, bestStreak: 0 }, // endless mode, level 100+, bosses scale off current player level indefinitely
-  guildWar: { active: false, streak: 0, bestStreak: 0, fielded: [] }, // squad gauntlet vs rival guilds, unlocks after Iris & Ash (journal_097) + Lv 105
+  guildWar: { active: false, streak: 0, bestStreak: 0, fielded: [] }, // squad gauntlet vs rival guilds, unlocks after Iris & Ash (journal_101) + Lv 105
   guildRoster: { recruited: [] }, // ids from GUILD_MEMBERS who've actually joined the Guild War roster
   visionMachine: { lastUseDay: -1, joelLetterCount: 0 }, // Varel Farseer's window — once per real day, 1M gold
   kindlingCommissions: { linesToday: 0, checksToday: 0, refreshDay: 0 }, // bounded daily ritual — 3 lines, 2 checks, resets once per game day
@@ -8326,7 +8326,7 @@ function isAllyUnlocked(name) {
 }
 
 // === THE VISION MACHINE ===
-// Varel Farseer + Mimi's trained Dreamsight, built at the Mended Grove after journal_102.
+// Varel Farseer + Mimi's trained Dreamsight, built at the Mended Grove after journal_095.
 // Deliberately expensive and deliberately once-per-real-day — a window, not a door, and
 // never meant to become infrastructure. San's side stays strictly one-directional (a
 // vision, never a conversation) to keep the "no certainty" arc from the Cellphone chapters
@@ -8356,7 +8356,7 @@ const JOEL_LETTER_REPLIES = [
 ];
 
 function isVisionMachineUnlocked() {
-  return G.storyJournal.read.includes('journal_102');
+  return G.storyJournal.read.includes('journal_095');
 }
 
 function canUseVisionMachine() {
@@ -9434,7 +9434,7 @@ function generateFrontierBoss(playerLevel, streak) {
 
 // === THE GUILD (recruitable roster) & GUILD WAR ===
 // Unlocked after the party learns it's not alone anymore — gated on having actually
-// met Iris & Ash (journal_097) plus a level floor, same "story beat before number"
+// met Iris & Ash (journal_101) plus a level floor, same "story beat before number"
 // pattern the Verdant Reach transition already uses. Pulled specifically from people
 // who already have real history with San or Joel (old office, Joel's dorm-mates, or
 // already-established allies) rather than the flavor-only shop NPCs — narrative-first
@@ -9443,7 +9443,7 @@ function generateFrontierBoss(playerLevel, streak) {
 // give as a shop/ally (Mimi/Aisy/Sister Wren's existing always-on bonuses are
 // untouched — this stacks an ADDITIONAL bonus only while fielded).
 const GUILD_WAR_MIN_LEVEL = 105;
-const GUILD_WAR_UNLOCK_CHAPTER = 'journal_097'; // Iris & Ash join
+const GUILD_WAR_UNLOCK_CHAPTER = 'journal_101'; // Iris & Ash join
 const GUILD_WAR_BASE_FIELDED = 3;
 // Field size scales with earned Guild Rank rather than level or streak — rank never
 // goes down, so this reads as trust genuinely earned over time rather than something
@@ -9716,7 +9716,7 @@ function checkGuildRecruitment() {
       const npc = G.npcs.find(n => n.n === def.npcName && n.t === 'trader');
       if (npc && npc.unlocked && (npc.visitCount || 0) >= def.recruitReq.visits && G.p.lvl >= 100) recruitGuildMember(def.id);
     } else if (def.recruitReq.type === 'kindling') {
-      if (G.storyJournal.read.includes('journal_097')) recruitGuildMember(def.id);
+      if (G.storyJournal.read.includes('journal_101')) recruitGuildMember(def.id);
     } else if (def.recruitReq.type === 'journal') {
       if (G.storyJournal.read.includes(def.recruitReq.journalId)) recruitGuildMember(def.id);
     }
@@ -15554,7 +15554,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.21';
+const BUILD_ID = '2026-08-08.22';
 // =========================
 
 
@@ -16199,14 +16199,14 @@ function loadGame() {
     // Second, more reliable recovery pass — the above depends on old bounty save data
     // that may have already been overwritten by a normal save cycle on an intermediate
     // version, before this recovery code even existed, leaving nothing left to find.
-    // This uses journal_101 ("What It Takes to Build a Window") instead — its own
+    // This uses journal_094 ("What It Takes to Build a Window") instead — its own
     // unlock condition IS defeating Skarrowyn, and its summary explicitly states both
     // dragons fell, so if it's unlocked, both quests are definitively already earned,
     // independent of whatever the old bounty data does or doesn't still contain.
     // Separate migration flag since farseerQuestRecovery above may already be marked
     // done from a prior run that had nothing to recover.
     if (!G.migrations.farseerQuestRecoveryV2) {
-      const ch101Unlocked = G.storyJournal.unlocked.includes('journal_101');
+      const ch101Unlocked = G.storyJournal.unlocked.includes('journal_094');
       const quest80b = G.quests.find(q => q.id === 80);
       const quest81b = G.quests.find(q => q.id === 81);
       let recoveredV2 = false;
