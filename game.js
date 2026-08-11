@@ -3966,6 +3966,78 @@ storyJournal: {
           { speaker: 'KW Liang', text: '"I hate that you might be right," Liang says, and the laugh that finally breaks loose from him is real, easy, entirely his own — no old persona standing between him and the sound of it.' },
         ]
       }
+,{
+        id: 'journal_111',
+        title: 'Coffee People',
+        chapter: 111,
+        unlockType: 'level',
+        unlockAt: 260,
+        icon: '☕',
+        summary: 'Over coffee at the Guild Café, San finally asks Mimi the things she never felt comfortable asking before — and ends up telling her, in return, the real reason she stopped fighting to get her own children back.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Guild Café has become, somehow, exactly what a café back home always was — a place people simply end up, without needing much of a reason. San spots Mimi already at a corner table, two cups steaming, and slides in across from her like no time has passed at all.' },
+          { speaker: 'San', text: '"Just like the good old days at Claims," you say, wrapping both hands around the cup. "We are all coffee people, apparently. Some things survive the end of the world completely intact."' },
+          { speaker: 'Narrator', text: 'A few tables over, Liang and Joel are deep into something that involves a great deal of hand gestures and at least one genuine laugh. Joel catches your eye first, lifts his cup slightly in greeting; Liang follows a half-second later with an exaggerated little salute, then goes straight back to whatever argument he was clearly winning.' },
+          { speaker: 'Mimi', text: '"They are going to be doing that for a while," Mimi says, not even needing to look. "I could tell you what about, if you want. I already know."' },
+          { speaker: 'San', text: '"I believe you," you say, laughing. "Some things about you never change either."' },
+          { speaker: 'San', text: '"How are the kids?" you ask, settling in properly now. "The older one — your daughter — and your son."' },
+          { speaker: 'Mimi', text: '"Getting too clever for me, both of them," Mimi says, warmth threaded all through the complaint. "She has opinions about everything now. He mostly just wants to know where she is at all times. It is exhausting. I would not trade it."' },
+          { speaker: 'San', text: '"I never did actually ask about your marital status," you admit, turning the cup slowly in your hands. "I thought you were married, at first. Then somewhere along the way I started thinking you were single. I was never really comfortable enough to just ask directly."' },
+          { speaker: 'Mimi', text: '"So I look single?" Mimi asks, one eyebrow going up, delighted by the question in a way that has nothing to do with actually answering it.' },
+          { speaker: 'San', text: 'You laugh, caught. "Yeah. Maybe."' },
+          { speaker: 'San', text: '"And the man I saw you with, that day near the Guild gates," you continue, "that was Brada, was it not? He is good to you. The two of you looked close."' },
+          { speaker: 'Mimi', text: '"Ah. Yes," Mimi says, something private and pleased settling into her face for just a moment before she lets the rest of the sentence catch up to it.' },
+          { speaker: 'San', text: '"Do your kids stay with you? You and your parents, I mean — now that we are all here in Aethon anyway."' },
+          { speaker: 'Mimi', text: '"Mostly," Mimi says. "My daughter stays with her father sometimes."' },
+          { speaker: 'San', text: '"Were you two divorced?"' },
+          { speaker: 'Mimi', text: '"Not exactly," Mimi says. "We just do not live together."' },
+          { speaker: 'San', text: '"That sounds a lot like my own situation, actually," you say, something rueful in it. "Divorce was never simple back in Brunei. Expensive enough that plenty of people just quietly stopped living as married instead of ever making it official."' },
+          { speaker: 'Mimi', text: '"Ah. Yes," Mimi says again, softer this time, recognizing the shape of it.' },
+          { speaker: 'San', text: '"I would have had my own kids with me," you say, quieter now, "if my ex-mother-in-law had not fought it so hard."' },
+          { speaker: 'Narrator', text: 'You tell her the rest slowly, the way you have only ever told it to a very small handful of people — that you had only ever wanted space, and that your ex-mother-in-law made it plain what staying would actually cost, unless you gave her son what he wanted, physically, whenever he wanted it. That speaking back against her, even once, was reason enough to be put out of the house entirely.' },
+          { speaker: 'San', text: '"Then she went and cried to my own mother about it," you say, something flat and old in your voice now, "made the whole thing into a performance where I was somehow the one who had done something wrong."' },
+          { speaker: 'San', text: '"I decided against trying to get them back after that," you say. "I just wanted my parents safe. They were already old. I did not have it in me to fight a war on two fronts at once."' },
+          { speaker: 'Narrator', text: 'You feel it rising before you can stop it — the old, familiar tightness — and you hold it back the only way you have ever really known how, standing up a little too quickly.' },
+          { speaker: 'San', text: '"I am going to get some cream for this," you say, already turning away. "Back in a moment."' },
+          { speaker: 'Narrator', text: 'You make it only a few steps before realizing your money pouch is still sitting on the table. You turn back — and that is when you see it: Brada, outside the café window, tapping lightly on the glass. Mimi opens it just enough to let the sound of the street in, and the two of them talk, brief and easy, the specific shorthand of people who do not need very many words to actually say something.' },
+          { speaker: 'Narrator', text: 'Brada has to go — something waiting for him at the Guild — and you watch, quietly, from a few steps back, the whole unhurried shape of it. The way Mimi\'s face does not change when he leaves, because she is not worried he is actually going anywhere.' },
+          { speaker: 'San', text: '"I left my pouch," you say, sliding back into your seat once he is gone.' },
+          { speaker: 'Mimi', text: '"I saw," Mimi says, already sliding a small plate of snacks across the table without being asked. "Eat something. You look like you need it more than the cream."' },
+          { speaker: 'Narrator', text: 'You do, and something in you settles as you eat — grateful, plainly, for a friend who lets a hard thing be said out loud without flinching from it, and glad, genuinely glad, for whatever steady thing Mimi has built with Brada. It sits next to the same quiet gladness you carry for what you have with Joel, two separate, ordinary happinesses, neither one needing to be smaller so the other can be true.' },
+        ]
+      }
+,{
+        id: 'journal_112',
+        title: 'What Chocolates Kept',
+        chapter: 112,
+        unlockType: 'level',
+        unlockAt: 265,
+        icon: '🎟️',
+        summary: 'A rare reply finally reaches Joel through the window — his old, self-destructive lottery habit becoming, against every odds, the thing that actually reaches San\'s parents, and Mama\'s own quiet generosity opening a door San had never let herself finish asking about.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The window opens the way it always does — quiet, one-directional, no promise of anything back. Joel goes still the moment the vision settles, and San recognizes the particular stillness immediately: this is not one of the ordinary glimpses. This is one of the rare ones.' },
+          { speaker: 'Joel', text: '"It is a letter," Joel says, voice careful, like speaking too loudly might make it stop being real. "From my mother. She actually wrote back."' },
+          { speaker: 'Narrator', text: 'You wait, San, not pushing, the way you have learned to wait for him through every one of these. When he finally reads it aloud, his voice catches almost immediately.' },
+          { speaker: 'Joel', text: '"The ticket won," he reads, slow, like he is still catching up to the words himself. "Tsu Carlits\'s ticket. The one you always bought through him, back home."' },
+          { speaker: 'San', text: '"Chocolates," you say, something clicking into place. "That is who you mean, is it not? Your roommate. Carlito. He actually ran that as a real business, did he not? Buying numbers for people."' },
+          { speaker: 'Joel', text: '"He did," Joel says, something rueful and fond tangled together in it. "I bought through him constantly. My numbers were never anything sensible — your father\'s car plate, once my own weight, birthdays, whatever happened to be sitting in my head that particular week. I lost more on that habit than I ever won. It was part of how the debt got as bad as it did, if I am honest. I always believed the next one would be the one that mattered."' },
+          { speaker: 'Narrator', text: 'Something in his voice is not quite shame and not quite nostalgia — just an old, familiar honesty about exactly who he used to be, spoken plainly, the way he has learned to speak about all of it now.' },
+          { speaker: 'Joel', text: '"Tsu Carlits still had the ticket on file when I disappeared," he continues, reading again. "He knew whose numbers those were. He knew I was missing, not confirmed dead. And he knew — " Joel\'s voice catches properly this time. "He knew how much I put myself through at work, for her. For Mama. So he sent it to her instead of just letting it sit unclaimed."' },
+          { speaker: 'San', text: '"That is an extraordinary thing for someone to do," you say quietly. "He did not have to do that at all."' },
+          { speaker: 'Joel', text: '"He did not," Joel agrees. "But apparently he watched me long enough to understand exactly where it should go."' },
+          { speaker: 'Narrator', text: 'Joel reads on, and this is where his voice finally breaks properly — not from the win itself, but from what his mother chose to do with it.' },
+          { speaker: 'Joel', text: '"She split it. Fifty-fifty, straight down the middle, with San\'s parents." He has to stop for a moment. "She is still in debt herself. She did not have to give away half of anything. She says — " he swallows, "she says San means as much to her as her own children do now, and she already knows how much you love me, unconditionally, and that was reason enough."' },
+          { speaker: 'Narrator', text: 'It is not a fortune, San understands, reading the actual numbers over Joel\'s shoulder — modest, a few thousand, split further still between your father\'s side and your mother\'s pension. Not remotely enough to solve everything. But real. Actually real, actually theirs, actually sent.' },
+          { speaker: 'San', text: '"My mother has her pension already," you say slowly, working through it. "It will matter more for my father. His citizenship is still not finalized. Every extra bit toward the treatment counts, even if it is not everything."' },
+          { speaker: 'Joel', text: '"It is not nothing," Joel says, and you can hear him deciding, in real time, to let that be enough instead of wishing it were more.' },
+          { speaker: 'San', text: '"Your mother did not have to do that," you say again, quieter now, something working through you that you do not entirely have words for yet.' },
+          { speaker: 'Joel', text: '"She never has needed a reason where you are concerned," Joel says. "You know that by now."' },
+          { speaker: 'Narrator', text: 'You do. And sitting with it — Joel\'s old, self-destructive faith in impossible numbers becoming, against every reasonable odds, the thing that actually reached your own parents — something else quietly surfaces, a question you have been carrying since long before any of this, one you have never quite let yourself finish asking out loud.' },
+          { speaker: 'San', text: '"Do you think they would ever actually meet?" you ask. "My parents. Your mother. If any of us ever found a way back, even just once."' },
+          { speaker: 'Joel', text: '"I think she would like that very much," Joel says, gentle, watching you rather than the window now. "I think she already thinks of them as family. She just has not gotten to say it to their faces yet."' },
+          { speaker: 'Narrator', text: 'The window closes the way it always does, without ceremony, without certainty of when it might open like this again. But something has genuinely shifted — not resolved, not finished, but real in a way it was not an hour ago. Somewhere very far from here, a debt gets a little smaller. A door, long assumed closed, sits open just slightly further than it did this morning.' },
+        ]
+      }
     ]
   },
 
@@ -8377,7 +8449,8 @@ const VISION_VIGNETTES = [
   "Your father is in the garden, crouched slower than he used to crouch, tending something green that is doing better than it has any right to. He straightens up, presses a hand to his back, and keeps going anyway.",
   "The house is quiet, mid-morning, nobody visibly in frame — just light through familiar windows, a ceiling fan turning, a kettle steaming on the stove that someone will come back for in a moment. Ordinary. Undramatic. Still standing.",
   "Your mother is folding laundry on the bed, the same unhurried rhythm she has always folded laundry in, and for just a moment she pauses, mid-fold, and looks toward the window — and you will never know if she felt anything at all, or if it was nothing, just a mother pausing in an ordinary afternoon.",
-  "An old friend of your father's has stopped by \u2014 someone from the old sales days, still telling the same stories he always told, still making your father laugh at the parts he has heard a hundred times already. Some friendships, apparently, never needed an occasion."
+  "An old friend of your father's has stopped by \u2014 someone from the old sales days, still telling the same stories he always told, still making your father laugh at the parts he has heard a hundred times already. Some friendships, apparently, never needed an occasion.",
+  "The window catches on someone you did not expect \u2014 Jeff's wife, though she does not carry that name anymore, laughing at something across a table with someone new. Someone who is actually looking at her children, not past them. She found out about all of it eventually, you learn, and it was not even the first time. She simply decided, finally, that she did not have to keep choosing him. Some doors, it turns out, were always hers to close."
 ];
 
 const JOEL_LETTER_REPLIES = [
@@ -9623,6 +9696,15 @@ const GUILD_MEMBERS = [
       'Mimi: "That one\'s favoring its left side. Just so you know."',
       'Mimi: "I already knew this was coming. Doesn\'t make it less annoying."',
       'Mimi: "Two floors away, I\'d have heard about this fight before it started."'
+    ] },
+  { id: 'brada', npcName: 'Brada Shah', role: 'Artillery', icon: '🎯',
+    recruitReq: { type: 'journal', journalId: 'journal_111' },
+    fieldBuff: { atkPct: 0.04 },
+    recruitLine: "Brada doesn't need much convincing. \"Mimi already told me you'd probably ask eventually. Ballistas, siege lines, anything that needs a steady hand and a longer memory than most people have \u2014 that's mine. Glad to actually put it to use.\"",
+    barks: [
+      'Brada: "Line up the shot. Wait. Then wait a little longer than that."',
+      'Brada: "Mimi already knows how this ends. I\'m just here to make sure it ends fast."',
+      'Brada: "Machinery doesn\'t lie to you. People, sometimes. Not this."'
     ] },
   { id: 'aisy', npcName: 'Aisy', role: 'Rogue', icon: '🌙',
     recruitReq: { type: 'ally' },
@@ -15586,7 +15668,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.23';
+const BUILD_ID = '2026-08-08.26';
 // =========================
 
 
@@ -20224,21 +20306,7 @@ const CHAPTER_ART = {
   "The Widow's Watch": 'chapter26-widows-watch.jpg',
   'journal_026': 'chapter26-widows-watch.jpg',
   'The Roads Senedra Walked': 'chapter27-roads-senedra-walked.jpg',
-  'journal_027': 'chapter27-roads-senedra-walked.jpg',
-  'The Room That Waited': 'chapter28-room-that-waited.jpg',
-  'journal_028': 'chapter28-room-that-waited.jpg',
-  'The Boy Who Stopped Checking': 'chapter29-boy-who-stopped-checking.jpg',
-  'journal_029': 'chapter29-boy-who-stopped-checking.jpg',
-  'The Storm That Never Broke': 'chapter30-storm-that-never-broke.jpg',
-  'journal_030': 'chapter30-storm-that-never-broke.jpg',
-  'What the Ember Remembers': 'chapter31-what-ember-remembers.jpg',
-  'journal_031': 'chapter31-what-ember-remembers.jpg',
-  'What the Ledger Never Said': 'chapter32-what-ledger-never-said.jpg',
-  'journal_032': 'chapter32-what-ledger-never-said.jpg',
-  'The Version That Stopped Pretending': 'chapter33-version-that-stopped-pretending.jpg',
-  'journal_033': 'chapter33-version-that-stopped-pretending.jpg',
-  'The Door Someone Built on Purpose': 'chapter34-door-built-on-purpose.jpg',
-  'journal_034': 'chapter34-door-built-on-purpose.jpg'
+  'journal_027': 'chapter27-roads-senedra-walked.jpg'
 };
 function getChapterArt(key) {
   const file = CHAPTER_ART[key];
