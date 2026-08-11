@@ -3934,6 +3934,38 @@ storyJournal: {
           { speaker: 'KW Liang', text: '"Kaya kaya," Liang says, one more time, and this time it does not sound like an old joke at all. It sounds like a name he has finally decided to grow into.' },
         ]
       }
+,{
+        id: 'journal_110',
+        title: 'A Dollar a Meal',
+        chapter: 110,
+        unlockType: 'level',
+        unlockAt: 255,
+        icon: '🍚',
+        summary: 'A stray memory of dollar nasi katok pulls the whole group into something quieter than usual — Joel speaking plainly about a season he once could only address through a hidden alter ego, and Liang admitting, for the first time, exactly how much of his old self he has left unspoken.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It starts, as these things usually do, with nothing important — San idly turning over a coin from a market stall, watching the light catch on it, and somewhere in that small, ordinary motion, an old memory surfaces uninvited.' },
+          { speaker: 'San', text: '"Remember the dollar nasi katok?" you say, mostly to yourself at first. "Keboys. The chicken rice at Menglait."' },
+          { speaker: 'Joel', text: 'Joel looks up from what he is doing, something immediate and unguarded crossing his face. "The dollar ones with the extra sambal, or the ones that actually gave you a real piece of chicken?"' },
+          { speaker: 'San', text: '"Both," you say, laughing despite yourself. "Depending on how broke we actually were that week."' },
+          { speaker: 'Joel', text: '"I lived on those for longer than I ever told anyone," Joel says, easy about it now in a way that still occasionally surprises you. "A dollar a meal, some weeks. I got very good at knowing which stalls actually meant it when they said extra."' },
+          { speaker: 'Narrator', text: 'It is a small thing, Joel saying this so plainly — but San remembers a version of him who would have folded a story like this into a joke before anyone got close enough to feel the actual weight of it. Two hundred levels into becoming who he is now, he simply does not do that anymore.' },
+          { speaker: 'Narrator', text: 'There was a season, long before any of this, when Joel could not have said any of it so plainly at all — not directly, not as himself. He ran a small, half-anonymous vlog back then, a persona he called Tigasin Ng Brunie, and it was there, hidden behind a name that was not quite his, that he first let himself actually say the things a dollar meal a week does to a person. It took the world ending and building itself back up around him before he learned he could simply say them as Joel instead.' },
+          { speaker: 'San', text: '"I did not know that had a name," you say, quiet, something tender in it.' },
+          { speaker: 'Joel', text: '"Neither did most people," Joel says, and does not elaborate further, and does not need to.' },
+          { speaker: 'KW Liang', text: '"Where I came from, food was not really something you missed," Liang says, joining the conversation with the easy tone he has mostly recovered by now. "Rationed. Functional. You ate because the alternative was worse, not because any of it was worth remembering." A beat, lighter. "This place, at least, understands a meal is allowed to actually be good."' },
+          { speaker: 'San', text: '"Amad keeps a supply of nasi katok, if you ever actually want to try it," you offer. "Just say the word."' },
+          { speaker: 'Narrator', text: 'Liang does not answer right away. Something crosses his face instead — brief, involuntary, gone almost as quickly as it arrived — the specific look of someone thinking of people rather than food.' },
+          { speaker: 'Aisyah', text: '"You do not have to perform being fine," Aisyah says, gently, watching him with the particular attentiveness of someone who has learned exactly what his easy tone is sometimes covering for.' },
+          { speaker: 'KW Liang', text: '"I know," Liang says, and for a moment none of the old deflecting humor shows up to fill the space. "I used to talk more than this. Did you know that? Back home, I mean. Before all of this."' },
+          { speaker: 'San', text: '"I remember," you say.' },
+          { speaker: 'KW Liang', text: '"I think I just ran out of things worth saying that were not about them," Liang admits, quiet, and nobody in the group moves to fill the silence that follows — Joel included, who simply stays exactly where he is, present without needing to say anything at all this time.' },
+          { speaker: 'Narrator', text: 'The moment passes the way these moments always do here — not resolved, just held, gently, by people who have learned better than to rush someone through it.' },
+          { speaker: 'Aisyah', text: '"Your hair is doing the thing again," Aisyah says, apropos of nothing, clearly deciding the room could use it.' },
+          { speaker: 'KW Liang', text: '"It is ALWAYS doing the thing," Liang says, aggrieved, swatting uselessly at the stubborn tuft at his crown that has never once, since the day he arrived, agreed to lie flat. "I have tried everything. I do not know what Aethon has against me specifically."' },
+          { speaker: 'Joel', text: '"At this point it might just be part of you," Joel says, grinning properly now, the heaviness of a moment ago allowed to actually pass. "Bunny-shaped and permanent."' },
+          { speaker: 'KW Liang', text: '"I hate that you might be right," Liang says, and the laugh that finally breaks loose from him is real, easy, entirely his own — no old persona standing between him and the sound of it.' },
+        ]
+      }
     ]
   },
 
@@ -15554,7 +15586,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.22';
+const BUILD_ID = '2026-08-08.23';
 // =========================
 
 
@@ -20192,7 +20224,21 @@ const CHAPTER_ART = {
   "The Widow's Watch": 'chapter26-widows-watch.jpg',
   'journal_026': 'chapter26-widows-watch.jpg',
   'The Roads Senedra Walked': 'chapter27-roads-senedra-walked.jpg',
-  'journal_027': 'chapter27-roads-senedra-walked.jpg'
+  'journal_027': 'chapter27-roads-senedra-walked.jpg',
+  'The Room That Waited': 'chapter28-room-that-waited.jpg',
+  'journal_028': 'chapter28-room-that-waited.jpg',
+  'The Boy Who Stopped Checking': 'chapter29-boy-who-stopped-checking.jpg',
+  'journal_029': 'chapter29-boy-who-stopped-checking.jpg',
+  'The Storm That Never Broke': 'chapter30-storm-that-never-broke.jpg',
+  'journal_030': 'chapter30-storm-that-never-broke.jpg',
+  'What the Ember Remembers': 'chapter31-what-ember-remembers.jpg',
+  'journal_031': 'chapter31-what-ember-remembers.jpg',
+  'What the Ledger Never Said': 'chapter32-what-ledger-never-said.jpg',
+  'journal_032': 'chapter32-what-ledger-never-said.jpg',
+  'The Version That Stopped Pretending': 'chapter33-version-that-stopped-pretending.jpg',
+  'journal_033': 'chapter33-version-that-stopped-pretending.jpg',
+  'The Door Someone Built on Purpose': 'chapter34-door-built-on-purpose.jpg',
+  'journal_034': 'chapter34-door-built-on-purpose.jpg'
 };
 function getChapterArt(key) {
   const file = CHAPTER_ART[key];
