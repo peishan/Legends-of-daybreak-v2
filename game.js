@@ -15821,6 +15821,8 @@ function rCombatLog() {
   }
   h += '</div>';
 
+  h += '<button onclick="exportLog()" class="btn-outline-ghost" style="width:100%;margin-bottom:12px;">📄 Export Log to .md</button>';
+
   if (entries.length === 0) {
     h += '<div class="panel" style="text-align:center;"><div class="btn-hint">Nothing here yet in this category.</div></div>';
   } else {
@@ -16112,7 +16114,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.36';
+const BUILD_ID = '2026-08-08.38';
 // =========================
 
 
@@ -17043,6 +17045,40 @@ function pasteGistId() {
   }
 }
 
+// Wraps fetch with a timeout and automatic retries — built specifically for flaky
+// connections (Bluetooth tethering especially), where a request can hang indefinitely
+// or drop mid-flight without ever surfacing a clear error. A raw fetch() has neither
+// problem covered on its own.
+//
+// Only retries genuine network-level failures (timeout, dropped connection, DNS
+// hiccup) — an HTTP response that came back but reports an error (401 bad token, 404
+// bad gist ID) is definitive, not transient, and retrying it would just waste time
+// without ever succeeding. Those are returned immediately instead.
+async function fetchWithRetry(url, options, maxRetries, timeoutMs, onRetry) {
+  maxRetries = maxRetries || 2;
+  timeoutMs = timeoutMs || 15000;
+  let lastError = null;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    if (attempt > 0 && onRetry) onRetry(attempt, maxRetries);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const resp = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timer);
+      return resp; // got a real HTTP response, even if it's an error status — caller decides what to do with it
+    } catch (e) {
+      clearTimeout(timer);
+      lastError = e.name === 'AbortError'
+        ? new Error('Request timed out \u2014 connection may be too unstable right now.')
+        : e;
+      if (attempt < maxRetries) {
+        await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); // brief backoff before retrying
+      }
+    }
+  }
+  throw lastError;
+}
+
 async function pushToCloud() {
   const token = getSyncToken();
   if (!token) { lg('❌ Paste your GitHub token first.'); return; }
@@ -17059,11 +17095,16 @@ async function pushToCloud() {
 
   G.syncBusy = 'Pushing to cloud\u2026'; render();
   try {
-    const resp = await fetch('https://api.github.com/gists' + (gistId ? '/' + gistId : ''), {
-      method: gistId ? 'PATCH' : 'POST',
-      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github+json' },
-      body
-    });
+    const resp = await fetchWithRetry(
+      'https://api.github.com/gists' + (gistId ? '/' + gistId : ''),
+      {
+        method: gistId ? 'PATCH' : 'POST',
+        headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github+json' },
+        body
+      },
+      2, 15000,
+      (attempt, max) => { G.syncBusy = 'Connection unstable \u2014 retrying (' + attempt + '/' + max + ')\u2026'; render(); }
+    );
     if (!resp.ok) throw new Error('GitHub responded ' + resp.status + ' \u2014 check your token has Gist access.');
     const data = await resp.json();
     if (!gistId) localStorage.setItem(SYNC_GIST_ID_KEY, data.id);
@@ -17087,9 +17128,12 @@ async function pullFromCloud() {
 
   G.syncBusy = 'Pulling from cloud\u2026'; render();
   try {
-    const resp = await fetch('https://api.github.com/gists/' + gistId, {
-      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github+json' }
-    });
+    const resp = await fetchWithRetry(
+      'https://api.github.com/gists/' + gistId,
+      { headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github+json' } },
+      2, 15000,
+      (attempt, max) => { G.syncBusy = 'Connection unstable \u2014 retrying (' + attempt + '/' + max + ')\u2026'; render(); }
+    );
     if (!resp.ok) throw new Error('GitHub responded ' + resp.status + ' \u2014 check your token and gist ID.');
     const data = await resp.json();
     const file = data.files && data.files[SYNC_GIST_FILENAME];
@@ -17114,6 +17158,25 @@ function resetGame() {
     localStorage.removeItem('ldb_save_v4'); // legacy key — must clear too, or loadGame() silently resurrects it
     location.reload();
   }
+}
+
+function exportLog() {
+  if (!G.log || G.log.length === 0) { lg('No log entries to export.'); return; }
+  const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  let md = '# Legends of Daybreak \u2014 Log Export\n\n';
+  md += '*Exported ' + new Date().toLocaleString() + ' \u2014 Level ' + G.p.lvl + ', Build ' + BUILD_ID + '*\n\n';
+  md += '_Note: the in-game log only keeps the most recent 200 entries \u2014 this export reflects only what was still visible at export time, not the full session history._\n\n---\n\n';
+  for (const entry of G.log) {
+    md += '- ' + entry + '\n';
+  }
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'legends-daybreak-log-' + ts + '.md';
+  a.click();
+  URL.revokeObjectURL(url);
+  lg('📜 Log exported!');
 }
 
 function exportSave() {
