@@ -4090,6 +4090,99 @@ storyJournal: {
           { speaker: 'Narrator', text: 'Soel rubs against your leg, once, unhurried — not asking for anything, just another small, present-tense reminder of who is actually still here. The people with you now. That, this time, is more than enough of an answer.' },
         ]
       }
+,{
+        id: 'journal_114',
+        title: 'What Small and Quick Was For',
+        chapter: 114,
+        unlockType: 'level',
+        unlockAt: 275,
+        icon: '🐰',
+        summary: 'A stray line in a Guild War scouting report finally cracks Liang open — the full truth of the Bunnies, the collapse he left mid-crisis, and the not-knowing he has carried alone since. The party\'s answer is immediate: they go together.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It comes up sideways, the way the important things usually do — a Guild War scouting report, read out loud at the debrief table, mentioning a stretch of contested territory that "does not behave right anymore." Nobody at the table means anything by it. It is the kind of line people say about a lot of places these days, half a joke, half a shrug.' },
+          { speaker: 'Narrator', text: 'Liang goes very still.' },
+          { speaker: 'Narrator', text: 'You almost miss it. Aisyah does not. She has spent enough time next to him by now to know the difference between him being quiet and him going somewhere else entirely.' },
+          { speaker: 'Aisyah', text: '"You know something about that," she says, not a question, once the debrief has moved on and it is just the four of you left at the table.' },
+          { speaker: 'KW Liang', text: '"Maybe," Liang says, too fast, already reaching for the easy deflection that has worked on everyone else for years.' },
+          { speaker: 'Aisyah', text: '"Liang."' },
+          { speaker: 'Narrator', text: 'Just his name. Nothing else. It is enough.' },
+          { speaker: 'Narrator', text: 'He is quiet for a long moment, long enough that you almost tell him he does not have to, and then he starts talking anyway, like something finally gave way under its own weight.' },
+          { speaker: 'KW Liang', text: '"There is a place I came from before Aethon," he says. "Not the old world. Somewhere in between — a version of it that was already coming apart when I got there. I did not choose to be there. I was already running from one collapse and found myself in the middle of a different one."' },
+          { speaker: 'KW Liang', text: '"There were people. A group of us, surviving on whatever we could figure out together. We called ourselves the Bunnies — evasive, adaptable, small enough to slip through things that would have caught anyone standing still. It was half a joke and half the only actual strategy any of us had."' },
+          { speaker: 'Narrator', text: 'His voice does something here it has never quite done in front of you before — goes careful, the way a person handles something they are afraid of dropping.' },
+          { speaker: 'KW Liang', text: '"I left while it was still actively falling apart. I went looking for help, for anything, and I found a door instead — the one that eventually put me here. I have never known what happened to the rest of them. Whether the collapse finished what it started. Whether any of them are even still — whether there is still a them to wonder about at all."' },
+          { speaker: 'KW Liang', text: '"I have not told you the whole truth of that, Aisyah. Not the actual size of not knowing. I let you think it was smaller than it is, because the real version of it did not feel like something I was allowed to bring into this. Into us."' },
+          { speaker: 'Narrator', text: 'Aisyah does not say anything for a moment. When she does, her voice is steadier than you expected, and gentler than his.' },
+          { speaker: 'Aisyah', text: '"You do not get to decide what I am allowed to carry with you," she says. "That was never yours to decide alone."' },
+          { speaker: 'San', text: '"The territory in that report," you say, carefully, watching him. "Do you think it could actually be connected? To where you came from?"' },
+          { speaker: 'KW Liang', text: '"I do not know," Liang admits. "I have wondered it every time something like this comes up. I have never let myself follow the thought all the way through, because I was afraid of exactly this — of hoping, and being wrong, in front of people who matter to me now."' },
+          { speaker: 'Narrator', text: 'Joel, quiet through most of this the way he sometimes is when a moment does not need him to fill it, finally speaks.' },
+          { speaker: 'Joel', text: '"Then we go find out," he says, simple, like it was never actually going to be a question. "Together. Not you working up the nerve to go alone and tell us about it after."' },
+          { speaker: 'KW Liang', text: '"You do not have to —"' },
+          { speaker: 'Aisyah', text: '"We know," Aisyah says, cutting him off, not unkindly. "We are choosing to anyway."' },
+          { speaker: 'Narrator', text: 'Something in Liang\'s face breaks open, just slightly — not relief exactly, not yet, but the particular loosening of a person who has been bracing for a long time and has just been told, plainly, that they do not have to brace alone anymore.' },
+          { speaker: 'KW Liang', text: '"Kaya kaya," he says, quiet, almost to himself, the old joke turned into something closer to a promise.' },
+          { speaker: 'Narrator', text: 'Nobody asks him to explain it this time. Nobody needs to. You are already thinking about the door, and the territory that does not behave right, and what it might actually take to go looking for a group of people who called themselves Bunnies because staying small and quick was the only thing that had ever kept them alive.' },
+        ]
+      }
+,{
+        id: 'journal_115',
+        title: 'A Seam, Not a Door',
+        chapter: 115,
+        unlockType: 'level',
+        unlockAt: 280,
+        icon: '🌌',
+        summary: 'Varel and Mimi work through the night to turn watching into crossing for the first time — an unstable, honestly-uncertain rift the party steps through together, landing not in the world Liang left, but somewhere closer to it than he has ever gotten before: unmapped, unexplored, and still clearly, quietly alive.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Varel listens to the whole thing without interrupting once — the scouting report, Liang\'s confession, the shape of what you are actually asking him for — and when you finish, he is quiet long enough that you start to wonder if he is going to say no.' },
+          { speaker: 'Varel', text: '"I have felt something off about that territory for longer than any of you have had a report to explain it." He says it plainly, no ceremony in it. "I did not have a reason to act on it before. I have one now."' },
+          { speaker: 'Narrator', text: 'He sends for Mimi. She arrives already half-certain what he is going to ask, the way she always seems to be.' },
+          { speaker: 'Mimi', text: '"You want to actually open it," she says, not a question either, the family resemblance in that particular habit unmistakable. "Not just look through it."' },
+          { speaker: 'Varel', text: '"Watching has never been the whole of what Farseeing is for. It was only ever the part I taught first, because it was the part that could not get anyone hurt."' },
+          { speaker: 'Narrator', text: 'The two of them work through the night, and you are not entirely sure, watching, whether what you are seeing is a ritual or an argument that both of them have simply agreed to have out loud instead of privately. Mimi keeps pushing at the edges of something; Varel keeps pulling her back from going too far too fast. It looks less like teacher and apprentice by the end of it, and more like two people who trust each other enough to actually disagree.' },
+          { speaker: 'Mimi', text: '"It will hold," Mimi finally says, close to dawn, sounding more certain than she looks. "For a while. I cannot promise you how long, and I cannot promise it stays open once you are through. This is not the same as watching. We do not actually know what we do not know yet."' },
+          { speaker: 'San', text: '"That is not exactly reassuring," you say.' },
+          { speaker: 'Varel', text: '"No," Varel agrees, entirely unbothered by that. "It is honest, though. I have found those two things trade off against each other more often than people would like."' },
+          { speaker: 'Narrator', text: 'Liang has said almost nothing this whole time. When you finally look over at him, he is staring at the place where the air has started to bend wrong, the way it apparently only ever bent for him once before, a long time ago, going the other direction.' },
+          { speaker: 'KW Liang', text: '"I never actually got to choose whether I was leaving," he says, quiet, mostly to himself. "I am choosing this part."' },
+          { speaker: 'Aisyah', text: 'She takes his hand. Does not say anything. Does not need to.' },
+          { speaker: 'Narrator', text: 'The rift, when it finally settles into something stable enough to actually use, does not look like the neat, single door Liang described falling through once. It looks more like a seam — a place where two different kinds of air have agreed, temporarily, to occupy the same space.' },
+          { speaker: 'Joel', text: '"Together," Joel says, the same word he used the night Liang finally told the truth, like it is simply the only answer this family has to anything anymore.' },
+          { speaker: 'Narrator', text: 'You go through first. San, Joel, Aisyah, Liang — the rift does something to sound on the way through, a half-second of total silence loud enough to feel in your teeth, and then you are standing somewhere that used to be a city, in a version of the world Liang has never once described the same way twice.' },
+          { speaker: 'Narrator', text: 'It is not one of the six places you already know. Whatever this is, it is further in, or further down, or simply further than anyone has mapped from the Aethon side. The tech-collapse quiet Liang always talked about is here, exactly as he said it would be — but underneath it, faint, unmistakable, there is something that is very clearly still moving.' },
+          { speaker: 'KW Liang', text: '"This is not where I left them," Liang says, turning slowly, something in his voice you have never heard from him before. "But it is closer than I have ever gotten to finding out."' },
+          { speaker: 'Narrator', text: 'Behind you, the seam holds, humming faintly, uncertain of how long it intends to keep its word. Ahead of you, an entire unmapped stretch of a third world waits, patient, indifferent, and completely unexplored.' },
+        ]
+      }
+,{
+        id: 'journal_116',
+        title: 'A Mark, On Purpose',
+        chapter: 116,
+        unlockType: 'level',
+        unlockAt: 285,
+        icon: '🐹',
+        summary: 'A weeks-old marking, cut fresh into a support beam, becomes the first real proof the Bunnies are still out there, still choosing to survive on purpose rather than by accident. The party doesn\'t find them today — but the search stops being a question of whether, and starts being a question of how much further.',
+        scenes: [
+          { speaker: 'Narrator', text: 'You do not go looking for the movement so much as let it decide the direction for you — a faint, irregular rhythm underneath the collapse-quiet, the kind of sound a place makes when something in it is still choosing to keep going.' },
+          { speaker: 'Narrator', text: 'The city, if it ever really was one, has folded in on itself in ways that do not match anything from the six zones you already know. Whatever caused this collapse was slower here, or crueler, or simply had more time to finish the job before anyone thought to stop it.' },
+          { speaker: 'KW Liang', text: '"This is not how I remember any of it looking." Liang keeps his voice low, scanning every doorway twice before letting the party pass it. "Not worse. Just different. Longer, maybe. I do not actually know how much time passed here while I was gone."' },
+          { speaker: 'Aisyah', text: '"Does that scare you?" she asks, not unkindly.' },
+          { speaker: 'KW Liang', text: '"Less than I expected," he admits. "I think I already made my peace with not knowing, a while ago. This is just the first time I have had to actually stand inside the not-knowing instead of carrying it around."' },
+          { speaker: 'Narrator', text: 'It is Joel who finds it first — a mark, deliberate, cut fresh enough into a support beam that the edges have not even started to weather. Not writing. A shape. Two long ears, unmistakable even reduced to the fewest lines a tired hand could manage.' },
+          { speaker: 'Joel', text: '"San." Just your name, and a nod toward the wall.' },
+          { speaker: 'Narrator', text: 'You cross the room to look. It is small, almost apologetic in size, tucked at knee height where anyone moving fast might miss it entirely and anyone moving carefully never would.' },
+          { speaker: 'Narrator', text: 'Liang\'s breath catches audibly behind you.' },
+          { speaker: 'KW Liang', text: '"That is ours," he says, quiet, reaching out like he is afraid touching it might make it not real. "That is actually ours. Someone left that on purpose."' },
+          { speaker: 'San', text: '"Recently?" you ask.' },
+          { speaker: 'KW Liang', text: '"I cannot tell exactly. Weeks, maybe. Not years — the cut is too clean for that." His hand is not quite steady. "Weeks means someone was standing exactly here, weeks ago, still marking territory the way we used to. Weeks means someone is still choosing to be careful about being found by the wrong people, which means —"' },
+          { speaker: 'Aisyah', text: '"Which means they are still choosing to survive on purpose," Aisyah finishes for him, gently. "Not just surviving by accident."' },
+          { speaker: 'Narrator', text: 'Liang does not answer that directly. He does not need to. He is already moving toward the next doorway, faster now, scanning for the next mark the way a person searches once they have finally been given a real reason to believe there is something left to find.' },
+          { speaker: 'Narrator', text: 'You do not find them today. The trail goes quiet again after the third marking, swallowed by a stretch of collapsed structure none of you can safely cross without better equipment than you brought expecting a single afternoon\'s search. But something has changed in the shape of the search itself — it is no longer a question of whether. It is a question of how much further, and how carefully.' },
+          { speaker: 'Joel', text: '"We come back better prepared," Joel says, already thinking practically, already thinking about what the party will actually need. "This is not a today thing. It was never going to be a today thing."' },
+          { speaker: 'KW Liang', text: '"I know," Liang says, and for the first time since the crossing, he sounds almost steady. "I think I can wait, now that I know waiting actually means something. That is different from the kind of waiting I was doing before."' },
+          { speaker: 'Narrator', text: 'Behind you, faint and patient, the seam Varel and Mimi opened hums on, holding its word a little longer than any of you had quite dared to hope it would. Ahead of you, past the collapsed stretch none of you could cross today, an entire unfinished search waits — smaller, now, than it was this morning. Still not finished. But smaller.' },
+        ]
+      }
     ]
   },
 
@@ -15159,7 +15252,7 @@ function triggerLevelUpAnimation(newLevel) {
 // selecting one selects both, together consuming 2 of the 4 slots, never split apart.
 const ACTIVE_PARTY_SLOTS = 4;
 const SWAPPABLE_PARTY_POOL = ['Mezstorm', 'Eliz', 'Senedra', 'Zaki', 'KW Liang', 'Mimi', 'Brada Shah', 'Dr. AA', 'Sister Wren', 'Ser Aldric'];
-const LINKED_PARTY_PAIRS = [['Mimi', 'Brada Shah']];
+const LINKED_PARTY_PAIRS = [['Mimi', 'Brada Shah'], ['Senedra', 'Zaki']];
 // Maps a swappable party member's name to the Guild Member id that gates their
 // availability, for the six who are recruit-gated rather than level-gated.
 const PARTY_MEMBER_GUILD_GATE = {
@@ -16141,7 +16234,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.39';
+const BUILD_ID = '2026-08-08.43';
 // =========================
 
 
@@ -17575,9 +17668,22 @@ function render(){
   // creates a fresh G.currentBoss object, so comparing it against the last-revealed
   // reference naturally detects a new fight without touching any of those 8+
   // separate combat-start locations.
+  //
+  // Skipped entirely during an active batch (Boss Rush / Fraying Frontier / Guild
+  // War / Mercenary) — the whole point of "Push/Take 5/10/25" is staying hands-off
+  // while it runs, and a manual "Engage" tap required before every single one of up
+  // to 25 chained fights would defeat that completely.
+  const inActiveBatch = (G.bossRush && G.bossRush.batchRemaining > 0) ||
+                         (G.frayingFrontier && G.frayingFrontier.batchRemaining > 0) ||
+                         (G.guildWar && G.guildWar.batchRemaining > 0) ||
+                         (G.mercenary && G.mercenary.batchRemaining > 0);
   if (G.state === 'combat' && G.currentBoss && bossArtFileName(G.currentBoss.n) && G.currentBoss !== G.bossRevealShownFor) {
-    renderBossReveal();
-    return;
+    if (inActiveBatch) {
+      G.bossRevealShownFor = G.currentBoss; // silently mark as shown, same as engageBossReveal(), just without the screen
+    } else {
+      renderBossReveal();
+      return;
+    }
   }
 
   // Auto-combat kick-start safety net. toggleAutoCombat() has always explicitly
