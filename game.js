@@ -16112,7 +16112,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.35';
+const BUILD_ID = '2026-08-08.36';
 // =========================
 
 
@@ -16582,7 +16582,22 @@ function loadGame() {
         if (saved.base && saved.eq) {
           // Modern save format: restore directly
           p.base = saved.base;
+          const defaultEq = p.eq; // fresh default gear (from this file's current party
+                                   // definitions) before it gets overwritten by the save
           p.eq = saved.eq;
+          // Migration: characters whose starting gear was added after some existing
+          // saves were already written would have null stored in these slots from
+          // back when they had no gear at all — restoring that null verbatim would
+          // silently erase gear that only exists in the game's current code, not in
+          // the old save. Only backfills a slot that is genuinely empty in the save
+          // AND has real default gear to offer; never touches a slot the player
+          // actually equipped something into themselves.
+          for (const slot of ['weapon', 'armor']) {
+            if (!p.eq[slot] && defaultEq[slot]) {
+              p.eq[slot] = defaultEq[slot];
+              lg('🧝 ' + p.n + "'s " + defaultEq[slot].n + ' has been fitted for them.');
+            }
+          }
         } else {
           // Legacy save from before the 8-slot system: reconstruct base stats by
           // removing whatever the old single-trinket gear had added, then migrate
