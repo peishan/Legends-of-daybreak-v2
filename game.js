@@ -4197,7 +4197,7 @@ storyJournal: {
   afkAdventureEliteToggle: false, // temporary picker-screen toggle, before starting
   notificationsEnabled: false,
   companionPrestige: {}, // { CompanionName: 'pathKey' } once chosen, absent until then
-  mercenary: { active: false, current: null, completed: 0 }, // current offered contract, if any; completed drives tier scaling
+  mercenary: { active: false, current: null, completed: 0, batchRemaining: 0 }, // current offered contract, if any; completed drives tier scaling; batchRemaining lets several contracts auto-chain without re-tapping "Take the Job" each time
   prestige: { count: 0, xpBonusPct: 0, goldBonusPct: 0 }, // permanent bonuses banked from past resets
   strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
   siegeDefense: { active: false, strongholdId: null, wave: 0, maxWaves: 3 },
@@ -14109,6 +14109,15 @@ function getMercenaryTier() {
   return Math.floor((G.mercenary.completed || 0) / MERCENARY_CONTRACTS_PER_TIER);
 }
 
+// Queues up several contracts to auto-chain without needing to re-tap "Take the Job"
+// between each one — combined with auto-combat already being on by default, this
+// means a whole batch can resolve with a single initial tap instead of one tap per
+// contract, which was turning into real repetitive strain over long sessions.
+function startMercenaryBatch(n) {
+  G.mercenary.batchRemaining = Math.max(0, n - 1); // this call itself starts contract #1
+  startMercenaryContract();
+}
+
 function startMercenaryContract() {
   const contract = getMercenaryContract();
   const zoneLv = Math.max(1, Math.min(G.p.lvl, 50));
@@ -14163,6 +14172,13 @@ function handleMercenaryVictory() {
   G.mercenary.current = null; // ready for a fresh contract next visit
   G.state = 'mercenary';
   lvlup();
+
+  if (G.mercenary.batchRemaining > 0) {
+    G.mercenary.batchRemaining--;
+    startMercenaryContract();
+    return;
+  }
+
   render();
 }
 
@@ -14183,6 +14199,7 @@ handleDefeat = function() {
     G.cbt.on = false;
     G.mercenary.active = false;
     G.mercenary.current = null;
+    G.mercenary.batchRemaining = 0; // a loss stops the batch outright — no silent continuation
     G.state = 'mercenary';
     render();
   } else {
@@ -15668,7 +15685,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.26';
+const BUILD_ID = '2026-08-08.27';
 // =========================
 
 
@@ -18687,6 +18704,12 @@ function rMercenary() {
   h += '<div class="btn-hint" style="margin:10px 0;line-height:1.6;">' + contract.flavor + '</div>';
   h += '<div class="btn-hint" style="margin-bottom:10px;">' + tierOpponents + ' opponents, mage + cleric backed \u2014 a short, sharp fight.</div>';
   h += '<button onclick="startMercenaryContract()" class="abtn" style="width:100%;">Take the Job</button>';
+  h += '<div class="btn-hint" style="text-align:center;margin:10px 0 6px;">Or line up several at once \u2014 auto-combat carries each fight, and the next contract starts on its own when one ends.</div>';
+  h += '<div style="display:flex;gap:6px;">';
+  for (const n of [5, 10, 25]) {
+    h += '<button onclick="startMercenaryBatch(' + n + ')" class="tier-btn" style="flex:1;">Take ' + n + '</button>';
+  }
+  h += '</div>';
   h += '</div>';
 
   h += '</div>';
