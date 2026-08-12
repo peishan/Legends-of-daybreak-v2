@@ -4189,9 +4189,9 @@ storyJournal: {
   templeHunt: { active: false, currentBossName: null },
   guildRepBalance: 0, // spendable reputation currency for the Guild Shop
   dragonHunt: { active: false, currentId: null, cleared: {} }, // legendary optional superbosses, repeatable; cleared keyed by dragon id
-  bossRush: { active: false, streak: 0, bestStreak: 0 }, // chained boss fights, escalating reward + difficulty, no rest between
-  frayingFrontier: { active: false, streak: 0, bestStreak: 0 }, // endless mode, level 100+, bosses scale off current player level indefinitely
-  guildWar: { active: false, streak: 0, bestStreak: 0, fielded: [] }, // squad gauntlet vs rival guilds, unlocks after Iris & Ash (journal_101) + Lv 105
+  bossRush: { active: false, streak: 0, bestStreak: 0, batchRemaining: 0 }, // chained boss fights, escalating reward + difficulty, no rest between
+  frayingFrontier: { active: false, streak: 0, bestStreak: 0, batchRemaining: 0 }, // endless mode, level 100+, bosses scale off current player level indefinitely
+  guildWar: { active: false, streak: 0, bestStreak: 0, fielded: [], batchRemaining: 0 }, // squad gauntlet vs rival guilds, unlocks after Iris & Ash (journal_101) + Lv 105
   guildRoster: { recruited: [] }, // ids from GUILD_MEMBERS who've actually joined the Guild War roster
   visionMachine: { lastUseDay: -1, joelLetterCount: 0 }, // Varel Farseer's window — once per real day, 1M gold
   kindlingCommissions: { linesToday: 0, checksToday: 0, refreshDay: 0 }, // bounded daily ritual — 3 lines, 2 checks, resets once per game day
@@ -9060,6 +9060,15 @@ function continueBossRush() {
   spawnBossRushEncounter();
 }
 
+// Queues up several fights in a row without needing to tap "Continue the Rush"
+// between each one — auto-combat carries each individual fight, and this carries the
+// gap between them. Stops naturally on defeat (handleDefeat already keeps everything
+// earned along the way), same behavior as ending the rush manually.
+function continueBossRushBatch(n) {
+  G.bossRush.batchRemaining = Math.max(0, n - 1);
+  continueBossRush();
+}
+
 function retreatBossRush() {
   lg('🏳️ Retreat — the rush ends at a streak of ' + G.bossRush.streak + '. Everything earned is kept.');
   G.bossRush.active = false;
@@ -9095,6 +9104,13 @@ function spawnFrayingFrontierEncounter() {
 function continueFrayingFrontier() {
   if (!G.frayingFrontier.active) return;
   spawnFrayingFrontierEncounter();
+}
+
+// Same batching pattern as Boss Rush — queues several pushes in a row, stops naturally
+// on defeat with everything earned along the way kept.
+function continueFrayingFrontierBatch(n) {
+  G.frayingFrontier.batchRemaining = Math.max(0, n - 1);
+  continueFrayingFrontier();
 }
 
 function retreatFrayingFrontier() {
@@ -10136,6 +10152,12 @@ function spawnGuildWarEncounter() {
 function continueGuildWar() {
   if (!G.guildWar.active) return;
   spawnGuildWarEncounter();
+}
+
+// Same batching pattern as Boss Rush and Fraying Frontier.
+function continueGuildWarBatch(n) {
+  G.guildWar.batchRemaining = Math.max(0, n - 1);
+  continueGuildWar();
 }
 
 function retreatGuildWar() {
@@ -14564,6 +14586,13 @@ handleVictory = function() {
     }
     G.state = 'boss_rush_room';
     lvlup();
+
+    if (G.bossRush.batchRemaining > 0) {
+      G.bossRush.batchRemaining--;
+      continueBossRush();
+      return;
+    }
+
     render();
   } else {
     _originalHandleVictoryForBossRush();
@@ -14580,6 +14609,7 @@ handleDefeat = function() {
     G.cbt.autoCombat = isAutoCombatPreferred();
     G.cbt.on = false;
     G.bossRush.active = false;
+    G.bossRush.batchRemaining = 0;
     G.currentBoss = null;
     G.state = 'menu';
     render();
@@ -14638,6 +14668,13 @@ handleVictory = function() {
     }
     G.state = 'fraying_frontier_room';
     lvlup();
+
+    if (G.frayingFrontier.batchRemaining > 0) {
+      G.frayingFrontier.batchRemaining--;
+      continueFrayingFrontier();
+      return;
+    }
+
     render();
   } else {
     _originalHandleVictoryForFrayingFrontier();
@@ -14673,6 +14710,13 @@ handleVictory = function() {
     }
     G.state = 'guild_war_room';
     lvlup();
+
+    if (G.guildWar.batchRemaining > 0) {
+      G.guildWar.batchRemaining--;
+      continueGuildWar();
+      return;
+    }
+
     render();
   } else {
     _originalHandleVictoryForGuildWar();
@@ -14706,6 +14750,7 @@ handleDefeat = function() {
     G.cbt.autoCombat = isAutoCombatPreferred();
     G.cbt.on = false;
     G.frayingFrontier.active = false;
+    G.frayingFrontier.batchRemaining = 0;
     G.currentBoss = null;
     G.state = 'menu';
     render();
@@ -14724,6 +14769,7 @@ handleDefeat = function() {
     G.cbt.autoCombat = isAutoCombatPreferred();
     G.cbt.on = false;
     G.guildWar.active = false;
+    G.guildWar.batchRemaining = 0;
     G.currentBoss = null;
     G.state = 'menu';
     render();
@@ -15936,7 +15982,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.29';
+const BUILD_ID = '2026-08-08.30';
 // =========================
 
 
@@ -19517,7 +19563,13 @@ function rBossRushRoom() {
 
   h += '<div class="btn-hint" style="text-align:center;margin:10px 0 16px;">The party got a brief recovery, not a full rest. Keep pushing, or bank what you\'ve got.</div>';
 
-  h += '<button onclick="continueBossRush()" class="abtn" style="width:100%;margin-bottom:10px;">⚔️ Continue the Rush</button>';
+  h += '<button onclick="continueBossRush()" class="abtn" style="width:100%;margin-bottom:8px;">⚔️ Continue the Rush</button>';
+  h += '<div class="btn-hint" style="text-align:center;margin:8px 0 6px;">Or push through several at once \u2014 auto-combat carries each fight, and it stops on its own the moment a fight is lost, keeping everything earned up to that point.</div>';
+  h += '<div style="display:flex;gap:6px;margin-bottom:10px;">';
+  for (const n of [5, 10, 25]) {
+    h += '<button onclick="continueBossRushBatch(' + n + ')" class="tier-btn" style="flex:1;">Push ' + n + '</button>';
+  }
+  h += '</div>';
   h += '<button onclick="retreatBossRush()" class="btn-outline-ghost" style="width:100%;">🏳️ Retreat (keep everything earned)</button>';
 
   h += '</div>';
@@ -19536,7 +19588,13 @@ function rFrayingFrontierRoom() {
 
   h += '<div class="btn-hint" style="text-align:center;margin:10px 0 16px;">The party got a brief recovery, not a full rest. Keep pushing, or bank what you\'ve got.</div>';
 
-  h += '<button onclick="continueFrayingFrontier()" class="abtn" style="width:100%;margin-bottom:10px;">🌫️ Push the Frontier Further</button>';
+  h += '<button onclick="continueFrayingFrontier()" class="abtn" style="width:100%;margin-bottom:8px;">🌫️ Push the Frontier Further</button>';
+  h += '<div class="btn-hint" style="text-align:center;margin:8px 0 6px;">Or push through several at once \u2014 stops on its own the moment a fight is lost, keeping everything earned up to that point.</div>';
+  h += '<div style="display:flex;gap:6px;margin-bottom:10px;">';
+  for (const n of [5, 10, 25]) {
+    h += '<button onclick="continueFrayingFrontierBatch(' + n + ')" class="tier-btn" style="flex:1;">Push ' + n + '</button>';
+  }
+  h += '</div>';
   h += '<button onclick="retreatFrayingFrontier()" class="btn-outline-ghost" style="width:100%;">🏳️ Retreat (keep everything earned)</button>';
 
   h += '</div>';
@@ -19608,7 +19666,13 @@ function rGuildWarRoom() {
 
   h += '<div class="btn-hint" style="text-align:center;margin:10px 0 16px;">The party got a brief recovery, not a full rest. Keep pushing, or bank what you\'ve got.</div>';
 
-  h += '<button onclick="continueGuildWar()" class="abtn" style="width:100%;margin-bottom:10px;">⚔️ Muster Again</button>';
+  h += '<button onclick="continueGuildWar()" class="abtn" style="width:100%;margin-bottom:8px;">⚔️ Muster Again</button>';
+  h += '<div class="btn-hint" style="text-align:center;margin:8px 0 6px;">Or muster through several at once \u2014 stops on its own the moment a fight is lost, keeping everything earned up to that point.</div>';
+  h += '<div style="display:flex;gap:6px;margin-bottom:10px;">';
+  for (const n of [5, 10, 25]) {
+    h += '<button onclick="continueGuildWarBatch(' + n + ')" class="tier-btn" style="flex:1;">Muster ' + n + '</button>';
+  }
+  h += '</div>';
   h += '<button onclick="retreatGuildWar()" class="btn-outline-ghost" style="width:100%;">🏳️ Retreat (keep everything earned)</button>';
 
   h += '</div>';
