@@ -7284,6 +7284,23 @@ function toggleActivePartyMember(name) {
   render();
 }
 
+// Generates a specific, human-readable explanation of what's actually still needed to
+// unlock a recruit-gated party candidate — rather than a generic "not yet met", since
+// "met in the story" and "mechanically recruited" can be genuinely different things
+// (e.g. Dr. AA requires 10 trader visits at Lv.100+, not just having encountered him).
+function getPartyMemberUnlockHint(p) {
+  const guildId = PARTY_MEMBER_GUILD_GATE[p.n];
+  if (!guildId) return 'Not yet unlocked.';
+  const def = GUILD_MEMBERS.find(m => m.id === guildId);
+  if (!def) return 'Not yet unlocked.';
+  const req = def.recruitReq;
+  if (req.type === 'ally') return 'Recruit ' + p.n + ' as a Guild ally first.';
+  if (req.type === 'journal') return 'Requires reaching a specific point in the story.';
+  if (req.type === 'trader_visits') return 'Visit their trader stall ' + req.visits + '+ times, at Level 100 or higher.';
+  if (req.type === 'kindling') return 'Requires progressing the Kindling Network storyline.';
+  return 'Not yet unlocked.';
+}
+
 function rPartySelection() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">👥 Active Party</div>';
@@ -7301,7 +7318,11 @@ function rPartySelection() {
     if (!p) continue;
 
     const partner = getLinkedPartyPartner(name);
-    const unlocked = isSwappablePartyMemberUnlocked(p);
+    const partnerP = partner ? G.party.find(x => x.n === partner) : null;
+    // A linked pair is only actually selectable once BOTH members are unlocked — the
+    // toggle function already enforces this, but the display was only checking the
+    // primary member, making a pair look available when it would silently fail.
+    const unlocked = isSwappablePartyMemberUnlocked(p) && (!partnerP || isSwappablePartyMemberUnlocked(partnerP));
     const selected = G.activePartySelection.includes(name);
 
     let label = p.n + ' \u2014 ' + p.r;
@@ -7312,7 +7333,10 @@ function rPartySelection() {
 
     h += '<button onclick="toggleActivePartyMember(\'' + name + '\')" class="btn-outline-ghost" style="width:100%;text-align:left;margin-bottom:8px;' + (selected ? 'border-color:var(--accent);background:rgba(124,58,237,0.15);' : '') + (!unlocked ? 'opacity:0.5;' : '') + '"' + (!unlocked ? ' disabled' : '') + '>';
     if (!unlocked) {
-      h += '🔒 ' + label + '<br><span style="font-size:10px;opacity:0.7;">Not yet met.</span>';
+      // Show whichever half of the pair is actually still locked, so the message
+      // points at the real blocker rather than defaulting to the primary member.
+      const lockedMember = !isSwappablePartyMemberUnlocked(p) ? p : partnerP;
+      h += '🔒 ' + label + '<br><span style="font-size:10px;opacity:0.7;">' + getPartyMemberUnlockHint(lockedMember) + '</span>';
     } else {
       h += (selected ? '✓ ' : '') + label + (selected ? '<br><span style="font-size:10px;opacity:0.7;">Active</span>' : '<br><span style="font-size:10px;opacity:0.7;">🪑 Benched \u2014 helping at the Guild</span>');
     }
@@ -15912,7 +15936,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.28';
+const BUILD_ID = '2026-08-08.29';
 // =========================
 
 
