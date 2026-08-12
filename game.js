@@ -15492,9 +15492,22 @@ function sf(minutes){
   lg('Focus started! ' + validMinutes + ' min...'); render();
   ft=setInterval(()=>{
     const el=Date.now()-G.fs, rm=G.fd-el;
-    if(G.state!='focus'){clearInterval(ft);return;}
+    // No longer cancels just because the player navigated away — that was the whole
+    // reason Focus Mode couldn't run alongside AFK Adventure or anything else. The
+    // timer now genuinely runs in the background regardless of G.state; only the
+    // explicit Cancel button (cf(), below) or actual completion ever stops it.
     if(rm<=0){
       clearInterval(ft);
+      // Captured immediately, before anything below (checkQ, checkAchievements, etc.)
+      // gets a chance to run — checkQ() specifically can trigger its own nested
+      // lvlup() call internally when the Focus quest itself completes, which can set
+      // G.state to 'story' on a fresh chapter unlock well before the code even
+      // reaches this function's own lvlup() call further down. Capturing late would
+      // just re-preserve that already-corrupted value instead of what the player was
+      // actually doing.
+      const wasActivelyElsewhere = G.state !== 'focus' && G.state !== 'menu';
+      const preservedState = G.state;
+
       const baseXp = G.focusDuration * 4;
       const baseGold = G.focusDuration * 2;
       G.p.fstreak++;  checkDailyQuests('focus', 1);
@@ -15531,15 +15544,25 @@ function sf(minutes){
       }
 
       checkAchievements();
-      lvlup(); G.state='menu'; render();
+      G.fs = null; G.fd = null; // clears the persistent indicator on other screens
+      lvlup();
+      // Restore whatever the player was actually doing before any of the above ran —
+      // otherwise a background Focus completion (or the nested lvlup() inside checkQ)
+      // could silently yank them out of combat or AFK Adventure into a story chapter
+      // or the menu. If they were genuinely on the Focus screen, let it settle there.
+      if (wasActivelyElsewhere) { G.state = preservedState; }
+      else if (G.state === 'focus') { G.state = 'menu'; }
+      render();
     }else{
       const el2=document.getElementById('ft');
       if(el2){const m=Math.floor(rm/60000),s=Math.floor((rm%60000)/1000);el2.textContent=m+':'+s.toString().padStart(2,'0');}
+      const el3=document.getElementById('ft-badge');
+      if(el3){const m=Math.floor(rm/60000),s=Math.floor((rm%60000)/1000);el3.textContent='🧘 '+m+':'+s.toString().padStart(2,'0');}
     }
   },1000);
 }
 
-function cf(){if(ft)clearInterval(ft);setS('menu');lg('Focus cancelled.');render();}
+function cf(){if(ft)clearInterval(ft);G.fs=null;G.fd=null;setS('menu');lg('Focus cancelled.');render();}
 
 // Small, auto-dismissing notification (top-right) — for quick status updates during a
 // grind (bounty progress, contract progress) and for events worth a brief heads-up
@@ -15717,7 +15740,20 @@ function getLogElementClass(msg) {
 function renderLogPanel() {
   const highlight = getLogHighlight();
   const tickerLines = G.log.slice(-12).reverse();
-  let h = '<div class="log-highlight ' + getLogElementClass(highlight) + '"><div class="lh-text">' + boldNumbers(highlight) + '</div></div>';
+  let h = '';
+  // Persistent Focus Mode indicator — visible on every screen now that a session
+  // keeps running in the background regardless of what the player is actually doing.
+  // Only shown when a session is genuinely active and not currently on the Focus
+  // screen itself (which already has its own full countdown display).
+  if (G.fs && G.fd && G.state !== 'focus') {
+    const rm = Math.max(0, G.fd - (Date.now() - G.fs));
+    const m = Math.floor(rm / 60000), s = Math.floor((rm % 60000) / 1000);
+    h += '<div onclick="setS(\'focus\')" style="display:flex;justify-content:space-between;align-items:center;background:rgba(124,58,237,0.15);border:1px solid var(--accent);border-radius:10px;padding:6px 10px;margin-bottom:6px;cursor:pointer;">';
+    h += '<span id="ft-badge" style="font-size:12px;font-weight:700;color:var(--accent-light);">🧘 ' + m + ':' + s.toString().padStart(2, '0') + '</span>';
+    h += '<span style="font-size:10px;color:var(--text-dim);">Focus running \u2014 tap to view</span>';
+    h += '</div>';
+  }
+  h += '<div class="log-highlight ' + getLogElementClass(highlight) + '"><div class="lh-text">' + boldNumbers(highlight) + '</div></div>';
   h += '<div class="log-ticker" id="log">';
   h += tickerLines.map(m => '<div class="le ' + getLogElementClass(m) + '">' + boldNumbers(m) + '</div>').join('');
   h += '</div>';
@@ -16040,7 +16076,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.32';
+const BUILD_ID = '2026-08-08.33';
 // =========================
 
 
