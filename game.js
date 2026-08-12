@@ -160,6 +160,11 @@ const G = {
     ],
     buffs: [], ailments: [], kills: 0, quests: 0, fstreak: 0, bossKills: 0, crafts: 0, survivedCritical: false, focusMinutesToday: 0
   },
+  // Which 4 of the swappable pool are actually fighting right now. Defaults to the
+  // original four so existing saves see zero change in who's active until the player
+  // deliberately opens the new selection screen. San, Joel, Aisyah, and Soel are fixed
+  // and never appear in this list — they're not swappable at all.
+  activePartySelection: ['Mezstorm', 'Eliz', 'Senedra', 'Zaki'],
   party: [
     { n: 'Joel', t: 'The Steadfast', r: 'Tank', hp: 120, mhp: 120, atk: 6, def: 8, spd: 4, on: true, d: 'Your partner and shield. Never lets you fight alone. A steadfast man from a Philippine village, second of four, breadwinner, stray-feeder, yours. He does not ask why you are here. He asks if you will let him stand beside you while you find out.', b: '+10% Max HP', col: '#7c3aed', affinityBonuses: [], gear: null, base: { mhp: 120, atk: 6, def: 8, spd: 4 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Aisyah', t: 'Sisterblade', r: 'Rogue', hp: 70, mhp: 70, atk: 10, def: 4, spd: 9, on: true, d: 'Your sister, sharp-eyed and sharper-tongued. Your eldest sister, who spent decades teaching secondary school math in the old world before she taught you to fight. Now she teaches you the dangerous paths of Aethon. Family is complicated. Family with knives is complicated and useful.', b: '+20% Gold found', col: '#059669', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 10, def: 4, spd: 9 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
@@ -167,7 +172,13 @@ const G = {
     { n: 'Eliz', t: 'Little Healer', r: 'Healer', hp: 65, mhp: 65, atk: 4, def: 5, spd: 5, on: false, ul: 4, d: 'A gentle soul with hands that mend wounds. She is your niece, Mez\'s daughter, autistic in the old world — which here means she experiences magic in textures and colors no one else can perceive. She cannot be reduced below 1 HP — a Guardian Spirit, the game calls it. You call it Eliz being Eliz. The girl who has always endured.', b: '+25% Healing potency. Guardian Spirit: Cannot be reduced below 1 HP.', col: '#db2777', passive: 'guardian_spirit', resurrect: { name: 'Breath of Life', cooldown: 0, maxCooldown: 5, healPct: 0.5, desc: 'Revives a fallen ally with 50% HP. 5-turn cooldown.' }, affinityBonuses: [], gear: null, base: { mhp: 65, atk: 4, def: 5, spd: 5 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Senedra', t: 'Swift Scout', r: 'Ranger', hp: 75, mhp: 75, atk: 8, def: 5, spd: 10, on: false, ul: 6, d: 'An eagle-eyed tracker from the northern woods. She learned this from her mother. From Aisyah. She finds secret paths where others see only walls. She offers you pemmican and speaks of trade routes and dried goods. The real money is in dried goods. They travel. They last. They sell.', b: '+20% Crit chance', col: '#ca8a04', affinityBonuses: [], gear: null, base: { mhp: 75, atk: 8, def: 5, spd: 10 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Zaki', t: 'Young Blade', r: 'Warrior', hp: 100, mhp: 100, atk: 9, def: 6, spd: 6, on: false, ul: 8, d: 'A hot-headed swordsman with a heart of gold. He is young. The firelight makes him look younger. He checks his pack seventeen times. Nervous, he admits. You tell him it is okay. You tell him checking is a kind of love. He wants to be brave like you. You do not feel brave. You feel tired. But you smile anyway.', b: '+15% Attack speed', col: '#dc2626', affinityBonuses: [], gear: null, base: { mhp: 100, atk: 9, def: 6, spd: 6 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'Soel', t: 'The Familiar', r: 'Support', hp: 55, mhp: 55, atk: 5, def: 4, spd: 8, on: false, ul: 10, d: 'Your loyal spirit cat companion. He came with the rain. He chose you. That is rare. That is everything. He is not merely a cat. He is a spirit. He is a choice made flesh. He is the space between San and Joel — the letters overlapping, the sounds merging. He cannot be killed — he reforms from spirit flame.', b: '+10% All stats · Spirit Cat (unkillable)', col: '#7c2d12', spiritCat: true, affinityBonuses: [], gear: null, base: { mhp: 55, atk: 5, def: 4, spd: 8 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } }
+    { n: 'Soel', t: 'The Familiar', r: 'Support', hp: 55, mhp: 55, atk: 5, def: 4, spd: 8, on: false, ul: 10, d: 'Your loyal spirit cat companion. He came with the rain. He chose you. That is rare. That is everything. He is not merely a cat. He is a spirit. He is a choice made flesh. He is the space between San and Joel — the letters overlapping, the sounds merging. He cannot be killed — he reforms from spirit flame.', b: '+10% All stats · Spirit Cat (unkillable)', col: '#7c2d12', spiritCat: true, affinityBonuses: [], gear: null, base: { mhp: 55, atk: 5, def: 4, spd: 8 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'KW Liang', t: 'Quick Hands', r: 'Scout', hp: 70, mhp: 70, atk: 9, def: 4, spd: 9, on: false, ul: 999, recruitGated: true, d: 'A personal shopper turned survivor turned something else entirely. Quick, sharp, and finally committed to something worth the trouble of showing up for. He still carries the Bunnies with him, quietly, even when he is laughing.', b: '+15% Crit chance', col: '#0d9488', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 9, def: 4, spd: 9 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Mimi', t: 'Dreamwalker', r: 'Divination Mage', hp: 55, mhp: 55, atk: 11, def: 3, spd: 7, on: false, ul: 999, recruitGated: true, d: 'She already knew you would ask before you finished asking. That is not a figure of speech with Mimi \u2014 the Dreamsight sees the shape of a fight before it happens, and she has learned to trust it completely.', b: '+15% Crit chance', col: '#a855f7', affinityBonuses: [], gear: null, base: { mhp: 55, atk: 11, def: 3, spd: 7 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Brada Shah', t: 'Steady Hand', r: 'Artillery', hp: 90, mhp: 90, atk: 13, def: 7, spd: 3, on: false, ul: 999, recruitGated: true, d: "Mimi's partner, and steady in every sense of the word \u2014 ballistas, siege lines, anything that rewards patience over speed. Slow to move, impossible to rush, and devastating once he actually lines up the shot.", b: '+15% Attack damage', col: '#78716c', affinityBonuses: [], gear: null, base: { mhp: 90, atk: 13, def: 7, spd: 3 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Dr. AA', t: 'Steady Hands', r: 'Healer', hp: 70, mhp: 70, atk: 5, def: 6, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Calm under pressure in the specific way only someone who has already seen the worst of it can be. Keeps a ghost story ready for the ride there, and a steady hand ready for whatever happens once you arrive.', b: '+20% Healing potency', col: '#0284c7', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 5, def: 6, spd: 5 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Sister Wren', t: 'True Devotion', r: 'Healer', hp: 68, mhp: 68, atk: 4, def: 8, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Spent a long time devoted to something that was never real. Knows real when she finally gets to stand next to it \u2014 and heals like someone who has decided, this time, the devotion is actually worth it.', b: '+10% Defense (party)', col: '#f0abfc', affinityBonuses: [], gear: null, base: { mhp: 68, atk: 4, def: 8, spd: 5 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Ser Aldric', t: 'The Other Kind of Found', r: 'Knight', hp: 110, mhp: 110, atk: 7, def: 9, spd: 3, on: false, ul: 999, recruitGated: true, d: 'Spent a long time being found by things. Guild work feels like the other version of that \u2014 chosen instead of caught. Holds a line like it is a personal promise, because to him, it is.', b: '+15% Defense', col: '#57534e', affinityBonuses: [], gear: null, base: { mhp: 110, atk: 7, def: 9, spd: 3 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } }
   ],
 
   partySynergies: [
@@ -7226,6 +7237,92 @@ function submitDiscipleResponse(optionIndex) {
   render();
 }
 
+// Toggles a swappable-pool member in or out of the active party, respecting the slot
+// cap and keeping linked pairs (Mimi/Brada) together — selecting one always selects
+// or deselects both, since they were never meant to be split apart.
+function toggleActivePartyMember(name) {
+  const p = G.party.find(x => x.n === name);
+  if (!p || !SWAPPABLE_PARTY_POOL.includes(name)) return;
+
+  const partner = getLinkedPartyPartner(name);
+  const currentlySelected = G.activePartySelection.includes(name);
+
+  if (currentlySelected) {
+    // Deselecting — remove this member and their linked partner, if any. Heal them to
+    // full immediately: combat has several "second wind" recovery spots that revive
+    // anyone at 0 HP by setting p.on=true directly, and a benched member left at 0 HP
+    // could otherwise get accidentally reactivated by one of those. Also just makes
+    // narrative sense — they're heading back to rest at the Guild, not staying downed.
+    for (const n of [name, partner]) {
+      if (!n) continue;
+      const member = G.party.find(x => x.n === n);
+      if (member) member.hp = member.mhp;
+    }
+    G.activePartySelection = G.activePartySelection.filter(n => n !== name && n !== partner);
+  } else {
+    if (!isSwappablePartyMemberUnlocked(p)) return; // can't select someone not yet met
+
+    const namesToAdd = [name];
+    if (partner && !G.activePartySelection.includes(partner)) {
+      const partnerP = G.party.find(x => x.n === partner);
+      if (!partnerP || !isSwappablePartyMemberUnlocked(partnerP)) return; // partner not unlocked, can't split the pair
+      namesToAdd.push(partner);
+    }
+
+    const roomNeeded = namesToAdd.length;
+    const roomAvailable = ACTIVE_PARTY_SLOTS - G.activePartySelection.length;
+    if (roomNeeded > roomAvailable) {
+      lg('👥 Not enough room in the active party for that \u2014 bench someone else first.');
+      return;
+    }
+
+    G.activePartySelection = G.activePartySelection.concat(namesToAdd);
+  }
+
+  syncActivePartyFlags();
+  saveGame();
+  render();
+}
+
+function rPartySelection() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">👥 Active Party</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:12px;">San, Joel, and Aisyah are always with you \u2014 the bonded trio never splits. Soel comes too, and never takes a slot. Everyone else below competes for ' + ACTIVE_PARTY_SLOTS + ' active spots \u2014 whoever is not chosen stays back and helps at the Guild instead.</div>';
+
+  h += '<div class="panel" style="text-align:center;margin-bottom:12px;">';
+  h += '<div class="panel-title">' + G.activePartySelection.length + ' / ' + ACTIVE_PARTY_SLOTS + ' active slots filled</div>';
+  h += '</div>';
+
+  const handledAsPair = new Set();
+
+  for (const name of SWAPPABLE_PARTY_POOL) {
+    if (handledAsPair.has(name)) continue;
+    const p = G.party.find(x => x.n === name);
+    if (!p) continue;
+
+    const partner = getLinkedPartyPartner(name);
+    const unlocked = isSwappablePartyMemberUnlocked(p);
+    const selected = G.activePartySelection.includes(name);
+
+    let label = p.n + ' \u2014 ' + p.r;
+    if (partner) {
+      handledAsPair.add(partner);
+      label = p.n + ' & ' + partner + ' (linked pair \u2014 2 slots)';
+    }
+
+    h += '<button onclick="toggleActivePartyMember(\'' + name + '\')" class="btn-outline-ghost" style="width:100%;text-align:left;margin-bottom:8px;' + (selected ? 'border-color:var(--accent);background:rgba(124,58,237,0.15);' : '') + (!unlocked ? 'opacity:0.5;' : '') + '"' + (!unlocked ? ' disabled' : '') + '>';
+    if (!unlocked) {
+      h += '🔒 ' + label + '<br><span style="font-size:10px;opacity:0.7;">Not yet met.</span>';
+    } else {
+      h += (selected ? '✓ ' : '') + label + (selected ? '<br><span style="font-size:10px;opacity:0.7;">Active</span>' : '<br><span style="font-size:10px;opacity:0.7;">🪑 Benched \u2014 helping at the Guild</span>');
+    }
+    h += '</button>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
 function rDisciples() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">📚 Teach a Disciple</div>';
@@ -9688,7 +9785,43 @@ const DISCIPLE_DILEMMAS = [
 ];
 
 const GUILD_MEMBERS = [
-  { id: 'mimi', npcName: 'Mimi', role: 'Scout', icon: '🦋',
+  { id: 'mezstorm', npcName: 'Mezstorm', role: 'Stormsinger', icon: '⛈️',
+    recruitReq: { type: 'always' }, // party-linked — recruited automatically the moment they're unlocked as a party candidate, see syncActivePartyFlags
+    fieldBuff: { spellDmgPct: 0.04 },
+    recruitLine: "Mezstorm doesn't need asking. \"Guild work, party work \u2014 same storm, different name for it. I'll help however you actually need it.\"",
+    barks: [
+      'Mezstorm: "The storm has opinions about this. It usually does."',
+      'Mezstorm: "Family. Complicated. Still useful."',
+      'Mezstorm: "I hear it before it arrives. Convenient, sometimes."'
+    ] },
+  { id: 'eliz', npcName: 'Eliz', role: 'Healer', icon: '💚',
+    recruitReq: { type: 'always' },
+    fieldBuff: { healPct: 0.04 },
+    recruitLine: "Eliz smiles the way she always does \u2014 quiet, certain. \"I can help here too. I like helping here too.\"",
+    barks: [
+      'Eliz: "Everyone here feels warm. I like that."',
+      'Eliz: "I can still feel it from here. The magic. The colors."',
+      'Eliz: "I am not tired. I promise."'
+    ] },
+  { id: 'senedra', npcName: 'Senedra', role: 'Ranger', icon: '🏹',
+    recruitReq: { type: 'always' },
+    fieldBuff: { critPct: 0.04 },
+    recruitLine: "Senedra is already scouting the Guild grounds before you finish asking. \"Good paths in and out of here too. I checked already.\"",
+    barks: [
+      'Senedra: "The real money is still in dried goods. I stand by that."',
+      'Senedra: "I learned to read a room the way I read a trail. Same skill."',
+      'Senedra: "Nobody sneaks up on this place while I am around."'
+    ] },
+  { id: 'zaki', npcName: 'Zaki', role: 'Warrior', icon: '🗡️',
+    recruitReq: { type: 'always' },
+    fieldBuff: { atkPct: 0.04 },
+    recruitLine: "Zaki straightens up immediately, trying and failing to look like he wasn't checking his pack again. \"I can help. I want to help. Just tell me what to do.\"",
+    barks: [
+      'Zaki: "I checked my gear seventeen times before coming here. Just so you know."',
+      'Zaki: "I still do not feel brave. I am trying anyway."',
+      'Zaki: "Somebody has to hold this line. Might as well be me."'
+    ] },
+  { id: 'mimi', npcName: 'Mimi', role: 'Divination Mage', icon: '🦋',
     recruitReq: { type: 'ally' },
     fieldBuff: { xpPct: 0.04 },
     recruitLine: "Mimi already knew you'd ask before you finished asking. \"Guild business? I'm in. I've always wanted an official reason to know things before everyone else does.\"",
@@ -14828,6 +14961,87 @@ function triggerLevelUpAnimation(newLevel) {
 
 // Per-level growth, tailored per companion instead of uniform — matches the same
 // individual-identity approach as their equipment roles and hidden growth abilities.
+// San, Joel, and Aisyah are the fixed trio — never appear in the swappable pool, can
+// never be benched. Soel is a familiar and doesn't take a slot at all. Everyone else
+// competes for ACTIVE_PARTY_SLOTS spots, unlocked either by level (the original four)
+// or by Guild recruitment (the six added later). Mimi and Brada are a linked pair —
+// selecting one selects both, together consuming 2 of the 4 slots, never split apart.
+const ACTIVE_PARTY_SLOTS = 4;
+const SWAPPABLE_PARTY_POOL = ['Mezstorm', 'Eliz', 'Senedra', 'Zaki', 'KW Liang', 'Mimi', 'Brada Shah', 'Dr. AA', 'Sister Wren', 'Ser Aldric'];
+const LINKED_PARTY_PAIRS = [['Mimi', 'Brada Shah']];
+// Maps a swappable party member's name to the Guild Member id that gates their
+// availability, for the six who are recruit-gated rather than level-gated.
+const PARTY_MEMBER_GUILD_GATE = {
+  'KW Liang': 'kw_liang',
+  'Mimi': 'mimi',
+  'Brada Shah': 'brada',
+  'Dr. AA': 'dr_aa',
+  'Sister Wren': 'sister_wren',
+  'Ser Aldric': 'ser_aldric'
+};
+// The reverse relationship for the original four — becoming available as a party
+// candidate (by level) is what recruits them to the Guild roster, not the other way
+// around, since they have no separate story-beat recruitment trigger of their own.
+const ORIGINAL_FOUR_GUILD_ID = {
+  'Mezstorm': 'mezstorm',
+  'Eliz': 'eliz',
+  'Senedra': 'senedra',
+  'Zaki': 'zaki'
+};
+
+// Marks a swappable-pool member as newly available for party selection, and — for the
+// original four specifically — folds them into the Guild roster at the same moment,
+// since level-unlock is their only path to either one. Called from every transition
+// point (loadGame's catch-up loop, live lvlup) so this can never drift out of sync.
+function unlockSwappablePartyMember(p) {
+  if (!p.unlocked) {
+    p.unlocked = true;
+    lg(p.n + ' ' + p.t + ' becomes available to bring into the active party.');
+  }
+  if (ORIGINAL_FOUR_GUILD_ID[p.n]) recruitGuildMember(ORIGINAL_FOUR_GUILD_ID[p.n]);
+}
+
+function getLinkedPartyPartner(name) {
+  for (const pair of LINKED_PARTY_PAIRS) {
+    if (pair[0] === name) return pair[1];
+    if (pair[1] === name) return pair[0];
+  }
+  return null;
+}
+
+// Whether a swappable-pool member has ever actually been met — level-gated ones check
+// their own p.ul against player level, recruit-gated ones check the Guild roster. This
+// is deliberately separate from p.on, which now means "currently selected as active."
+function isSwappablePartyMemberUnlocked(p) {
+  if (PARTY_MEMBER_GUILD_GATE[p.n]) {
+    return isGuildMemberRecruited(PARTY_MEMBER_GUILD_GATE[p.n]);
+  }
+  return p.unlocked || p.ul <= G.p.lvl;
+}
+
+// Recalculates p.on for every swappable-pool member based on activePartySelection —
+// call this after the selection changes, and on load/level-up so p.on always reflects
+// the current pick rather than drifting out of sync with it.
+function syncActivePartyFlags() {
+  for (const p of G.party) {
+    if (!SWAPPABLE_PARTY_POOL.includes(p.n)) continue; // fixed trio + Soel untouched
+    const wasOn = p.on;
+    p.on = G.activePartySelection.includes(p.n);
+    if (p.on && p.hp <= 0) p.hp = p.mhp; // freshly activated member shouldn't enter combat dead
+    if (!p.on && p.hp <= 0) p.hp = p.mhp; // defensive catch-all — a benched member sitting at 0 HP could otherwise be accidentally reactivated by one of combat's "second wind" checks, which set p.on=true for anyone at 0 HP unconditionally
+    if (p.on && !wasOn) lg(p.n + ' ' + p.t + ' joins the active party!');
+  }
+}
+
+// Unified "has this party member ever been unlocked" check, regardless of whether
+// they're currently active or benched — used anywhere the UI or growth logic needs
+// to know if someone exists at all (equipment screen, stat growth), as distinct from
+// whether they're in today's fighting four.
+function isPartyMemberUnlocked(p) {
+  if (SWAPPABLE_PARTY_POOL.includes(p.n)) return isSwappablePartyMemberUnlocked(p);
+  return p.on || p.ul <= G.p.lvl;
+}
+
 const COMPANION_LEVEL_GROWTH = {
   Joel:     { mhp: 12, atk: 1, def: 2, spd: 0 }, // The Steadfast — bulwark, more HP/DEF than offense
   Aisyah:   { mhp: 6,  atk: 2, def: 0, spd: 1 }, // Sisterblade — sharp and fast, fragile
@@ -14836,6 +15050,12 @@ const COMPANION_LEVEL_GROWTH = {
   Senedra:  { mhp: 7,  atk: 2, def: 0, spd: 1 }, // Swift Scout — precision and speed
   Zaki:     { mhp: 10, atk: 2, def: 1, spd: 0 }, // Young Blade — balanced frontliner
   Soel:     { mhp: 8,  atk: 1, def: 1, spd: 1 }, // The Familiar — matches his all-stats passive
+  'KW Liang':    { mhp: 7,  atk: 2, def: 0, spd: 1 }, // Quick Hands — fast, offense-leaning scout
+  Mimi:          { mhp: 6,  atk: 2, def: 1, spd: 0 }, // Dreamwalker — offense-focused caster like Mezstorm
+  'Brada Shah':  { mhp: 9,  atk: 2, def: 1, spd: 0 }, // Steady Hand — slow, heavy, durable artillery
+  'Dr. AA':      { mhp: 9,  atk: 1, def: 1, spd: 0 }, // Steady Hands — durable clinical healer
+  'Sister Wren': { mhp: 8,  atk: 1, def: 2, spd: 0 }, // True Devotion — protective, DEF-leaning healer
+  'Ser Aldric':  { mhp: 11, atk: 1, def: 2, spd: 0 }, // The Other Kind of Found — even tankier than Joel, slower
 };
 
 // Original starting stats (before any growth) and unlock level per companion — used only
@@ -14951,7 +15171,7 @@ function lvlup(){
 
     // === STAGE 2: PARTY AUTO STAT GROWTH (per-companion, tailored to their role) ===
     for(let p of G.party){
-      if(p.on || p.ul <= G.p.lvl){
+      if(isPartyMemberUnlocked(p)){
         if (!p.base) p.base = { mhp: p.mhp, atk: p.atk, def: p.def, spd: p.spd };
         const oldMhp = p.mhp, oldAtk = p.atk, oldDef = p.def, oldSpd = p.spd;
         const growth = COMPANION_LEVEL_GROWTH[p.n] || { mhp: 8, atk: 1, def: 1, spd: 0 };
@@ -14970,7 +15190,14 @@ function lvlup(){
     }
 
     for(let s of G.p.skills){if(!s.on&&s.ul<=G.p.lvl){s.on=true;lg('Learned: '+s.n+'!');}}
-    for(let p of G.party){if(!p.on&&p.ul<=G.p.lvl){p.on=true;p.hp=p.mhp;lg(p.n+' '+p.t+' joins!');}}
+    for(let p of G.party){
+      if (SWAPPABLE_PARTY_POOL.includes(p.n)) {
+        if (!p.unlocked && p.ul <= G.p.lvl) unlockSwappablePartyMember(p);
+      } else if (!p.on && p.ul <= G.p.lvl) {
+        p.on = true; p.hp = p.mhp; lg(p.n + ' ' + p.t + ' joins!');
+      }
+    }
+    syncActivePartyFlags();
     checkAchievements();
     checkTalentUnlocks();
     unlockRestSites();
@@ -15685,7 +15912,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.27';
+const BUILD_ID = '2026-08-08.28';
 // =========================
 
 
@@ -15729,7 +15956,7 @@ function saveGame() {
 
 
     },
-    party: G.party.map(p => ({ n: p.n, t: p.t, r: p.r, hp: p.hp, mhp: p.mhp, atk: p.atk, def: p.def, spd: p.spd, on: p.on, ul: p.ul, d: p.d, b: p.b, col: p.col, affinityBonuses: p.affinityBonuses, gear: p.gear, base: p.base, eq: p.eq })),
+    party: G.party.map(p => ({ n: p.n, t: p.t, r: p.r, hp: p.hp, mhp: p.mhp, atk: p.atk, def: p.def, spd: p.spd, on: p.on, ul: p.ul, unlocked: p.unlocked, d: p.d, b: p.b, col: p.col, affinityBonuses: p.affinityBonuses, gear: p.gear, base: p.base, eq: p.eq })),
     quests: G.quests.map(q => ({ id: q.id, n: q.n, d: q.d, t: q.t, c: q.c, need: q.need, rw: q.rw, done: q.done })),
         bounties: G.bounties.map(b => ({ id: b.id, c: b.c, done: b.done, refreshDay: b.refreshDay })),
     questCollapsed: G.questCollapsed || {},
@@ -15776,6 +16003,7 @@ function saveGame() {
     strongholdTasks: G.strongholdTasks,
     guildHallLevel: G.guildHallLevel,
     guildBoss: G.guildBoss,
+    activePartySelection: G.activePartySelection,
     disciples: G.disciples,
     graduatedDisciples: G.graduatedDisciples || [],
     retroactiveGrowthApplied: G.retroactiveGrowthApplied,
@@ -16143,6 +16371,7 @@ function loadGame() {
       const saved = data.party.find(sp => sp.n === p.n);
       if (saved) {
         p.on = saved.on;
+        p.unlocked = saved.unlocked || false;
         p.affinityBonuses = saved.affinityBonuses || [];
 
         if (saved.base && saved.eq) {
@@ -16194,17 +16423,21 @@ function loadGame() {
     retroactivelyFixCompanionGrowth();
 
     // Catch up any companion whose unlock level has already been reached but who never
-    // got flagged as joined — mirrors unlockRestSites() below. Without this, a companion
-    // stays permanently un-joined if their unlock level was passed before this check
-    // existed, or before they existed in an older save, since p.on is otherwise only
-    // ever set inside lvlup()'s level-up loop and never re-checked on load.
+    // got flagged as available. Swappable-pool members become newly SELECTABLE
+    // (p.unlocked) rather than automatically active — p.on for them is governed by
+    // activePartySelection instead, synced right after this loop. Soel (not in the
+    // pool) keeps the original direct-join behavior since he isn't swappable at all.
     for (let p of G.party) {
-      if (!p.on && p.ul <= G.p.lvl) {
+      if (SWAPPABLE_PARTY_POOL.includes(p.n)) {
+        if (!p.unlocked && p.ul <= G.p.lvl) unlockSwappablePartyMember(p);
+      } else if (!p.on && p.ul <= G.p.lvl) {
         p.on = true;
         p.hp = p.mhp;
         lg(p.n + ' ' + p.t + ' joins!');
       }
     }
+    G.activePartySelection = data.activePartySelection || ['Mezstorm', 'Eliz', 'Senedra', 'Zaki'];
+    syncActivePartyFlags();
 
         for (let q of G.quests) {
       const saved = data.quests.find(sq => sq.id === q.id);
@@ -17129,6 +17362,7 @@ function render(){
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='guild_boss')h+=rGuildBoss();
   else if(G.state=='disciples')h+=rDisciples();
+  else if(G.state=='party_selection')h+=rPartySelection();
   else if(G.state=='combat_log')h+=rCombatLog();
   else if(G.state=='dragon_hunt')h+=rDragonHunt();
   else if(G.state=='prestige')h+=rPrestige();
@@ -17183,6 +17417,7 @@ function attachEvents() {
     else if(a=='stronghold')setS('stronghold');
     else if(a=='guild_boss')setS('guild_boss');
     else if(a=='disciples')setS('disciples');
+    else if(a=='party_selection')setS('party_selection');
     else if(a=='dragon_hunt')setS('dragon_hunt');
     else if(a=='prestige')setS('prestige');
     else if(a=='boss_rush')setS('boss_rush');
@@ -19923,6 +20158,7 @@ function rMenu(){
       {i:'🛡️',l:'Guild',a:'guild'},
       {i:'⚔️',l:'Guild Boss',a:'guild_boss'},
       {i:'📚',l:'Teach a Disciple',a:'disciples'},
+      {i:'👥',l:'Active Party',a:'party_selection'},
       {i:'🗼',l:'Stronghold',a:'stronghold'},
     ]},
     { title: '🧙 Character', items: [
@@ -20657,10 +20893,12 @@ function rParty(){
   }
   h += '<div class="plist">';
   for(let p of G.party){
-    h+='<div class="pcard '+(p.on?'':'locked')+'"><div class="pava" style="background:'+p.col+'20;border-color:'+p.col+'">'+(p.on?portraitImg(p.n.toLowerCase(), p.col+'30', p.n[0]):'<span style="font-size:20px">🔒</span>')+(p.on?'<span class="pava-role-badge" title="'+p.r+'">'+re(p.r)+'</span>':'')+'</div><div class="pinfo"><div class="pn">'+p.n+' <span class="pt">'+p.t+'</span></div><div class="pr" style="color:'+p.col+'">'+p.r+'</div><div class="pd">'+p.d+'</div><div class="pb">'+p.b+'</div>'+(p.on?'<div class="ps">HP:'+p.hp+'/'+p.mhp+' ATK:'+p.atk+(p.gear&&p.gear.atk?'(+'+p.gear.atk+')':'')+' DEF:'+p.def+(p.gear&&p.gear.def?'(+'+p.gear.def+')':'')+' SPD:'+p.spd+(p.gear&&p.gear.spd?'(+'+p.gear.spd+')':'')+(getBlessDef(p)?' <span style="color:var(--rest);font-weight:700;">🐱+10 DEF</span>':'')+'</div>':'')+(G.affinity[p.n]?'<div class="affinity-bar"><div class="affinity-fill '+getAffinityColor(G.affinity[p.n].val)+'" style="width:'+getAffinityBarPct(p.n)+'%"></div></div><div class="affinity-label">'+(G.affinity[p.n].val>=70?'💕 Close':G.affinity[p.n].val>=40?'💛 Friendly':G.affinity[p.n].val>=20?'💔 Distant':'💀 Strained')+' ('+G.affinity[p.n].val+')</div>':'')
+    const memberUnlocked = isPartyMemberUnlocked(p);
+    const isBenched = memberUnlocked && SWAPPABLE_PARTY_POOL.includes(p.n) && !p.on;
+    h+='<div class="pcard '+(memberUnlocked?'':'locked')+'"><div class="pava" style="background:'+p.col+'20;border-color:'+p.col+'">'+(memberUnlocked?portraitImg(p.n.toLowerCase(), p.col+'30', p.n[0]):'<span style="font-size:20px">🔒</span>')+(memberUnlocked?'<span class="pava-role-badge" title="'+p.r+'">'+re(p.r)+'</span>':'')+'</div><div class="pinfo"><div class="pn">'+p.n+' <span class="pt">'+p.t+'</span></div><div class="pr" style="color:'+p.col+'">'+p.r+'</div><div class="pd">'+p.d+'</div><div class="pb">'+p.b+'</div>'+(isBenched?'<div class="btn-hint" style="color:var(--gold);margin:4px 0;">\ud83e\ude91 Benched \u2014 helping at the Guild right now</div>':'')+(memberUnlocked?'<div class="ps">HP:'+p.hp+'/'+p.mhp+' ATK:'+p.atk+(p.gear&&p.gear.atk?'(+'+p.gear.atk+')':'')+' DEF:'+p.def+(p.gear&&p.gear.def?'(+'+p.gear.def+')':'')+' SPD:'+p.spd+(p.gear&&p.gear.spd?'(+'+p.gear.spd+')':'')+(getBlessDef(p)?' <span style="color:var(--rest);font-weight:700;">🐱+10 DEF</span>':'')+'</div>':'')+(G.affinity[p.n]?'<div class="affinity-bar"><div class="affinity-fill '+getAffinityColor(G.affinity[p.n].val)+'" style="width:'+getAffinityBarPct(p.n)+'%"></div></div><div class="affinity-label">'+(G.affinity[p.n].val>=70?'💕 Close':G.affinity[p.n].val>=40?'💛 Friendly':G.affinity[p.n].val>=20?'💔 Distant':'💀 Strained')+' ('+G.affinity[p.n].val+')</div>':'')
 +(G.affinityUnlocks[p.n]?'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">'+G.affinityUnlocks[p.n].map(function(u){var un=p.affinityBonuses&&p.affinityBonuses.includes(u.id);return '<span title="'+u.d+'" style="font-size:9px;padding:2px 6px;border-radius:8px;border:1px solid '+(un?'var(--xp);color:var(--xp);':'var(--border);color:var(--text-dim);opacity:0.6;')+'">'+(un?'🌟 ':'🔒 ')+u.n+' ('+u.th+')</span>';}).join('')+'</div>':'')+rGrowthAbilityBadge(p.n)+rCompanionPrestigeBadge(p.n)+'</div></div>';
     // === COMPANION EQUIPMENT (8 slots for most, reduced for Soel — see hiddenSlots) ===
-    if(p.on || p.ul <= G.p.lvl){
+    if(memberUnlocked){
       const role = getCompanionRole(p.n);
       const hiddenSlots = (role && role.hiddenSlots) || [];
       const slotOrder = ['weapon','armor','head','hands','feet','ring1','ring2','amulet'].filter(s => !hiddenSlots.includes(s));
