@@ -187,12 +187,12 @@ const G = {
     { n: 'Senedra', t: 'Swift Scout', r: 'Ranger', hp: 75, mhp: 75, atk: 8, def: 5, spd: 10, on: false, ul: 6, d: 'An eagle-eyed tracker from the northern woods. She learned this from her mother. From Aisyah. She finds secret paths where others see only walls. She offers you pemmican and speaks of trade routes and dried goods. The real money is in dried goods. They travel. They last. They sell.', b: '+20% Crit chance', col: '#ca8a04', affinityBonuses: [], gear: null, base: { mhp: 75, atk: 8, def: 5, spd: 10 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Zaki', t: 'Young Blade', r: 'Warrior', hp: 100, mhp: 100, atk: 9, def: 6, spd: 6, on: false, ul: 8, d: 'A hot-headed swordsman with a heart of gold. He is young. The firelight makes him look younger. He checks his pack seventeen times. Nervous, he admits. You tell him it is okay. You tell him checking is a kind of love. He wants to be brave like you. You do not feel brave. You feel tired. But you smile anyway.', b: '+15% Attack speed', col: '#dc2626', affinityBonuses: [], gear: null, base: { mhp: 100, atk: 9, def: 6, spd: 6 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Soel', t: 'The Familiar', r: 'Support', hp: 55, mhp: 55, atk: 5, def: 4, spd: 8, on: false, ul: 10, d: 'Your loyal spirit cat companion. He came with the rain. He chose you. That is rare. That is everything. He is not merely a cat. He is a spirit. He is a choice made flesh. He is the space between San and Joel — the letters overlapping, the sounds merging. He cannot be killed — he reforms from spirit flame.', b: '+10% All stats · Spirit Cat (unkillable)', col: '#7c2d12', spiritCat: true, affinityBonuses: [], gear: null, base: { mhp: 55, atk: 5, def: 4, spd: 8 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'KW Liang', t: 'Quick Hands', r: 'Scout', hp: 70, mhp: 70, atk: 9, def: 4, spd: 9, on: false, ul: 999, recruitGated: true, d: 'A personal shopper turned survivor turned something else entirely. Quick, sharp, and finally committed to something worth the trouble of showing up for. He still carries the Bunnies with him, quietly, even when he is laughing.', b: '+15% Crit chance', col: '#0d9488', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 9, def: 4, spd: 9 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'Mimi', t: 'Dreamwalker', r: 'Divination Mage', hp: 55, mhp: 55, atk: 11, def: 3, spd: 7, on: false, ul: 999, recruitGated: true, d: 'She already knew you would ask before you finished asking. That is not a figure of speech with Mimi \u2014 the Dreamsight sees the shape of a fight before it happens, and she has learned to trust it completely.', b: '+15% Crit chance', col: '#a855f7', affinityBonuses: [], gear: null, base: { mhp: 55, atk: 11, def: 3, spd: 7 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'Brada Shah', t: 'Steady Hand', r: 'Artillery', hp: 90, mhp: 90, atk: 13, def: 7, spd: 3, on: false, ul: 999, recruitGated: true, d: "Mimi's partner, and steady in every sense of the word \u2014 ballistas, siege lines, anything that rewards patience over speed. Slow to move, impossible to rush, and devastating once he actually lines up the shot.", b: '+15% Attack damage', col: '#78716c', affinityBonuses: [], gear: null, base: { mhp: 90, atk: 13, def: 7, spd: 3 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'Dr. AA', t: 'Steady Hands', r: 'Healer', hp: 70, mhp: 70, atk: 5, def: 6, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Calm under pressure in the specific way only someone who has already seen the worst of it can be. Keeps a ghost story ready for the ride there, and a steady hand ready for whatever happens once you arrive.', b: '+20% Healing potency', col: '#0284c7', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 5, def: 6, spd: 5 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'Sister Wren', t: 'True Devotion', r: 'Healer', hp: 68, mhp: 68, atk: 4, def: 8, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Spent a long time devoted to something that was never real. Knows real when she finally gets to stand next to it \u2014 and heals like someone who has decided, this time, the devotion is actually worth it.', b: '+10% Defense (party)', col: '#f0abfc', affinityBonuses: [], gear: null, base: { mhp: 68, atk: 4, def: 8, spd: 5 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'Ser Aldric', t: 'The Other Kind of Found', r: 'Knight', hp: 110, mhp: 110, atk: 7, def: 9, spd: 3, on: false, ul: 999, recruitGated: true, d: 'Spent a long time being found by things. Guild work feels like the other version of that \u2014 chosen instead of caught. Holds a line like it is a personal promise, because to him, it is.', b: '+15% Defense', col: '#57534e', affinityBonuses: [], gear: null, base: { mhp: 110, atk: 7, def: 9, spd: 3 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } }
+    { n: 'KW Liang', t: 'Quick Hands', r: 'Scout', hp: 70, mhp: 70, atk: 9, def: 4, spd: 9, on: false, ul: 999, recruitGated: true, d: 'A personal shopper turned survivor turned something else entirely. Quick, sharp, and finally committed to something worth the trouble of showing up for. He still carries the Bunnies with him, quietly, even when he is laughing.', b: '+15% Crit chance', col: '#0d9488', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 9, def: 4, spd: 9 }, eq: { weapon: { n: "Quick Hands' Edge", slot: 'weapon', forCompanion: 'KW Liang', r: 'rare', ilvl: 28, atk: 24, spd: 10, d: "Twin blades for Liang. +24 ATK, +10 SPD" }, armor: { n: "Scavenger's Wrap", slot: 'armor', forCompanion: 'KW Liang', r: 'rare', ilvl: 28, def: 16, spd: 8, d: "Light armor for Liang. +16 DEF, +8 SPD" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Mimi', t: 'Dreamwalker', r: 'Divination Mage', hp: 55, mhp: 55, atk: 11, def: 3, spd: 7, on: false, ul: 999, recruitGated: true, d: 'She already knew you would ask before you finished asking. That is not a figure of speech with Mimi \u2014 the Dreamsight sees the shape of a fight before it happens, and she has learned to trust it completely.', b: '+15% Crit chance', col: '#a855f7', affinityBonuses: [], gear: null, base: { mhp: 55, atk: 11, def: 3, spd: 7 }, eq: { weapon: { n: 'Dreamsight Focus', slot: 'weapon', forCompanion: 'Mimi', r: 'rare', ilvl: 28, atk: 26, def: 4, d: "Focus for Mimi. +26 ATK, +4 DEF" }, armor: { n: "Dreamwalker's Shawl", slot: 'armor', forCompanion: 'Mimi', r: 'rare', ilvl: 28, def: 14, spd: 6, d: "Light robes for Mimi. +14 DEF, +6 SPD" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Brada Shah', t: 'Steady Hand', r: 'Artillery', hp: 90, mhp: 90, atk: 13, def: 7, spd: 3, on: false, ul: 999, recruitGated: true, d: "Mimi's partner, and steady in every sense of the word \u2014 ballistas, siege lines, anything that rewards patience over speed. Slow to move, impossible to rush, and devastating once he actually lines up the shot.", b: '+15% Attack damage', col: '#78716c', affinityBonuses: [], gear: null, base: { mhp: 90, atk: 13, def: 7, spd: 3 }, eq: { weapon: { n: "Steady Hand's Ballista-Bow", slot: 'weapon', forCompanion: 'Brada Shah', r: 'rare', ilvl: 28, atk: 30, def: 10, d: "Heavy siege bow for Brada. +30 ATK, +10 DEF" }, armor: { n: 'Siege-Line Plating', slot: 'armor', forCompanion: 'Brada Shah', r: 'rare', ilvl: 28, def: 22, d: "Heavy plating for Brada. +22 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Dr. AA', t: 'Steady Hands', r: 'Healer', hp: 70, mhp: 70, atk: 5, def: 6, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Calm under pressure in the specific way only someone who has already seen the worst of it can be. Keeps a ghost story ready for the ride there, and a steady hand ready for whatever happens once you arrive.', b: '+20% Healing potency', col: '#0284c7', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 5, def: 6, spd: 5 }, eq: { weapon: { n: 'Old-World Medical Kit', slot: 'weapon', forCompanion: 'Dr. AA', r: 'rare', ilvl: 28, atk: 14, def: 10, d: "Field kit for Dr. AA. +14 ATK, +10 DEF" }, armor: { n: "Physician's Coat", slot: 'armor', forCompanion: 'Dr. AA', r: 'rare', ilvl: 28, def: 18, atk: 4, d: "Coat for Dr. AA. +18 DEF, +4 ATK" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Sister Wren', t: 'True Devotion', r: 'Healer', hp: 68, mhp: 68, atk: 4, def: 8, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Spent a long time devoted to something that was never real. Knows real when she finally gets to stand next to it \u2014 and stands between the party and whatever comes next, calling on the Temple\u2019s grace when it is needed.', b: '+10% Defense (party) \u00b7 Intercession (DEF buff) \u00b7 Temple\u2019s Grace (cure chance)', col: '#f0abfc', affinityBonuses: [], gear: null, base: { mhp: 68, atk: 4, def: 8, spd: 5 }, eq: { weapon: { n: 'Temple-Blessed Censer', slot: 'weapon', forCompanion: 'Sister Wren', r: 'rare', ilvl: 28, atk: 12, def: 12, d: "Censer for Sister Wren. +12 ATK, +12 DEF" }, armor: { n: 'Vestments of Intercession', slot: 'armor', forCompanion: 'Sister Wren', r: 'rare', ilvl: 28, def: 20, d: "Sacred vestments for Sister Wren. +20 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Ser Aldric', t: 'The Other Kind of Found', r: 'Knight', hp: 110, mhp: 110, atk: 7, def: 9, spd: 3, on: false, ul: 999, recruitGated: true, d: 'Spent a long time being found by things. Guild work feels like the other version of that \u2014 chosen instead of caught. Holds a line like it is a personal promise, because to him, it is.', b: '+15% Defense', col: '#57534e', affinityBonuses: [], gear: null, base: { mhp: 110, atk: 7, def: 9, spd: 3 }, eq: { weapon: { n: "The Other Kind of Found's Blade", slot: 'weapon', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, atk: 20, def: 14, d: "Sword for Ser Aldric. +20 ATK, +14 DEF" }, armor: { n: "Knight's Unbroken Plate", slot: 'armor', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, def: 26, d: "Heavy plate for Ser Aldric. +26 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } }
   ],
 
   partySynergies: [
@@ -7764,6 +7764,41 @@ function isElizActive() {
   return G.party.some(p => p.n === 'Eliz' && p.on && p.hp > 0);
 }
 
+// === SISTER WREN ABILITIES: INTERCESSION, TEMPLE'S GRACE ===
+// Deliberately distinct from Eliz rather than a reskinned copy — Wren leans protective
+// (a DEF buff, matching her being the highest-DEF healer-type character in the party)
+// rather than curative-first. She still carries some cure capability, since she comes
+// from the Temple and its own cure ritual (see TEMPLE_CURE_COST above) — but at a
+// lower chance than Eliz's Sacred Cleansing, since curing isn't her main identity the
+// way it is Eliz's. No level-gating here since Wren is recruit-gated, not level-gated.
+const WREN_INTERCESSION_CHANCE = 0.18;
+const WREN_GRACE_CHANCE = 0.20;
+
+function isWrenActive() {
+  return G.party.some(p => p.n === 'Sister Wren' && p.on && p.hp > 0);
+}
+
+function tickWrenHealerAbilities() {
+  if (!isWrenActive()) return;
+
+  // Intercession — a party-wide DEF buff, Wren's actual signature rather than Eliz's
+  // ATK-focused Bless. Reads as her standing between the party and whatever's coming,
+  // matching "the last thing she has left to have been right about."
+  const alreadyInterceded = G.p.buffs.some(b => b.n === 'Interceded');
+  if (!alreadyInterceded && Math.random() < WREN_INTERCESSION_CHANCE) {
+    G.p.buffs.push({ n: 'Interceded', t: 4, def: Math.ceil(G.p.lvl * 0.3) });
+    lg('🕯️ Sister Wren stands between the party and what comes next. DEF increased for a few turns.');
+  }
+
+  // Temple's Grace — a real but secondary cure chance, distinct in name and lower in
+  // rate than Eliz's Sacred Cleansing, tied specifically to Wren's Temple background
+  // rather than a generic "healer cures things" mechanic.
+  if (G.p.ailments.length > 0 && Math.random() < WREN_GRACE_CHANCE) {
+    cureAilments(true);
+    lg('🙏 Sister Wren calls on the Temple\u2019s grace. The affliction lifts.');
+  }
+}
+
 // === JOEL PALADIN ABILITIES: LAY ON HANDS, DIVINE STRENGTH, PROTECTION FROM EVIL, SMITE UNDEAD ===
 // Same standalone pattern as Eliz's abilities. Protection from Evil and Smite Undead are
 // checked directly at combat damage-calc time (see doEnemyAttack/doPartyAttack) since
@@ -9913,7 +9948,7 @@ const GUILD_MEMBERS = [
     ] },
   { id: 'sister_wren', npcName: 'Sister Wren', role: 'Support', icon: '🕯️',
     recruitReq: { type: 'ally' },
-    fieldBuff: { atkPct: 0.03 },
+    fieldBuff: { defPct: 0.10 },
     recruitLine: "Sister Wren doesn't hesitate. \"I spent a long time devoted to something that was never real. I know real when I finally get to stand next to it.\"",
     barks: [
       'Sister Wren: "Hold the line. I\'ve seen worse hold longer."',
@@ -12106,6 +12141,7 @@ function finishPlayerTurn() {
   
   tickAilments();
   tickElizHealerAbilities();
+  tickWrenHealerAbilities();
   tickJoelPaladinAbilities();
   tickZakiFighterAbilities();
   tickSoelWarmPresence();
@@ -16076,7 +16112,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.33';
+const BUILD_ID = '2026-08-08.35';
 // =========================
 
 
