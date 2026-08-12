@@ -4063,6 +4063,33 @@ storyJournal: {
           { speaker: 'Narrator', text: 'The window closes the way it always does, without ceremony, without certainty of when it might open like this again. But something has genuinely shifted — not resolved, not finished, but real in a way it was not an hour ago. Somewhere very far from here, a debt gets a little smaller. A door, long assumed closed, sits open just slightly further than it did this morning.' },
         ]
       }
+,{
+        id: 'journal_113',
+        title: 'Worn Long Enough',
+        chapter: 113,
+        unlockType: 'level',
+        unlockAt: 270,
+        icon: '🏢',
+        summary: 'The window finds C. Adv., Robin\'s old firm still carrying his name, and San finally sees what she could never quite read at the time — that her old coworkers\' careful silence was never indifference, but fear wearing indifference\'s shape, over a dozen small, real kindnesses she never let herself count.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The window finds C. Adv. — Robin\'s old firm, still carrying his name even now, since changing a sign costs more than most people think it should. His business partner runs it these days, quietly, has since the day Robin never came back. Kept the name for convenience, everyone assumes. San is no longer sure that is the only reason.' },
+          { speaker: 'Narrator', text: 'You watch them the way the window always lets you watch — close enough to see faces, too far to be seen back. Erma is still there, still sharp-tongued in the same way she always was, though you notice something now you never let yourself notice at the time: the sharpness only ever showed up on the days cases slowed down, after the road laws changed and drivers got more careful than they used to be. Robin had a way of turning a slow month into someone\'s personal failing. Erma absorbed most of it. But she also used to text you, sometimes, just to ask how life was going. You always filed that under politeness too.' },
+          { speaker: 'Narrator', text: 'Imah is not there anymore — married a few years back, still fighting to keep her own small business afloat, the kind of fight nobody outside it ever really sees. Before you went missing, she used to text you constantly, unable to keep every case straight in her own head, always needing San to remember the details she couldn\'t. You thought it was just the job. She had also sent a wedding invitation, later. You and Joel had gone.' },
+          { speaker: 'Narrator', text: 'Dre left for a better offer, the reasonable kind of leaving. You remember, watching her now, that she still mentions missing the two of you getting Zus together some mornings before work — a small, ordinary ritual that apparently mattered more than either of you said out loud at the time. Jeh left too, for the same reasonable reasons, though you remember the one time she texted you in something close to panic, needing your caller ID app to figure out who kept calling her from an unknown number. You solved it in under a minute. She never quite let you forget that.' },
+          { speaker: 'Narrator', text: 'Sabby, Zai, and Erna — a different Erna, nothing to do with the first — are all still there, all still wearing the same careful, unreadable expression you used to read as simple indifference. Sabby has been a widow for years now; C. Adv. was never a job to her so much as the only thing standing between her and everything falling apart after her husband died. Zai has children who need feeding, and you still run into her sometimes at your own Claims office now — she is a customer there too, small world that Aethon apparently still is — and out of all of them, she is the one who never bothered hiding anything. She knows exactly what she is worth at that firm. She never needed Robin\'s permission to know it.' },
+          { speaker: 'Narrator', text: 'Erna tried, once, to have you over for Raya. You got lost on the way and never actually made it. She never brought it up again directly — instead she started texting you every so often about her Temu free gifts, certain that just one more invite would finally unlock the thing, no matter how many times you gently tried to explain that the whole system was built never to complete. You are fairly sure she still does not believe you. You have decided you do not mind being the one who is wrong about that, forever, if it means she keeps texting.' },
+          { speaker: 'Narrator', text: 'And Nurul — a shy clerk the firm let go of years before any of this, someone who owed San exactly nothing — still crossed an entire wedding hall at Imah\'s ceremony just to say hello. She did not have to. She did it anyway.' },
+          { speaker: 'Narrator', text: 'Some of them still reply, here and there, when San is the one who texts first. It is never much. It is never nothing, either.' },
+          { speaker: 'Narrator', text: 'You understand it now, watching from somewhere none of them can see you back. It was never that they did not care. It was that caring, openly, where Robin might notice, was not a risk any of them could actually afford to take. What you were reading as indifference was fear, worn carefully enough to look like something else — and underneath it, in a dozen small, indirect ways, the care had been there the entire time. A text about nothing. A drink before work. A number you could trace in under a minute. A door that stayed open even after Raya never happened.' },
+          { speaker: 'Narrator', text: 'They wonder sometimes, you can tell, how it all would have gone if nothing had ever changed. Your disappearance left something behind that was never quite filled in again, and Robin\'s, later, left another. People move on — they have to, there is rarely a version of grief that lets you not move on — but moving on was never the same thing as you not being missed. Nine years, in the end, is nine years, whatever anyone did or did not manage to say about it out loud.' },
+          { speaker: 'San', text: 'I could never actually read their minds. I do not think I ever really tried to. I just assumed the silence meant what it looked like.' },
+          { speaker: 'Narrator', text: 'And here, finally, is the thing you actually decide, watching the window close on all of them at once: you are done carrying it. Not the memory — you will keep every part of that, gladly — but the particular, useless weight of wondering what they really felt and whether you had somehow gotten it wrong. Some feelings get buried in work because work is the only place left to put them. Some silence is just fear, worn long enough that it starts to look like something chosen. You cannot go back and unbury any of it. You are allowed, finally, to stop trying.' },
+          { speaker: 'San', text: 'What about you? Do you miss your coworkers at SK*? Even the ones who made it hard for you. Chocolates too.' },
+          { speaker: 'Narrator', text: 'Joel does not answer right away. He pulls you in instead, holds on the way he does when a question is too large to hand back in words yet.' },
+          { speaker: 'Joel', text: 'Does the answer actually matter? I am here. With you.' },
+          { speaker: 'Narrator', text: 'Soel rubs against your leg, once, unhurried — not asking for anything, just another small, present-tense reminder of who is actually still here. The people with you now. That, this time, is more than enough of an answer.' },
+        ]
+      }
     ]
   },
 
@@ -16114,7 +16141,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.38';
+const BUILD_ID = '2026-08-08.39';
 // =========================
 
 
