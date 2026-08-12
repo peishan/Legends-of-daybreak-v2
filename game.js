@@ -10462,9 +10462,9 @@ function addRuneLoot(zoneName) {
 }
 
 // Rune combine modal state
-G.runeCombineModal = { open: false, selected: [], batchSize: 3 };
+G.runeCombineModal = { open: false, selected: [], batchSize: 3, typeFilter: null };
 
-const RUNE_COMBINE_BATCH_SIZES = [3, 5, 8, 10];
+const RUNE_COMBINE_BATCH_SIZES = [3, 6, 9];
 const RUNE_RARITY_ORDER = ['common', 'uncommon', 'rare', 'epic'];
 
 // Larger batches jump more rarity tiers and apply a bigger stat multiplier on top of
@@ -10492,7 +10492,10 @@ function openCombineModal() {
 // matching ones already exist. Built specifically to avoid the manual tap-through-and-
 // scroll workflow, since that's what was causing the reported lag on large inventories.
 // Works on a value-based map rather than array indices, so nothing shifts mid-process.
-function autoCombineRunes() {
+// typeFilter is optional — omit it (or pass null) to combine every type at once,
+// matching the original behavior. Pass a specific rune type key to only touch that
+// type, leaving everything else in the inventory untouched.
+function autoCombineRunes(typeFilter) {
   const batchSize = G.runeCombineModal.batchSize || 3;
   let totalCombines = 0;
   const producedCounts = {}; // name -> count, for the summary message
@@ -10502,9 +10505,15 @@ function autoCombineRunes() {
   // "power", just rarity "uncommon"), so grouping by type only would incorrectly
   // mix a freshly-upgraded rune back in with lower-rarity ones of the same type,
   // undervaluing it in the next combine. Composite key prevents that entirely.
+  //
+  // Runes excluded by typeFilter are kept in a separate, untouched list — the final
+  // inventory rebuild below reassembles from groups PLUS this list, since anything
+  // that never entered groups would otherwise just vanish from G.runes entirely.
   const groupKey = (r) => r.type + '|' + r.r;
   let groups = new Map();
+  const excludedByFilter = [];
   for (const rune of G.runes) {
+    if (typeFilter && rune.type !== typeFilter) { excludedByFilter.push(rune); continue; }
     const key = groupKey(rune);
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(rune);
@@ -10556,15 +10565,19 @@ function autoCombineRunes() {
   }
 
   if (totalCombines === 0) {
-    lg('🔮 No matching batches of ' + batchSize + ' found to combine.');
+    lg('🔮 No matching batches of ' + batchSize + ' found to combine' + (typeFilter && RUNE_TYPES[typeFilter] ? ' for ' + RUNE_TYPES[typeFilter].name : '') + '.');
+    render();
     return;
   }
 
-  // Flatten the final state of every group back into G.runes
+  // Flatten the final state of every group back into G.runes, plus anything that was
+  // excluded by the type filter and never entered a group in the first place — without
+  // this, filtering to a specific type would silently delete every other type's runes.
   G.runes = [];
   for (const [, runeList] of groups) {
     for (const r of runeList) G.runes.push(r);
   }
+  for (const r of excludedByFilter) G.runes.push(r);
 
   const summary = Object.entries(producedCounts).map(([name, count]) => count + '× ' + name).join(', ');
   lg('✨ Auto-combined ' + totalCombines + ' batch' + (totalCombines === 1 ? '' : 'es') + ': ' + summary + '!');
@@ -10572,7 +10585,7 @@ function autoCombineRunes() {
 }
 
 function closeCombineModal() {
-  G.runeCombineModal = { open: false, selected: [], batchSize: 3 };
+  G.runeCombineModal = { open: false, selected: [], batchSize: 3, typeFilter: null };
   render();
 }
 
@@ -10583,6 +10596,20 @@ function setCombineBatchSize(size) {
     G.runeCombineModal.selected = G.runeCombineModal.selected.slice(0, size);
   }
   render();
+}
+
+function setCombineTypeFilter(typeKey) {
+  G.runeCombineModal.typeFilter = typeKey;
+  render();
+}
+
+// Sets the batch size and immediately combines at that size, in one pass — avoids
+// calling setCombineBatchSize (which renders on its own) followed by a second combine
+// call and a second render, which was wasteful for a screen already flagged as
+// feeling slow to use.
+function combineRunesAtSize(size) {
+  G.runeCombineModal.batchSize = size;
+  autoCombineRunes(G.runeCombineModal.typeFilter);
 }
 
 function toggleCombineRune(runeIndex) {
@@ -15982,7 +16009,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.30';
+const BUILD_ID = '2026-08-08.31';
 // =========================
 
 
@@ -16313,7 +16340,12 @@ function loadGame() {
     G.riftFightsRemaining = data.riftFightsRemaining || 0;
     G.riftTriggerAt = data.riftTriggerAt || (3 + Math.floor(Math.random() * 3));
     G.runeSocketModal = { open: false, source: 'inv', itemIndex: null, slot: null, memberName: null, slotIndex: null };
-    G.runeCombineModal = data.runeCombineModal || { open: false, selected: [], batchSize: 3 };
+    // Only batchSize is a genuine saved preference — open/selected are transient UI
+    // state that should never survive a reload. Restoring them as-is (the previous
+    // behavior) meant leaving the manual combine modal open with runes selected could
+    // silently persist across sessions, dropping the player straight back into a
+    // stale, possibly mixed-type selection instead of the normal auto-combine screen.
+    G.runeCombineModal = { open: false, selected: [], batchSize: (data.runeCombineModal && data.runeCombineModal.batchSize) || 3, typeFilter: (data.runeCombineModal && data.runeCombineModal.typeFilter) || null };
     G.grindChampionship = data.grindChampionship || { bestWave: 0, claimedTiers: [] };
     if (data.story) {
       G.story = data.story;
@@ -18164,27 +18196,34 @@ function rRunes(){
 
   let h='<div style="padding:16px;"><h2 class="st">💎 Rune Socketing</h2>';
 
-  // Combine button moved to the top — previously sat after the entire rune grid,
-  // requiring a scroll past every owned rune just to reach it.
+  // Redesigned combine section — big header, pick a type (or all types), then combine
+  // at a specific batch size. Manual select still exists as a de-emphasized fallback
+  // link below, but this is now the primary, one-screen workflow — no scrolling past
+  // the whole inventory, no separate modal, which is what was causing the reported lag.
   if (G.runes.length > 0) {
-    const batchSize = G.runeCombineModal.batchSize || 3;
+    const activeFilter = G.runeCombineModal.typeFilter;
+    const filterLabel = activeFilter ? (RUNE_TYPES[activeFilter] ? RUNE_TYPES[activeFilter].name : activeFilter) : 'All Types';
 
-    // Auto-combine — processes every possible matching batch across the whole
-    // inventory in one tap, including cascading combines. Built specifically so the
-    // manual tap-through-and-scroll flow (the source of the reported lag) can be
-    // skipped entirely. Batch size selector included right here so switching sizes
-    // never requires opening the laggier manual modal either.
-    h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:6px;">Batch size (bigger = better rarity jump + bonus):</div>';
-    h+='<div style="display:flex;gap:6px;margin-bottom:10px;">';
-    for (let size of RUNE_COMBINE_BATCH_SIZES) {
-      const isSel = batchSize === size;
-      h+='<button onclick="setCombineBatchSize(' + size + ')" class="tier-btn' + (isSel ? ' sel' : '') + '" style="flex:1;">' + size + '</button>';
+    h += '<div style="text-align:center;font-size:20px;font-weight:800;color:var(--gold);margin:4px 0 12px;">⚡ Combine Runes</div>';
+
+    h += '<div style="font-size:11px;color:var(--text-dim);margin-bottom:6px;">Type:</div>';
+    h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">';
+    h += '<button onclick="setCombineTypeFilter(null)" class="tier-btn' + (!activeFilter ? ' sel' : '') + '" style="flex:1 1 auto;min-width:70px;">All Types</button>';
+    for (const key in RUNE_TYPES) {
+      const t = RUNE_TYPES[key];
+      const isSel = activeFilter === key;
+      h += '<button onclick="setCombineTypeFilter(\'' + key + '\')" class="tier-btn' + (isSel ? ' sel' : '') + '" style="flex:1 1 auto;min-width:70px;">' + t.icon + ' ' + t.name.replace('Rune of ', '') + '</button>';
     }
-    h+='</div>';
-    h+='<button id="btn-auto-combine" onclick="autoCombineRunes()" style="width:100%;padding:12px;border-radius:12px;border:2px solid var(--gold);background:linear-gradient(135deg,var(--gold),#b8860b);color:#1a1a1a;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;box-shadow:0 2px 8px var(--shadow-accent);">';
-    h+='⚡ Auto-Combine All (batch of ' + batchSize + ')';
-    h+='</button>';
-    h+='<button id="btn-combine" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:12px;cursor:pointer;margin-bottom:16px;">';
+    h += '</div>';
+
+    h += '<div style="font-size:11px;color:var(--text-dim);margin-bottom:6px;">Combine (' + filterLabel + '):</div>';
+    h += '<div style="display:flex;gap:8px;margin-bottom:16px;">';
+    for (const size of RUNE_COMBINE_BATCH_SIZES) {
+      h += '<button onclick="combineRunesAtSize(' + size + ')" class="abtn" style="flex:1;padding:12px 4px;font-size:13px;">Combine ' + size + '</button>';
+    }
+    h += '</div>';
+
+    h += '<button id="btn-combine" style="width:100%;padding:8px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:11px;cursor:pointer;margin-bottom:16px;">';
     h+='🔮 Manual Select Instead';
     h+='</button>';
   }
