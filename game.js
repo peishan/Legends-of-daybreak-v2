@@ -138,7 +138,21 @@ const G = {
       { n: 'Black Blade of Disaster', c: 70, dmg: '6d10', on: false, ul: 45, tier: 9, d: 'A blade of pure entropy that unmakes what it touches.', elem: 'arcane' },
       { n: 'Meteor Swarm', c: 60, dmg: '4d10', on: false, ul: 47, tier: 9, d: 'Ultimate destruction from the sky.', elem: 'fire', status: { type: 'burn', chance: 0.5, dmg: 5, turns: 3 } },
       { n: 'Wish Fulfilled', c: 50, on: false, ul: 48, tier: 9, d: 'Reality bends briefly in your favor.', buff: true, buffType: 'fullRestore', elem: 'arcane' },
-      { n: 'Time Stop', c: 80, on: false, ul: 50, tier: 9, d: 'The world freezes. You alone still move.', buff: true, buffType: 'timeStop', elem: 'arcane' }
+      { n: 'Time Stop', c: 80, on: false, ul: 50, tier: 9, d: 'The world freezes. You alone still move.', buff: true, buffType: 'timeStop', elem: 'arcane' },
+
+      // === TIER 10 (Lv 60) — the original capstone was designed for a level-50 game;
+      // everything from here on extends that same spell tradition into what the game
+      // actually became, each tier tied to a real story beat rather than an arbitrary
+      // number, spaced far enough apart that reaching one still feels like a milestone.
+      { n: "Farseer's Reach", c: 85, dmg: '5d12', on: false, ul: 60, tier: 10, d: "Varel taught you this without meaning to — see the strike land before you throw it.", elem: 'arcane', status: { type: 'shock', chance: 0.35, turns: 1 } },
+      { n: 'Guildbound Surge', c: 40, on: false, ul: 90, tier: 11, d: "Something in you moves faster once you stop carrying everything alone.", buff: true, buffType: 'haste', buffVal: 8, buffTurns: 4, elem: 'arcane' },
+      { n: "Muster's Call", c: 90, dmg: '6d12', on: false, ul: 120, tier: 12, d: "The line holds because everyone actually shows up. This is what showing up sounds like.", elem: 'lightning', status: { type: 'shock', chance: 0.4, turns: 1 } },
+      { n: 'Kindled Resolve', c: 45, on: false, ul: 150, tier: 13, d: "A small, steady flame that has survived worse than this.", buff: true, buffType: 'defense', buffVal: 9, buffTurns: 4, elem: 'fire' },
+      { n: 'Threshold Whisper', c: 35, on: false, ul: 180, tier: 14, d: "Something on the other side is already listening. You listen back.", buff: true, buffType: 'manaRestore', buffVal: 35, elem: 'arcane' },
+      { n: 'Breach Strike', c: 100, dmg: '7d12', on: false, ul: 210, tier: 15, d: "The door opened once. This is what walked through with you.", elem: 'void', status: { type: 'poison', chance: 0.4, dmg: 6, turns: 3 } },
+      { n: 'Kaya Kaya', c: 55, on: false, ul: 240, tier: 16, d: "An old joke that stopped being a joke. Still means the same thing: I am glad you are here.", buff: true, buffType: 'fullRestore', elem: 'arcane' },
+      { n: 'Steady Hand', c: 95, dmg: '6d14', on: false, ul: 260, tier: 17, d: "Line up the shot. Wait. Then wait a little longer than that.", elem: 'physical', status: { type: 'shock', chance: 0.45, turns: 1 } },
+      { n: 'What the Journey Kept', c: 110, on: false, ul: 300, tier: 18, d: "Everyone who stayed, all the way to here. This is theirs too.", buff: true, buffType: 'timeStop', elem: 'arcane' }
     ],
     eq: {
     weapon: { n: 'Apprentice Staff', slot: 'weapon', atk: 2, int: 1, r: 'common', ilvl: 1, d: 'A worn wooden staff crackling with faint arcane energy.' },
@@ -10371,7 +10385,18 @@ const TALENTS = [
   { id: 'rift_walker', name: 'Rift Walker', icon: '🌀', lv: 24, desc: 'Dimensional Instability triggers 1 fight sooner', effect: { riftReduce: 1 } },
   { id: 'elemental_mastery', name: 'Elemental Mastery', icon: '🔥', lv: 26, desc: '+15% elemental weakness damage', effect: { elemWeakBonus: 0.15 } },
   { id: 'void_resistance', name: 'Void Resistance', icon: '🛡️', lv: 28, desc: '-50% Void Bleed HP drain', effect: { voidRed: 0.50 } },
-  { id: 'ascension', name: 'Ascension', icon: '⭐', lv: 30, desc: 'All stats +3. Something greater awaits...', effect: { allStats: 3 } }
+  { id: 'ascension', name: 'Ascension', icon: '⭐', lv: 30, desc: 'All stats +3. Something greater awaits...', effect: { allStats: 3 } },
+
+  // The original 8 talents were designed as a complete, level-30 capstone set for a
+  // shorter game than this became. These extend the same tradition through the new
+  // level-300 ceiling, each tied to a real story beat, stacking further value onto the
+  // same proven multiplier categories above rather than introducing new mechanics.
+  { id: 'what_remains_after', name: 'What Remains After', icon: '🕯️', lv: 50, desc: 'Further -8% MP costs — the capstone was never actually the end.', effect: { mpCostRed: 0.08 } },
+  { id: 'guilds_weight', name: "The Guild's Weight", icon: '🛡️', lv: 100, desc: '+10% elemental weakness damage — carrying less alone hits harder.', effect: { elemWeakBonus: 0.10 } },
+  { id: 'kindled_patience', name: 'Kindled Patience', icon: '🔥', lv: 150, desc: '-20% further Void Bleed HP drain — a small flame that has learned to wait.', effect: { voidRed: 0.20 } },
+  { id: 'threshold_readiness', name: 'Threshold Readiness', icon: '🌌', lv: 200, desc: '+10% further Planar Resonance bonus — something on the other side is already listening.', effect: { resonanceBonus: 0.10 } },
+  { id: 'what_chocolates_kept', name: 'What Chocolates Kept', icon: '🍚', lv: 250, desc: 'Further -7% MP costs — some things are worth remembering exactly as they were.', effect: { mpCostRed: 0.07 } },
+  { id: 'eternal_vigil', name: 'The Eternal Vigil', icon: '👑', lv: 300, desc: '+10% further elemental weakness damage — nothing left to prove, faced anyway.', effect: { elemWeakBonus: 0.10 } }
 ];
 
 function getTalentEffect(id) {
@@ -10381,9 +10406,15 @@ function getTalentEffect(id) {
 function getTalentMultiplier(type) {
   let mult = 1;
   if (type === 'mpCost' && getTalentEffect('spellweaver')) mult -= 0.10;
+  if (type === 'mpCost' && getTalentEffect('what_remains_after')) mult -= 0.08;
+  if (type === 'mpCost' && getTalentEffect('what_chocolates_kept')) mult -= 0.07;
   if (type === 'resonance' && getTalentEffect('planar_attunement')) mult += 0.10;
+  if (type === 'resonance' && getTalentEffect('threshold_readiness')) mult += 0.10;
   if (type === 'elemWeak' && getTalentEffect('elemental_mastery')) mult += 0.15;
+  if (type === 'elemWeak' && getTalentEffect('guilds_weight')) mult += 0.10;
+  if (type === 'elemWeak' && getTalentEffect('eternal_vigil')) mult += 0.10;
   if (type === 'voidDrain' && getTalentEffect('void_resistance')) mult -= 0.50;
+  if (type === 'voidDrain' && getTalentEffect('kindled_patience')) mult -= 0.20;
   return mult;
 }
 
@@ -16009,7 +16040,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.31';
+const BUILD_ID = '2026-08-08.32';
 // =========================
 
 
