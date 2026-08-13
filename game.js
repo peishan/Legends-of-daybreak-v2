@@ -16186,11 +16186,17 @@ function getSpeakerColor(speaker) {
 // Mirrors getSpeakerColor()'s exact lookup — San, a party member, or nobody
 // recognizable (Narrator, one-off NPCs, bosses/echoes). Returns null in the last
 // two cases so scenes without a real portrait render exactly as they did before.
+// Multi-word names (Sister Wren, KW Liang, Dr. AA, Ser Aldric, Brada Shah) get their
+// spaces/periods stripped for the filename — 'sister wren.jpg' is fragile to host and
+// link to, 'sisterwren.jpg' isn't.
+function portraitFileNameFor(name) {
+  return name.toLowerCase().replace(/[\s.]/g, '');
+}
 function getSpeakerPortrait(speaker) {
   if (speaker === 'San') return portraitImg('san', '#7c3aed30', 'S');
   if (speaker === 'Narrator') return null;
   const member = G.party.find(p => p.n === speaker);
-  if (member) return portraitImg(speaker.toLowerCase(), member.col + '30', speaker[0]);
+  if (member) return portraitImg(portraitFileNameFor(speaker), member.col + '30', speaker[0]);
   return null;
 }
 
@@ -21204,7 +21210,7 @@ function rCbt() {
   for (let p of G.party) {
     if (p.on) {
       h += '<div class="party-avatar" title="' + p.n + ' ' + p.hp + '/' + p.mhp + ' HP">';
-      h += '<div class="party-avatar-circle" style="border-color:' + p.col + ';">' + portraitImg(p.n.toLowerCase(), p.col + '30', p.n[0]) + '</div>';
+      h += '<div class="party-avatar-circle" style="border-color:' + p.col + ';">' + portraitImg(portraitFileNameFor(p.n), p.col + '30', p.n[0]) + '</div>';
       h += '<div class="party-avatar-hp"><div class="party-avatar-hp-fill" style="width:' + Math.max(0, (p.hp/p.mhp)*100) + '%;background:' + (p.hp <= 0 ? 'var(--disabled)' : 'var(--hp)') + ';"></div></div>';
       h += '</div>';
     }
@@ -21409,7 +21415,7 @@ function rParty(){
   for(let p of G.party){
     const memberUnlocked = isPartyMemberUnlocked(p);
     const isBenched = memberUnlocked && SWAPPABLE_PARTY_POOL.includes(p.n) && !p.on;
-    h+='<div class="pcard '+(memberUnlocked?'':'locked')+'"><div class="pava" style="background:'+p.col+'20;border-color:'+p.col+'">'+(memberUnlocked?portraitImg(p.n.toLowerCase(), p.col+'30', p.n[0]):'<span style="font-size:20px">🔒</span>')+(memberUnlocked?'<span class="pava-role-badge" title="'+p.r+'">'+re(p.r)+'</span>':'')+'</div><div class="pinfo"><div class="pn">'+p.n+' <span class="pt">'+p.t+'</span></div><div class="pr" style="color:'+p.col+'">'+p.r+'</div><div class="pd">'+p.d+'</div><div class="pb">'+p.b+'</div>'+(isBenched?'<div class="btn-hint" style="color:var(--gold);margin:4px 0;">\ud83e\ude91 Benched \u2014 helping at the Guild right now</div>':'')+(memberUnlocked?'<div class="ps">HP:'+p.hp+'/'+p.mhp+' ATK:'+p.atk+(p.gear&&p.gear.atk?'(+'+p.gear.atk+')':'')+' DEF:'+p.def+(p.gear&&p.gear.def?'(+'+p.gear.def+')':'')+' SPD:'+p.spd+(p.gear&&p.gear.spd?'(+'+p.gear.spd+')':'')+(getBlessDef(p)?' <span style="color:var(--rest);font-weight:700;">🐱+10 DEF</span>':'')+'</div>':'')+(G.affinity[p.n]?'<div class="affinity-bar"><div class="affinity-fill '+getAffinityColor(G.affinity[p.n].val)+'" style="width:'+getAffinityBarPct(p.n)+'%"></div></div><div class="affinity-label">'+(G.affinity[p.n].val>=70?'💕 Close':G.affinity[p.n].val>=40?'💛 Friendly':G.affinity[p.n].val>=20?'💔 Distant':'💀 Strained')+' ('+G.affinity[p.n].val+')</div>':'')
+    h+='<div class="pcard '+(memberUnlocked?'':'locked')+'"><div class="pava" style="background:'+p.col+'20;border-color:'+p.col+'">'+(memberUnlocked?portraitImg(portraitFileNameFor(p.n), p.col+'30', p.n[0]):'<span style="font-size:20px">🔒</span>')+(memberUnlocked?'<span class="pava-role-badge" title="'+p.r+'">'+re(p.r)+'</span>':'')+'</div><div class="pinfo"><div class="pn">'+p.n+' <span class="pt">'+p.t+'</span></div><div class="pr" style="color:'+p.col+'">'+p.r+'</div><div class="pd">'+p.d+'</div><div class="pb">'+p.b+'</div>'+(isBenched?'<div class="btn-hint" style="color:var(--gold);margin:4px 0;">\ud83e\ude91 Benched \u2014 helping at the Guild right now</div>':'')+(memberUnlocked?'<div class="ps">HP:'+p.hp+'/'+p.mhp+' ATK:'+p.atk+(p.gear&&p.gear.atk?'(+'+p.gear.atk+')':'')+' DEF:'+p.def+(p.gear&&p.gear.def?'(+'+p.gear.def+')':'')+' SPD:'+p.spd+(p.gear&&p.gear.spd?'(+'+p.gear.spd+')':'')+(getBlessDef(p)?' <span style="color:var(--rest);font-weight:700;">🐱+10 DEF</span>':'')+'</div>':'')+(G.affinity[p.n]?'<div class="affinity-bar"><div class="affinity-fill '+getAffinityColor(G.affinity[p.n].val)+'" style="width:'+getAffinityBarPct(p.n)+'%"></div></div><div class="affinity-label">'+(G.affinity[p.n].val>=70?'💕 Close':G.affinity[p.n].val>=40?'💛 Friendly':G.affinity[p.n].val>=20?'💔 Distant':'💀 Strained')+' ('+G.affinity[p.n].val+')</div>':'')
 +(G.affinityUnlocks[p.n]?'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">'+G.affinityUnlocks[p.n].map(function(u){var un=p.affinityBonuses&&p.affinityBonuses.includes(u.id);return '<span title="'+u.d+'" style="font-size:9px;padding:2px 6px;border-radius:8px;border:1px solid '+(un?'var(--xp);color:var(--xp);':'var(--border);color:var(--text-dim);opacity:0.6;')+'">'+(un?'🌟 ':'🔒 ')+u.n+' ('+u.th+')</span>';}).join('')+'</div>':'')+rGrowthAbilityBadge(p.n)+rCompanionPrestigeBadge(p.n)+'</div></div>';
     // === COMPANION EQUIPMENT (8 slots for most, reduced for Soel — see hiddenSlots) ===
     if(memberUnlocked){
