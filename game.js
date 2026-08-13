@@ -4225,6 +4225,34 @@ storyJournal: {
           { speaker: 'Bunny Elder', text: '"Welcome back, small and quick," she says, and for the first time since the crossing, Liang actually laughs — unsteady, disbelieving, entirely real.' },
         ]
       }
+,{
+        id: 'journal_118',
+        title: 'What Small and Quick Was Actually For',
+        chapter: 118,
+        unlockType: 'level',
+        unlockAt: 295,
+        icon: '🔥',
+        summary: 'Reyes tells Liang the truth he has carried an unknown version of for years — two lost, Denny and Old Mateo, named honestly rather than left as a number. Not absolution, not blame, just the real shape of it, finally handed to him by someone who stayed to know it properly.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Reyes waits until the fire is properly going before she starts, and even then she takes her time about it — not stalling, you realize, just making sure everyone still standing has actually settled somewhere before she says any of the names out loud.' },
+          { speaker: 'Bunny Elder', text: '"Two," she says finally, no preamble left to soften it with. "We lost two. Not the night you left — later. Winter, the second one after. The kind of collapse that does not announce itself until it is already happening."' },
+          { speaker: 'Narrator', text: 'He does not ask who yet. He is very still, the way he gets right before something lands.' },
+          { speaker: 'Bunny Elder', text: '"Denny," Reyes says, and something in her own voice catches for the first time all night. "You remember him. Youngest of us. Never stopped complaining about the cold and never once actually left when he had the chance to."' },
+          { speaker: 'KW Liang', text: '"Denny." Just the name, flat, like saying it any other way might make it more true than it already is.' },
+          { speaker: 'Bunny Elder', text: '"And Old Mateo. Not from anything sudden — just tired, in the end, the way people get when they have been holding a line for longer than anyone should have to. He went easy. That is the part I actually want you to keep, if you keep anything."' },
+          { speaker: 'Narrator', text: 'Nobody rushes to fill the silence after that. Aisyah\'s hand finds Liang\'s without either of them making a show of it. Joel, across the fire, says nothing at all, which is its own kind of steady.' },
+          { speaker: 'KW Liang', text: '"I was not here." His voice is careful, testing each word before he commits to it. "For either of those. I do not get to have been here."' },
+          { speaker: 'Bunny Elder', text: '"No," Reyes agrees, direct rather than gentle about it, which you suspect is exactly what he actually needs from her right now. "You do not. That is true, and it is going to stay true, and you are going to have to actually live next to that instead of around it."' },
+          { speaker: 'Bunny Elder', text: '"But you did not do this. The world did this. There is a difference, and I need you to actually hear it instead of just agreeing with me to make the conversation shorter."' },
+          { speaker: 'Narrator', text: 'He laughs at that, wet and unsteady, the sound of someone caught between grief and being genuinely known.' },
+          { speaker: 'KW Liang', text: '"You have not changed even a little."' },
+          { speaker: 'Bunny Elder', text: '"Someone had to hold that part together too," she says, almost gentle now that the worst of it is actually said. "Might as well have been me."' },
+          { speaker: 'Narrator', text: 'You watch something shift in Liang across the fire — not relief, nothing that clean, but the particular loosening of a person who has been carrying an unknown number for years and has finally been handed the real one instead. Two. Not zero, not everyone. Two, and a reason each, and someone who was actually there to tell him honestly instead of letting him build worse versions alone in his own head.' },
+          { speaker: 'KW Liang', text: '"Thank you," he tells Reyes, quiet, meaning something much larger than the two words usually carry. "For not letting me imagine it as worse than it was. Or pretend it was smaller."' },
+          { speaker: 'Bunny Elder', text: '"That is what small and quick was always actually for," Reyes says. "Not just surviving. Making sure the ones who did not get to survive were seen, honestly, by someone who stayed long enough to do it properly."' },
+          { speaker: 'Narrator', text: 'The fire burns low around a group that is smaller than it should be and larger than Liang let himself hope for, for years. Somewhere behind you, the seam Varel and Mimi opened still hums, patient, holding a door between two worlds that no longer have to be entirely separate from each other.' },
+        ]
+      }
     ]
   },
 
@@ -16311,7 +16339,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.47';
+const BUILD_ID = '2026-08-08.48';
 // =========================
 
 
