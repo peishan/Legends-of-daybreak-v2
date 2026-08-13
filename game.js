@@ -18102,6 +18102,7 @@ function render(){
   else if(G.state=='boss_rush_room')h+=rBossRushRoom();
   else if(G.state=='fraying_frontier_room')h+=rFrayingFrontierRoom();
   else if(G.state=='guild_war')h+=rGuildWar();
+  else if(G.state=='story_so_far')h+=rStorySoFar();
   else if(G.state=='guild_war_room')h+=rGuildWarRoom();
   else if(G.state=='chain_quest')h+=rChainQuest();
   else if(G.state=='event_deck')h+=rEventDeck();
@@ -18149,6 +18150,7 @@ function attachEvents() {
     else if(a=='fraying_frontier')setS('fraying_frontier');
     else if(a=='kindling_network')setS('kindling_network');
     else if(a=='guild_war')setS('guild_war');
+    else if(a=='story_so_far')setS('story_so_far');
     else if(a=='chain_quest')setS('chain_quest');
     else if(a=='event_deck')setS('event_deck');
     else if(a=='sync')setS('sync');
@@ -20279,6 +20281,43 @@ function rFrayingFrontierRoom() {
   return h;
 }
 
+function isSeasonTwoRevealed() {
+  return G.storyJournal.read.includes('journal_092') || G.storyJournal.read.includes('journal_093');
+}
+
+function rStorySoFar() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">📖 The Story So Far</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">The series, at a glance.</div>';
+
+  h += '<div style="border-radius:14px;overflow:hidden;border:2px solid var(--border);margin-bottom:20px;">';
+  h += '<img src="story-art/cover-series.jpg" style="width:100%;display:block;" onerror="this.parentElement.style.display=\'none\';">';
+  h += '</div>';
+
+  h += '<div class="panel-title" style="margin-bottom:8px;">Season One: The Daybreak Journey</div>';
+  h += '<div style="border-radius:14px;overflow:hidden;border:2px solid var(--border);margin-bottom:12px;">';
+  h += '<img src="story-art/cover-season1.jpg" style="width:100%;display:block;" onerror="this.parentElement.style.display=\'none\';">';
+  h += '</div>';
+  h += '<div style="border-radius:14px;overflow:hidden;border:2px solid var(--border);margin-bottom:24px;">';
+  h += '<img src="story-art/glossary-season1-part1.jpg" style="width:100%;display:block;" onerror="this.parentElement.style.display=\'none\';">';
+  h += '</div>';
+
+  h += '<div class="panel-title" style="margin-bottom:8px;">Season Two: Echoes of Two Worlds</div>';
+  if (isSeasonTwoRevealed()) {
+    h += '<div style="border-radius:14px;overflow:hidden;border:2px solid var(--gold);margin-bottom:12px;">';
+    h += '<img src="story-art/cover-season2.jpg" style="width:100%;display:block;" onerror="this.parentElement.style.display=\'none\';">';
+    h += '</div>';
+  } else {
+    h += '<div class="panel" style="text-align:center;padding:40px 16px;">';
+    h += '<div style="font-size:32px;margin-bottom:8px;">🔒</div>';
+    h += '<div class="btn-hint">Unlocks once the story crosses into it. No spoilers here yet.</div>';
+    h += '</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
 function rGuildWar() {
   const unlocked = isGuildWarUnlocked();
   let h = '<div class="content">';
@@ -20906,6 +20945,9 @@ function rMenu(){
     {i:'⛪',l:'Temple',d:'Blessings, cures, and revival',a:'temple'},
   ];
   const sections=[
+    { title: '📖 The Story', items: [
+      {i:'📖',l:'The Story So Far',a:'story_so_far'},
+    ]},
     { title: '🐉 Legendary Hunts', items: [
       {i:'🐉',l:'Dragon Hunt',a:'dragon_hunt'},
       {i:'💀',l:'Boss Rush',a:'boss_rush'},
