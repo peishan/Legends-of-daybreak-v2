@@ -8900,6 +8900,7 @@ function doPrestige() {
   G.prestige.xpBonusPct = Math.min(PRESTIGE_BONUS_CAP, (G.prestige.xpBonusPct || 0) + xpGain);
   G.prestige.goldBonusPct = Math.min(PRESTIGE_BONUS_CAP, (G.prestige.goldBonusPct || 0) + goldGain);
   G.prestige.count = (G.prestige.count || 0) + 1;
+  G.prestige.highestLvlEver = Math.max(G.prestige.highestLvlEver || 1, oldLvl); // feeds the Rite of Return's catch-up scaling below
 
   // Reset the level/xp/base-stat track back to the start of the game.
   G.p.lvl = 1;
@@ -15618,6 +15619,51 @@ function lvlup(){
     playLevelUpSound();
   }
 }
+
+// === RITE OF RETURN ===
+// A repeatable, deliberately non-level-gated catch-up mechanic for right after a
+// Prestige — otherwise re-reaching a level-gated zone (like The Unbroken Vale at 56)
+// can genuinely take a while, which reads fine as a mechanical grind but breaks the
+// roleplay logic: San hasn't actually forgotten how to get there or lost her standing
+// with Varel just because her level number reset. Framed narratively as the Guild
+// fast-tracking a veteran's reconditioning rather than treating her like a true
+// level-1 newcomer. Deliberately capped at the player's own previous peak — this is a
+// catch-up tool, not a way to skip past genuinely new progress.
+function isRiteOfReturnAvailable() {
+  return (G.prestige.count || 0) >= 1 && G.p.lvl < (G.prestige.highestLvlEver || 1);
+}
+
+function riteOfReturnLevelsPerUse() {
+  const base = 2;
+  const prestigeBonus = Math.floor((G.prestige.count || 0) / 2);
+  return Math.min(10, base + prestigeBonus);
+}
+
+function runRiteOfReturn(uses) {
+  if (!isRiteOfReturnAvailable()) { lg('The Rite of Return has nothing left to give you right now.'); return; }
+  uses = uses || 1;
+  const perUse = riteOfReturnLevelsPerUse();
+  let totalLevelsGranted = 0;
+  for (let u = 0; u < uses; u++) {
+    if (!isRiteOfReturnAvailable()) break; // stop the moment they hit their own previous peak
+    const targetLvl = Math.min(G.p.lvl + perUse, G.prestige.highestLvlEver);
+    let xpNeeded = 0;
+    for (let l = G.p.lvl; l < targetLvl; l++) xpNeeded += xpNeededForLevel(l);
+    G.p.xp += xpNeeded;
+    const before = G.p.lvl;
+    lvlup();
+    totalLevelsGranted += (G.p.lvl - before);
+  }
+  if (totalLevelsGranted > 0) {
+    lg('⚡ The Rite of Return carries you forward ' + totalLevelsGranted + ' level' + (totalLevelsGranted === 1 ? '' : 's') + ' \u2014 the Guild recognizing what you already proved once.');
+  }
+  if (!isRiteOfReturnAvailable()) {
+    lg('⚡ You have caught back up to where you were. The Rite of Return rests until your next Prestige.');
+  }
+  saveGame();
+  render();
+}
+
 function checkQ(){
   for(let q of G.quests){
     if(q.done)continue;
@@ -16339,7 +16385,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.48';
+const BUILD_ID = '2026-08-08.49';
 // =========================
 
 
@@ -19714,6 +19760,22 @@ function rPrestige() {
     h += '</div>';
   }
   h += '</div>';
+
+  if (isRiteOfReturnAvailable()) {
+    const perUse = riteOfReturnLevelsPerUse();
+    const levelsRemaining = (G.prestige.highestLvlEver || 1) - G.p.lvl;
+    h += '<div class="panel panel-gold">';
+    h += '<div class="panel-title" style="color:var(--gold);">\u26a1 Rite of Return</div>';
+    h += '<div class="btn-hint" style="margin-bottom:8px;">The Guild remembers what you already proved once \u2014 this isn\'t a level-1 climb from nothing, it\'s a fast-tracked reconditioning back to where you actually stood. Caps out the moment you reach your own previous peak (Level ' + G.prestige.highestLvlEver + ').</div>';
+    h += '<div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">+' + perUse + ' levels per use \u00b7 ' + levelsRemaining + ' level' + (levelsRemaining === 1 ? '' : 's') + ' left to reach your peak</div>';
+    h += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+    h += '<button onclick="runRiteOfReturn(1)" class="tier-btn" style="flex:1;">Once</button>';
+    h += '<button onclick="runRiteOfReturn(5)" class="tier-btn" style="flex:1;">Push 5</button>';
+    h += '<button onclick="runRiteOfReturn(10)" class="tier-btn" style="flex:1;">Push 10</button>';
+    h += '<button onclick="runRiteOfReturn(25)" class="tier-btn" style="flex:1;">Push 25</button>';
+    h += '</div>';
+    h += '</div>';
+  }
 
   h += '<div class="panel">';
   h += '<div class="panel-title" style="margin-bottom:8px;">What Happens</div>';
