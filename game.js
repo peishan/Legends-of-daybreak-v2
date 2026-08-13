@@ -546,6 +546,11 @@ const G = {
     { n: 'Where the Bunnies Ran', lv: 240, elem: 'none', d: "The outer edge of it \u2014 makeshift shelter, tally marks, a supply cache someone maintained carefully and recently. Liang recognizes every single detail before he says a word. This is the first real trace of the people he left behind, not confirmation of anyone specific, just proof someone was still here.", en: ['Perimeter Drone', 'Salvage Construct', 'Abandoned Guard Unit'], loot: ['A Tally Someone Kept', "Liang's Old Cache Marker", 'Proof Someone Held This Line'], xp: 2400, g: 1440, dg: 'impossible' },
     { n: 'The Last Warren', lv: 250, elem: 'none', d: "Deep inside it now, past every marker Liang half-remembers and several he clearly does not want to. Whatever actually happened here, it happened fast \u2014 and for the first time since the rabbits and the jokes, San watches him have to actually face it instead of talk around it.", en: ['Warren Sentinel', 'The Last Alarm', 'Something Still Guarding This'], loot: ['A Warren Left In A Hurry', "The Last Thing Anyone Wrote Down", 'Proof, Whatever It Turns Out To Mean'], xp: 2500, g: 1500, dg: 'impossible' },
     { n: "The System That Won't Stop", lv: 260, elem: 'none', d: "The actual source, finally \u2014 not a villain, not a monster, just an automated core still executing an emergency protocol from a crisis that ended long ago and never got the order to stand down. It does not hate anyone. It is simply still running. That, somehow, makes it worse.", en: ['Emergency Protocol Drone', 'Directive Loop Construct', 'The System, In Pieces'], loot: ['A Protocol Nobody Cancelled', 'Core Access Fragment', 'The Order It Was Waiting For'], xp: 2600, g: 1560, dg: 'impossible' },
+    { n: 'The First Uncertainty', lv: 270, elem: 'none', d: "Not found by looking for it \u2014 found because Varel and Mimi's seam-work keeps listening even when no one asked it to, and something out here answered that was never on any map. The ground holds most of the time. Not all of the time. Nobody has explained why yet.", en: ['Unsettled Form', 'Flickering Presence', 'Something Still Deciding'], loot: ['A Footprint That Moved After', 'Ground That Remembered Being Asked', 'Proof Something Answered'], xp: 2700, g: 1620, dg: 'impossible' },
+    { n: 'Where the Map Gives Up', lv: 280, elem: 'none', d: "The same stretch of ground, twice, in one afternoon, arranged two different ways. Nobody's memory is wrong. The place itself has not decided what it actually is yet, and everyone is simply visiting it mid-decision.", en: ['Contradiction Walker', 'The Wrong Direction', 'A Place That Moved'], loot: ['A Map That Disagreed With Itself', 'Two Versions Of The Same Path', "Ground Still Arguing"], xp: 2800, g: 1680, dg: 'impossible' },
+    { n: 'The Half-Finished Hall', lv: 290, elem: 'none', d: "Architecture mid-arrival \u2014 columns that fade into unfinished suggestion a few feet off the ground, a ceiling that is only actually there in some of the places you look at it. Something is still building this. Nobody has found who, or what, yet.", en: ['Unfinished Guardian', 'Scaffold Wraith', 'Something Still Being Built'], loot: ['A Column Not Yet Decided On', 'Half a Doorway', 'Proof Someone Is Still Working'], xp: 2900, g: 1740, dg: 'impossible' },
+    { n: 'The Waiting Shape', lv: 300, elem: 'none', d: "Something enormous, almost finished, patient in a way that reads as worse than hostile would have. It has been forming for longer than anyone here has existed. Whatever it is becoming, it is very nearly ready to be it.", en: ['The Almost-Formed', 'Patient Shape', "What's Nearly Here"], loot: ['A Shape Still Settling', 'The Last Piece Not Yet Placed', 'Proof It Is Almost Time'], xp: 3000, g: 1800, dg: 'impossible' },
+    { n: 'What It Was Becoming', lv: 310, elem: 'none', d: "The reveal, finally \u2014 not a monster's lair, not a ruin. A possibility, mid-formation, still genuinely undecided about what it will end up being. Nothing here is fixed yet. That is, San is slowly starting to understand, exactly the point.", en: ['An Unwritten Thing', 'The Shape Before The Choice', 'Something Watching Itself Decide'], loot: ['A Future Not Yet Settled', 'Proof Nothing Here Is Fixed', "What It Chose, In The End"], xp: 3100, g: 1860, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -1451,6 +1456,12 @@ const G = {
     { n: 'The Order That Never Stood Down', zone: "The System That Won't Stop", hp: 1040000, mhp: 1040000, atk: 2540, def: 1520, xp: 505000, g: 361000,
       mechanic: 'phase', phases: 3, currentPhase: 1, phaseHp: 346667,
       desc: "It does not hate anyone. It was never built to. Somewhere, a long time ago, something went wrong badly enough that this protocol was the correct answer — and it has simply never once been told the crisis is over. It is not malice. It is not even really a mind. It is just the last order still being followed, faithfully, by something that was only ever trying to help." },
+    // World 2's own climax boss. Same fixed, one-time stat-block approach as The
+    // Order That Never Stood Down above — HP scaled off the same proven Fraying
+    // Frontier formula at level 310, so it stays grounded rather than arbitrary.
+    { n: 'An Unwritten Thing', zone: 'What It Was Becoming', hp: 1248951, mhp: 1248951, atk: 3047, def: 1823, xp: 605741, g: 433385,
+      mechanic: 'phase', phases: 3, currentPhase: 1, phaseHp: 416317,
+      desc: "It is not hostile, exactly \u2014 it is undecided, and being watched while undecided seems to be the thing it can least tolerate. Every hit either of you lands seems to nudge it a little further toward some shape or another. Nobody is certain yet whether fighting it is actually choosing what it becomes, or just making it choose faster." },
     // The Endless Thinning's own boss — every zone boss above it is a fixed stat
     // block, calibrated once and left to eventually fall behind the same way regular
     // monsters used to. This one carries no hp/atk/def/xp/g of its own at all:
@@ -4251,6 +4262,95 @@ storyJournal: {
           { speaker: 'KW Liang', text: '"Thank you," he tells Reyes, quiet, meaning something much larger than the two words usually carry. "For not letting me imagine it as worse than it was. Or pretend it was smaller."' },
           { speaker: 'Bunny Elder', text: '"That is what small and quick was always actually for," Reyes says. "Not just surviving. Making sure the ones who did not get to survive were seen, honestly, by someone who stayed long enough to do it properly."' },
           { speaker: 'Narrator', text: 'The fire burns low around a group that is smaller than it should be and larger than Liang let himself hope for, for years. Somewhere behind you, the seam Varel and Mimi opened still hums, patient, holding a door between two worlds that no longer have to be entirely separate from each other.' },
+        ]
+      }
+,{
+        id: 'journal_119',
+        title: 'Sometimes, Not Every Hour',
+        chapter: 119,
+        unlockType: 'level',
+        unlockAt: 300,
+        icon: '🌿',
+        summary: 'Months after the Closed Eye\'s ending, San finds Aldric and Wren settled into something neither of their pasts would have predicted — ordinary afternoons, small rituals, a knight who finds people on purpose now and a woman relearning devotion at exactly the size a child\'s grass charm can hold.',
+        scenes: [
+          { speaker: 'Narrator', text: 'You find them at the Mended Grove on an unremarkable afternoon, doing something you almost walk past without registering — Aldric, sitting across from one of the newer recruits Iris brought in last month, listening far more than he is talking. Wren is a short distance away, showing Sabby\'s grandson (visiting for the day, underfoot in the good way) how to properly braid the loose grass into the kind of small, useless charm children make everywhere, in every world, given enough patience and green things to work with.' },
+          { speaker: 'Narrator', text: 'Neither of them is doing anything that looks like what happened to either of them. That, you are slowly realizing, might be the entire point.' },
+          { speaker: 'Narrator', text: 'You settle nearby, close enough to overhear without making it obvious that is what you are doing.' },
+          { speaker: 'Narrator', text: 'The recruit — young, still a little too eager in the specific way that used to make you nervous for reasons you could not name until you actually knew Aldric\'s story — is talking about a Guild War loss, replaying it out loud the way people do when they are looking for someone to tell them it was their fault so they can finally stop turning it over.' },
+          { speaker: 'Ser Aldric', text: '"It was not your fault," he says, plain, no performance in it. "You made a reasonable call with the information you actually had. That is different from a mistake. I know the difference matters less when you are the one who is upset, but it is still true."' },
+          { speaker: 'Narrator', text: 'The recruit does not look fully convinced. Aldric does not push it further — just lets the sentence sit there, unforced, the way you have noticed he does now with almost everyone who comes through still braced for something.' },
+          { speaker: 'San', text: '"You do this a lot," you say, once the recruit has wandered off looking marginally lighter than they arrived. "Find the new ones. Sit with whatever they are carrying."' },
+          { speaker: 'Ser Aldric', text: '"Someone did it for me," he says, simply. "Late. Later than it should have taken. I am not interested in making anyone else wait that long, if I can help it."' },
+          { speaker: 'Narrator', text: 'Across the clearing, Wren finishes the grass charm and hands it over with a ceremony far too solemn for what it actually is, and Sabby\'s grandson receives it like she has just handed him something genuinely sacred. In a way, you suppose, watching her do it, she has — just not the way either of them would have meant that word a year ago.' },
+          { speaker: 'San', text: '"And that," you say, nodding toward her, "is new too, is it not?"' },
+          { speaker: 'Ser Aldric', text: '"She started small," Aldric says, watching her with something unguarded in it. "Grass charms. A blessing over someone\'s cooking fire that was really just her checking they had eaten. It built from there. I do not think she trusts herself with anything bigger yet. I do not think she needs to rush that."' },
+          { speaker: 'Narrator', text: 'You think of the fire, months ago now — Wren admitting out loud that she had known, the whole time, and kept going anyway, because stopping would have meant admitting what she gave up was never worth it. You think of Aldric kneeling beside her with no triumph in his voice at all, just the plain, hard-won fact of it: it gets a little easier.' },
+          { speaker: 'San', text: '"It actually did, then," you say, watching both of them from exactly the right distance to see it clearly. "Get easier."' },
+          { speaker: 'Narrator', text: 'He is quiet for a moment, considering the question with the same care he gives everything.' },
+          { speaker: 'Ser Aldric', text: '"Not all at once," he says, finally. "But yes. Most days now I do not think about any of it until something makes me. That used to happen every hour. Now it happens sometimes. I will take sometimes."' },
+          { speaker: 'Narrator', text: 'Wren, apparently finished with charm-braiding for the afternoon, wanders over and settles beside Aldric without asking whether the spot is free — the specific, unbothered ease of two people who stopped needing to ask that a while ago.' },
+          { speaker: 'Sister Wren', text: '"Was he telling you the sometimes-not-every-hour thing again?" she asks you, dry, fond underneath it. "He tells everyone the sometimes-not-every-hour thing eventually. It is his version of small talk now."' },
+          { speaker: 'Ser Aldric', text: '"It is a genuinely useful thing to know," he says, entirely unbothered by being teased about it.' },
+          { speaker: 'Sister Wren', text: '"It is," Wren agrees, softer than the tease a moment ago. "I just like that you have decided it is also allowed to be ordinary. Not every conversation has to be the whole rescue over again."' },
+          { speaker: 'Narrator', text: 'You leave them there eventually — a knight who used to be found by the wrong things now spending his afternoons finding the right ones on purpose, and a woman who used to lead a congregation into something false now leading exactly one small child through exactly one small, honest ritual at a time. Nothing about it is dramatic. That, you have come to understand, was never actually the goal. Ordinary was always the goal. They just had to build their way back to being allowed to have it.' },
+        ]
+      }
+,{
+        id: 'journal_120',
+        title: 'Quieter Might Be Enough',
+        chapter: 120,
+        unlockType: 'level',
+        unlockAt: 305,
+        icon: '🔇',
+        summary: 'The party reaches the actual source behind the entire collapse — not a villain, just a failsafe that never got the order to stand down. Shutting it down doesn\'t feel like victory. It feels like finally letting something rest, the same permission Liang was given two chapters ago, given now to the whole world he left behind.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The core is not hidden. That is somehow the worst part — no vault, no final door, just a room the size of a cathedral where a single failsafe protocol has been quietly, patiently executing itself for longer than anyone left alive has been counting. It does not notice you arrive. It has not noticed anything in years.' },
+          { speaker: 'KW Liang', text: '"This is it," Liang says, quiet, and you understand from his voice that he does not mean the room. "This is the actual thing. Everything since the Threshold District — all of it traces back to whatever is still running in here."' },
+          { speaker: 'Narrator', text: 'The Order That Never Stood Down does not announce itself as a villain, because it was never built to be one. It activates the way a failsafe activates — mechanically, without malice, executing the last order it was ever given because no one ever gave it a different one.' },
+          { speaker: 'Joel', text: '"It is not angry," Joel says, watching it power up, something almost gentle in the observation. "It does not even know there is anything left to be angry at. It is just still doing the job."' },
+          { speaker: 'Narrator', text: 'The fight, when it comes, does not feel like defeating something. It feels like the last, hardest push of a much longer, much quieter argument — not good against evil, just finally against not yet, a system that was owed a stand-down order years ago finally getting one, however it has to arrive.' },
+          { speaker: 'Narrator', text: 'When it goes still, it does not explode, does not collapse dramatically the way a defeated boss usually does. The lights along its housing simply dim, one bank at a time, unhurried, like something exhaling for the first time in years.' },
+          { speaker: 'Narrator', text: 'He does not move for a long moment, watching the last light fade out.' },
+          { speaker: 'KW Liang', text: '"I keep waiting to feel like we won something," he says, finally. "I do not think that is actually what this was. I think we just finally let something stop."' },
+          { speaker: 'San', text: '"Does that feel different?" you ask. "From winning?"' },
+          { speaker: 'KW Liang', text: '"Quieter," Liang says, after real thought. "Which, given everything, might be exactly what this place actually needed. Not a victory. Just quiet. It has not had that in a very long time."' },
+          { speaker: 'Narrator', text: 'Outside, for the first time since the Threshold District, the city does not hum. No idle sentries looping their announcements to no one. No relay ghosts repeating a signal nobody sent. Just the particular, enormous silence of a place that has finally been allowed to stop pretending it is still mid-crisis.' },
+          { speaker: 'Joel', text: '"It sounds like nothing," Joel says, listening to it. "I did not expect nothing to sound like this much relief."' },
+          { speaker: 'Narrator', text: 'Reyes finds you before you leave — word travels fast, even here, even now — and stands for a moment in the new quiet with an expression that has nothing to do with triumph in it at all.' },
+          { speaker: 'Bunny Elder', text: '"We stopped hearing it a few hours ago," she says. "I thought something had gone wrong. I did not let myself consider it might just be finished."' },
+          { speaker: 'KW Liang', text: '"It is not finished," he says, and there is something steadier in him saying it than there has been since the crossing. "Nothing about any of this is finished. But it is quieter now. I think quieter might actually be enough, for today."' },
+          { speaker: 'Narrator', text: 'You leave the core room behind, the whole ruined district settling into a silence it earned the hard way — not an ending, not really, just the first honest quiet this world has been allowed to have in longer than Liang can remember. Somewhere behind you, the seam still holds. Ahead of you, a door back to everyone who is still waiting, on both sides of it now.' },
+        ]
+      }
+,{
+        id: 'journal_121',
+        title: 'Something Noticed Us First',
+        chapter: 121,
+        unlockType: 'level',
+        unlockAt: 315,
+        icon: '🌫️',
+        summary: 'The seam Varel and Mimi opened has started listening on its own — and something answered. Unlike the last crossing, nobody here knows this world, or what it is, or what it might become. The party steps through into somewhere still deciding what it is going to be.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Varel finds you before you have even properly sat down for the evening, something in his usually unhurried manner genuinely different this time.' },
+          { speaker: 'Varel Farseer', text: '"The seam has been listening on its own," he says, without much preamble. "I did not build it to do that. It is doing it anyway. And something out there just answered."' },
+          { speaker: 'Mimi', text: '"Not Liang\'s world," Mimi adds, already half-lost in whatever she is seeing that the rest of you cannot. "Somewhere else entirely. It does not match anything either of us has ever mapped."' },
+          { speaker: 'San', text: '"Answered how?" you ask, already not sure you are going to like the answer.' },
+          { speaker: 'Varel Farseer', text: '"Politely, almost," Varel says, which is somehow the least reassuring possible word he could have used. "Like something noticing it was being looked at, and looking back, deliberately, to confirm it. I do not know what that means yet. I know it has never happened before."' },
+          { speaker: 'Narrator', text: 'This is different from the last crossing, and everyone in the room seems to feel it at the same time — no Liang standing at the threshold with a decade of familiarity to lean on, no name for what waits on the other side, nothing at all except a seam that has apparently started listening on its own.' },
+          { speaker: 'Joel', text: '"We are not walking into somewhere someone already knows," Joel says, working through it out loud. "We are walking into somewhere that noticed us first."' },
+          { speaker: 'Mimi', text: '"That is one way to put it," Mimi agrees, quiet. "I would not call it wrong."' },
+          { speaker: 'Narrator', text: 'You look at the seam, humming the same as it always has, patient and unbothered, giving absolutely nothing away about what is actually on the other side of it now.' },
+          { speaker: 'San', text: '"Do we go?" you ask, mostly to Joel, though the question is really for everyone in the room.' },
+          { speaker: 'Joel', text: '"We have gone through for less certainty than this before," he says, and there is no hesitation in it at all. "I would rather know what noticed us than spend the next month wondering."' },
+          { speaker: 'Varel Farseer', text: '"I can hold it open," Varel says. "I cannot promise you will like what is waiting on the other side of holding it open. I have genuinely never been less certain of what a seam actually leads to."' },
+          { speaker: 'Narrator', text: 'Nobody treats that as a reason to stay. If anything, it settles something — an honest not-knowing is easier to walk into than a comfortable lie would have been.' },
+          { speaker: 'Narrator', text: 'The crossing itself feels different too, this time — not the sharp, immediate arrival of the last one, but something slower, like stepping into a room where the furniture has not entirely finished being placed. The ground holds. Mostly. There is a version of holding that is not quite the same as certainty, and you are standing on it.' },
+          { speaker: 'KW Liang', text: '"This is not my world," Liang says, low, taking it in with the specific caution of someone whose only frame of reference just stopped applying. "I do not recognize any of this. I do not think anyone is meant to, yet."' },
+          { speaker: 'Narrator', text: 'Something in the middle distance is not quite a building and not quite not one — columns that fade into unfinished suggestion a few feet off the ground, edges that have not committed to being edges. Nothing here reads as ruined. It reads, more than anything else, as unfinished, mid-arrival, still actively becoming whatever it is eventually going to be.' },
+          { speaker: 'San', text: '"It feels like walking in before something is ready," you say, careful, watching a wall that has not decided whether it wants to be load-bearing yet.' },
+          { speaker: 'Narrator', text: 'Mimi is quiet for a long moment, reading something none of the rest of you have access to.' },
+          { speaker: 'Mimi', text: '"I do not think we are early," she says, finally. "I think this place simply has not finished deciding what it is going to be. That is a very different thing from unfinished. Unfinished implies someone stopped. Nothing here has stopped."' },
+          { speaker: 'Narrator', text: 'Behind you, the seam holds, quieter and less certain of itself than it has ever sounded before. Ahead of you, an entire world waits, mid-formation — not a place to rescue, not a place to mourn. Just somewhere still deciding, with the party standing inside the decision, whether it wants to or not.' },
         ]
       }
     ]
@@ -16385,7 +16485,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.51';
+const BUILD_ID = '2026-08-08.54';
 // =========================
 
 
