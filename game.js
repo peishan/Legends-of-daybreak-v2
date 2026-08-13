@@ -551,6 +551,11 @@ const G = {
     { n: 'The Half-Finished Hall', lv: 290, elem: 'none', d: "Architecture mid-arrival \u2014 columns that fade into unfinished suggestion a few feet off the ground, a ceiling that is only actually there in some of the places you look at it. Something is still building this. Nobody has found who, or what, yet.", en: ['Unfinished Guardian', 'Scaffold Wraith', 'Something Still Being Built'], loot: ['A Column Not Yet Decided On', 'Half a Doorway', 'Proof Someone Is Still Working'], xp: 2900, g: 1740, dg: 'impossible' },
     { n: 'The Waiting Shape', lv: 300, elem: 'none', d: "Something enormous, almost finished, patient in a way that reads as worse than hostile would have. It has been forming for longer than anyone here has existed. Whatever it is becoming, it is very nearly ready to be it.", en: ['The Almost-Formed', 'Patient Shape', "What's Nearly Here"], loot: ['A Shape Still Settling', 'The Last Piece Not Yet Placed', 'Proof It Is Almost Time'], xp: 3000, g: 1800, dg: 'impossible' },
     { n: 'What It Was Becoming', lv: 310, elem: 'none', d: "The reveal, finally \u2014 not a monster's lair, not a ruin. A possibility, mid-formation, still genuinely undecided about what it will end up being. Nothing here is fixed yet. That is, San is slowly starting to understand, exactly the point.", en: ['An Unwritten Thing', 'The Shape Before The Choice', 'Something Watching Itself Decide'], loot: ['A Future Not Yet Settled', 'Proof Nothing Here Is Fixed', "What It Chose, In The End"], xp: 3100, g: 1860, dg: 'impossible' },
+    { n: 'A Door Never Finished', lv: 320, elem: 'none', d: "Not a new discovery so much as an old one, revisited \u2014 the Architect's chamber, years later, and something in its unfinished blueprints has kept drafting itself in its absence. The plan lost its planner. It did not stop.", en: ['Drafting Remnant', 'Blueprint Echo', 'Something Still Sketching'], loot: ["A Line Drawn After The Architect Fell", 'Blueprint Fragment, Still Warm', 'Proof The Plan Outlived Its Planner'], xp: 3200, g: 1920, dg: 'impossible' },
+    { n: 'The Scaffold Behind Everything', lv: 330, elem: 'none', d: "Underneath the blueprints, structure \u2014 the actual architecture connecting world to world, laid as bare as scaffolding ever gets. Every seam Varel has ever opened traces back to something built here, first, by someone who never got to see what it would eventually hold up.", en: ['Structural Ward', 'Load-Bearing Ghost', 'Something Holding This Up'], loot: ["A Support Beam Older Than The Breaking", 'Scaffold Key', 'Proof This Was Load-Bearing All Along'], xp: 3300, g: 1980, dg: 'impossible' },
+    { n: "Every Door It Ever Drew", lv: 340, elem: 'none', d: "A hall of doors, more than anyone can count, each one leading somewhere \u2014 Liang's collapsing city among them, the still-forming world from before it, dozens more nobody has ever opened. The Architect was not building one door. It was building all of them.", en: ['Unopened Door', 'Something Behind It', 'A Door That Recognizes You'], loot: ['A Door Not Yet Opened', "The Architect's Full Index", 'Proof There Are More Worlds Than Anyone Has Counted'], xp: 3400, g: 2040, dg: 'impossible' },
+    { n: 'The Door With a Familiar Shape', lv: 350, elem: 'none', d: "The rest of the hall stops mattering the moment you find it again \u2014 one door, unremarkable in every visible way, that neither San nor Joel can look at directly for very long. Nobody has opened it yet. Nobody has quite worked up the nerve.", en: ['Something Guarding It Gently', 'A Door That Waits', 'The Weight Of Almost Knowing'], loot: ['A Handle Warm To The Touch', 'Proof This One Is Different', 'The Courage To Actually Open It'], xp: 3500, g: 2100, dg: 'impossible' },
+    { n: 'What the Architect Was Actually Drawing', lv: 360, elem: 'none', d: "The last blueprint, unfinished, and the reason for all of it laid out plainly at last: not chaos, not malice, a genuine, desperate attempt to connect everything the Breaking tore apart \u2014 including, San realizes, standing in front of one door in particular, doors that were never actually about worlds like Liang's at all.", en: ['The Last Draft', "What the Plan Was Actually For", 'The Architect\u2019s Final Intention'], loot: ["The Architect's Last Blueprint", 'A Door With A Familiar Shape', 'Proof The Plan Was Never Really Finished, Only Interrupted'], xp: 3600, g: 2160, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -1462,6 +1467,14 @@ const G = {
     { n: 'An Unwritten Thing', zone: 'What It Was Becoming', hp: 1248951, mhp: 1248951, atk: 3047, def: 1823, xp: 605741, g: 433385,
       mechanic: 'phase', phases: 3, currentPhase: 1, phaseHp: 416317,
       desc: "It is not hostile, exactly \u2014 it is undecided, and being watched while undecided seems to be the thing it can least tolerate. Every hit either of you lands seems to nudge it a little further toward some shape or another. Nobody is certain yet whether fighting it is actually choosing what it becomes, or just making it choose faster." },
+    // World 3's climax boss. Deliberately not a new villain — the Architect itself
+    // was already faced and defeated back in journal_034. This is what its unfinished
+    // plan left running unattended: the draft-process itself, still drawing doors with
+    // no one left to decide which ones should exist. Same grounded scaling approach,
+    // level 360 this time.
+    { n: 'The Draft That Kept Drawing', zone: 'What the Architect Was Actually Drawing', hp: 1483295, mhp: 1483295, atk: 3619, def: 2165, xp: 719398, g: 514703,
+      mechanic: 'phase', phases: 3, currentPhase: 1, phaseHp: 494431,
+      desc: "Not the Architect \u2014 the Architect is gone, and has been since journal_034. This is what it left running: the drafting process itself, ownerless now, still opening doors because nobody ever told it the plan had a planner, and the planner is not coming back to finish deciding which ones should stay shut." },
     // The Endless Thinning's own boss — every zone boss above it is a fixed stat
     // block, calibrated once and left to eventually fall behind the same way regular
     // monsters used to. This one carries no hp/atk/def/xp/g of its own at all:
@@ -4351,6 +4364,33 @@ storyJournal: {
           { speaker: 'Narrator', text: 'Mimi is quiet for a long moment, reading something none of the rest of you have access to.' },
           { speaker: 'Mimi', text: '"I do not think we are early," she says, finally. "I think this place simply has not finished deciding what it is going to be. That is a very different thing from unfinished. Unfinished implies someone stopped. Nothing here has stopped."' },
           { speaker: 'Narrator', text: 'Behind you, the seam holds, quieter and less certain of itself than it has ever sounded before. Ahead of you, an entire world waits, mid-formation — not a place to rescue, not a place to mourn. Just somewhere still deciding, with the party standing inside the decision, whether it wants to or not.' },
+        ]
+      }
+,{
+        id: 'journal_122',
+        title: 'A Shape You Would Know Anywhere',
+        chapter: 122,
+        unlockType: 'level',
+        unlockAt: 320,
+        icon: '📐',
+        summary: 'A fragment from the still-forming world leads Mezstorm and Eliz back to the Architect\'s old chamber — and the plan, it turns out, never actually stopped when its planner fell. Deep in a hall of unopened doors, one stops San and Joel cold, unexplainably familiar.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It is Mezstorm who notices first — a fragment pulled from the last, still-forming world, unremarkable to look at, except that the seal worked into its edge is one she has seen exactly once before, years ago, in a chamber that should have gone quiet the day its owner fell.' },
+          { speaker: 'Mezstorm', text: '"This is Architect work," she says, turning it over, something old and wary crossing her face. "I would know that seal anywhere. I watched it fall silent myself."' },
+          { speaker: 'Eliz', text: '"You said it fell silent," Eliz says, careful, already following the thread. "Not that the plan did."' },
+          { speaker: 'Narrator', text: 'Nobody has to say the rest of it out loud. If the plan outlived its planner, then whatever the Architect was actually building has been running, unattended, this entire time — and something from a genuinely new, still-forming world just handed you a piece of it.' },
+          { speaker: 'San', text: '"We go back," you say, already certain, already halfway to the decision before you finish the sentence. "To the chamber. See what is actually still running in there."' },
+          { speaker: 'Narrator', text: 'The chamber has not changed since the day The Architect fell — blueprints still lining walls that should have collapsed a dozen levels ago, that same too-deliberate silence you all noticed the first time. Except now, deeper in, past where the fight actually happened, something is still drafting.' },
+          { speaker: 'Mezstorm', text: '"Storms do not build doors," Mezstorm says again, quieter this time, an old line finding new weight. "I said that the first time we stood here. I did not know then that the storm building them would just keep going without anyone actually steering it."' },
+          { speaker: 'Joel', text: '"It is not the Architect," Joel says, watching lines draw themselves across a wall with no hand guiding them. "It cannot be. We ended that part."' },
+          { speaker: 'Eliz', text: '"It is what the Architect left running," Eliz says, and there is real sympathy in it, the same sympathy she offered the first time. "A plan that never got told it was allowed to stop, drafting doors because that is the only thing it has ever known how to do. I do not think it knows the difference between finishing and simply continuing."' },
+          { speaker: 'Narrator', text: 'Deeper in, past the drafting, an entire hall opens — doors, more than anyone can easily count, each one distinct, each one leading somewhere. Liang\'s collapsing city is here, marked plainly. The still-forming world you just left is here too, already labeled in a hand none of you recognize.' },
+          { speaker: 'Narrator', text: 'You walk the hall slowly, reading marks on doors that were drawn before you had any reason to know they existed, and the scale of what the Architect was actually attempting starts to properly land.' },
+          { speaker: 'San', text: '"It was not building one door," you say, quiet, mostly to yourself. "It was building all of them."' },
+          { speaker: 'Narrator', text: 'And then, further down the hall than any of you expected to find anything at all, one door stops you outright — no obvious reason why, nothing about its shape different from any of the others, except that something in you recognizes it before your mind can explain how.' },
+          { speaker: 'Narrator', text: 'He has gone very still beside you, looking at the same door, the same unexplainable certainty on his face.' },
+          { speaker: 'Joel', text: '"San," he says, careful, like the word itself might disturb something. "That door."' },
+          { speaker: 'Narrator', text: 'Neither of you says the rest of it. Neither of you has to. Whatever the Architect\'s plan was actually reaching for, when it finally, desperately tried to connect everything the Breaking tore apart — it was never only reaching for worlds like Liang\'s. Somewhere in an unfinished blueprint, drawn by someone who never got to see it through, is a door with a shape you would know anywhere.' },
         ]
       }
     ]
@@ -16485,7 +16525,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.54';
+const BUILD_ID = '2026-08-08.56';
 // =========================
 
 
