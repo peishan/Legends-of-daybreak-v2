@@ -853,7 +853,7 @@ const G = {
     { id: 'perfectionist', n: 'Perfectionist', d: 'Complete a 25-minute focus session', icon: '🧘', t: 'focus', need: 1, rw: { xp: 150, g: 75 }, done: false, secret: false },
     { id: 'secret_lover', n: 'Secret Admirer', d: 'Reach max affinity with a certain familiar...', icon: '❓', t: 'affinity', target: 'Soel', need: 100, rw: { xp: 500, g: 200 }, done: false, secret: true },
     { id: 'void_touched', n: 'Void Touched', d: 'Survive the deepest darkness', icon: '❓', t: 'kill_specific', target: 'Abyssal Horror', need: 1, rw: { xp: 500, g: 250 }, done: false, secret: true },
-    { id: 'planar_pioneer', n: 'Planar Pioneer', d: 'Enter the Arcane Planar Tower', icon: '🌀', t: 'reach_level', need: 11, rw: { xp: 90, g: 85 }, done: false, secret: false },
+    { id: 'planar_pioneer', n: 'Planar Pioneer', d: 'Enter the Arcane Planar Tower', icon: '🌀', t: 'level', need: 11, rw: { xp: 90, g: 85 }, done: false, secret: false },
     { id: 'rift_walker', n: 'Rift Walker', d: 'Defeat 20 enemies in the Arcane Planar Tower', icon: '🌌', t: 'kills', need: 20, rw: { xp: 500, g: 300 }, done: false, secret: false },
     { id: 'planarch_slayer', n: 'Planarch Slayer', d: 'Defeat The Planarch and claim the tower', icon: '👑', t: 'boss_specific', target: 'The Planarch', need: 1, rw: { xp: 420, g: 1500 }, done: false, secret: false },
     { id: 'planar_master', n: 'Planar Master', d: 'Reach Level 15', icon: '⭐', t: 'level', need: 15, rw: { xp: 1000, g: 600 }, done: false, secret: false },
@@ -16385,7 +16385,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.49';
+const BUILD_ID = '2026-08-08.50';
 // =========================
 
 
