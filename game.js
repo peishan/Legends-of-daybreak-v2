@@ -20307,6 +20307,9 @@ function rStorySoFar() {
     h += '<div style="border-radius:14px;overflow:hidden;border:2px solid var(--gold);margin-bottom:12px;">';
     h += '<img src="story-art/cover-season2.jpg" style="width:100%;display:block;" onerror="this.parentElement.style.display=\'none\';">';
     h += '</div>';
+    h += '<div style="border-radius:14px;overflow:hidden;border:2px solid var(--gold);margin-bottom:24px;">';
+    h += '<img src="story-art/glossary-season2-allies.jpg" style="width:100%;display:block;" onerror="this.parentElement.style.display=\'none\';">';
+    h += '</div>';
   } else {
     h += '<div class="panel" style="text-align:center;padding:40px 16px;">';
     h += '<div style="font-size:32px;margin-bottom:8px;">🔒</div>';
