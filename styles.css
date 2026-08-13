@@ -829,7 +829,7 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .erow-compact { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding-bottom: 4px; }
 .ecard-compact { min-width: 62px; padding: 6px 4px; flex-shrink: 0; }
 .eicon-compact { font-size: 22px; margin-bottom: 2px; }
-.ename-compact { font-size: 9px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 56px; margin: 0 auto 4px; }
+.ename-compact { font-size: 9px; font-weight: 600; white-space: normal; overflow: visible; word-break: break-word; line-height: 1.15; max-width: 56px; margin: 0 auto 4px; }
 
 .skill-grid { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 6px; margin-bottom: 6px; padding-bottom: 6px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
 .skill-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 2px; text-align: center; cursor: pointer; user-select: none; transition: all 0.15s; flex: 0 0 60px; scroll-snap-align: start; }
