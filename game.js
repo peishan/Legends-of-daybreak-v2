@@ -187,12 +187,13 @@ const G = {
     { n: 'Senedra', t: 'Swift Scout', r: 'Ranger', hp: 75, mhp: 75, atk: 8, def: 5, spd: 10, on: false, ul: 6, d: 'An eagle-eyed tracker from the northern woods. She learned this from her mother. From Aisyah. She finds secret paths where others see only walls. She offers you pemmican and speaks of trade routes and dried goods. The real money is in dried goods. They travel. They last. They sell.', b: '+20% Crit chance', col: '#ca8a04', affinityBonuses: [], gear: null, base: { mhp: 75, atk: 8, def: 5, spd: 10 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Zaki', t: 'Young Blade', r: 'Warrior', hp: 100, mhp: 100, atk: 9, def: 6, spd: 6, on: false, ul: 8, d: 'A hot-headed swordsman with a heart of gold. He is young. The firelight makes him look younger. He checks his pack seventeen times. Nervous, he admits. You tell him it is okay. You tell him checking is a kind of love. He wants to be brave like you. You do not feel brave. You feel tired. But you smile anyway.', b: '+15% Attack speed', col: '#dc2626', affinityBonuses: [], gear: null, base: { mhp: 100, atk: 9, def: 6, spd: 6 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Soel', t: 'The Familiar', r: 'Support', hp: 55, mhp: 55, atk: 5, def: 4, spd: 8, on: false, ul: 10, d: 'Your loyal spirit cat companion. He came with the rain. He chose you. That is rare. That is everything. He is not merely a cat. He is a spirit. He is a choice made flesh. He is the space between San and Joel — the letters overlapping, the sounds merging. He cannot be killed — he reforms from spirit flame.', b: '+10% All stats · Spirit Cat (unkillable)', col: '#7c2d12', spiritCat: true, affinityBonuses: [], gear: null, base: { mhp: 55, atk: 5, def: 4, spd: 8 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'KW Liang', t: 'Quick Hands', r: 'Scout', hp: 70, mhp: 70, atk: 9, def: 4, spd: 9, on: false, ul: 999, recruitGated: true, d: 'A personal shopper turned survivor turned something else entirely. Quick, sharp, and finally committed to something worth the trouble of showing up for. He still carries the Bunnies with him, quietly, even when he is laughing.', b: '+15% Crit chance', col: '#0d9488', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 9, def: 4, spd: 9 }, eq: { weapon: { n: "Quick Hands' Edge", slot: 'weapon', forCompanion: 'KW Liang', r: 'rare', ilvl: 28, atk: 24, spd: 10, d: "Twin blades for Liang. +24 ATK, +10 SPD" }, armor: { n: "Scavenger's Wrap", slot: 'armor', forCompanion: 'KW Liang', r: 'rare', ilvl: 28, def: 16, spd: 8, d: "Light armor for Liang. +16 DEF, +8 SPD" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'KW Liang', t: 'Quick Hands', r: 'Scout', hp: 70, mhp: 70, atk: 9, def: 4, spd: 9, on: false, ul: 999, recruitGated: true, d: 'A personal shopper turned survivor turned something else entirely. Quick, sharp, and finally committed to something worth the trouble of showing up for. He still carries the Bunnies with him, quietly, even when he is laughing. Snowball, small and quick, never strays far.', b: '+15% Crit chance \u00b7 Snowball (18% dodge chance)', col: '#0d9488', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 9, def: 4, spd: 9 }, eq: { weapon: { n: "Quick Hands' Edge", slot: 'weapon', forCompanion: 'KW Liang', r: 'rare', ilvl: 28, atk: 24, spd: 10, d: "Twin blades for Liang. +24 ATK, +10 SPD" }, armor: { n: "Scavenger's Wrap", slot: 'armor', forCompanion: 'KW Liang', r: 'rare', ilvl: 28, def: 16, spd: 8, d: "Light armor for Liang. +16 DEF, +8 SPD" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Mimi', t: 'Dreamwalker', r: 'Divination Mage', hp: 55, mhp: 55, atk: 11, def: 3, spd: 7, on: false, ul: 999, recruitGated: true, d: 'She already knew you would ask before you finished asking. That is not a figure of speech with Mimi \u2014 the Dreamsight sees the shape of a fight before it happens, and she has learned to trust it completely.', b: '+15% Crit chance', col: '#a855f7', affinityBonuses: [], gear: null, base: { mhp: 55, atk: 11, def: 3, spd: 7 }, eq: { weapon: { n: 'Dreamsight Focus', slot: 'weapon', forCompanion: 'Mimi', r: 'rare', ilvl: 28, atk: 26, def: 4, d: "Focus for Mimi. +26 ATK, +4 DEF" }, armor: { n: "Dreamwalker's Shawl", slot: 'armor', forCompanion: 'Mimi', r: 'rare', ilvl: 28, def: 14, spd: 6, d: "Light robes for Mimi. +14 DEF, +6 SPD" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Brada Shah', t: 'Steady Hand', r: 'Artillery', hp: 90, mhp: 90, atk: 13, def: 7, spd: 3, on: false, ul: 999, recruitGated: true, d: "Mimi's partner, and steady in every sense of the word \u2014 ballistas, siege lines, anything that rewards patience over speed. Slow to move, impossible to rush, and devastating once he actually lines up the shot.", b: '+15% Attack damage', col: '#78716c', affinityBonuses: [], gear: null, base: { mhp: 90, atk: 13, def: 7, spd: 3 }, eq: { weapon: { n: "Steady Hand's Ballista-Bow", slot: 'weapon', forCompanion: 'Brada Shah', r: 'rare', ilvl: 28, atk: 30, def: 10, d: "Heavy siege bow for Brada. +30 ATK, +10 DEF" }, armor: { n: 'Siege-Line Plating', slot: 'armor', forCompanion: 'Brada Shah', r: 'rare', ilvl: 28, def: 22, d: "Heavy plating for Brada. +22 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Dr. AA', t: 'Steady Hands', r: 'Healer', hp: 70, mhp: 70, atk: 5, def: 6, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Calm under pressure in the specific way only someone who has already seen the worst of it can be. Keeps a ghost story ready for the ride there, and a steady hand ready for whatever happens once you arrive.', b: '+20% Healing potency', col: '#0284c7', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 5, def: 6, spd: 5 }, eq: { weapon: { n: 'Old-World Medical Kit', slot: 'weapon', forCompanion: 'Dr. AA', r: 'rare', ilvl: 28, atk: 14, def: 10, d: "Field kit for Dr. AA. +14 ATK, +10 DEF" }, armor: { n: "Physician's Coat", slot: 'armor', forCompanion: 'Dr. AA', r: 'rare', ilvl: 28, def: 18, atk: 4, d: "Coat for Dr. AA. +18 DEF, +4 ATK" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Sister Wren', t: 'True Devotion', r: 'Healer', hp: 68, mhp: 68, atk: 4, def: 8, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Spent a long time devoted to something that was never real. Knows real when she finally gets to stand next to it \u2014 and stands between the party and whatever comes next, calling on the Temple\u2019s grace when it is needed.', b: '+10% Defense (party) \u00b7 Intercession (DEF buff) \u00b7 Temple\u2019s Grace (cure chance)', col: '#f0abfc', affinityBonuses: [], gear: null, base: { mhp: 68, atk: 4, def: 8, spd: 5 }, eq: { weapon: { n: 'Temple-Blessed Censer', slot: 'weapon', forCompanion: 'Sister Wren', r: 'rare', ilvl: 28, atk: 12, def: 12, d: "Censer for Sister Wren. +12 ATK, +12 DEF" }, armor: { n: 'Vestments of Intercession', slot: 'armor', forCompanion: 'Sister Wren', r: 'rare', ilvl: 28, def: 20, d: "Sacred vestments for Sister Wren. +20 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'Ser Aldric', t: 'The Other Kind of Found', r: 'Knight', hp: 110, mhp: 110, atk: 7, def: 9, spd: 3, on: false, ul: 999, recruitGated: true, d: 'Spent a long time being found by things. Guild work feels like the other version of that \u2014 chosen instead of caught. Holds a line like it is a personal promise, because to him, it is.', b: '+15% Defense', col: '#57534e', affinityBonuses: [], gear: null, base: { mhp: 110, atk: 7, def: 9, spd: 3 }, eq: { weapon: { n: "The Other Kind of Found's Blade", slot: 'weapon', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, atk: 20, def: 14, d: "Sword for Ser Aldric. +20 ATK, +14 DEF" }, armor: { n: "Knight's Unbroken Plate", slot: 'armor', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, def: 26, d: "Heavy plate for Ser Aldric. +26 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } }
+    { n: 'Ser Aldric', t: 'The Other Kind of Found', r: 'Knight', hp: 110, mhp: 110, atk: 7, def: 9, spd: 3, on: false, ul: 999, recruitGated: true, d: 'Spent a long time being found by things. Guild work feels like the other version of that \u2014 chosen instead of caught. Holds a line like it is a personal promise, because to him, it is.', b: '+15% Defense', col: '#57534e', affinityBonuses: [], gear: null, base: { mhp: 110, atk: 7, def: 9, spd: 3 }, eq: { weapon: { n: "The Other Kind of Found's Blade", slot: 'weapon', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, atk: 20, def: 14, d: "Sword for Ser Aldric. +20 ATK, +14 DEF" }, armor: { n: "Knight's Unbroken Plate", slot: 'armor', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, def: 26, d: "Heavy plate for Ser Aldric. +26 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Iris', t: 'Held Her Own', r: 'Scout', hp: 68, mhp: 68, atk: 9, def: 4, spd: 10, on: false, ul: 999, recruitGated: true, d: 'Held a line alone for years before the Guild gave her something better than solitude. Ash has never once left her side, and Ash is usually right.', b: '+15% Crit chance \u00b7 Ash (20% chance a missed attack lands anyway)', col: '#c2703d', affinityBonuses: [], gear: null, base: { mhp: 68, atk: 9, def: 4, spd: 10 }, eq: { weapon: { n: "Iris's Long Knives", slot: 'weapon', forCompanion: 'Iris', r: 'rare', ilvl: 28, atk: 25, spd: 9, d: "Twin knives for Iris. +25 ATK, +9 SPD" }, armor: { n: "Ash's Watch", slot: 'armor', forCompanion: 'Iris', r: 'rare', ilvl: 28, def: 15, spd: 7, d: "Light armor for Iris. +15 DEF, +7 SPD" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } }
   ],
 
   partySynergies: [
@@ -4181,6 +4182,37 @@ storyJournal: {
           { speaker: 'Joel', text: '"We come back better prepared," Joel says, already thinking practically, already thinking about what the party will actually need. "This is not a today thing. It was never going to be a today thing."' },
           { speaker: 'KW Liang', text: '"I know," Liang says, and for the first time since the crossing, he sounds almost steady. "I think I can wait, now that I know waiting actually means something. That is different from the kind of waiting I was doing before."' },
           { speaker: 'Narrator', text: 'Behind you, faint and patient, the seam Varel and Mimi opened hums on, holding its word a little longer than any of you had quite dared to hope it would. Ahead of you, past the collapsed stretch none of you could cross today, an entire unfinished search waits — smaller, now, than it was this morning. Still not finished. But smaller.' },
+        ]
+      }
+,{
+        id: 'journal_117',
+        title: 'Small and Quick',
+        chapter: 117,
+        unlockType: 'level',
+        unlockAt: 290,
+        icon: '🐰',
+        summary: 'The second attempt finds them waiting — four survivors, older, changed, not all of them, but still here. Reyes, sharp-eyed and careful, gives Liang the one thing he never let himself expect: not everyone made it, but he did not lose all of them either.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The second attempt goes differently from the first, in ways too small to name individually and too many to ignore — better rope, better light, a route Liang has half-memorized just from staring at it in his sleep since the last visit. It still takes three days past the collapsed stretch before the markings start again.' },
+          { speaker: 'Narrator', text: 'This time there are more of them. Closer together. Less careful about being found, or maybe just more confident that whoever is following the trail already means them no harm.' },
+          { speaker: 'KW Liang', text: '"They know we are here," Liang says, quiet, somewhere on the second day. "They have known for a while. This is not a trail anymore. It is an invitation."' },
+          { speaker: 'Narrator', text: 'He is right. The last marking is not tucked into a doorway at all — it is out in the open, painted large enough to see from the street, and beneath it, waiting, are people.' },
+          { speaker: 'Narrator', text: 'Four of them. Older than you expected, though you are not sure why you expected anything else — time did not stop for them any more than it stopped for Liang. One leans on a length of pipe like a cane, favoring a leg that clearly never healed quite right. Another has a scar running the length of one forearm, old enough to have gone pale and unremarkable. All four of them are watching Liang with an expression you do not have a clean word for — somewhere between disbelief and something that has been waiting so long it forgot it was allowed to hope.' },
+          { speaker: 'Narrator', text: 'A woman steps forward first. Sharp-eyed, gray threading through hair that used to be dark, a voice roughened by years of talking quietly in places where loud was dangerous.' },
+          { speaker: 'Bunny Elder', text: '"You are actually here." It is not quite a question. It does not sound like she trusts the answer yet, either way.' },
+          { speaker: 'KW Liang', text: '"Reyes." Just her name, and something breaks in his voice saying it. "I did not know. I have not known, this whole time, whether —"' },
+          { speaker: 'Bunny Elder', text: '"We are still here," Reyes says, cutting off the rest of it before he can finish. "Not all of us. Not the way we were. But still here."' },
+          { speaker: 'Narrator', text: 'There is a silence after that neither of you rushes to fill. It is the kind of silence that is doing real work — counting, quietly, everyone standing here against everyone who is not.' },
+          { speaker: 'KW Liang', text: '"Who," Liang finally asks, careful, like the word itself might cost something.' },
+          { speaker: 'Bunny Elder', text: '"Later," Reyes says, not unkindly. "You will want to sit down for that list. Right now I would rather just look at you for a minute, if you do not mind. It has been a long time since I got to do that."' },
+          { speaker: 'Narrator', text: 'Liang does not argue. Neither do you. Some things are allowed to happen out of order, and being looked at, finally, by someone who spent this long wondering whether there would ever be a reason to, is apparently one of them.' },
+          { speaker: 'Narrator', text: 'She stays close to Liang\'s shoulder the whole time, not speaking, not needing to — just present, the same way she has been every time this particular weight has come up.' },
+          { speaker: 'Bunny Elder', text: '"You brought people," Reyes says eventually, taking in the rest of you properly for the first time. "Good. That is good. We stopped being able to spare the hands for looking outward a long time ago. Maybe that changes now."' },
+          { speaker: 'Joel', text: '"It can," Joel says, simple, the same word he has meant every time he has said some version of it since this whole thing started. "If that is something you actually want."' },
+          { speaker: 'Narrator', text: 'You watch Liang\'s face while Reyes considers that — watch him hold still for an answer he has been afraid to actually hear for longer than he has known any of you. Whatever she says next, you understand, is going to matter more than almost anything that has happened since he first fell through a door he never meant to walk through.' },
+          { speaker: 'Bunny Elder', text: '"We will talk," Reyes finally says. "Properly. Tonight, once everyone here has had a chance to actually believe their own eyes."' },
+          { speaker: 'Narrator', text: 'She looks at Liang a moment longer, something softening in it that the roughness in her voice never quite managed to hide.' },
+          { speaker: 'Bunny Elder', text: '"Welcome back, small and quick," she says, and for the first time since the crossing, Liang actually laughs — unsteady, disbelieving, entirely real.' },
         ]
       }
     ]
@@ -10145,7 +10177,8 @@ const GUILD_MEMBERS = [
     barks: [
       'Iris: "Ash smells something. Ash is usually right."',
       'Iris: "I held a line alone for years. This is so much better."',
-      'Iris: "Ash says hello. Ash means \'attack now.\'"'
+      'Iris: "Ash says hello. Ash means \'attack now.\'"',
+      'Iris: "Ash catches what should have missed. Ash is always sure it was never actually going to miss at all."'
     ] }
 ];
 
@@ -10232,7 +10265,18 @@ function doGuildWarMemberAttack(memberDef) {
     advantage: 'normal'
   });
 
-  if (!attackResult.hit) {
+  // Ash — Iris's fox. She never gets targeted in this abstracted combat system (Guild
+  // War members only ever attack, never defend), so a dodge mechanic wouldn't apply to
+  // her the way it does Liang's Snowball. "Ash smells something, Ash is usually right"
+  // translates instead into a genuine chance her instinct simply overrides a miss.
+  let attackHit = attackResult.hit;
+  let ashSaved = false;
+  if (!attackHit && memberDef.id === 'iris' && Math.random() < 0.20) {
+    attackHit = true;
+    ashSaved = true;
+  }
+
+  if (!attackHit) {
     lg('❌ ' + memberDef.npcName + ' misses ' + target.n + ' (' + attackResult.d20.roll + ')');
     return;
   }
@@ -10246,7 +10290,8 @@ function doGuildWarMemberAttack(memberDef) {
   target.hp = Math.max(0, target.hp - finalDamage);
 
   const critTag = attackResult.isCrit ? ' 💥 CRIT!' : '';
-  lg('⚔️ ' + memberDef.npcName + ' hits ' + target.n + ' for ' + finalDamage + critTag);
+  const ashTag = ashSaved ? ' 🦊 (Ash smelled it coming)' : '';
+  lg('⚔️ ' + memberDef.npcName + ' hits ' + target.n + ' for ' + finalDamage + critTag + ashTag);
 }
 
 function guildWarBark() {
@@ -11331,8 +11376,14 @@ function doPartyAttack(member, noBonus) {
   });
   
   if (!attackResult.hit) {
-    lg('❌ ' + member.n + ' misses ' + target.n + ' (' + attackResult.d20.roll + ')');
-    return;
+    // Ash — Iris's fox, same mechanic here as in Guild War: her own miss has a real
+    // chance to land anyway, on the strength of "Ash smelled it coming."
+    if (member.n === 'Iris' && Math.random() < 0.20) {
+      lg('🦊 ' + member.n + "'s attack should have missed " + target.n + ' \u2014 Ash smelled it coming, and it lands anyway.');
+    } else {
+      lg('❌ ' + member.n + ' misses ' + target.n + ' (' + attackResult.d20.roll + ')');
+      return;
+    }
   }
   
   const damageResult = DICE.damageRoll({
@@ -11570,6 +11621,14 @@ function doEnemyAttack(enemy) {
   // highest SPD stat in the party. Checked before the attack roll even happens.
   if (target !== G.p && target.n === 'Senedra' && G.p.lvl >= SENEDRA_EVASION_UNLOCK && Math.random() < (hasCompanionPrestige('Senedra', 'shadow_stalker') ? 0.35 : 0.20)) {
     lg('💨 Senedra evades ' + enemy.n + "'s attack entirely!");
+    return;
+  }
+
+  // Snowball — Liang's rabbit, small and quick enough to slip a hit that should have
+  // landed. Same shape as Senedra's Evasion, distinct flavor, tied to Liang rather than
+  // a level threshold since he's recruit-gated rather than level-gated.
+  if (target !== G.p && target.n === 'KW Liang' && Math.random() < 0.18) {
+    lg('🐇 Snowball darts between Liang and ' + enemy.n + "'s attack — it never actually lands!");
     return;
   }
 
@@ -15251,7 +15310,7 @@ function triggerLevelUpAnimation(newLevel) {
 // or by Guild recruitment (the six added later). Mimi and Brada are a linked pair —
 // selecting one selects both, together consuming 2 of the 4 slots, never split apart.
 const ACTIVE_PARTY_SLOTS = 4;
-const SWAPPABLE_PARTY_POOL = ['Mezstorm', 'Eliz', 'Senedra', 'Zaki', 'KW Liang', 'Mimi', 'Brada Shah', 'Dr. AA', 'Sister Wren', 'Ser Aldric'];
+const SWAPPABLE_PARTY_POOL = ['Mezstorm', 'Eliz', 'Senedra', 'Zaki', 'KW Liang', 'Mimi', 'Brada Shah', 'Dr. AA', 'Sister Wren', 'Ser Aldric', 'Iris'];
 const LINKED_PARTY_PAIRS = [['Mimi', 'Brada Shah'], ['Senedra', 'Zaki']];
 // Maps a swappable party member's name to the Guild Member id that gates their
 // availability, for the six who are recruit-gated rather than level-gated.
@@ -15261,7 +15320,8 @@ const PARTY_MEMBER_GUILD_GATE = {
   'Brada Shah': 'brada',
   'Dr. AA': 'dr_aa',
   'Sister Wren': 'sister_wren',
-  'Ser Aldric': 'ser_aldric'
+  'Ser Aldric': 'ser_aldric',
+  'Iris': 'iris'
 };
 // The reverse relationship for the original four — becoming available as a party
 // candidate (by level) is what recruits them to the Guild roster, not the other way
@@ -15340,6 +15400,7 @@ const COMPANION_LEVEL_GROWTH = {
   'Dr. AA':      { mhp: 9,  atk: 1, def: 1, spd: 0 }, // Steady Hands — durable clinical healer
   'Sister Wren': { mhp: 8,  atk: 1, def: 2, spd: 0 }, // True Devotion — protective, DEF-leaning healer
   'Ser Aldric':  { mhp: 11, atk: 1, def: 2, spd: 0 }, // The Other Kind of Found — even tankier than Joel, slower
+  'Iris':        { mhp: 7,  atk: 2, def: 0, spd: 1 }, // Held Her Own — fast, offense-leaning scout, same shape as Senedra
 };
 
 // Original starting stats (before any growth) and unlock level per companion — used only
@@ -16234,7 +16295,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.43';
+const BUILD_ID = '2026-08-08.46';
 // =========================
 
 
