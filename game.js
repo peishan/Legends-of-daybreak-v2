@@ -1078,6 +1078,16 @@ const G = {
         { n: 'Collar of the Space Between', slot: 'amulet', forCompanion: 'Soel', q: 1, r: 'epic', price: 400, ilvl: 28, def: 12, atk: 10, d: 'Collar for Soel. +12 DEF, +10 ATK' }
       ],
       unlocked: true, zone: 'The Static Fields', zoneLv: 26, visitCount: 0 },
+    { n: 'Thessa', t: 'trader', title: 'The Fitter', icon: '\u2696\ufe0f', col: '#8b7355', zone: 'The Unbroken Vale', zoneLv: 56,
+      d: "She doesn't ask who it's for. \"Gear is gear until someone's actually wearing it,\" she says, laying out a rack that fits whoever needs it \u2014 no name stitched into any of it. Every newer face in the Guild ends up at her stall eventually, once they realize nobody built them a full kit yet.",
+      stock: [
+        { n: "Fitter's Circlet", slot: 'head', forCompanion: 'any', q: 1, r: 'rare', price: 340, ilvl: 28, def: 14, atk: 6, d: 'Universal head gear. +14 DEF, +6 ATK. Fits anyone.' },
+        { n: "Fitter's Wraps", slot: 'hands', forCompanion: 'any', q: 1, r: 'rare', price: 340, ilvl: 28, atk: 10, spd: 4, d: 'Universal hand gear. +10 ATK, +4 SPD. Fits anyone.' },
+        { n: "Fitter's Treads", slot: 'feet', forCompanion: 'any', q: 1, r: 'rare', price: 340, ilvl: 28, spd: 10, def: 4, d: 'Universal foot gear. +10 SPD, +4 DEF. Fits anyone.' },
+        { n: "Fitter's Band", slot: 'ring', forCompanion: 'any', q: 1, r: 'rare', price: 320, ilvl: 28, atk: 8, def: 4, d: 'Universal ring. +8 ATK, +4 DEF. Fits anyone.' },
+        { n: "Fitter's Charm", slot: 'amulet', forCompanion: 'any', q: 1, r: 'rare', price: 340, ilvl: 28, def: 10, spd: 6, d: 'Universal amulet. +10 DEF, +6 SPD. Fits anyone.' }
+      ],
+      unlocked: true, zone: 'The Unbroken Vale', zoneLv: 56, visitCount: 0 },
     { n: 'Dr. AA', t: 'trader', title: "The Old-World Doctor", icon: '🩺', col: '#0d9488', zone: 'The Unbroken Vale', zoneLv: 56,
       d: "A friend from San's old firm, of all people to turn up out here — the one who always had a ghost story ready between checkups and complained, only half-joking, that nobody ever wanted the vitamins as much as the stories. He still packs both. Proper medicine on one side of the cart, a stack of paperbacks on the other. He swears every one of them really happened.",
       stock: [
@@ -5155,7 +5165,7 @@ function equipPartyGearSlot(memberName, slot, invIndex) {
   if (!member) return;
   const item = G.p.inv[invIndex];
   if (!item || item.slot !== slot) return;
-  if (item.forCompanion !== memberName) {
+  if (item.forCompanion !== memberName && item.forCompanion !== 'any') {
     lg('❌ ' + item.n + ' is not fitted for ' + memberName + '!');
     return;
   }
@@ -16295,7 +16305,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.46';
+const BUILD_ID = '2026-08-08.47';
 // =========================
 
 
@@ -16798,12 +16808,14 @@ function loadGame() {
             lg('🧝 ' + p.n + '\'s ' + oldGear.n + ' has been moved into their amulet slot.');
           }
         }
-        // Sanitize equipped gear: anything sitting in a slot that isn't actually restricted
-        // to this companion (e.g. San's own weapon equipped on Soel, from before this fix)
-        // gets returned to inventory rather than silently kept.
+        // Sanitize equipped gear: anything sitting in a slot that is EXPLICITLY
+        // restricted to a different companion (e.g. San's own weapon equipped on Soel,
+        // from before this fix) gets returned to inventory rather than silently kept.
+        // Items with no forCompanion set at all are universal — safe for any swappable
+        // party member — and are deliberately left alone here.
         for (let slot in p.eq) {
           const eq = p.eq[slot];
-          if (eq && eq.forCompanion !== p.n) {
+          if (eq && eq.forCompanion !== p.n && eq.forCompanion !== 'any') {
             addI({ ...eq });
             lg('🧝 ' + eq.n + " wasn't actually fitted for " + p.n + ' — returned to your bag.');
             p.eq[slot] = null;
@@ -21426,7 +21438,7 @@ function rParty(){
           h += '<div style="font-size:9px;color:var(--text-dim);margin-bottom:4px;">' + statBits.join(' ') + '</div>';
           h += '<button class="unequip-pgear" data-member="' + p.n + '" data-slot="' + slot + '" style="width:100%;padding:3px;border-radius:6px;border:1px solid var(--danger);background:transparent;color:var(--danger);font-size:9px;font-weight:600;cursor:pointer;">Unequip</button>';
         } else {
-          const candidates = G.p.inv.map((it, idx) => ({it, idx})).filter(x => x.it.slot === invSlotKey && x.it.forCompanion === p.n);
+          const candidates = G.p.inv.map((it, idx) => ({it, idx})).filter(x => x.it.slot === invSlotKey && (x.it.forCompanion === p.n || x.it.forCompanion === 'any'));
           if (candidates.length > 0) {
             h += '<div style="display:flex;flex-direction:column;gap:2px;margin-top:2px;">';
             for (let c of candidates.slice(0, 3)) {
@@ -21511,7 +21523,7 @@ function getEquipComparison(item) {
 // always compares against San's own equipment regardless of who an item is for.
 function getEquipComparisonForOwner(item) {
   if (!item || !item.slot) return null;
-  if (!item.forCompanion) return getEquipComparison(item);
+  if (!item.forCompanion || item.forCompanion === 'any') return getEquipComparison(item);
   const owner = G.party.find(p => p.n === item.forCompanion);
   if (!owner || !owner.eq) return null; // unknown owner — treat as unsellable, not junk
   const slot = item.slot === 'ring' ? (owner.eq.ring1 ? 'ring2' : 'ring1') : item.slot;
