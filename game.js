@@ -16385,7 +16385,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.50';
+const BUILD_ID = '2026-08-08.51';
 // =========================
 
 
@@ -16494,6 +16494,7 @@ function saveGame() {
     prestigeCount: G.prestige.count || 0,
     prestigeXpBonusPct: G.prestige.xpBonusPct || 0,
     prestigeGoldBonusPct: G.prestige.goldBonusPct || 0,
+    prestigeHighestLvlEver: G.prestige.highestLvlEver || 0,
     bossRushBestStreak: G.bossRush.bestStreak || 0,
     guildWarBestStreak: G.guildWar.bestStreak || 0,
     guildRosterRecruited: G.guildRoster.recruited || [],
@@ -16782,6 +16783,21 @@ function loadGame() {
     G.prestige.count = data.prestigeCount || 0;
     G.prestige.xpBonusPct = data.prestigeXpBonusPct || 0;
     G.prestige.goldBonusPct = data.prestigeGoldBonusPct || 0;
+    if (data.prestigeHighestLvlEver) {
+      G.prestige.highestLvlEver = data.prestigeHighestLvlEver;
+    } else if (G.prestige.count >= 1) {
+      // Migration: this save Prestiged before highestLvlEver existed as a tracked field
+      // at all (or briefly existed but was never actually being saved — an earlier bug).
+      // Can't know the real number retroactively, so estimate a safe floor: whatever
+      // level was required to reach the tier they're already on, using the same
+      // formula the Prestige screen itself uses for the next tier.
+      let lvl = PRESTIGE_MIN_LEVEL + 2 * PRESTIGE_TIER_STEP; // tier 3 baseline
+      let increment = PRESTIGE_TIER_STEP;
+      for (let t = 4; t <= G.prestige.count; t++) { increment += 10; lvl += increment; }
+      const estimatedFloor = G.prestige.count <= 3 ? (PRESTIGE_MIN_LEVEL + (G.prestige.count - 1) * PRESTIGE_TIER_STEP) : lvl;
+      G.prestige.highestLvlEver = Math.max(estimatedFloor, G.p.lvl);
+      lg('\u26a1 The Rite of Return has been restored for you \u2014 your prior Prestige history predates it, so this is an estimate rather than your exact old peak.');
+    }
     G.bossRush.bestStreak = data.bossRushBestStreak || 0;
     G.guildWar.bestStreak = data.guildWarBestStreak || 0;
     G.guildRoster.recruited = data.guildRosterRecruited || [];
