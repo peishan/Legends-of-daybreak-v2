@@ -16525,7 +16525,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.57';
+const BUILD_ID = '2026-08-08.58';
 // =========================
 
 
@@ -21446,14 +21446,16 @@ function rCbt() {
     h += '</div></div>';
   }
 
-  // === PARTY STRIP: portraits + visible HP bars + actual numeric HP/MP text ===
+  // === PARTY STRIP: portraits + visible HP bars + actual numeric HP text ===
+  // MP intentionally removed from display — San was the only one who ever had it shown
+  // (party members don't use MP in this system), which made her column visibly taller
+  // than everyone else's and threw off row-wrapping once portraits got bigger. Still
+  // available in the hover tooltip for anyone on a device where that works.
   h += '<div class="party-strip">';
   h += '<div class="party-avatar" title="San ' + G.p.hp + '/' + G.p.mhp + ' HP · ' + G.p.mp + '/' + G.p.mmp + ' MP · AC ' + playerAC + '">';
   h += '<div class="party-avatar-circle" style="border-color:#7c3aed;">' + portraitImg('san', '#7c3aed30', 'S') + '</div>';
   h += '<div class="party-avatar-hp"><div class="party-avatar-hp-fill" style="width:' + Math.max(0, (G.p.hp/G.p.mhp)*100) + '%;background:var(--hp);"></div></div>';
   h += '<div class="party-avatar-stat-text" style="color:var(--hp);">' + G.p.hp + '/' + G.p.mhp + '</div>';
-  h += '<div class="party-avatar-hp"><div class="party-avatar-hp-fill" style="width:' + Math.max(0, (G.p.mp/G.p.mmp)*100) + '%;background:var(--mp);"></div></div>';
-  h += '<div class="party-avatar-stat-text" style="color:var(--mp);">' + G.p.mp + '/' + G.p.mmp + '</div>';
   h += '</div>';
   for (let p of G.party) {
     if (p.on) {
