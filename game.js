@@ -16525,7 +16525,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.56';
+const BUILD_ID = '2026-08-08.57';
 // =========================
 
 
@@ -21446,18 +21446,21 @@ function rCbt() {
     h += '</div></div>';
   }
 
-  // === PARTY STRIP: portraits + thin HP bars, no name text ===
+  // === PARTY STRIP: portraits + visible HP bars + actual numeric HP/MP text ===
   h += '<div class="party-strip">';
   h += '<div class="party-avatar" title="San ' + G.p.hp + '/' + G.p.mhp + ' HP · ' + G.p.mp + '/' + G.p.mmp + ' MP · AC ' + playerAC + '">';
   h += '<div class="party-avatar-circle" style="border-color:#7c3aed;">' + portraitImg('san', '#7c3aed30', 'S') + '</div>';
   h += '<div class="party-avatar-hp"><div class="party-avatar-hp-fill" style="width:' + Math.max(0, (G.p.hp/G.p.mhp)*100) + '%;background:var(--hp);"></div></div>';
+  h += '<div class="party-avatar-stat-text" style="color:var(--hp);">' + G.p.hp + '/' + G.p.mhp + '</div>';
   h += '<div class="party-avatar-hp"><div class="party-avatar-hp-fill" style="width:' + Math.max(0, (G.p.mp/G.p.mmp)*100) + '%;background:var(--mp);"></div></div>';
+  h += '<div class="party-avatar-stat-text" style="color:var(--mp);">' + G.p.mp + '/' + G.p.mmp + '</div>';
   h += '</div>';
   for (let p of G.party) {
     if (p.on) {
       h += '<div class="party-avatar" title="' + p.n + ' ' + p.hp + '/' + p.mhp + ' HP">';
       h += '<div class="party-avatar-circle" style="border-color:' + p.col + ';">' + portraitImg(portraitFileNameFor(p.n), p.col + '30', p.n[0]) + '</div>';
       h += '<div class="party-avatar-hp"><div class="party-avatar-hp-fill" style="width:' + Math.max(0, (p.hp/p.mhp)*100) + '%;background:' + (p.hp <= 0 ? 'var(--disabled)' : 'var(--hp)') + ';"></div></div>';
+      h += '<div class="party-avatar-stat-text" style="color:' + (p.hp <= 0 ? 'var(--disabled)' : 'var(--hp)') + ';">' + p.hp + '/' + p.mhp + '</div>';
       h += '</div>';
     }
   }
