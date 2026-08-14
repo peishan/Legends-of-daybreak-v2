@@ -7119,7 +7119,7 @@ function generateDailyQuests() {
   }
 
   const pool = DAILY_QUESTS.filter(t => t.id !== 'dq5');
-  for (let i = 0; i < 3 && pool.length > 0; i++) {
+  for (let i = 0; i < 7 && pool.length > 0; i++) {
     const idx = Math.floor(Math.random() * pool.length);
     const template = pool.splice(idx, 1)[0];
     G.dailyQuests.push({
@@ -16772,7 +16772,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.62';
+const BUILD_ID = '2026-08-08.64';
 // =========================
 
 
@@ -21149,6 +21149,7 @@ function rMenu(){
     {i:'⚔️',l:'Adventure',d:'Explore zones and fight',a:'explore'},
     {i:'👥',l:'Party',d:'Manage companions',a:'party'},
     {i:'🌀',l:'Grind Room',d:'Endless wave battles',a:'grind_room'},
+    {i:'🎯',l:'Adventure Farming',d:'Set the party loose, keep grinding while you\'re away',a:'afk_adventure'},
     {i:'⚔️',l:'Raid Mode',d:'Boss gauntlets + elites',a:'raid_select'},
     {i:'⛪',l:'Temple',d:'Blessings, cures, and revival',a:'temple'},
   ];
@@ -21165,7 +21166,6 @@ function rMenu(){
     { title: '📋 Quick Work', items: [
       {i:'📅',l:'Today',a:'today'},
       {i:'📋',l:'Mercenary',a:'mercenary'},
-      {i:'🎯',l:'Adventure Farming',a:'afk_adventure'},
     ]},
     { title: '🏰 Guild & Stronghold', items: [
       {i:'🛡️',l:'Guild',a:'guild'},
