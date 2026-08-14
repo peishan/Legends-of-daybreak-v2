@@ -4393,6 +4393,81 @@ storyJournal: {
           { speaker: 'Narrator', text: 'Neither of you says the rest of it. Neither of you has to. Whatever the Architect\'s plan was actually reaching for, when it finally, desperately tried to connect everything the Breaking tore apart — it was never only reaching for worlds like Liang\'s. Somewhere in an unfinished blueprint, drawn by someone who never got to see it through, is a door with a shape you would know anywhere.' },
         ]
       }
+,{
+        id: 'journal_123',
+        title: 'Listening, Specifically',
+        chapter: 123,
+        unlockType: 'level',
+        unlockAt: 325,
+        icon: '🌫️',
+        summary: 'Deeper into the still-forming world, Mimi realizes it is not broken, only genuinely undecided — and that it has been listening to the party specifically, working out what visitors are supposed to mean. By the time they reach the Waiting Shape, it becomes clear that whatever comes next will be shaped by how they choose to meet it, not just whether they win.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The deeper you go, the less this world agrees with itself — a stretch of ground Joel swears you crossed an hour ago, arranged now at a different angle, leading somewhere it did not lead the first time. Nobody argues about it. There is nothing to argue with. The place simply has not decided.' },
+          { speaker: 'Narrator', text: 'Mimi walks with her eyes half-closed more often than open here, reading something the rest of you cannot access.' },
+          { speaker: 'Mimi', text: '"This is doing something to my Dreamsight," she admits, finally, quiet. "Normally I see the shape of a thing before it happens. Here I see several shapes, all at once, none of them more true than the others yet. I do not think that is a flaw in the world. I think that is honestly what it is."' },
+          { speaker: 'San', text: '"Can you still read it?" you ask. "Enough to know what we are walking into?"' },
+          { speaker: 'Mimi', text: '"I can read that it is listening," Mimi says. "To us, specifically. I do not think this place has had visitors before. I think it genuinely does not know yet what visitors are supposed to mean for what it becomes."' },
+          { speaker: 'Narrator', text: 'The Half-Finished Hall makes the shape of the whole world plain — columns fading into unfinished suggestion, a ceiling only partly committed to existing, the unmistakable feeling of standing inside something still being decided rather than something already broken.' },
+          { speaker: 'Joel', text: '"It does not feel abandoned," Joel says, running a hand along a wall that has not finished deciding whether it is a wall. "World one felt abandoned. This feels more like walking in early. Like we got here before it was ready to be looked at."' },
+          { speaker: 'KW Liang', text: '"I keep waiting for it to feel dangerous the way the last one did," Liang admits. "It does not, exactly. It feels more like standing very close to something enormous that has not decided yet whether it likes you."' },
+          { speaker: 'Narrator', text: 'By the time you reach the Waiting Shape, that uncertainty has a size to it — something vast, patient, unmistakably close to finished, occupying the center of a space that seems to have organized itself entirely around waiting for whatever it is about to become.' },
+          { speaker: 'Narrator', text: 'You stand in front of it a long moment before anyone moves to fight anything at all.' },
+          { speaker: 'San', text: '"It is not attacking," you say, working through it out loud. "It is just... watching us watch it."' },
+          { speaker: 'Mimi', text: '"I do not think combat is actually the point here," Mimi says, careful. "I think combat is just the only language any of us currently share with it. It may not mean the same thing to it that it means to us."' },
+          { speaker: 'Joel', text: '"Then we should be careful what we are actually saying," Joel says, already thinking it through. "If every hit shapes what this becomes, we are not just fighting it. We are telling it something about what things from other worlds are actually like."' },
+          { speaker: 'Narrator', text: 'Nobody treats that lightly, walking the last stretch toward What It Was Becoming. Whatever waits at the end of this world, it is going to leave here changed by however you choose to meet it — and for the first time since the crossing, that feels like it might matter more than winning does.' },
+        ]
+      }
+,{
+        id: 'journal_124',
+        title: 'A Choice, Not a Victory',
+        chapter: 124,
+        unlockType: 'level',
+        unlockAt: 330,
+        icon: '✨',
+        summary: 'The fight with An Unwritten Thing turns out to be a conversation, not a battle — every hit shaping what it becomes, until the party\'s restraint gives it something to finally settle into. What\'s left isn\'t a monster or a ruin, but the first place in this entire world that got to choose what it wanted to be.',
+        scenes: [
+          { speaker: 'Narrator', text: 'An Unwritten Thing does not look like anything, exactly — the closest San can manage, afterward, is that it looked like several answers at once, none of them chosen yet, all of them equally possible until the moment they were not.' },
+          { speaker: 'Narrator', text: 'The fight goes strangely from the very first exchange. Every strike lands the way a strike is supposed to, and yet each one seems to nudge something in the shape of it, like the fight itself is a conversation none of you fully speak the language of.' },
+          { speaker: 'Joel', text: '"Careful," Joel says, low, watching it shift after Aisyah\'s opening hit. "I do not think we get to take that back once it is said."' },
+          { speaker: 'Narrator', text: 'You fight it the way you would fight anything — committed, careful, watching each other\'s openings — but something in how this particular fight unfolds is different, and by the second exchange everyone seems to feel it at once: this is not a battle being won so much as a shape being decided, one honest hit at a time.' },
+          { speaker: 'KW Liang', text: '"It is not fighting back the way it could," Liang notices, midway through, something careful in his voice. "It has the strength to hurt us properly. It is choosing something closer to matching us instead."' },
+          { speaker: 'Mimi', text: '"I do not think it wants to win," Mimi says, breathless, still reading whatever the rest of you cannot. "I think it wants to know what winning would have looked like, from something like us. That might be the actual question it has been asking this whole time."' },
+          { speaker: 'Narrator', text: 'So you answer it the only way any of you actually know how — hard when it needs to be hard, but never past what the moment calls for, no killing blow thrown just because you could throw one. Aisyah pulls a strike at the very end that could have ended it outright, and lets it land soft instead.' },
+          { speaker: 'Aisyah', text: '"That was a choice," she says, to no one in particular, watching the shape in front of her go very still. "I want it to know that was a choice."' },
+          { speaker: 'Narrator', text: 'The stillness that follows is not the stillness of something defeated. It is the stillness of something finally arriving somewhere — the shifting, uncertain shape at the center of the room settling, slowly, into something with actual edges, actual weight, the unmistakable feeling of a decision finally made.' },
+          { speaker: 'Narrator', text: 'What stands there afterward is not a monster, and was clearly never going to become one, not after everything it just watched you choose. It looks, more than anything else, like a place — solid now, real now, something that could genuinely be walked into rather than simply witnessed.' },
+          { speaker: 'San', text: '"What is it?" you ask, quiet, watching it settle fully into whatever it has decided to be.' },
+          { speaker: 'Mimi', text: '"I think," Mimi says, slow, working it out as she says it, "it is the first place in this entire world that got to choose what it wanted to be, instead of just happening to something. I think we are looking at the only part of this world that is actually, finally finished — on purpose, the way it wanted to be."' },
+          { speaker: 'Joel', text: '"Because of how we fought it," Joel says, not quite a question.' },
+          { speaker: 'Mimi', text: '"Because of how you chose to," Mimi corrects, gently. "There is a difference, and I think it is the whole reason this world found us at all."' },
+          { speaker: 'Narrator', text: 'Behind you, the seam holds, quieter now, almost satisfied. Ahead of you, an entire settled place waits — not a ruin, not a threat, the very first corner of an unstable world that finally, deliberately, got to become something. World two, you understand, standing in the middle of it, was never actually about what you would find here. It was about what you would leave behind, once you did.' },
+        ]
+      }
+,{
+        id: 'journal_125',
+        title: 'Not Yet, On Purpose',
+        chapter: 125,
+        unlockType: 'level',
+        unlockAt: 350,
+        icon: '🔒',
+        summary: 'The Draft That Kept Drawing turns out to already be working on the familiar door, ownerless and patient in the worst way — finishing a decision that was never its place to make. The party stops it, and chooses, deliberately, to leave the door closed a little longer. Not because they can\'t open it. Because it should be them who decides when.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The line draws itself into existence a hand\'s width from the door before anyone actually notices it happening — one stroke, then another, patient and mechanical, the unmistakable sound of something being finished by a process that has no idea what it is actually finishing.' },
+          { speaker: 'Mezstorm', text: '"It is drawing on this one," Mezstorm says, already moving, already understanding what that means before anyone else fully catches up. "Right now. It does not know to wait. It has never once known to wait."' },
+          { speaker: 'San', text: 'You watch another line appear, and something in you goes cold in a way that has nothing to do with fear and everything to do with the sudden, physical understanding of what "finished" would actually mean here, arriving on a schedule none of you set.' },
+          { speaker: 'Joel', text: '"Not like this," Joel says, already between you and the door, already deciding something with his whole body before he finishes saying it out loud. "Whatever this is. Whenever it is. It does not get decided by something that does not even know it is deciding anything."' },
+          { speaker: 'Narrator', text: 'The Draft That Kept Drawing does not have a face to read intention from, does not have anything that resembles a reason. It simply keeps working, the way it has kept working since the day its architect fell and never told it to stop, and it does not slow down for the four of you standing in its way.' },
+          { speaker: 'Narrator', text: 'The fight is nothing like the last one. There is no conversation in this one, no shape being decided one honest hit at a time — just something ownerless and endless that has to be stopped outright, plainly, before it finishes a decision that was never its place to make.' },
+          { speaker: 'KW Liang', text: '"It is not cruel," Liang says, mid-fight, breathless, something almost sympathetic under the urgency of it. "I do not think it has ever been cruel. It just never learned that some doors are supposed to wait for the people they are actually about."' },
+          { speaker: 'Narrator', text: 'When it finally stills, the drafting stops with it — the half-finished line on the door fading, incomplete, exactly as unfinished as it needs to stay for now. The door itself does not open. It was never asked to. It simply, finally, gets to remain a question instead of becoming an answer nobody was ready for yet.' },
+          { speaker: 'Narrator', text: 'He stands in front of it a long moment after, not reaching for it, not needing to.' },
+          { speaker: 'Joel', text: '"We are not opening this today," he says, quiet, sure. "Not because we cannot. Because it should actually be us who decides when. Not something that never learned how to wait."' },
+          { speaker: 'San', text: '"Today, then," you agree, quiet, watching the door settle back into stillness. "Just — not yet."' },
+          { speaker: 'Mezstorm', text: '"That is allowed," Mezstorm says, gentle, the closest thing to permission any of you have actually needed since you found this hall. "It has waited this long already. It can wait a little longer, for the right reason instead of the wrong one."' },
+          { speaker: 'Narrator', text: 'You leave the hall the way you found it — quiet, unfinished, one door among hundreds now safely, deliberately still closed. Somewhere behind you, the seam holds. Ahead of you, an entire unfinished blueprint keeps waiting, patient in the one way that actually matters: on your own time, for once, instead of someone else\'s.' },
+        ]
+      }
     ]
   },
 
@@ -16525,7 +16600,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.58';
+const BUILD_ID = '2026-08-08.60';
 // =========================
 
 
@@ -18102,7 +18177,6 @@ function render(){
   else if(G.state=='boss_rush_room')h+=rBossRushRoom();
   else if(G.state=='fraying_frontier_room')h+=rFrayingFrontierRoom();
   else if(G.state=='guild_war')h+=rGuildWar();
-  else if(G.state=='story_so_far')h+=rStorySoFar();
   else if(G.state=='guild_war_room')h+=rGuildWarRoom();
   else if(G.state=='chain_quest')h+=rChainQuest();
   else if(G.state=='event_deck')h+=rEventDeck();
@@ -18150,7 +18224,6 @@ function attachEvents() {
     else if(a=='fraying_frontier')setS('fraying_frontier');
     else if(a=='kindling_network')setS('kindling_network');
     else if(a=='guild_war')setS('guild_war');
-    else if(a=='story_so_far')setS('story_so_far');
     else if(a=='chain_quest')setS('chain_quest');
     else if(a=='event_deck')setS('event_deck');
     else if(a=='sync')setS('sync');
@@ -20281,46 +20354,6 @@ function rFrayingFrontierRoom() {
   return h;
 }
 
-function isSeasonTwoRevealed() {
-  return G.storyJournal.read.includes('journal_092') || G.storyJournal.read.includes('journal_093');
-}
-
-function rStorySoFar() {
-  let h = '<div class="content">';
-  h += '<div class="st" style="text-align:center;">📖 The Story So Far</div>';
-  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">The series, at a glance.</div>';
-
-  h += '<div style="border-radius:14px;overflow:hidden;border:2px solid var(--border);margin-bottom:20px;">';
-  h += '<img src="story-art/cover-series.jpg" style="width:100%;display:block;" onerror="this.parentElement.style.display=\'none\';">';
-  h += '</div>';
-
-  h += '<div class="panel-title" style="margin-bottom:8px;">Season One: The Daybreak Journey</div>';
-  h += '<div style="border-radius:14px;overflow:hidden;border:2px solid var(--border);margin-bottom:12px;">';
-  h += '<img src="story-art/cover-season1.jpg" style="width:100%;display:block;" onerror="this.parentElement.style.display=\'none\';">';
-  h += '</div>';
-  h += '<div style="border-radius:14px;overflow:hidden;border:2px solid var(--border);margin-bottom:24px;">';
-  h += '<img src="story-art/glossary-season1-part1.jpg" style="width:100%;display:block;" onerror="this.parentElement.style.display=\'none\';">';
-  h += '</div>';
-
-  h += '<div class="panel-title" style="margin-bottom:8px;">Season Two: Echoes of Two Worlds</div>';
-  if (isSeasonTwoRevealed()) {
-    h += '<div style="border-radius:14px;overflow:hidden;border:2px solid var(--gold);margin-bottom:12px;">';
-    h += '<img src="story-art/cover-season2.jpg" style="width:100%;display:block;" onerror="this.parentElement.style.display=\'none\';">';
-    h += '</div>';
-    h += '<div style="border-radius:14px;overflow:hidden;border:2px solid var(--gold);margin-bottom:24px;">';
-    h += '<img src="story-art/glossary-season2-allies.jpg" style="width:100%;display:block;" onerror="this.parentElement.style.display=\'none\';">';
-    h += '</div>';
-  } else {
-    h += '<div class="panel" style="text-align:center;padding:40px 16px;">';
-    h += '<div style="font-size:32px;margin-bottom:8px;">🔒</div>';
-    h += '<div class="btn-hint">Unlocks once the story crosses into it. No spoilers here yet.</div>';
-    h += '</div>';
-  }
-
-  h += '</div>';
-  return h;
-}
-
 function rGuildWar() {
   const unlocked = isGuildWarUnlocked();
   let h = '<div class="content">';
@@ -20948,9 +20981,6 @@ function rMenu(){
     {i:'⛪',l:'Temple',d:'Blessings, cures, and revival',a:'temple'},
   ];
   const sections=[
-    { title: '📖 The Story', items: [
-      {i:'📖',l:'The Story So Far',a:'story_so_far'},
-    ]},
     { title: '🐉 Legendary Hunts', items: [
       {i:'🐉',l:'Dragon Hunt',a:'dragon_hunt'},
       {i:'💀',l:'Boss Rush',a:'boss_rush'},
