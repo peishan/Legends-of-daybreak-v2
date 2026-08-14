@@ -7401,7 +7401,14 @@ const DAILY_QUESTS = [
   { id: 'dq5', n: 'Rest & Recover', d: 'Rest once at any campsite', t: 'rest', need: 1, rw: { xp: 25, g: 10 } },
   { id: 'dq6', n: 'Gold Hoarder', d: 'Earn 50 gold from any source', t: 'earn_gold', need: 50, rw: { xp: 50, g: 30 } },
   { id: 'dq7', n: 'Skill Master', d: 'Use focus mode once', t: 'focus', need: 1, rw: { xp: 60, g: 35 } },
-  { id: 'dq8', n: 'Party Bond', d: 'Win a battle with a full party', t: 'full_party_battle', need: 1, rw: { xp: 40, g: 20 } }
+  { id: 'dq8', n: 'Party Bond', d: 'Win a battle with a full party', t: 'full_party_battle', need: 1, rw: { xp: 40, g: 20 } },
+  { id: 'dq9', n: 'Spellstorm', d: 'Cast 10 spells in combat', t: 'cast_spells', need: 10, rw: { xp: 75, g: 40 } },
+  { id: 'dq10', n: 'Clear the Field', d: 'Defeat 8 monsters', t: 'kill', need: 8, rw: { xp: 70, g: 35 } },
+  { id: 'dq11', n: 'Stocked Shelves', d: 'Craft 5 potions', t: 'craft', need: 5, rw: { xp: 65, g: 35 } },
+  { id: 'dq12', n: 'Cartographer', d: 'Explore 4 different zones', t: 'explore', need: 4, rw: { xp: 85, g: 45 } },
+  { id: 'dq13', n: 'Actually Recovering', d: 'Rest twice at any campsite', t: 'rest', need: 2, rw: { xp: 45, g: 20 } },
+  { id: 'dq14', n: 'Deep Pockets', d: 'Earn 150 gold from any source', t: 'earn_gold', need: 150, rw: { xp: 95, g: 60 } },
+  { id: 'dq15', n: 'Focused Twice Over', d: 'Use focus mode twice', t: 'focus', need: 2, rw: { xp: 110, g: 65 } }
 ];
 
 const THEME_KEY = 'ldb_theme';
@@ -8694,17 +8701,27 @@ const STRONGHOLDS = {
     tasks: [
       { id: 'st_tower_upkeep', n: 'Tower Upkeep', d: "Defeat 3 Planar Wisps (found in Arcane Planar Tower) to keep the tower's wards charged", t: 'kill_specific', target: 'Planar Wisp', c: 0, need: 3, rw: { xp: 90, g: 70 }, done: false, refreshDay: -1 },
       { id: 'st_tower_rift_ward', n: 'Rift Ward', d: "Defeat 2 Rift Stalkers (found in Arcane Planar Tower) threatening the tower's seal", t: 'kill_specific', target: 'Rift Stalker', c: 0, need: 2, rw: { xp: 110, g: 85 }, done: false, refreshDay: -1 },
-      { id: 'st_tower_armory', n: 'Armory Watch', d: "Defeat 3 Aether Golems (found in Arcane Planar Tower) guarding the Tower Armory", t: 'kill_specific', target: 'Aether Golem', c: 0, need: 3, rw: { xp: 130, g: 100 }, done: false, refreshDay: -1, minGuildLevel: 2 }
+      { id: 'st_tower_chrono', n: 'Steady the Clocks', d: "Defeat 2 Chronomancers (found in Arcane Planar Tower) before the tower's own time slips further", t: 'kill_specific', target: 'Chronomancer', c: 0, need: 2, rw: { xp: 100, g: 80 }, done: false, refreshDay: -1 },
+      { id: 'st_tower_armory', n: 'Armory Watch', d: "Defeat 3 Aether Golems (found in Arcane Planar Tower) guarding the Tower Armory", t: 'kill_specific', target: 'Aether Golem', c: 0, need: 3, rw: { xp: 130, g: 100 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_tower_void', n: 'What the Void Weaves', d: "Defeat 2 Void Weavers (found in Arcane Planar Tower) unraveling the tower's own wards", t: 'kill_specific', target: 'Void Weaver', c: 0, need: 2, rw: { xp: 150, g: 115 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_tower_wisp_ii', n: 'Wisp Tide', d: "Defeat 6 Planar Wisps (found in Arcane Planar Tower) as they surge past the second ward line", t: 'kill_specific', target: 'Planar Wisp', c: 0, need: 6, rw: { xp: 220, g: 170 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_tower_leviathan_i', n: 'The Deep Current', d: "Defeat 1 Planar Leviathan (found in Arcane Planar Tower) before it fully surfaces", t: 'kill_specific', target: 'Planar Leviathan', c: 0, need: 1, rw: { xp: 320, g: 260 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_tower_rift_ii', n: 'Rift Ward, Deepened', d: "Defeat 5 Rift Stalkers (found in Arcane Planar Tower) as the tower's seal is tested harder", t: 'kill_specific', target: 'Rift Stalker', c: 0, need: 5, rw: { xp: 380, g: 300 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_tower_golem_ii', n: 'The Vault Holds', d: "Defeat 5 Aether Golems (found in Arcane Planar Tower) still guarding what the Tower Vault protects", t: 'kill_specific', target: 'Aether Golem', c: 0, need: 5, rw: { xp: 430, g: 340 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_tower_leviathan_ii', n: 'What Surfaced Fully', d: "Defeat 2 Planar Leviathans (found in Arcane Planar Tower) now that the Sanctum draws them in whole", t: 'kill_specific', target: 'Planar Leviathan', c: 0, need: 2, rw: { xp: 600, g: 500 }, done: false, refreshDay: -1, minGuildLevel: 5 }
     ],
     // The Guild Hall is the core progression structure for this stronghold — everything
     // else added to it later checks the current level here. Level 1 is automatic on
     // claim (no cost); each level after that is a gold-gated upgrade with a concrete unlock.
+    // Materials are tiered by design: early levels lean on generic, widely-farmed mats;
+    // later levels lean harder on this zone's own specific loot, so the climb gets
+    // genuinely harder as the Guild Hall grows, not just more expensive.
     guildHall: [
       { level: 1, name: 'Tower Claimed', cost: 0, desc: 'Free rest and a daily stipend — the tower answers to you now.' },
-      { level: 2, name: 'Tower Armory', cost: 800, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
-      { level: 3, name: 'Tower Training Grounds', cost: 2500, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
-      { level: 4, name: 'Tower Vault', cost: 6000, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
-      { level: 5, name: 'Tower Sanctum', cost: 15000, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
+      { level: 2, name: 'Tower Armory', cost: 800, mats: { 'Iron Ore': 6 }, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
+      { level: 3, name: 'Tower Training Grounds', cost: 2500, mats: { 'Herb Bundle': 8, 'Planar Essence': 4 }, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
+      { level: 4, name: 'Tower Vault', cost: 6000, mats: { 'Aether Shard': 6, 'Chrono Sand': 4 }, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
+      { level: 5, name: 'Tower Sanctum', cost: 15000, mats: { 'Void Thread': 8, 'Rift Splinter': 8, 'Chrono Sand': 6 }, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
     ],
     zoneLv: 11, // used to scale siege-defense enemies
     siegeEnemies: ['Planar Wisp', 'Rift Stalker', 'Void Weaver', 'Astral Construct'],
@@ -8720,14 +8737,21 @@ const STRONGHOLDS = {
     tasks: [
       { id: 'st_grove_bramble', n: 'Bramble Watch', d: 'Defeat 3 Bramble Wardens (found in The Unbroken Vale) to keep the grove\'s borders soft instead of hostile', t: 'kill_specific', target: 'Bramble Warden', c: 0, need: 3, rw: { xp: 900, g: 700 }, done: false, refreshDay: -1 },
       { id: 'st_grove_thistle', n: 'Thistle Clearing', d: 'Defeat 2 Thistle Stalkers (found in The Unbroken Vale) before they choke the new growth', t: 'kill_specific', target: 'Thistle Stalker', c: 0, need: 2, rw: { xp: 1100, g: 850 }, done: false, refreshDay: -1 },
-      { id: 'st_grove_harvest', n: "Harvest Escort", d: 'Defeat 3 Harvest Golems (found in Sunreach Fields) threatening the Sunreach trade road', t: 'kill_specific', target: 'Harvest Golem', c: 0, need: 3, rw: { xp: 1300, g: 1000 }, done: false, refreshDay: -1, minGuildLevel: 2 }
+      { id: 'st_grove_wildroot', n: 'Wildroot Tending', d: 'Defeat 2 Wildroot Sprites (found in The Unbroken Vale) before their mischief spreads past the borders', t: 'kill_specific', target: 'Wildroot Sprite', c: 0, need: 2, rw: { xp: 1000, g: 780 }, done: false, refreshDay: -1 },
+      { id: 'st_grove_harvest', n: "Harvest Escort", d: 'Defeat 3 Harvest Golems (found in Sunreach Fields) threatening the Sunreach trade road', t: 'kill_specific', target: 'Harvest Golem', c: 0, need: 3, rw: { xp: 1300, g: 1000 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_grove_guardian', n: "What the Fields Keep Safe", d: 'Defeat 2 Sunreach Guardians (found in Sunreach Fields) before the harvest is put at risk', t: 'kill_specific', target: 'Sunreach Guardian', c: 0, need: 2, rw: { xp: 1450, g: 1150 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_grove_bloomwatcher', n: 'Bloomwatch', d: 'Defeat 2 Bloomwatchers (found in Sunreach Fields) drifting too close to the grove\'s own new growth', t: 'kill_specific', target: 'Bloomwatcher', c: 0, need: 2, rw: { xp: 1500, g: 1200 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_grove_bramble_ii', n: 'Bramble Watch, Widened', d: 'Defeat 6 Bramble Wardens (found in The Unbroken Vale) as the grove\'s borders push further out', t: 'kill_specific', target: 'Bramble Warden', c: 0, need: 6, rw: { xp: 2200, g: 1700 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_grove_thistle_ii', n: 'Thistle Clearing, Again', d: 'Defeat 5 Thistle Stalkers (found in The Unbroken Vale) as the choking growth keeps returning', t: 'kill_specific', target: 'Thistle Stalker', c: 0, need: 5, rw: { xp: 2500, g: 1950 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_grove_harvest_ii', n: 'The Full Harvest Road', d: 'Defeat 6 Harvest Golems (found in Sunreach Fields) escorting the trade road end to end', t: 'kill_specific', target: 'Harvest Golem', c: 0, need: 6, rw: { xp: 3200, g: 2600 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_grove_guardian_ii', n: 'The Fields, Fully Kept', d: 'Defeat 3 Sunreach Guardians (found in Sunreach Fields) now that the Sanctum draws the whole field\'s attention', t: 'kill_specific', target: 'Sunreach Guardian', c: 0, need: 3, rw: { xp: 4200, g: 3400 }, done: false, refreshDay: -1, minGuildLevel: 5 }
     ],
     guildHall: [
       { level: 1, name: 'Grove Tended', cost: 0, desc: 'Free rest and a daily stipend — the vale already trusts you with this much.' },
-      { level: 2, name: "Root Cellar Stores", cost: 12000, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
-      { level: 3, name: 'Sunlit Training Ground', cost: 35000, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
-      { level: 4, name: "The Grove's Deep Roots", cost: 90000, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
-      { level: 5, name: 'Heartwood Sanctum', cost: 220000, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
+      { level: 2, name: "Root Cellar Stores", cost: 12000, mats: { 'Iron Ore': 10, 'Herb Bundle': 10 }, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
+      { level: 3, name: 'Sunlit Training Ground', cost: 35000, mats: { 'Unbroken Root': 8, 'Sunreach Grain': 8 }, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
+      { level: 4, name: "The Grove's Deep Roots", cost: 90000, mats: { 'First Bloom Petal': 6, "Guardian's Bramble": 6 }, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
+      { level: 5, name: 'Heartwood Sanctum', cost: 220000, mats: { 'Soil That Remembers Nothing': 8, 'A Harvest Nobody Rationed': 8, 'First Bloom Petal': 6 }, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
     ],
     zoneLv: 56,
     siegeEnemies: ['Bramble Warden', 'Wildroot Sprite', 'Thistle Stalker', 'Harvest Golem'],
@@ -8743,18 +8767,119 @@ const STRONGHOLDS = {
     tasks: [
       { id: 'st_edge_elder', n: "The Elder's Patience", d: 'Defeat 3 Root-Bound Elders (found in The Rootbound Sanctuary) before their patience runs out entirely', t: 'kill_specific', target: 'Root-Bound Elder', c: 0, need: 3, rw: { xp: 2200, g: 1700 }, done: false, refreshDay: -1 },
       { id: 'st_edge_keeper', n: 'What the Sanctuary Keeps', d: 'Defeat 2 Sanctuary Keepers (found in The Rootbound Sanctuary) guarding whatever comes next', t: 'kill_specific', target: 'Sanctuary Keeper', c: 0, need: 2, rw: { xp: 2600, g: 2000 }, done: false, refreshDay: -1 },
-      { id: 'st_edge_sentinel', n: 'The Elderwood Line', c: 0, d: 'Defeat 3 Elderwood Sentinels (found in The Rootbound Sanctuary) holding the actual edge of the map', t: 'kill_specific', target: 'Elderwood Sentinel', need: 3, rw: { xp: 3000, g: 2400 }, done: false, refreshDay: -1, minGuildLevel: 2 }
+      { id: 'st_edge_sentinel', n: 'The Elderwood Line', c: 0, d: 'Defeat 3 Elderwood Sentinels (found in The Rootbound Sanctuary) holding the actual edge of the map', t: 'kill_specific', target: 'Elderwood Sentinel', need: 3, rw: { xp: 3000, g: 2400 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_edge_elder_ii', n: "The Elders, Pressed Further", c: 0, d: 'Defeat 6 Root-Bound Elders (found in The Rootbound Sanctuary) as the edge itself grows more restless', t: 'kill_specific', target: 'Root-Bound Elder', need: 6, rw: { xp: 4200, g: 3400 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_edge_keeper_ii', n: 'What Else the Sanctuary Guards', c: 0, d: 'Defeat 4 Sanctuary Keepers (found in The Rootbound Sanctuary) now that deeper watchers have taken notice', t: 'kill_specific', target: 'Sanctuary Keeper', need: 4, rw: { xp: 4800, g: 3900 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_edge_sentinel_ii', n: 'The Line, Held Longer', c: 0, d: 'Defeat 6 Elderwood Sentinels (found in The Rootbound Sanctuary) as the edge of the map pushes further out', t: 'kill_specific', target: 'Elderwood Sentinel', need: 6, rw: { xp: 5600, g: 4500 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_edge_elder_iii', n: "The Elders' Last Patience", c: 0, d: 'Defeat 10 Root-Bound Elders (found in The Rootbound Sanctuary) as the Training Ground pushes deeper still', t: 'kill_specific', target: 'Root-Bound Elder', need: 10, rw: { xp: 7000, g: 5600 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_edge_keeper_iii', n: 'The Deepest Keepers', c: 0, d: 'Defeat 6 Sanctuary Keepers (found in The Rootbound Sanctuary) now guarding something the Edge itself is only beginning to understand', t: 'kill_specific', target: 'Sanctuary Keeper', need: 6, rw: { xp: 8200, g: 6600 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_edge_sentinel_iii', n: 'Where the Map Actually Ends', c: 0, d: 'Defeat 8 Elderwood Sentinels (found in The Rootbound Sanctuary) at the true, final edge of anything mapped', t: 'kill_specific', target: 'Elderwood Sentinel', need: 8, rw: { xp: 9800, g: 8000 }, done: false, refreshDay: -1, minGuildLevel: 5 },
+      { id: 'st_edge_elder_iv', n: 'What Even the Elders Fear', c: 0, d: 'Defeat 12 Root-Bound Elders (found in The Rootbound Sanctuary) as the Sanctum draws in everything this deep', t: 'kill_specific', target: 'Root-Bound Elder', need: 12, rw: { xp: 11500, g: 9200 }, done: false, refreshDay: -1, minGuildLevel: 5 }
     ],
     guildHall: [
       { level: 1, name: 'Edge Claimed', cost: 0, desc: 'Free rest and a daily stipend — the first foothold past everything that has ever been mapped.' },
-      { level: 2, name: 'Provisions at the Threshold', cost: 30000, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
-      { level: 3, name: 'Watchfire Training Ground', cost: 85000, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
-      { level: 4, name: 'The Edge Deepens', cost: 220000, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
-      { level: 5, name: "Where the Map Ends", cost: 550000, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
+      { level: 2, name: 'Provisions at the Threshold', cost: 30000, mats: { 'Unbroken Root': 12, 'Sunreach Grain': 10 }, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
+      { level: 3, name: 'Watchfire Training Ground', cost: 85000, mats: { 'Heartwood Shard': 10 }, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
+      { level: 4, name: 'The Edge Deepens', cost: 220000, mats: { 'What the Roots Kept': 8, 'Heartwood Shard': 8 }, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
+      { level: 5, name: "Where the Map Ends", cost: 550000, mats: { 'The First Bloom, Still Sealed': 6, 'What the Roots Kept': 10 }, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
     ],
     zoneLv: 95,
     siegeEnemies: ['Root-Bound Elder', 'Sanctuary Keeper', 'Elderwood Sentinel'],
     siegeReward: { xp: 9000, gold: 7000, guildRep: 90 }
+  },
+  // === STRONGHOLDS ADDED AS WORLDS EXPAND ===
+  // Each new world eventually earns its own stronghold, same as the original three —
+  // claimed once the party has real standing there, tasks and materials drawn from that
+  // world's own zones so the theme carries through rather than reusing generic content.
+  bunniesWarren: {
+    name: "The Bunnies' Warren",
+    icon: '🐇',
+    era: 'threshold',
+    restSiteIds: ['warren_camp', 'warren_tavern'],
+    desc: "Reyes never called it a stronghold, exactly — she called it \"the place we finally stopped having to defend so carefully.\" Close enough. The Warren is yours to help hold now, the same way it has always been theirs.",
+    stipend: { xp: 2200, gold: 1400 },
+    tasks: [
+      { id: 'st_warren_sentry', n: 'Sentry Sweep', d: 'Defeat 3 Idle Sentry Units (found in The Threshold District) still looping their old patrol routes near the Warren', t: 'kill_specific', target: 'Idle Sentry Unit', c: 0, need: 3, rw: { xp: 3800, g: 2400 }, done: false, refreshDay: -1 },
+      { id: 'st_warren_walker', n: 'Walker Watch', d: 'Defeat 2 Unmanned Response Walkers (found in The Threshold District) drifting too close to the Warren\'s edge', t: 'kill_specific', target: 'Unmanned Response Walker', c: 0, need: 2, rw: { xp: 4200, g: 2700 }, done: false, refreshDay: -1 },
+      { id: 'st_warren_ghost', n: 'Ghost Inventory', d: 'Defeat 3 Ghost Inventory Drones (found in The Unpaid Ledger) still trying to fulfill orders no one placed', t: 'kill_specific', target: 'Ghost Inventory Drone', c: 0, need: 3, rw: { xp: 4600, g: 3000 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_warren_enforcement', n: 'Collections, Cancelled', d: 'Defeat 2 Collections Enforcement Units (found in The Unpaid Ledger) before they reach the Warren\'s own accounts', t: 'kill_specific', target: 'Collections Enforcement Unit', c: 0, need: 2, rw: { xp: 5000, g: 3300 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_warren_relay', n: 'Relay Silence', d: 'Defeat 3 Relay Ghosts (found in The Signal Dark) still broadcasting the cascade\'s first failsafe', t: 'kill_specific', target: 'Relay Ghost', c: 0, need: 3, rw: { xp: 5400, g: 3600 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_warren_perimeter', n: 'Perimeter, Held', d: 'Defeat 4 Perimeter Drones (found in Where the Bunnies Ran) patrolling the edge Liang used to hold alone', t: 'kill_specific', target: 'Perimeter Drone', c: 0, need: 4, rw: { xp: 6200, g: 4100 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_warren_salvage', n: 'Salvage Run', d: 'Defeat 3 Salvage Constructs (found in Where the Bunnies Ran) picking through what the Warren still needs', t: 'kill_specific', target: 'Salvage Construct', c: 0, need: 3, rw: { xp: 6800, g: 4500 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_warren_sentinel', n: 'What Still Guards This', d: 'Defeat 4 Warren Sentinels (found in The Last Warren) still standing post out of pure old habit', t: 'kill_specific', target: 'Warren Sentinel', c: 0, need: 4, rw: { xp: 7600, g: 5100 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_warren_alarm', n: 'The Last Alarm, Silenced', d: 'Defeat 3 instances of The Last Alarm (found in The Last Warren) still sounding for a crisis long since over', t: 'kill_specific', target: 'The Last Alarm', c: 0, need: 3, rw: { xp: 8400, g: 5600 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_warren_guarding', n: 'Whatever It Turns Out To Mean', d: 'Defeat 4 things Still Guarding This (found in The Last Warren) even now that the Warren is genuinely safe', t: 'kill_specific', target: 'Something Still Guarding This', c: 0, need: 4, rw: { xp: 9800, g: 6600 }, done: false, refreshDay: -1, minGuildLevel: 5 }
+    ],
+    guildHall: [
+      { level: 1, name: 'Warren Claimed', cost: 60000, desc: 'Free rest and a daily stipend — Reyes\'s people already trust you with this much, and now it is official.' },
+      { level: 2, name: 'Warren Stores, Restocked', cost: 180000, mats: { "Threshold District Access Card": 8, 'A Receipt For Nothing': 8 }, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
+      { level: 3, name: 'Warren Training Ground', cost: 420000, mats: { 'Sentry Unit Core': 10, 'A Loop That Never Resolved': 8 }, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
+      { level: 4, name: "The Warren's Deeper Stores", cost: 900000, mats: { 'Relay Core Fragment': 10, "A Tally Someone Kept": 10 }, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
+      { level: 5, name: 'Kaya Kaya Sanctum', cost: 2000000, mats: { 'A Warren Left In A Hurry': 12, "The Last Thing Anyone Wrote Down": 10, 'Proof, Whatever It Turns Out To Mean': 8 }, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
+    ],
+    zoneLv: 250,
+    siegeEnemies: ['Idle Sentry Unit', 'Relay Ghost', 'Warren Sentinel', 'The Last Alarm'],
+    siegeReward: { xp: 40000, gold: 26000, guildRep: 180 }
+  },
+  settledPlace: {
+    name: 'The Settled Place',
+    icon: '✨',
+    era: 'unstableReach',
+    restSiteIds: ['settled_camp', 'settled_tavern'],
+    desc: "It never told anyone what to call it, only that it wanted to be walked into rather than simply witnessed. \"The Settled Place\" is San's own name for it, offered once, quietly — and it seemed to like the sound of that well enough to keep it.",
+    stipend: { xp: 3400, gold: 2100 },
+    tasks: [
+      { id: 'st_settled_unsettled', n: 'What Hasn\'t Settled Yet', d: 'Defeat 3 Unsettled Forms (found in The First Uncertainty) still deciding what they want to be near the Settled Place\'s own edge', t: 'kill_specific', target: 'Unsettled Form', c: 0, need: 3, rw: { xp: 5200, g: 3300 }, done: false, refreshDay: -1 },
+      { id: 'st_settled_flicker', n: 'Steadying the Flicker', d: 'Defeat 2 Flickering Presences (found in The First Uncertainty) before the uncertainty spreads back in', t: 'kill_specific', target: 'Flickering Presence', c: 0, need: 2, rw: { xp: 5600, g: 3600 }, done: false, refreshDay: -1 },
+      { id: 'st_settled_walker', n: 'The Ground Disagrees', d: 'Defeat 3 Contradiction Walkers (found in Where the Map Gives Up) still arranging the ground two ways at once', t: 'kill_specific', target: 'Contradiction Walker', c: 0, need: 3, rw: { xp: 6000, g: 3900 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_settled_moved', n: 'A Place That Kept Moving', d: 'Defeat 2 instances of A Place That Moved (found in Where the Map Gives Up) before they unsettle what the Settled Place already decided', t: 'kill_specific', target: 'A Place That Moved', c: 0, need: 2, rw: { xp: 6400, g: 4200 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_settled_wraith', n: 'Scaffold Watch', d: 'Defeat 3 Scaffold Wraiths (found in The Half-Finished Hall) still half-building things nobody asked for anymore', t: 'kill_specific', target: 'Scaffold Wraith', c: 0, need: 3, rw: { xp: 6900, g: 4500 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_settled_guardian', n: 'What the Hall Still Guards', d: 'Defeat 4 Unfinished Guardians (found in The Half-Finished Hall) protecting architecture that finished deciding without them', t: 'kill_specific', target: 'Unfinished Guardian', c: 0, need: 4, rw: { xp: 7800, g: 5100 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_settled_almost', n: 'The Almost-Formed', d: 'Defeat 3 of the Almost-Formed (found in The Waiting Shape) still patiently waiting for a decision already made', t: 'kill_specific', target: 'The Almost-Formed', c: 0, need: 3, rw: { xp: 8600, g: 5700 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_settled_patient', n: 'Patience, Answered', d: 'Defeat 4 Patient Shapes (found in The Waiting Shape) that have been waiting since long before the Settled Place chose anything', t: 'kill_specific', target: 'Patient Shape', c: 0, need: 4, rw: { xp: 9600, g: 6400 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_settled_nearly', n: "What's Still Nearly Here", d: 'Defeat 3 things that are Nearly Here (found in The Waiting Shape) as more of this world keeps arriving', t: 'kill_specific', target: "What's Nearly Here", c: 0, need: 3, rw: { xp: 10600, g: 7100 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_settled_watching', n: 'Something Watching Itself Decide', d: 'Defeat 3 things Watching Themselves Decide (found in What It Was Becoming) even now that this place has already chosen', t: 'kill_specific', target: 'Something Watching Itself Decide', c: 0, need: 3, rw: { xp: 12800, g: 8600 }, done: false, refreshDay: -1, minGuildLevel: 5 }
+    ],
+    guildHall: [
+      { level: 1, name: 'A Name It Kept', cost: 100000, desc: 'Free rest and a daily stipend — the first place in its own world that got to decide what it wanted to be, and it wanted this too.' },
+      { level: 2, name: 'What It Chose to Keep', cost: 300000, mats: { 'A Footprint That Moved After': 8, 'Ground That Remembered Being Asked': 8 }, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
+      { level: 3, name: 'A Ground That Finally Agrees', cost: 700000, mats: { 'A Map That Disagreed With Itself': 10, 'Ground Still Arguing': 8 }, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
+      { level: 4, name: 'Halls, Actually Finished', cost: 1500000, mats: { 'A Column Not Yet Decided On': 10, 'Proof Someone Is Still Working': 10 }, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
+      { level: 5, name: 'What It Was Always Becoming', cost: 3500000, mats: { 'A Future Not Yet Settled': 12, 'Proof Nothing Here Is Fixed': 10, "What It Chose, In The End": 8 }, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
+    ],
+    zoneLv: 310,
+    siegeEnemies: ['Unsettled Form', 'Contradiction Walker', 'Scaffold Wraith', 'The Almost-Formed'],
+    siegeReward: { xp: 65000, gold: 43000, guildRep: 260 }
+  },
+  watchedHall: {
+    name: 'The Watched Hall',
+    icon: '📐',
+    era: 'unfinishedBlueprint',
+    restSiteIds: ['hall_camp', 'hall_tavern'],
+    desc: "Nobody put the Architect's plan to rest by stopping it once. Something this old needs actual, ongoing stewardship — which is, Varel points out more than once, exactly the kind of work he has apparently been training for his whole life without knowing it.",
+    stipend: { xp: 4200, gold: 2700 },
+    tasks: [
+      { id: 'st_hall_remnant', n: 'What Kept Drafting', d: 'Defeat 3 Drafting Remnants (found in A Door Never Finished) still sketching lines nobody asked for', t: 'kill_specific', target: 'Drafting Remnant', c: 0, need: 3, rw: { xp: 6800, g: 4400 }, done: false, refreshDay: -1 },
+      { id: 'st_hall_echo', n: 'Blueprint Echoes', d: 'Defeat 2 Blueprint Echoes (found in A Door Never Finished) still repeating a plan long since interrupted', t: 'kill_specific', target: 'Blueprint Echo', c: 0, need: 2, rw: { xp: 7300, g: 4700 }, done: false, refreshDay: -1 },
+      { id: 'st_hall_ward', n: 'Structural Watch', d: 'Defeat 3 Structural Wards (found in The Scaffold Behind Everything) still guarding architecture with no one left to report to', t: 'kill_specific', target: 'Structural Ward', c: 0, need: 3, rw: { xp: 7900, g: 5100 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_hall_loadbearing', n: 'What Still Holds This Up', d: 'Defeat 2 Load-Bearing Ghosts (found in The Scaffold Behind Everything) keeping the connection between worlds standing', t: 'kill_specific', target: 'Load-Bearing Ghost', c: 0, need: 2, rw: { xp: 8500, g: 5500 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_hall_unopened', n: 'The Unopened, Left Unopened', d: 'Defeat 3 Unopened Doors (found in Every Door It Ever Drew) that have decided, on their own, to stop staying shut', t: 'kill_specific', target: 'Unopened Door', c: 0, need: 3, rw: { xp: 9200, g: 6000 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_hall_behind', n: 'Something Behind It', d: 'Defeat 4 things waiting Behind It (found in Every Door It Ever Drew) before they find a door willing to let them through', t: 'kill_specific', target: 'Something Behind It', c: 0, need: 4, rw: { xp: 10200, g: 6700 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_hall_recognizes', n: 'A Door That Recognizes You', d: 'Defeat 3 Doors That Recognize You (found in Every Door It Ever Drew) — unsettling company, whichever of you they actually mean', t: 'kill_specific', target: 'A Door That Recognizes You', c: 0, need: 3, rw: { xp: 11200, g: 7400 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_hall_guarding', n: 'Guarding It Gently', d: "Defeat 3 things Guarding It Gently (found in The Door With a Familiar Shape) — patient, careful, never actually hostile", t: 'kill_specific', target: 'Something Guarding It Gently', c: 0, need: 3, rw: { xp: 12800, g: 8500 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_hall_waits', n: 'A Door That Waits', d: "Defeat 4 Doors That Wait (found in The Door With a Familiar Shape) — nothing urgent about any of them, which is somehow the hardest part", t: 'kill_specific', target: 'A Door That Waits', c: 0, need: 4, rw: { xp: 14200, g: 9400 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_hall_almost', n: 'The Weight of Almost Knowing', d: "Defeat 3 instances of The Weight Of Almost Knowing (found in The Door With a Familiar Shape) — a feeling, mostly, given just enough shape to fight", t: 'kill_specific', target: 'The Weight Of Almost Knowing', c: 0, need: 3, rw: { xp: 16000, g: 10600 }, done: false, refreshDay: -1, minGuildLevel: 5 }
+    ],
+    guildHall: [
+      { level: 1, name: 'The Hall, Watched', cost: 160000, desc: 'Free rest and a daily stipend — someone has to actually keep watch here, and it may as well be people who already know what this place is capable of.' },
+      { level: 2, name: 'What the Vigil Keeps', cost: 480000, mats: { "A Line Drawn After The Architect Fell": 8, 'Blueprint Fragment, Still Warm': 8 }, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
+      { level: 3, name: "The Scaffold, Reinforced", cost: 1100000, mats: { 'A Support Beam Older Than The Breaking': 10, 'Scaffold Key': 8 }, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
+      { level: 4, name: 'The Index, Catalogued', cost: 2400000, mats: { 'A Door Not Yet Opened': 8, "The Architect's Full Index": 10 }, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
+      { level: 5, name: 'The Vigil, Permanent', cost: 5500000, mats: { 'A Handle Warm To The Touch': 6, 'Proof This One Is Different': 8, 'The Courage To Actually Open It': 4 }, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
+    ],
+    zoneLv: 350,
+    siegeEnemies: ['Drafting Remnant', 'Structural Ward', 'Unopened Door', 'Something Guarding It Gently'],
+    siegeReward: { xp: 95000, gold: 63000, guildRep: 340 }
   }
 };
 
@@ -8796,7 +8921,23 @@ function upgradeGuildHall(strongholdId) {
   const nextTier = def.guildHall.find(t => t.level === currentLevel + 1);
   if (!nextTier) { lg('🏰 ' + def.name + "'s Guild Hall is already at maximum level."); return; }
   if (G.p.gold < nextTier.cost) { lg('❌ Need ' + nextTier.cost + 'G to build ' + nextTier.name + ' (have ' + G.p.gold + 'G).'); return; }
+  // Materials cost — checked in full before anything is deducted, same as craft().
+  // Tiered by design: earlier levels lean on generic, widely-farmed materials, later
+  // levels lean harder on materials specific to this stronghold's own zone, so the
+  // climb genuinely gets harder as the Guild Hall grows rather than just costing more gold.
+  if (nextTier.mats) {
+    for (let [mn, mq] of Object.entries(nextTier.mats)) {
+      const iv = G.p.inv.find(x => x.n === mn);
+      if (!iv || iv.q < mq) { lg('❌ Missing materials for ' + nextTier.name + ': need ' + mq + 'x ' + mn + (iv ? ' (have ' + iv.q + ')' : ' (have none)') + '.'); return; }
+    }
+  }
   G.p.gold -= nextTier.cost;
+  if (nextTier.mats) {
+    for (let [mn, mq] of Object.entries(nextTier.mats)) {
+      const iv = G.p.inv.find(x => x.n === mn);
+      iv.q -= mq; if (iv.q <= 0) { const ix = G.p.inv.indexOf(iv); G.p.inv.splice(ix, 1); }
+    }
+  }
   G.guildHallLevel[strongholdId] = nextTier.level;
   lg('🏰 GUILD HALL UPGRADED: ' + nextTier.name + ' (Level ' + nextTier.level + ')!');
   lg('   ' + nextTier.desc);
@@ -8824,11 +8965,17 @@ function grantStrongholdStipend(site) {
   const level = getGuildHallLevel(strongholdId);
   const stipendTier = def.guildHall.find(t => t.stipendMult && t.level <= level);
   const mult = stipendTier ? stipendTier.stipendMult : 1;
-  const xp = Math.floor(def.stipend.xp * mult);
-  const gold = Math.floor(def.stipend.gold * mult);
+  // Graduated disciples genuinely help run the Guild's operations, strongholds
+  // included — a small, capped bonus per disciple rather than a full assignment
+  // system, so the payoff for teaching them through is felt everywhere, not just
+  // in Guild War/Guild Boss where they're already fielded.
+  const discipleCount = (G.graduatedDisciples || []).length;
+  const discipleBonus = Math.min(0.30, discipleCount * 0.02); // +2% per disciple, capped at +30%
+  const xp = Math.floor(def.stipend.xp * mult * (1 + discipleBonus));
+  const gold = Math.floor(def.stipend.gold * mult * (1 + discipleBonus));
   G.p.xp += xp;
   G.p.gold += gold;
-  lg('🏰 The tower provides for you: +' + xp + ' XP, +' + gold + 'G.');
+  lg('🏰 The tower provides for you: +' + xp + ' XP, +' + gold + 'G.' + (discipleBonus > 0 ? ' (+' + Math.round(discipleBonus * 100) + '% from your graduated disciples helping run things.)' : ''));
   if (getGuildHallStat(strongholdId, 'blessing')) {
     G.p.buffs.push({ n: "Guildmaster's Blessing", t: 3, atk: Math.round(G.p.stats.int * 0.1) || 1, def: 1 });
     lg("✨ The Guild Sanctum's blessing settles over you — +10% to all stats for your next 3 fights.");
@@ -16625,7 +16772,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.61';
+const BUILD_ID = '2026-08-08.62';
 // =========================
 
 
