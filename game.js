@@ -4446,8 +4446,33 @@ storyJournal: {
       }
 ,{
         id: 'journal_125',
-        title: 'Not Yet, On Purpose',
+        title: 'A Language Someone Else Began',
         chapter: 125,
+        unlockType: 'level',
+        unlockAt: 335,
+        icon: '🗺️',
+        summary: 'Varel finds the scaffold beneath the drafting and recognizes it — not as something new, but as the same underlying structure he has spent his whole life quietly rediscovering alone in a tower. Realizing he was never truly the first, and never really alone, turns out to be a relief rather than a loss.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Varel finds the scaffold before anyone else does, drawn to it the way he is always drawn to anything that looks like it might finally explain something — structure laid bare beneath the drafting, the actual architecture connecting world to world, exposed the way scaffolding only ever is when someone has stopped bothering to hide it.' },
+          { speaker: 'Narrator', text: 'He goes very still in front of it, close enough that Mimi reaches out before she means to, like she is bracing to catch him.' },
+          { speaker: 'Mimi', text: '"Varel." Just his name, careful.' },
+          { speaker: 'Varel Farseer', text: '"I know this," he says, finally, and there is something genuinely unsteady in his voice for the first time since any of you have known him. "Not the shape of it. The grammar of it. This is the same underlying structure I have been quietly rediscovering my entire life, one careful piece at a time, and calling it my own work."' },
+          { speaker: 'San', text: '"You did not invent it," you say, gently, working out what he actually means.' },
+          { speaker: 'Varel Farseer', text: '"No," he says. "I thought I had. I was rather proud of having built something from nothing, alone in a tower, no one to check my work against. It turns out I was simply the first person in a very long time patient enough to notice something that was already here, waiting to be noticed again."' },
+          { speaker: 'Narrator', text: 'He runs a hand along a line of the scaffold the same way he handles the Vision Machine\'s own instruments — careful, reverent, a little afraid of it, in the specific way people get afraid of things that matter enormously.' },
+          { speaker: 'Mimi', text: '"Does that change anything?" Mimi asks, quiet. "What you have built with it. What we have built with it."' },
+          { speaker: 'Narrator', text: 'He considers that for a long moment before answering, and when he does, something in him has settled.' },
+          { speaker: 'Varel Farseer', text: '"No," he says again, steadier this time. "It changes what I thought I was doing. It does not change what I actually did. The seam still opened. The Vision Machine still works. I was simply never as alone in figuring out how as I believed myself to be — and I find, oddly, that I do not mind that nearly as much as I expected to."' },
+          { speaker: 'Joel', text: '"It means you were part of something," Joel offers, simple, the way he tends to land on the plain center of a thing. "Even before you knew it. That is not smaller than doing it alone. I do not think it is smaller at all."' },
+          { speaker: 'Narrator', text: 'Something eases in Varel\'s shoulders that has been there, unnoticed, for as long as any of you have known him — the particular tension of a man who built his entire sense of worth on being the only one who ever managed something, quietly setting it down.' },
+          { speaker: 'Varel Farseer', text: '"Whoever built this originally is long gone," he says, looking back at the scaffold, something almost fond in it now. "But they left the door open for someone else to keep learning the same language. I suppose that makes me the someone else. I find I would rather be that than the only one who ever mattered."' },
+          { speaker: 'Narrator', text: 'You leave the scaffold room with the seam-work ahead making a different kind of sense than it did an hour ago — not one man\'s careful, solitary genius, but a language someone else began, generations gone, that a lonely sage in a tower simply happened to be patient enough to keep speaking. Somewhere ahead, past the last of the drafting, the door with the familiar shape is still waiting. For now, that is exactly where it stays.' },
+        ]
+      }
+,{
+        id: 'journal_126',
+        title: 'Not Yet, On Purpose',
+        chapter: 126,
         unlockType: 'level',
         unlockAt: 350,
         icon: '🔒',
@@ -16600,7 +16625,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.60';
+const BUILD_ID = '2026-08-08.61';
 // =========================
 
 
