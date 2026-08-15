@@ -16556,14 +16556,32 @@ function sendLocalNotification(title, body) {
 // Battle reward popup — deliberately distinct from the toast system (which is tuned for
 // quick 3.3s confirmations). This lingers for 15s specifically so a glance is enough,
 // without needing to scroll the activity log to see what a fight actually paid out.
+// Positioned dynamically below the actual header (not a hardcoded pixel guess) since the
+// header's real height varies a lot — class/prestige badges, buffs row, XP booster badge,
+// AFK banner can all add height, and a fixed top was landing the popup on top of the XP
+// bar and gold line instead of below them.
 function showBattleRewardPopup(xp, gold, extra) {
   const existing = document.querySelector('.battle-reward-popup');
   if (existing) existing.remove(); // replace rather than stack — one summary at a time
   const el = document.createElement('div');
   el.className = 'battle-reward-popup';
-  el.innerHTML = '<span class="brp-xp">✨ +' + xp.toLocaleString() + ' XP</span><span class="brp-gold">💰 +' + gold.toLocaleString() + 'G</span>'
-    + (extra ? '<div class="brp-extra">' + extra + '</div>' : '');
+
+  const pct = Math.floor((G.p.xp / G.p.xpN) * 100);
+  const boosterActive = G.expBooster && G.expBooster.expiresAt > Date.now();
+
+  let html = '<div class="brp-row"><span class="brp-xp">\u2728 +' + xp.toLocaleString() + ' XP</span><span class="brp-gold">\uD83D\uDCB0 +' + gold.toLocaleString() + 'G</span></div>';
+  html += '<div class="brp-detail">Lv.' + G.p.lvl + ' \u2014 ' + G.p.xp.toLocaleString() + '/' + G.p.xpN.toLocaleString() + ' (' + pct + '%)' + (boosterActive ? ' <span class="brp-booster">\u26A1 XP boost active</span>' : '') + '</div>';
+  if (extra) html += '<div class="brp-extra">' + extra + '</div>';
+  el.innerHTML = html;
+
   document.body.appendChild(el);
+
+  // Position below the real header height, recalculated on every show since buffs/badges
+  // change how tall the header actually renders from one fight to the next.
+  const hdr = document.querySelector('.hdr');
+  const hdrBottom = hdr ? hdr.getBoundingClientRect().bottom : 90;
+  el.style.top = (hdrBottom + 10) + 'px';
+
   if (navigator.vibrate) navigator.vibrate(25); // a light single pulse, not the level-up pattern
   setTimeout(() => { el.classList.add('brp-fade'); setTimeout(() => el.remove(), 400); }, 15000);
 }
