@@ -4488,6 +4488,229 @@ storyJournal: {
           { speaker: 'Narrator', text: 'You leave the hall the way you found it — quiet, unfinished, one door among hundreds now safely, deliberately still closed. Somewhere behind you, the seam holds. Ahead of you, an entire unfinished blueprint keeps waiting, patient in the one way that actually matters: on your own time, for once, instead of someone else\'s.' },
         ]
       }
+,{
+        id: 'journal_127',
+        title: 'Not Yet, In Her Own Hand',
+        chapter: 127,
+        unlockType: 'level',
+        unlockAt: 355,
+        icon: '✍️',
+        summary: 'San notices the pattern — every reply through the window has been Mama\'s handwriting, never the daughter\'s — and it pulls her mind, unexpectedly, toward wanting to see her own father instead.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The pattern is the kind of thing you only notice once you have seen it enough times to actually count. Every reply that has ever come back through the window has been in the same hand — careful, a little cramped at the edges, unmistakably Mama\'s. Never once has it been hers.' },
+          { speaker: 'San', text: '"Joel," you say, quiet, the window still holding its last light between you both. "Has it ever occurred to you that she has never actually written back? Not once. It is always Mama."' },
+          { speaker: 'Narrator', text: 'Joel goes still in the particular way he goes still when something obvious finally gets said out loud.' },
+          { speaker: 'Joel', text: '"She is seven," he says, slow, like he is working it out fresh even though some part of him must have always known. "Maybe eight, now, depending how the years actually line up out here versus in there. I have never sat and done that math properly. It felt like something I was not allowed to want to know."' },
+          { speaker: 'San', text: '"She might not even have the letters down yet. Not really. Not enough to trust with something this size."' },
+          { speaker: 'Joel', text: '"No," he agrees, something working through his jaw before he lets it settle. "Probably not. Mama would not force it either. She was never the type to make a child perform readiness before it was actually there."' },
+          { speaker: 'Narrator', text: 'Neither of you says anything for a while. The window has already closed, the frame gone back to being just a frame, ordinary and waiting. You find your mind has wandered somewhere you did not send it — your own sons, at seven, at eight, the exact shape of a hand still learning to hold a pencil properly. You have never once seen either of them write anything at all. You never will, probably. That was always the deal you made with yourself, the one you have mostly stopped questioning.' },
+          { speaker: 'Narrator', text: 'Mostly.' },
+          { speaker: 'San', text: '"I want to try something different tonight," you say, surprising yourself with how steady it comes out. "Not the usual window. I want to see my father. Just him. On purpose, this time, instead of whatever the window happens to give me."' },
+          { speaker: 'Narrator', text: 'Joel looks at you for a long moment — not surprised, exactly. More like he has been waiting for you to ask for something specific for longer than either of you has said out loud.' },
+          { speaker: 'Joel', text: '"Then let\'s see him," he says, and reaches for your hand the way he always does before the frame opens, like the asking itself is half the ritual.' },
+        ]
+      }
+,{
+        id: 'journal_128',
+        title: 'Another Vision of Her Father',
+        chapter: 128,
+        unlockType: 'level',
+        unlockAt: 360,
+        icon: '🕯️',
+        summary: 'San finally tells Joel the fuller shape of her father\'s two quiet acts of standing up — for her mother, and for her — and the broken-family theory he built to explain the ex who never deserved defending.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The window holds on him longer than it usually holds on anyone — San\'s father, sitting where he always sits, a cup of something going cold beside him, older in the shoulders than the last vision let her notice.' },
+          { speaker: 'San', text: '"He was the one who actually stood up, in that family," you say, not looking away from the glass. "Twice, that I know of. Both times, it cost him something."' },
+          { speaker: 'Joel', text: '"Tell me," he says, simply, and does not fill the space with anything else.' },
+          { speaker: 'San', text: '"My grandmother — my father\'s mother — was married off young, to a man she never chose, because a fortune teller once told her family it would change their luck. Whatever bitterness that left in her, she spent decades finding new places to put it. My mother caught most of it, for years. And the one time it actually came to a head, in front of everyone, it was my father who stood between them. His own mother, against his own wife. He told her, plainly, that whatever she felt entitled to say, she did not get to say it to my mother."' },
+          { speaker: 'Joel', text: '"That is not a small thing, standing against your own mother like that."' },
+          { speaker: 'San', text: '"It is not. I do not think they have ever fully repaired it, honestly. But he did it anyway." You let out a breath that is almost a laugh. "The second time was for me. He actually met my ex, once — in person, not secondhand — and told him off outright. To his face. For using his own daughter the way he had been using me."' },
+          { speaker: 'Joel', text: '"Good," Joel says, no hesitation in it at all.' },
+          { speaker: 'San', text: '"He supported the divorce completely. Never once made me doubt it. Better off single than a man like him, he said, more than once. And he had a theory about why my ex was like that — decided it came from a terribly broken family. Parents split when he was young, apparently, and my father always said that kind of thing leaves a mark on a person that never quite closes."' },
+          { speaker: 'Narrator', text: 'You look at Joel, and something in your chest does the thing it always does now, right before you say the true thing out loud.' },
+          { speaker: 'San', text: '"My father does not know your parents separated too. During your own high school years, no less. He has never met you. He built a whole theory out of broken homes producing broken men, and he has no idea it does not actually hold up. Not against you."' },
+          { speaker: 'Narrator', text: 'Joel is quiet for a moment, turning that over.' },
+          { speaker: 'Joel', text: '"Maybe it is not the breaking that decides it," he says, finally. "Maybe it is just what a person chooses to do with what is left over afterward."' },
+        ]
+      }
+,{
+        id: 'journal_129',
+        title: 'What the Theory Missed',
+        chapter: 129,
+        unlockType: 'level',
+        unlockAt: 365,
+        icon: '🧩',
+        summary: 'San asks the question she has never quite asked before, and Joel finally says out loud what his own parents\' separation actually did to him — not breakage, but a rearranged idea of what staying was supposed to look like.',
+        scenes: [
+          { speaker: 'Narrator', text: 'You do not open the window again for this part. Some things do not need the glass — they just need to actually be said.' },
+          { speaker: 'San', text: '"Tell me about after," you say. "Your parents. I know it happened. I do not think I ever asked what it actually did to you."' },
+          { speaker: 'Narrator', text: 'Joel is quiet long enough that you almost take the question back.' },
+          { speaker: 'Joel', text: '"It did not break me the way you might expect," he says eventually. "It just — rearranged what I thought steady was supposed to look like. I stopped expecting people to stay simply because staying was the easier choice. I learned early that people leave for reasons that have nothing to do with whether they loved you enough."' },
+          { speaker: 'San', text: '"Is that why you never once, in two years, made me feel like I owed you certainty?"' },
+          { speaker: 'Joel', text: '"Maybe," he says. "Or maybe I just decided a long time ago that the leaving was never going to be the thing that proved whether the love was real. Only what happened while someone was actually still there."' },
+          { speaker: 'San', text: '"My father would like that answer," you say, quiet. "He would not know why. But he would like it."' },
+        ]
+      }
+,{
+        id: 'journal_130',
+        title: 'The Roads That Doubled Back',
+        chapter: 130,
+        unlockType: 'level',
+        unlockAt: 370,
+        icon: '🛤️',
+        summary: 'The fuller shape of the Village Ex, in order — the breakup, the party, the pregnancy used as a trap that did not hold, and the pandemic-era return that ended, finally, with a blessing instead of a reunion.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Some of this Joel has told you in pieces already, across a dozen small conversations that never quite added up to the whole shape until tonight, sitting together with nowhere else to be.' },
+          { speaker: 'Joel', text: '"We had already ended things," Joel says, plain, like he has decided to just start at the actual beginning this time instead of wherever the story usually gets picked up. "Clean enough, at the time. Then there was a party. She knew exactly how much I had had to drink before she ever came near me that night. I did not know that until much later. I do not think I want to know how much later, honestly — some things are worse the more precisely you can date them."' },
+          { speaker: 'San', text: '"That is not a small thing to carry either."' },
+          { speaker: 'Joel', text: '"No. And then she was pregnant, and I understood, fast, exactly what she was hoping that would do. Bring me back. Trap me into staying, if the word does not sound too harsh." He shakes his head. "It did not work. I had already landed the SK* job by then. I left anyway. Not because of the baby — despite it, if I am honest, which I still am not entirely proud of."' },
+          { speaker: 'Narrator', text: 'The window stays dark through this part. Neither of you needs the glass to hold what is already sitting plainly enough between you.' },
+          { speaker: 'Joel', text: '"She came back once more, years later. During the pandemic — after the Brunei ex, after all of that had already fallen apart on its own. Crying. Asking me to take her back properly, this time, like enough time might have made the same offer land differently."' },
+          { speaker: 'San', text: '"What did you say?"' },
+          { speaker: 'Joel', text: '"I told her to go look for someone else. That I was not the one for her — not out of cruelty, I hope. Just honesty, finally, instead of the blessing dressed up as something softer that I think she actually wanted from me instead." He is quiet a moment. "The borders opened not long after that. I went back to Brunei, back to SK*, back to the only shape of a life I still had any real claim to."' },
+          { speaker: 'San', text: '"And her?"' },
+          { speaker: 'Joel', text: '"Weeks. It only took her weeks." Something wry and tired moves through his voice, not quite bitterness, closer to exhaustion long since worn smooth. "A new man. Not married, not that it seems to matter to either of them. A third child on the way now. My daughter is her second. He loves her, from what I have heard. Genuinely. I find I do not resent that as much as I once thought I would."' },
+          { speaker: 'San', text: '"Do you resent any of it? Actually?"' },
+          { speaker: 'Joel', text: '"The party, still, some nights," he admits. "Not her moving on. Moving on was never the part that was ever really about me."' },
+        ]
+      }
+,{
+        id: 'journal_131',
+        title: 'What She Never Told Him',
+        chapter: 131,
+        unlockType: 'level',
+        unlockAt: 375,
+        icon: '📵',
+        summary: 'The messages during the pregnancy, the answer Joel refused to make for her, the block that followed — and the uncertain, secondhand way he ever found out his daughter had actually been born.',
+        scenes: [
+          { speaker: 'San', text: '"You blocked her. At some point. I remember you mentioning it once, in passing, and then never again."' },
+          { speaker: 'Joel', text: '"During the pregnancy," Joel says, quiet. "She kept messaging me. Asking, over and over, whether she should keep it. Whether she should abort. As if I had any right to hand her that answer, from that far away, having already made my own choice to leave."' },
+          { speaker: 'San', text: '"What did you tell her?"' },
+          { speaker: 'Joel', text: '"That she was an adult. That she already knew what was right and wrong, whatever she decided, and it was never going to be mine to decide for her." He exhales, slow. "I blocked her shortly after that. I could not keep being asked a question I had no honest answer to."' },
+          { speaker: 'San', text: '"So how did you find out? That she actually had her — that your daughter was born?"' },
+          { speaker: 'Narrator', text: 'Joel is quiet long enough that you understand, before he even says it, that this part does not resolve into a clean answer.' },
+          { speaker: 'Joel', text: '"I genuinely do not know, cleanly," he admits. "Maybe I unblocked her, eventually, and do not remember deciding to. Maybe she found another way through — a different number, a mutual friend. Maybe it was just the village doing what villages do, word finding its way to Mama before it ever found its way to me directly. I have tried to reconstruct it since. It never holds together the same way twice."' },
+          { speaker: 'San', text: '"Does it bother you? Not knowing exactly how you found out?"' },
+          { speaker: 'Joel', text: '"Less than you would think," Joel says. "I know that I did find out. I know I have never once regretted knowing. The exact door it came through matters less to me than the fact that, somehow, it did."' },
+        ]
+      }
+,{
+        id: 'journal_132',
+        title: 'What Mama Saw That He Didn\'t',
+        chapter: 132,
+        unlockType: 'level',
+        unlockAt: 380,
+        icon: '👀',
+        summary: 'Alone with Mama at the hotel, without Joel, San hears things he never told her himself — a birthday party where the Village Ex could not be bothered to feed him, and a Brunei Ex whose life may never have been as settled as Joel believed.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It comes back to you in the vision the way it actually happened — not through Joel at all, but through Mama, the two of you alone in the hotel room while he worked overtime, the kind of conversation that only ever happens once the men in the room have left it.' },
+          { speaker: 'Mama', text: '"You know," Mama says, turning a bracelet over in her hands, not quite looking at you, the way people talk when they are deciding how much to actually say, "I never did like that first one. The one before you."' },
+          { speaker: 'San', text: '"Joel has never told me much about her. Not the small things."' },
+          { speaker: 'Mama', text: '"There was a birthday party. Her older daughter\'s — from before Joel, that one. He went, because he thought that is what you do, when you are trying to be decent to a woman\'s children even after everything." Mama shakes her head, something old and unimpressed moving through it. "She was the host. Her own daughter\'s party. And she could not be bothered to bring him so much as a plate. He waited hours before she finally did, and only then because someone else must have said something to her about it."' },
+          { speaker: 'San', text: '"Hours?"' },
+          { speaker: 'Mama', text: '"Hours. I do not understand what girlfriend that is." She says it plainly, the way she says most things, no drama in it at all, which somehow makes it land harder than if she had raised her voice. "A woman who cannot even feed the man standing in her own home."' },
+          { speaker: 'Narrator', text: 'You file it away, quiet, another small piece of a picture Joel has only ever shown you in careful fragments.' },
+          { speaker: 'San', text: '"What about the other one? The one in Brunei?"' },
+          { speaker: 'Mama', text: '"His father liked her," Mama says, and there is something careful in how she says it, like she is choosing to be fair even where she is not sure fairness is actually warranted. "Good with words, that one. Joel described her well, and his father believed what he was told, because he had never once met her himself. Everything he knew came secondhand, through his own son\'s eyes." A pause. "That is not nothing. But it is not the same as actually knowing someone."' },
+          { speaker: 'San', text: '"Was there something he did not know?"' },
+          { speaker: 'Mama', text: '"I heard, after, that she may have already had someone. A husband, of a kind — not on paper, not official, but real enough that there was a son from it too, back in the Philippines. Whether that was still going on while she was planning to marry my son, I do not know for certain. I only know the pandemic came before anyone ever had to find out for sure." Mama sets the bracelet down, finally looking at you directly. "Some people carry more than they ever let you see. I do not say this to make you distrust everyone who comes after. I say it because you should know your husband was not always careless with his heart. Sometimes he simply was not given the whole truth to be careful with."' },
+        ]
+      }
+,{
+        id: 'journal_133',
+        title: 'Why He Is Different',
+        chapter: 133,
+        unlockType: 'level',
+        unlockAt: 385,
+        icon: '🔍',
+        summary: 'San names the actual difference between Joel and everyone who came before him — not that he never upsets her, but that he never once makes her go looking alone for the reason why.',
+        scenes: [
+          { speaker: 'San', text: '"I get you upset sometimes. Even now. Even before Aethon."' },
+          { speaker: 'Joel', text: '"You do. Everyone does, eventually, with someone they actually love."' },
+          { speaker: 'San', text: '"But we never once went days without talking. Not once, in two years. My ex could go a whole night over something as small as a photograph."' },
+          { speaker: 'Joel', text: '"Tell me about the photograph."' },
+          { speaker: 'San', text: '"I saw my old colleague\'s car, parked somewhere ordinary, and I wanted to take a picture of it as a joke — the kind of small, stupid thing you send a friend to make them laugh. My ex was furious. Cold, for an entire night, over nothing I could actually name. I have wondered since if it was jealousy. I genuinely do not know. I have never been especially good at reading why someone is angry with me. I think that might be part of why I am the way I am — I suspect, some days, that I am on the spectrum somewhere, and it makes the why behind other people\'s anger genuinely difficult for me to reach."' },
+          { speaker: 'Joel', text: '"And with me?"' },
+          { speaker: 'San', text: '"With you, I do not have to reach for it. You just tell me. Plainly, the same day, and then it is actually over." You look at him. "That is the whole difference, I think. Not that you never upset me. That you never once made me go looking for the reason on my own."' },
+        ]
+      }
+,{
+        id: 'journal_134',
+        title: 'Better Than Her',
+        chapter: 134,
+        unlockType: 'level',
+        unlockAt: 390,
+        icon: '⚖️',
+        summary: 'San finally says out loud the comparison her ex used against her for years — and the quiet, obvious hypocrisy underneath it she was never allowed to point out at the time.',
+        scenes: [
+          { speaker: 'San', text: '"He compared me to her, once. Openly."' },
+          { speaker: 'Joel', text: '"To who?"' },
+          { speaker: 'San', text: '"His ex. The one he still looks up, to this day — Facebook, mutual friends, whatever he can still find. He said, more than once, why can\'t you be more like her. She has children with her husband." You almost laugh, the way you always do at the parts that should not be funny and are anyway. "She cheated on him. That was the whole reason they ended. And somehow, in his head, she was still the standard I kept failing to meet."' },
+          { speaker: 'Joel', text: '"That is not a small thing to carry either."' },
+          { speaker: 'San', text: '"It was never really about her. I understood that eventually. It was about having someone to hold up that made me feel like I was always coming up short, no matter what I actually did."' },
+        ]
+      }
+,{
+        id: 'journal_135',
+        title: 'What He Called It',
+        chapter: 135,
+        unlockType: 'level',
+        unlockAt: 395,
+        icon: '🕊️',
+        summary: 'The hardest thing San has ever told Joel — not what actually happened to her during her lowest years, but what her ex chose to call it instead, and how long it took her to find the words to correct him.',
+        scenes: [
+          { speaker: 'Narrator', text: 'This one San tells slower than the others. Joel does not fill any of the silences she leaves.' },
+          { speaker: 'San', text: '"He used to bring up things from before him. Flings, he called them. One-night stands. Said it like it was evidence of something broken in me, something he had generously overlooked when he married me."' },
+          { speaker: 'Joel', text: '"And what was it actually?"' },
+          { speaker: 'San', text: '"I was somewhere very low, when most of that happened. Somewhere I did not know how to get out of on my own. There were men who understood exactly how low I was, and used it, and I was too afraid of what fighting back might cost me to ever actually fight back. It was never freedom. It was never anything close to what he made it sound like." You look at your own hands, steady, for once, while you say it. "He turned the worst thing that ever happened to me into a character flaw. I let him, for longer than I am proud of, because I did not yet have the words to correct him."' },
+          { speaker: 'Narrator', text: 'Joel does not say anything for a moment. Then he reaches for your hand, careful, like he is asking permission with the gesture itself.' },
+          { speaker: 'Joel', text: '"You have the words now."' },
+          { speaker: 'San', text: '"I do," you say. "I just needed somewhere safe enough to finally use them."' },
+        ]
+      }
+,{
+        id: 'journal_136',
+        title: 'What Mez Gave Up',
+        chapter: 136,
+        unlockType: 'level',
+        unlockAt: 400,
+        icon: '🌩️',
+        summary: 'Mez finally tells San why her support was never simple — two older sons given up so they could be happy, a wound that broke her for years, and Eliz, the second chance she never quite let herself trust.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Mezstorm finds you both by the fire, later, uninvited but not unwelcome — the kind of conversation that only happens once someone has clearly been building up to it for a while.' },
+          { speaker: 'Mezstorm', text: '"I owe you an explanation," Mez says, not quite meeting your eyes. "For how I was, when you first left him. I was not kind about it. I know that."' },
+          { speaker: 'San', text: '"You do not owe me anything."' },
+          { speaker: 'Mezstorm', text: '"I do, actually." A long pause, the fire doing most of the work of filling it. "I had two sons, before Eliz. From my first marriage. When it ended, I gave them up. Both of them. To their father."' },
+          { speaker: 'San', text: '"Why?"' },
+          { speaker: 'Mezstorm', text: '"Because he could give them a whole family, and I could not, not the way things stood then. I told myself — as long as they are happy, it does not matter if they end up loving another woman as their mother, or growing up in a different faith than mine. I meant it, when I said it. I am not sure I have ever stopped meaning it, even now." Something in Mez\'s voice goes very quiet. "It broke me anyway. For a very long time. Meaning something does not make it cost less."' },
+          { speaker: 'Narrator', text: 'You think of your own sons, the shape of the same decision made from a different angle, and understand, finally, exactly why Mez\'s silence back then was never really about you at all.' },
+          { speaker: 'San', text: '"Is that why it took you so long to be glad for me? When I left?"' },
+          { speaker: 'Mezstorm', text: '"You were doing the thing I already knew the cost of," Mez says. "I did not want you to pay it too. I was not being cruel. I was being a coward, watching someone I love walk toward the exact fire that already took something from me."' },
+          { speaker: 'San', text: '"And Eliz?"' },
+          { speaker: 'Mezstorm', text: '"My second chance. With my second husband. I did not let myself believe I deserved one, for a long time. I still catch myself, some mornings, waiting for her to be taken too. I do not think that fear ever fully leaves, once you have already lived the other version once."' },
+          { speaker: 'San', text: '"You are allowed to just be glad for her. Without waiting for it to be taken back."' },
+          { speaker: 'Mezstorm', text: '"I am working on that," Mez says, something almost like a smile finally breaking through. "Slowly. It is the one storm I have never quite learned to command."' },
+        ]
+      }
+,{
+        id: 'journal_137',
+        title: 'How Aisyah Carries It',
+        chapter: 137,
+        unlockType: 'level',
+        unlockAt: 405,
+        icon: '🌤️',
+        summary: 'Aisyah never actually says San was right to leave — she just stopped talking about the past entirely, and San finally understands that refusing to dwell was always her sister\'s own particular way of moving both of them forward.',
+        scenes: [
+          { speaker: 'San', text: '"You never once said I was right. Back then. Not directly."' },
+          { speaker: 'Aisyah', text: '"I know," Aisyah says, not defensive about it, just plain. "I am not really built for that kind of saying. I never have been."' },
+          { speaker: 'San', text: '"Then what were you doing? All those months you barely mentioned it?"' },
+          { speaker: 'Aisyah', text: '"Making sure you had somewhere to actually go, instead of somewhere to keep replaying what you left." She shrugs, easy, the way she makes almost everything look easy even when you know it costs her something. "Mez needed to grieve it out loud. That is just how she processes things. I have never been like that. I would rather find you a reason to look forward than sit with you in a reason to look back. It is not that the past does not matter. It is that I do not think dwelling in it ever actually fixed anything, for me."' },
+          { speaker: 'San', text: '"Is that easier? Being like that?"' },
+          { speaker: 'Aisyah', text: '"Some days. Other days it just means I am carrying things quietly instead of loudly. Quiet is not the same as absent." She looks at you, something warm and certain underneath the usual sharpness. "I did not need to tell you that you were right. I just needed you to have a family business, and trade routes, and a reason to get up the next morning that had nothing to do with him at all. That was always going to say it better than the words would have."' },
+          { speaker: 'San', text: '"It did," you tell her, and mean it completely. "It said it better than anything Mez ever managed to put into words either."' },
+          { speaker: 'Aisyah', text: '"Do not tell her that," Aisyah says, something almost fond in the warning. "She will insist it is a competition, and then never admit she lost."' },
+        ]
+      }
     ]
   },
 
