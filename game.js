@@ -14725,6 +14725,11 @@ function startGrindWave() {
   // the victory would route to the wrong handler since 'active' was still false.
   G.endlessGrind.active = true;
 
+  // Same reasoning as afkAdventureNextEncounter(): if the player is browsing Quests/
+  // Items/etc. while AFK Grind runs in the background, don't yank them back to the
+  // combat screen just because a new wave needs G.state='combat' to actually run.
+  const screenBeforeWave = G.state;
+
   G.endlessGrind.wave++;
   G.cbt.on = true;
   G.cbt.turn = 0;
@@ -14882,6 +14887,9 @@ function startGrindWave() {
   
   triggerSoelCommentary('explore');
   checkSoelFortune();
+  if (G.grindAfkMode && screenBeforeWave !== 'combat') {
+    G.state = screenBeforeWave;
+  }
   render();
 }
 
@@ -15325,6 +15333,13 @@ const ELITE_AFK_REWARD_MULT = 1.5;
 
 function afkAdventureNextEncounter() {
   if (!G.afkAdventure.active) return;
+  // If the player has navigated away to browse Quests/Items/etc. while AFK Adventure
+  // runs in the background (non-visible mode), sc() below still forces G.state to
+  // 'combat' to actually run the fight — but that shouldn't yank the screen out from
+  // under someone just checking their inventory. Combat itself doesn't depend on which
+  // screen is displayed (G.cbt.on / doAutoCombatTick() run regardless), so it's safe to
+  // restore whatever screen they were actually looking at once the encounter is set up.
+  const screenBeforeEncounter = G.state;
   const zi = G.afkAdventure.zoneIndices[Math.floor(Math.random() * G.afkAdventure.zoneIndices.length)];
   sc(zi, true);
   if (G.afkAdventure.eliteMode && G.cbt.on && G.cbt.en.length > 0) {
@@ -15343,6 +15358,10 @@ function afkAdventureNextEncounter() {
     G.cbt.autoCombat = true;
     G.autoCombatHeartbeat = Date.now();
     doAutoCombatTick();
+  }
+  if (!G.afkAdventure.visible && screenBeforeEncounter !== 'combat') {
+    G.state = screenBeforeEncounter;
+    render();
   }
 }
 
@@ -16741,6 +16760,24 @@ function renderLogPanel() {
     h += '<div onclick="setS(\'focus\')" style="display:flex;justify-content:space-between;align-items:center;background:rgba(124,58,237,0.15);border:1px solid var(--accent);border-radius:10px;padding:6px 10px;margin-bottom:6px;cursor:pointer;">';
     h += '<span id="ft-badge" style="font-size:12px;font-weight:700;color:var(--accent-light);">🧘 ' + m + ':' + s.toString().padStart(2, '0') + '</span>';
     h += '<span style="font-size:10px;color:var(--text-dim);">Focus running \u2014 tap to view</span>';
+    h += '</div>';
+  }
+  // Persistent AFK Adventure / AFK Grind indicators — same reasoning as Focus Mode's
+  // badge above. Both loops now leave G.state alone while running in the background
+  // (see afkAdventureNextEncounter() / startGrindWave()), so without a badge like this
+  // there would be no way to tell they're still ticking while browsing another screen.
+  if (G.afkAdventure.active && G.state !== 'combat') {
+    const elapsedMs = Date.now() - (G.afkAdventure.startTime || Date.now());
+    const em = Math.floor(elapsedMs / 60000);
+    h += '<div onclick="setS(\'combat\')" style="display:flex;justify-content:space-between;align-items:center;background:rgba(16,185,129,0.15);border:1px solid var(--success);border-radius:10px;padding:6px 10px;margin-bottom:6px;cursor:pointer;">';
+    h += '<span style="font-size:12px;font-weight:700;color:var(--success);">🗺️ AFK ' + em + 'm \u2014 ✨' + G.afkAdventure.totalXp.toLocaleString() + ' \uD83D\uDCB0' + G.afkAdventure.totalGold.toLocaleString() + '</span>';
+    h += '<span style="font-size:10px;color:var(--text-dim);">Running \u2014 tap to view</span>';
+    h += '</div>';
+  }
+  if (G.endlessGrind.active && G.grindAfkMode && G.state !== 'combat') {
+    h += '<div onclick="setS(\'combat\')" style="display:flex;justify-content:space-between;align-items:center;background:rgba(16,185,129,0.15);border:1px solid var(--success);border-radius:10px;padding:6px 10px;margin-bottom:6px;cursor:pointer;">';
+    h += '<span style="font-size:12px;font-weight:700;color:var(--success);">🌀 Grind Wave ' + G.endlessGrind.wave + ' \u2014 ✨' + G.endlessGrind.totalXp.toLocaleString() + ' \uD83D\uDCB0' + G.endlessGrind.totalGold.toLocaleString() + '</span>';
+    h += '<span style="font-size:10px;color:var(--text-dim);">Running \u2014 tap to view</span>';
     h += '</div>';
   }
   h += '<div class="log-highlight ' + getLogElementClass(highlight) + '"><div class="lh-text">' + boldNumbers(highlight) + '</div></div>';
