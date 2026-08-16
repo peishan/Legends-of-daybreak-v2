@@ -4858,6 +4858,8 @@ storyJournal: {
   frayingFrontier: { active: false, streak: 0, bestStreak: 0, batchRemaining: 0 }, // endless mode, level 100+, bosses scale off current player level indefinitely
   guildWar: { active: false, streak: 0, bestStreak: 0, fielded: [], batchRemaining: 0 }, // squad gauntlet vs rival guilds, unlocks after Iris & Ash (journal_101) + Lv 105
   guildRoster: { recruited: [] }, // ids from GUILD_MEMBERS who've actually joined the Guild War roster
+  guildGather: { lastCollectedDay: -1 }, // once-per-real-day materials from unfielded, non-core Guild Members
+  guildWeeklyReward: { lastClaimedWeek: -1 }, // manual claim, tied to Guild Rank — lapses if not claimed that week
   visionMachine: { lastUseDay: -1, joelLetterCount: 0 }, // Varel Farseer's window — once per real day, 1M gold
   kindlingCommissions: { linesToday: 0, checksToday: 0, refreshDay: 0 }, // bounded daily ritual — 3 lines, 2 checks, resets once per game day
   guildBoss: { tierIndex: 0, currentHp: 0, lastAttemptDay: 0 }, // persistent HP across days — the whole recruited roster chips away at it together
@@ -10712,6 +10714,7 @@ const GUILD_MEMBERS = [
   { id: 'mimi', npcName: 'Mimi', role: 'Divination Mage', icon: '🦋',
     recruitReq: { type: 'ally' },
     fieldBuff: { xpPct: 0.04 },
+    gatherMats: ['Aether Shard'],
     recruitLine: "Mimi already knew you'd ask before you finished asking. \"Guild business? I'm in. I've always wanted an official reason to know things before everyone else does.\"",
     barks: [
       'Mimi: "That one\'s favoring its left side. Just so you know."',
@@ -10721,6 +10724,7 @@ const GUILD_MEMBERS = [
   { id: 'brada', npcName: 'Brada Shah', role: 'Artillery', icon: '🎯',
     recruitReq: { type: 'journal', journalId: 'journal_111' },
     fieldBuff: { atkPct: 0.04 },
+    gatherMats: ['Iron Ore'],
     recruitLine: "Brada doesn't need much convincing. \"Mimi already told me you'd probably ask eventually. Ballistas, siege lines, anything that needs a steady hand and a longer memory than most people have \u2014 that's mine. Glad to actually put it to use.\"",
     barks: [
       'Brada: "Line up the shot. Wait. Then wait a little longer than that."',
@@ -10730,6 +10734,7 @@ const GUILD_MEMBERS = [
   { id: 'aisy', npcName: 'Aisy', role: 'Rogue', icon: '🌙',
     recruitReq: { type: 'ally' },
     fieldBuff: { critPct: 0.03 },
+    gatherMats: ['Bone Shard'],
     recruitLine: "Aisy just appears at your side, like she'd already decided before you asked. \"Nobody ever notices me leave a room. Let's see what they make of me showing up to one.\"",
     barks: [
       'Aisy: "They didn\'t see me. They still don\'t."',
@@ -10739,6 +10744,7 @@ const GUILD_MEMBERS = [
   { id: 'kw_liang', npcName: 'KW Liang', role: 'Scout', icon: '🐇',
     recruitReq: { type: 'journal', journalId: 'journal_109' },
     fieldBuff: { defPct: 0.04 },
+    gatherMats: ['Herb Bundle'],
     recruitLine: "Liang doesn't hesitate for even a second. \"Kaya kaya taught me some deals are worth honoring properly. This is the first one I've ever actually wanted to.\"",
     barks: [
       'KW Liang: "Kaya kaya! Business is business, even out here."',
@@ -10748,6 +10754,7 @@ const GUILD_MEMBERS = [
   { id: 'sister_wren', npcName: 'Sister Wren', role: 'Support', icon: '🕯️',
     recruitReq: { type: 'ally' },
     fieldBuff: { defPct: 0.10 },
+    gatherMats: ['Herb Bundle'],
     recruitLine: "Sister Wren doesn't hesitate. \"I spent a long time devoted to something that was never real. I know real when I finally get to stand next to it.\"",
     barks: [
       'Sister Wren: "Hold the line. I\'ve seen worse hold longer."',
@@ -10757,6 +10764,7 @@ const GUILD_MEMBERS = [
   { id: 'ser_aldric', npcName: 'Ser Aldric', role: 'Frontline', icon: '⚔️',
     recruitReq: { type: 'ally' },
     fieldBuff: { defPct: 0.04 },
+    gatherMats: ['Iron Ore'],
     recruitLine: 'Ser Aldric considers it for exactly as long as it takes to answer. "I spent a long time being found by things. This feels like the other version of that. Count me in."',
     barks: [
       'Ser Aldric: "Properly, this time. All the way through."',
@@ -10766,6 +10774,7 @@ const GUILD_MEMBERS = [
   { id: 'dudin', npcName: 'Dudin', role: 'Frontline', icon: '🎖️',
     recruitReq: { type: 'trader_visits', visits: 10 },
     fieldBuff: { atkPct: 0.05 },
+    gatherMats: ['Iron Ore'],
     recruitLine: "Dudin sets down the ration crate he's been rebuilding all week. \"Joel already told me you'd ask eventually. Wasn't going to say no to backing up my old dorm-mate's whole family.\"",
     barks: [
       'Dudin: "Eat first, fight second. Same rule as always."',
@@ -10775,6 +10784,7 @@ const GUILD_MEMBERS = [
   { id: 'jorvin', npcName: 'Jorvin', role: 'Engineer', icon: '🔧',
     recruitReq: { type: 'trader_visits', visits: 10 },
     fieldBuff: { critPct: 0.03 },
+    gatherMats: ['Gem Dust'],
     recruitLine: "Jorvin wipes his hands on a rag that hasn't been clean in years. \"Same admin desk, different apocalypse. Sure, I'll come find the weak point in whatever this is.\"",
     barks: [
       'Jorvin: "Everything has a weak point. Even this."',
@@ -10784,6 +10794,7 @@ const GUILD_MEMBERS = [
   { id: 'wahyu', npcName: 'Wahyu', role: 'Utility', icon: '👕',
     recruitReq: { type: 'trader_visits', visits: 10 },
     fieldBuff: { goldPct: 0.04 },
+    gatherMats: ['Gem Dust'],
     recruitLine: "Wahyu grins, already measuring you for something. \"Guild work? Sure. Somebody's got to notice what's actually worth grabbing off this thing once it's down.\"",
     barks: [
       'Wahyu: "Custom fit, custom timing. I\'ll know when to move."',
@@ -10793,6 +10804,7 @@ const GUILD_MEMBERS = [
   { id: 'jonathan', npcName: 'Jonathan', role: 'Striker', icon: '⚙️',
     recruitReq: { type: 'trader_visits', visits: 10 },
     fieldBuff: { atkPct: 0.04 },
+    gatherMats: ['Fire Essence', 'Obsidian'],
     recruitLine: "Jonathan's already halfway to yes before you finish asking. \"Been chasing whatever's trending since the old office. This is definitely trending.\"",
     barks: [
       'Jonathan: "Never done this professionally before. Great time to start!"',
@@ -10802,6 +10814,7 @@ const GUILD_MEMBERS = [
   { id: 'lewis', npcName: 'Lewis', role: 'Opportunist', icon: '🧳',
     recruitReq: { type: 'trader_visits', visits: 10 },
     fieldBuff: { goldPct: 0.05 },
+    gatherMats: ['Iron Ore', 'Herb Bundle'],
     recruitLine: "Lewis is already calculating margins before you've explained the mission. \"Guild work pays in reputation. Reputation's worth something eventually. I'm in.\"",
     barks: [
       'Lewis: "I could sell this thing\'s teeth. Probably. Later, though."',
@@ -10811,6 +10824,7 @@ const GUILD_MEMBERS = [
   { id: 'dr_aa', npcName: 'Dr. AA', role: 'Healer', icon: '🩺',
     recruitReq: { type: 'trader_visits', visits: 10 },
     fieldBuff: { xpPct: 0.04 },
+    gatherMats: ['Herb Bundle'],
     recruitLine: "Dr. AA is already packing the cart. \"Guild work. Good. I've got a new ghost story and nobody to tell it to on the way there.\"",
     barks: [
       'Dr. AA: "Take with food. Not that anyone ever does."',
@@ -10820,6 +10834,7 @@ const GUILD_MEMBERS = [
   { id: 'iris', npcName: 'Iris', role: 'Scout', icon: '🦊',
     recruitReq: { type: 'kindling' },
     fieldBuff: { critPct: 0.04 },
+    gatherMats: ['Frost Gem', 'Ice Crystal'],
     recruitLine: "Iris and Ash don't need asking twice. \"Guild work. Finally, something with actual structure. Ash has opinions about structure.\"",
     barks: [
       'Iris: "Ash smells something. Ash is usually right."',
@@ -10858,6 +10873,113 @@ function checkGuildRecruitment() {
     }
   }
 }
+
+// === IDLE GUILD MEMBER MATERIAL GATHERING ===
+// Only the 12 recruited-but-optional members (not the 4 party-linked ones, who are
+// always out adventuring with San and never actually idle) can gather — identified by
+// recruitReq.type !== 'always', reusing the existing marker rather than adding a new
+// field. "Idle" specifically means recruited AND not currently fielded for Guild War.
+function getIdleGatheringGuildMembers() {
+  return GUILD_MEMBERS.filter(def =>
+    def.recruitReq.type !== 'always' &&
+    isGuildMemberRecruited(def.id) &&
+    !G.guildWar.fielded.includes(def.id) &&
+    def.gatherMats
+  );
+}
+
+function canCollectGuildMaterials() {
+  return G.guildGather.lastCollectedDay !== G.gameDay && getIdleGatheringGuildMembers().length > 0;
+}
+
+// Picks a material actually needed by an owned, not-yet-maxed stronghold's next Guild
+// Hall tier — so the rare payout is always useful rather than a fixed material that
+// might not even apply to whichever strongholds this player has actually claimed.
+// Guild Rank 5 (Champion) gate matches the "higher-ranked members or higher Guild Rank"
+// design: it's a rank gate rather than a per-member one, since a handful of named
+// members don't really support their own separate tier system.
+const GUILD_GATHER_RARE_MAT_MIN_RANK = 5;
+function getGatherableRareStrongholdMat() {
+  if (getGuildRank() < GUILD_GATHER_RARE_MAT_MIN_RANK) return null;
+  const candidates = [];
+  for (let id in STRONGHOLDS) {
+    if (!G.strongholds[id]) continue;
+    const def = STRONGHOLDS[id];
+    const nextTier = def.guildHall.find(t => t.level === getGuildHallLevel(id) + 1);
+    if (nextTier && nextTier.mats) {
+      for (let mn in nextTier.mats) candidates.push(mn);
+    }
+  }
+  if (candidates.length === 0) return null;
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+function collectGuildMemberMaterials() {
+  if (G.guildGather.lastCollectedDay === G.gameDay) { lg('📦 Already collected from the guild roster today.'); return; }
+  const idle = getIdleGatheringGuildMembers();
+  if (idle.length === 0) { lg('📦 No idle guild members ready to gather \u2014 recruit more, or unfield someone from Guild War.'); return; }
+
+  G.guildGather.lastCollectedDay = G.gameDay;
+  const gained = {};
+  for (let def of idle) {
+    for (let mn of def.gatherMats) {
+      const qty = 2 + Math.floor(Math.random() * 2); // 2-3 per member per material
+      addI({ n: mn, t: 'mat', q: qty, r: 'common' });
+      gained[mn] = (gained[mn] || 0) + qty;
+    }
+  }
+  const rareMat = getGatherableRareStrongholdMat();
+  if (rareMat) {
+    addI({ n: rareMat, t: 'mat', q: idle.length, r: 'rare' });
+    gained[rareMat] = (gained[rareMat] || 0) + idle.length;
+  }
+
+  const summary = Object.entries(gained).map(([n, q]) => q + 'x ' + n).join(', ');
+  lg('📦 The idle guild roster gathered: ' + summary + '.');
+  render();
+}
+
+// === WEEKLY GUILD REWARD ===
+// Manual claim, tied to Guild Rank rather than Guild Contracts (which already refresh
+// weekly and pay Rep) — this is a deliberately separate payoff so Rank keeps mattering
+// past its shop unlocks. Lapses if the week rolls over unclaimed, same spirit as a
+// real weekly reset: shows up, waits, doesn't apologize for leaving if ignored.
+function getCurrentGuildWeek() { return Math.floor(G.gameDay / 7); }
+
+function isWeeklyGuildRewardAvailable() {
+  return G.guildJoined && G.guildWeeklyReward.lastClaimedWeek !== getCurrentGuildWeek();
+}
+
+function getWeeklyGuildRewardPreview() {
+  const rank = getGuildRank();
+  return {
+    rank,
+    gold: rank * 5000,
+    xp: rank * 4000,
+    matQty: rank * 3,
+    rareMat: rank >= GUILD_GATHER_RARE_MAT_MIN_RANK ? true : false
+  };
+}
+
+function claimWeeklyGuildReward() {
+  if (!isWeeklyGuildRewardAvailable()) { lg('🏰 Already claimed this week\'s guild reward \u2014 check back after reset.'); return; }
+  const rank = getGuildRank();
+  const rankDef = getGuildRankDef();
+  const gold = rank * 5000;
+  const xp = rank * 4000;
+  const matQty = rank * 3;
+  G.p.gold += gold;
+  G.p.xp += xp;
+  addI({ n: 'Iron Ore', t: 'mat', q: matQty, r: 'common' });
+  let extra = '';
+  const rareMat = getGatherableRareStrongholdMat();
+  if (rareMat) { addI({ n: rareMat, t: 'mat', q: 2, r: 'rare' }); extra = ', +2x ' + rareMat; }
+  G.guildWeeklyReward.lastClaimedWeek = getCurrentGuildWeek();
+  lg('🏰 Weekly Guild Reward claimed (' + (rankDef ? rankDef.name : 'Rank ' + rank) + '): +' + gold.toLocaleString() + 'G, +' + xp.toLocaleString() + ' XP, +' + matQty + 'x Iron Ore' + extra + '.');
+  lvlup();
+  render();
+}
+
 
 function isGuildWarUnlocked() {
   return G.p.lvl >= GUILD_WAR_MIN_LEVEL && G.storyJournal.read.includes(GUILD_WAR_UNLOCK_CHAPTER);
@@ -17294,6 +17416,8 @@ function saveGame() {
     bossRushBestStreak: G.bossRush.bestStreak || 0,
     guildWarBestStreak: G.guildWar.bestStreak || 0,
     guildRosterRecruited: G.guildRoster.recruited || [],
+    guildGatherLastCollectedDay: G.guildGather.lastCollectedDay,
+    guildWeeklyRewardLastClaimedWeek: G.guildWeeklyReward.lastClaimedWeek,
     visionMachineLastUseDay: G.visionMachine.lastUseDay,
     visionMachineJoelLetterCount: G.visionMachine.joelLetterCount || 0,
     chainQuests: G.chainQuests || {},
@@ -17597,6 +17721,8 @@ function loadGame() {
     G.bossRush.bestStreak = data.bossRushBestStreak || 0;
     G.guildWar.bestStreak = data.guildWarBestStreak || 0;
     G.guildRoster.recruited = data.guildRosterRecruited || [];
+    G.guildGather.lastCollectedDay = data.guildGatherLastCollectedDay !== undefined ? data.guildGatherLastCollectedDay : -1;
+    G.guildWeeklyReward.lastClaimedWeek = data.guildWeeklyRewardLastClaimedWeek !== undefined ? data.guildWeeklyRewardLastClaimedWeek : -1;
     G.visionMachine.lastUseDay = data.visionMachineLastUseDay !== undefined ? data.visionMachineLastUseDay : -1;
     G.visionMachine.joelLetterCount = data.visionMachineJoelLetterCount || 0;
     G.chainQuests = data.chainQuests || {};
@@ -20954,6 +21080,36 @@ function rGuildWar() {
   h += '<div class="panel-title" style="color:var(--gold);">Best Streak</div>';
   h += '<div style="font-size:24px;font-weight:700;margin:8px 0;color:var(--gold);">' + (G.guildWar.bestStreak || 0) + '</div>';
   h += '</div>';
+
+  // Weekly Guild Reward — separate from Guild Contracts (which already pay Rep weekly);
+  // this one is tied to Guild Rank specifically, manual claim, lapses if the week rolls
+  // over unclaimed.
+  const weeklyPreview = getWeeklyGuildRewardPreview();
+  h += '<div class="panel' + (isWeeklyGuildRewardAvailable() ? ' panel-gold' : '') + '" style="text-align:center;">';
+  h += '<div class="panel-title" style="' + (isWeeklyGuildRewardAvailable() ? 'color:var(--gold);' : '') + '">🏰 Weekly Guild Reward</div>';
+  if (isWeeklyGuildRewardAvailable()) {
+    h += '<div class="btn-hint" style="margin:6px 0;">+' + weeklyPreview.gold.toLocaleString() + 'G, +' + weeklyPreview.xp.toLocaleString() + ' XP, +' + weeklyPreview.matQty + 'x Iron Ore' + (weeklyPreview.rareMat ? ', +2x a rare stronghold material' : '') + '</div>';
+    h += '<button onclick="claimWeeklyGuildReward()" class="abtn" style="width:100%;">Claim This Week\'s Reward</button>';
+    h += '<div class="btn-hint" style="margin-top:4px;font-size:10px;">Lapses if not claimed before the week resets.</div>';
+  } else {
+    h += '<div class="btn-hint">' + (G.guildJoined ? 'Already claimed this week \u2014 check back after reset.' : 'Join the Guild to unlock weekly rewards.') + '</div>';
+  }
+  h += '</div>';
+
+  // Idle Guild Member material gathering — recruited-but-unfielded, non-core members
+  // passively gather crafting materials once per real day.
+  const idleGatherers = getIdleGatheringGuildMembers();
+  if (idleGatherers.length > 0) {
+    h += '<div class="panel' + (canCollectGuildMaterials() ? ' panel-gold' : '') + '" style="text-align:center;">';
+    h += '<div class="panel-title" style="' + (canCollectGuildMaterials() ? 'color:var(--gold);' : '') + '">📦 Idle Roster Gathering</div>';
+    h += '<div class="btn-hint" style="margin:6px 0;">' + idleGatherers.length + ' unfielded member' + (idleGatherers.length > 1 ? 's' : '') + ' gathering: ' + idleGatherers.map(d => d.icon + ' ' + d.npcName).join(', ') + '</div>';
+    if (canCollectGuildMaterials()) {
+      h += '<button onclick="collectGuildMemberMaterials()" class="abtn" style="width:100%;">Collect Today\'s Materials</button>';
+    } else {
+      h += '<div class="btn-hint">Already collected today \u2014 check back tomorrow.</div>';
+    }
+    h += '</div>';
+  }
 
   h += '<div class="panel-title" style="margin:14px 0 8px;">Guild Roster (' + G.guildWar.fielded.length + '/' + getGuildWarMaxFielded() + ' fielded)</div>';
   for (let def of GUILD_MEMBERS) {
