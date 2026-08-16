@@ -4867,7 +4867,7 @@ storyJournal: {
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
-  afkAdventure: { active: false, zoneIndices: [], startTime: 0, startLevel: 1, legendaryItemsGained: [], totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null, eliteMode: false, visible: false },
+  afkAdventure: { active: false, zoneIndices: [], startTime: 0, startLevel: 1, legendaryItemsGained: [], totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null, eliteMode: false, visible: false, playerBrowsing: false },
   afkAdventurePicker: [], // temporary selection state while choosing zones, before starting
   afkAdventureEliteToggle: false, // temporary picker-screen toggle, before starting
   notificationsEnabled: false,
@@ -15019,9 +15019,23 @@ function renderAfkAdventureBar() {
     + (bossEntries.length > 0
       ? '<div style="text-align:center;background:rgba(245,215,110,0.12);border:1px solid var(--gold);border-radius:10px;padding:8px;margin-bottom:12px;font-size:14px;font-weight:800;color:var(--gold);">👑 ' + bossEntries.map(([n, c]) => n + (c > 1 ? ' ×' + c : '')).join(' &nbsp;\u2022&nbsp; ') + '</div>'
       : '<div style="text-align:center;font-size:12px;color:var(--text-dim);margin-bottom:12px;">No boss encounters yet</div>')
+    + '<div class="afk-grind-row" style="justify-content:center;gap:8px;flex-wrap:wrap;">'
+    + '<button onclick="browseAwayFromAfkAdventure(\'quest\')" style="background:var(--bg-hover);">📜 Quests</button>'
+    + '<button onclick="browseAwayFromAfkAdventure(\'inventory\')" style="background:var(--bg-hover);">🎒 Items</button>'
+    + '<button onclick="browseAwayFromAfkAdventure(\'party\')" style="background:var(--bg-hover);">👥 Party</button>'
+    + '</div>'
     + '<div class="afk-grind-row" style="justify-content:center;">'
     + '<button onclick="stopAfkAdventure()">Stop &amp; Exit</button></div>'
     + '</div>';
+}
+
+// Called from the shortcut buttons on the AFK Adventure bar itself — setS() already
+// flips playerBrowsing on for anything but 'combat' (see setS()), so this just needs
+// to be a real setS() call rather than a direct G.state assignment. The persistent
+// badge in renderLogPanel() (🗺️ AFK ...) stays visible on whatever screen this lands
+// on, and taps back to 'combat' to bring the bar back.
+function browseAwayFromAfkAdventure(screen) {
+  setS(screen);
 }
 
 // Compact HP/MP/XP display shared by both AFK bar screens — these bypass the full
@@ -15372,6 +15386,7 @@ function startAfkAdventure(zoneIndices, eliteMode, visible) {
   G.afkAdventure.startTime = Date.now();
   G.afkAdventure.startLevel = G.p.lvl;
   G.afkAdventure.legendaryItemsGained = [];
+  G.afkAdventure.playerBrowsing = false;
   G.afkAdventure.totalXp = 0;
   G.afkAdventure.totalGold = 0;
   G.afkAdventure.totalKills = 0;
@@ -16951,6 +16966,14 @@ function setS(s){
   if (s === 'skills') triggerSoelCommentary('skills');
   if (s === 'rest') triggerSoelCommentary('rest');
   if (s === 'party') triggerSoelCommentary('party');
+  // AFK Adventure's background bar cycles G.state through 'combat'/'explore' (and
+  // occasionally other sc()-driven states) on its own via sc(), never through setS() —
+  // only a real tap does that. So a setS() call to anything but 'combat' while AFK
+  // Adventure is running unmistakably means the player chose to go look at something
+  // else, and the bar should get out of the way until they tap back to it.
+  if (G.afkAdventure.active && !G.afkAdventure.visible) {
+    G.afkAdventure.playerBrowsing = (s !== 'combat');
+  }
   G.state=s;render();
 }
 function flee(){
@@ -18608,13 +18631,16 @@ function render(){
 
   updateMusicForState();
 
-  // AFK Adventure Mode — same idea, but checked on activity alone rather than a
-  // specific G.state, since this mode cycles between 'explore' and 'combat' every
-  // single encounter (unlike Grind's autoNext, which stays in 'combat' throughout).
-  // Without this, the full explore screen would flash back in during every gap.
+  // AFK Adventure Mode — checked on activity alone rather than a specific G.state,
+  // since this mode cycles between 'explore' and 'combat' every single encounter
+  // (unlike Grind's autoNext, which stays in 'combat' throughout). Without this, the
+  // full explore screen would flash back in during every gap. Now also respects
+  // playerBrowsing (set in setS()) — the bar takes over during the AFK loop's own
+  // internal state cycling, but backs off the moment the player deliberately taps
+  // to another screen, so Quests/Items/Party etc. stay reachable while AFK runs.
   // Skipped entirely in "visible" mode — full combat stays on screen the whole time,
   // for actively watching fights rather than a background/AFK loop.
-  if (G.afkAdventure.active && !G.afkAdventure.visible) {
+  if (G.afkAdventure.active && !G.afkAdventure.visible && !G.afkAdventure.playerBrowsing) {
     renderAfkAdventureBar();
     return;
   }
