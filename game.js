@@ -4819,6 +4819,8 @@ storyJournal: {
     totalXp: 0,
     totalGold: 0,
     sessionStart: null,
+    startLevel: 1,
+    legendaryItemsGained: [],
     autoNext: true,
     maxZoneLevel: 1,
     difficulty: 'normal', // normal, hard, nightmare
@@ -4865,7 +4867,7 @@ storyJournal: {
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
-  afkAdventure: { active: false, zoneIndices: [], startTime: 0, totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null, eliteMode: false, visible: false },
+  afkAdventure: { active: false, zoneIndices: [], startTime: 0, startLevel: 1, legendaryItemsGained: [], totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null, eliteMode: false, visible: false },
   afkAdventurePicker: [], // temporary selection state while choosing zones, before starting
   afkAdventureEliteToggle: false, // temporary picker-screen toggle, before starting
   notificationsEnabled: false,
@@ -14675,6 +14677,8 @@ function enterGrindRoom() {
   G.endlessGrind.totalXp = 0;
   G.endlessGrind.totalGold = 0;
   G.endlessGrind.sessionStart = Date.now();
+  G.endlessGrind.startLevel = G.p.lvl;
+  G.endlessGrind.legendaryItemsGained = [];
   G.endlessGrind.maxZoneLevel = Math.max(1, G.p.lvl);
   G.state = 'grind_room';
   lg('🌀 Entered the Endless Grind Room!');
@@ -15059,6 +15063,7 @@ function startAfkGrind() {
 }
 
 function stopAfkGrind() {
+  showSessionSummaryPopup(G.endlessGrind.sessionStart, G.endlessGrind.startLevel, G.endlessGrind.totalXp, G.endlessGrind.totalGold, G.endlessGrind.legendaryItemsGained, '\uD83C\uDF00 AFK Grind Complete');
   G.grindAfkMode = false;
   G.cbt.autoCombat = isAutoCombatPreferred();
   G.endlessGrind.active = false;
@@ -15346,6 +15351,8 @@ function startAfkAdventure(zoneIndices, eliteMode, visible) {
   G.afkAdventure.active = true;
   G.afkAdventure.zoneIndices = zoneIndices;
   G.afkAdventure.startTime = Date.now();
+  G.afkAdventure.startLevel = G.p.lvl;
+  G.afkAdventure.legendaryItemsGained = [];
   G.afkAdventure.totalXp = 0;
   G.afkAdventure.totalGold = 0;
   G.afkAdventure.totalKills = 0;
@@ -15362,6 +15369,7 @@ function startAfkAdventure(zoneIndices, eliteMode, visible) {
 }
 
 function stopAfkAdventure() {
+  showSessionSummaryPopup(G.afkAdventure.startTime, G.afkAdventure.startLevel, G.afkAdventure.totalXp, G.afkAdventure.totalGold, G.afkAdventure.legendaryItemsGained, '\uD83D\uDDFA\uFE0F AFK Adventure Complete');
   G.afkAdventure.active = false;
   G.afkAdventure.backgroundedAt = null;
   G.afkAdventurePicker = [];
@@ -16309,6 +16317,19 @@ function addI(it){
   else G.p.inv.push({...it,q:it.q||1});
 }
 
+// Tracks legendary drops during an active AFK Adventure or AFK Grind session so the
+// stop-and-exit summary can actually list what came in, not just totals. Wrapping addI()
+// rather than touching every loot call site — same pattern as the handleVictory/
+// handleDefeat wrappers elsewhere in this file.
+const _originalAddIForAfkTracking = addI;
+addI = function(it) {
+  _originalAddIForAfkTracking(it);
+  if (it.r === 'legendary') {
+    if (G.afkAdventure.active) G.afkAdventure.legendaryItemsGained.push(it.n);
+    if (G.endlessGrind.active) G.endlessGrind.legendaryItemsGained.push(it.n);
+  }
+};
+
 function useI(ix){
   const it=G.p.inv[ix];
   if(!it)return;
@@ -16584,6 +16605,51 @@ function showBattleRewardPopup(xp, gold, extra) {
 
   if (navigator.vibrate) navigator.vibrate(25); // a light single pulse, not the level-up pattern
   setTimeout(() => { el.classList.add('brp-fade'); setTimeout(() => el.remove(), 400); }, 15000);
+}
+
+// Session summary popup — shown on "Stop & Exit" from AFK Adventure or AFK Grind, using
+// the exact same white-card visual language as the battle reward popup, just with more
+// to say: how long the session actually ran (wall-clock, including backgrounded time),
+// XP earned (already includes any active booster, since totalXp is accumulated post-
+// multiplier by the existing victory handlers), levels gained, and any legendary drops.
+// Tap-to-dismiss since there's more here to actually read than a routine combat ping —
+// still auto-clears after 25s as a safety net if left alone.
+function showSessionSummaryPopup(startTime, startLevel, totalXp, totalGold, legendaryItems, label) {
+  const existing = document.querySelector('.battle-reward-popup');
+  if (existing) existing.remove();
+
+  const elapsedMs = Math.max(0, Date.now() - (startTime || Date.now()));
+  const hours = Math.floor(elapsedMs / 3600000);
+  const mins = Math.floor((elapsedMs % 3600000) / 60000);
+  const durationStr = hours > 0 ? (hours + 'h ' + mins + 'm') : (mins + 'm');
+  const levelsGained = Math.max(0, G.p.lvl - (startLevel || G.p.lvl));
+
+  const el = document.createElement('div');
+  el.className = 'battle-reward-popup session-summary-popup';
+  el.style.pointerEvents = 'auto';
+
+  let html = '<div class="brp-session-title">' + (label || 'Session Summary') + '</div>';
+  html += '<div class="brp-detail">\u23F1\uFE0F ' + durationStr + ' away</div>';
+  html += '<div class="brp-row"><span class="brp-xp">\u2728 +' + totalXp.toLocaleString() + ' XP</span><span class="brp-gold">\uD83D\uDCB0 +' + totalGold.toLocaleString() + 'G</span></div>';
+  html += '<div class="brp-detail">' + (levelsGained > 0 ? '\uD83C\uDF1F +' + levelsGained + ' level' + (levelsGained > 1 ? 's' : '') + ' \u2014 now Lv.' + G.p.lvl : 'Lv.' + G.p.lvl + ' \u2014 no level gained this run') + '</div>';
+  if (legendaryItems && legendaryItems.length > 0) {
+    const counts = {};
+    for (let n of legendaryItems) counts[n] = (counts[n] || 0) + 1;
+    const legendaryLine = Object.entries(counts).map(([n, c]) => n + (c > 1 ? ' x' + c : '')).join(', ');
+    html += '<div class="brp-legendary">\uD83D\uDFE1 Legendary: ' + legendaryLine + '</div>';
+  }
+  html += '<div class="brp-dismiss-hint">Tap to dismiss</div>';
+  el.innerHTML = html;
+
+  el.addEventListener('click', () => { el.classList.add('brp-fade'); setTimeout(() => el.remove(), 400); });
+  document.body.appendChild(el);
+
+  const hdr = document.querySelector('.hdr');
+  const hdrBottom = hdr ? hdr.getBoundingClientRect().bottom : 90;
+  el.style.top = (hdrBottom + 10) + 'px';
+
+  if (navigator.vibrate) navigator.vibrate([25, 40, 25]);
+  setTimeout(() => { if (document.body.contains(el)) { el.classList.add('brp-fade'); setTimeout(() => el.remove(), 400); } }, 25000);
 }
 
 function showToast(text, type) {
