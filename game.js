@@ -4821,6 +4821,7 @@ storyJournal: {
     sessionStart: null,
     startLevel: 1,
     legendaryItemsGained: [],
+    playerBrowsing: false,
     autoNext: true,
     maxZoneLevel: 1,
     difficulty: 'normal', // normal, hard, nightmare
@@ -14887,7 +14888,7 @@ function startGrindWave() {
   
   triggerSoelCommentary('explore');
   checkSoelFortune();
-  if (G.grindAfkMode && screenBeforeWave !== 'combat') {
+  if (G.grindAfkMode && G.endlessGrind.playerBrowsing && screenBeforeWave !== 'combat') {
     G.state = screenBeforeWave;
   }
   render();
@@ -15066,7 +15067,20 @@ function renderAfkGrindBar() {
     + '</div>'
     + '<div class="afk-grind-row"><span>Auto-next: ' + (g.autoNext ? 'ON' : 'OFF') + '</span>'
     + '<button onclick="stopAfkGrind()">Stop &amp; Exit</button></div>'
+    + '<div class="afk-grind-row" style="justify-content:center;gap:8px;flex-wrap:wrap;margin-top:8px;">'
+    + '<button onclick="browseAwayFromAfkGrind(\'quest\')" style="background:var(--bg-hover);">📜 Quests</button>'
+    + '<button onclick="browseAwayFromAfkGrind(\'inventory\')" style="background:var(--bg-hover);">🎒 Items</button>'
+    + '<button onclick="browseAwayFromAfkGrind(\'party\')" style="background:var(--bg-hover);">👥 Party</button>'
+    + '</div>'
     + '</div>';
+}
+
+// Same idea as browseAwayFromAfkAdventure() — setS() already flips
+// G.endlessGrind.playerBrowsing on for anything but 'combat', so this just needs to be
+// a real setS() call. The persistent badge in renderLogPanel() (🌀 Grind Wave ...)
+// stays visible wherever this lands, and taps back to 'combat' to bring the bar back.
+function browseAwayFromAfkGrind(screen) {
+  setS(screen);
 }
 
 function startAfkGrind() {
@@ -15074,6 +15088,11 @@ function startAfkGrind() {
   G.grindAfkStartTime = Date.now();
   G.grindAfkStartXp = G.endlessGrind.totalXp;
   G.grindAfkStartGold = G.endlessGrind.totalGold;
+  // Enabling AFK mode should always show the AFK bar first, regardless of which
+  // management screen it was enabled from — false here (not whatever setS() set it to
+  // getting here) is what lets the very next wave actually transition into 'combat'
+  // and stay there instead of snapping back to the screen the button was pressed on.
+  G.endlessGrind.playerBrowsing = false;
   // Previously assumed auto-combat was already ticking when this was pressed — if it
   // wasn't (or the tick chain had already died), nothing would ever actually run,
   // leaving the display frozen at Wave 1 / 0m / 0XP indefinitely. Explicitly ensure
@@ -16973,6 +16992,13 @@ function setS(s){
   // else, and the bar should get out of the way until they tap back to it.
   if (G.afkAdventure.active && !G.afkAdventure.visible) {
     G.afkAdventure.playerBrowsing = (s !== 'combat');
+  }
+  // Same reasoning, same mechanism, for AFK Grind — startGrindWave() reads this instead
+  // of naively comparing against the pre-wave screen (which incorrectly treated "just
+  // enabled AFK mode from the Grind Room screen" as "deliberately browsing away",
+  // silently cancelling the very first transition into the AFK bar view).
+  if (G.endlessGrind.active && G.grindAfkMode) {
+    G.endlessGrind.playerBrowsing = (s !== 'combat');
   }
   G.state=s;render();
 }
