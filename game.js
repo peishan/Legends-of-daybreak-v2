@@ -15001,6 +15001,25 @@ function toggleAutoNext() {
   render();
 }
 
+// Shared XP booster status line for both AFK bars — shows remaining time so it's
+// obvious at a glance whether the potion needs refreshing before it lapses, rather
+// than only finding out mid-session once the boosted numbers quietly stop being boosted.
+function afkXpBoosterHtml() {
+  const active = G.expBooster && G.expBooster.expiresAt > Date.now();
+  if (!active) {
+    return '<div style="text-align:center;font-size:11px;color:var(--text-dim);margin-bottom:12px;">No XP boost active</div>';
+  }
+  const remainMs = G.expBooster.expiresAt - Date.now();
+  const remainMin = Math.floor(remainMs / 60000);
+  const remainSec = Math.floor((remainMs % 60000) / 1000);
+  const timeStr = remainMin > 0 ? (remainMin + 'm ' + remainSec + 's') : (remainSec + 's');
+  const lowTime = remainMs < 5 * 60 * 1000; // under 5 minutes — worth flagging harder
+  return '<div style="text-align:center;font-size:12px;font-weight:700;margin-bottom:12px;padding:6px;border-radius:8px;'
+    + (lowTime ? 'background:rgba(239,68,68,0.15);border:1px solid var(--danger);color:var(--danger);' : 'background:rgba(245,215,110,0.12);border:1px solid var(--gold);color:var(--gold);')
+    + '">\u26A1 XP Boost: +' + Math.floor((G.expBooster.mult || 0.5) * 100) + '% \u2014 ' + timeStr + ' left'
+    + (lowTime ? ' \u2014 refresh soon!' : '') + '</div>';
+}
+
 function renderAfkAdventureBar() {
   const a = document.getElementById('app'); if (!a) return;
   const adv = G.afkAdventure;
@@ -15011,6 +15030,7 @@ function renderAfkAdventureBar() {
     + afkVitalsHtml()
     + '<div class="afk-grind-title">🎯 AFK Adventure</div>'
     + '<div style="text-align:center;font-size:12px;color:var(--text-dim);margin-bottom:12px;">' + zoneNames + '</div>'
+    + afkXpBoosterHtml()
     + '<div class="afk-grind-stats">'
     + '<span>\u23F1\uFE0F ' + minutesPassed + 'm</span>'
     + '<span>\u2694\uFE0F ' + adv.totalKills + '</span>'
@@ -15060,6 +15080,7 @@ function renderAfkGrindBar() {
   a.innerHTML = '<div class="afk-grind-bar">'
     + afkVitalsHtml()
     + '<div class="afk-grind-title">⚔️ Grind Room \u2014 Wave ' + g.wave + '</div>'
+    + afkXpBoosterHtml()
     + '<div class="afk-grind-stats">'
     + '<span>\u23F1\uFE0F ' + minutesPassed + 'm</span>'
     + '<span>\u2728 +' + xpGained.toLocaleString() + ' XP</span>'
