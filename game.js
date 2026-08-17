@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 09:35 (Busy Day Autopilot, batch round counter, daily quest count \u2192 15)';
+const APP_VERSION = '2026-08-17 (Guild Bounty Missions: squad dispatch, composition bonus, cooldown-gated)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -4865,6 +4865,13 @@ storyJournal: {
   // then chains into a Mercenary batch. Deliberately does NOT touch AFK Adventure, Guild
   // Boss, Guild War, Frontier, or Boss Rush — those stay manual on purpose.
   busyDayAutopilot: { active: false, queue: [], queueIndex: 0, startTime: 0, completedCount: 0, skippedTargets: [], playerBrowsing: false, pendingAfterMercenary: false },
+  guildWarRivalEncounters: {}, // per-rival muster count, keyed by rival name — drives Corran/Fen's evolving banter
+  // Guild Bounty Missions — dispatch a squad (up to 4, from recruited members not
+  // otherwise occupied) on a job. The job itself resolves fast (5-15 real minutes,
+  // faster with a stronger/more diverse squad); what actually gates repeat use is a
+  // 2-3 hour cooldown *after* collecting, before the next dispatch is allowed. 5
+  // dispatches per real day, one active at a time.
+  guildBountyMission: { dispatchedToday: 0, lastResetDay: -1, cooldownUntil: 0, active: null, selectedMembers: [] },
   visionMachine: { lastUseDay: -1, joelLetterCount: 0 }, // Varel Farseer's window — once per real day, 1M gold
   kindlingCommissions: { linesToday: 0, checksToday: 0, refreshDay: 0 }, // bounded daily ritual — 3 lines, 2 checks, resets once per game day
   guildBoss: { tierIndex: 0, currentHp: 0, lastAttemptDay: 0 }, // persistent HP across days — the whole recruited roster chips away at it together
@@ -10729,9 +10736,16 @@ const GUILD_MEMBERS = [
       'Zaki: "Somebody has to hold this line. Might as well be me."'
     ] },
   { id: 'mimi', npcName: 'Mimi', role: 'Divination Mage', icon: '🦋',
+    bountyArchetype: 'Utility',
+    hallSpot: 'the window seat, where the light actually reaches',
     recruitReq: { type: 'ally' },
     fieldBuff: { xpPct: 0.04 },
     gatherMats: ['Aether Shard'],
+    hubBanter: [
+      'Mimi: "I knew you\'d walk in before you did. Still not going to tell you how much I already know about your day."',
+      'Mimi: "The Hall feels different when San\'s here versus not. I can\'t explain it. I just know."',
+      'Mimi: "I miss the old office some days. Mostly I miss knowing things nobody else did yet. This job scratches the same itch."'
+    ],
     recruitLine: "Mimi already knew you'd ask before you finished asking. \"Guild business? I'm in. I've always wanted an official reason to know things before everyone else does.\"",
     barks: [
       'Mimi: "That one\'s favoring its left side. Just so you know."',
@@ -10739,9 +10753,16 @@ const GUILD_MEMBERS = [
       'Mimi: "Two floors away, I\'d have heard about this fight before it started."'
     ] },
   { id: 'brada', npcName: 'Brada Shah', role: 'Artillery', icon: '🎯',
+    bountyArchetype: 'DPS',
+    hallSpot: 'near the hearth, always with an audience',
     recruitReq: { type: 'journal', journalId: 'journal_111' },
     fieldBuff: { atkPct: 0.04 },
     gatherMats: ['Iron Ore'],
+    hubBanter: [
+      'Brada: "A gentle heart and a silver tongue only gets you so far. Turns out it gets you pretty far, actually."',
+      'Brada: "Somebody has to make this Hall sound less like a war council. I volunteered."',
+      'Brada: "Ask me about half the gear in this hall sometime. I\'m never busy. I love the sound of my own stories."'
+    ],
     recruitLine: "Brada doesn't need much convincing. \"Mimi already told me you'd probably ask eventually. Ballistas, siege lines, anything that needs a steady hand and a longer memory than most people have \u2014 that's mine. Glad to actually put it to use.\"",
     barks: [
       'Brada: "Line up the shot. Wait. Then wait a little longer than that."',
@@ -10749,9 +10770,16 @@ const GUILD_MEMBERS = [
       'Brada: "Machinery doesn\'t lie to you. People, sometimes. Not this."'
     ] },
   { id: 'aisy', npcName: 'Aisy', role: 'Rogue', icon: '🌙',
+    bountyArchetype: 'DPS',
+    hallSpot: 'somewhere you won\'t notice until she wants you to',
     recruitReq: { type: 'ally' },
     fieldBuff: { critPct: 0.03 },
     gatherMats: ['Bone Shard'],
+    hubBanter: [
+      'Aisy: "Nobody notices when I\'m in a room. I notice everything about the room anyway. Old habit."',
+      'Aisy: "Mimi and I still talk like we\'re two desks apart. Some things don\'t need distance to change."',
+      'Aisy: "I\'m fine standing in the corner. The corner sees the most, honestly."'
+    ],
     recruitLine: "Aisy just appears at your side, like she'd already decided before you asked. \"Nobody ever notices me leave a room. Let's see what they make of me showing up to one.\"",
     barks: [
       'Aisy: "They didn\'t see me. They still don\'t."',
@@ -10759,9 +10787,16 @@ const GUILD_MEMBERS = [
       'Aisy: "Some habits from the old office never really left."'
     ] },
   { id: 'kw_liang', npcName: 'KW Liang', role: 'Scout', icon: '🐇',
+    bountyArchetype: 'Utility',
+    hallSpot: 'by the door, watching everyone come and go',
     recruitReq: { type: 'journal', journalId: 'journal_109' },
     fieldBuff: { defPct: 0.04 },
     gatherMats: ['Herb Bundle'],
+    hubBanter: [
+      'KW Liang: "Snowball found a new corner of the Hall to nap in. She has better taste in real estate than most people."',
+      'KW Liang: "Kaya kaya. Even off the clock, the arrows stay counted."',
+      'KW Liang: "Quiet work is still work. Nobody claps for it, but it\'s still the reason half these plans hold together."'
+    ],
     recruitLine: "Liang doesn't hesitate for even a second. \"Kaya kaya taught me some deals are worth honoring properly. This is the first one I've ever actually wanted to.\"",
     barks: [
       'KW Liang: "Kaya kaya! Business is business, even out here."',
@@ -10769,9 +10804,16 @@ const GUILD_MEMBERS = [
       'KW Liang: "Aisy taught me patience. San taught me to actually ask questions before I break something."'
     ] },
   { id: 'sister_wren', npcName: 'Sister Wren', role: 'Support', icon: '🕯️',
+    bountyArchetype: 'Support',
+    hallSpot: 'the small shrine corner she built herself',
     recruitReq: { type: 'ally' },
     fieldBuff: { defPct: 0.10 },
     gatherMats: ['Herb Bundle'],
+    hubBanter: [
+      'Sister Wren: "Dr. AA and I argue about whether faith or medicine actually holds this Hall together. We\'ve never once settled it. I don\'t think we\'re supposed to."',
+      'Sister Wren: "I light the same candle every evening. Not for anyone in particular anymore. Just for the habit of it."',
+      'Sister Wren: "Real devotion doesn\'t need an audience. Took me a long time and a very false doctrine to actually learn that."'
+    ],
     recruitLine: "Sister Wren doesn't hesitate. \"I spent a long time devoted to something that was never real. I know real when I finally get to stand next to it.\"",
     barks: [
       'Sister Wren: "Hold the line. I\'ve seen worse hold longer."',
@@ -10779,9 +10821,16 @@ const GUILD_MEMBERS = [
       'Sister Wren: "Steady. That\'s all this ever takes."'
     ] },
   { id: 'ser_aldric', npcName: 'Ser Aldric', role: 'Frontline', icon: '⚔️',
+    bountyArchetype: 'Tank',
+    hallSpot: 'standing, always standing, near the entrance',
     recruitReq: { type: 'ally' },
     fieldBuff: { defPct: 0.04 },
     gatherMats: ['Iron Ore'],
+    hubBanter: [
+      'Ser Aldric: "Dudin and I trade old duty stories more than either of us will admit. Different armies, same aching knees."',
+      'Ser Aldric: "I keep the armor polished even on quiet days. Habit outlasts the need for it, most times."',
+      'Ser Aldric: "Company. Still the whole reason I stay."'
+    ],
     recruitLine: 'Ser Aldric considers it for exactly as long as it takes to answer. "I spent a long time being found by things. This feels like the other version of that. Count me in."',
     barks: [
       'Ser Aldric: "Properly, this time. All the way through."',
@@ -10789,9 +10838,16 @@ const GUILD_MEMBERS = [
       'Ser Aldric: "Company. That\'s all I ever actually needed."'
     ] },
   { id: 'dudin', npcName: 'Dudin', role: 'Frontline', icon: '🎖️',
+    bountyArchetype: 'Tank',
+    hallSpot: 'the kitchen corner, rebuilding a ration crate',
     recruitReq: { type: 'trader_visits', visits: 10 },
     fieldBuff: { atkPct: 0.05 },
     gatherMats: ['Iron Ore'],
+    hubBanter: [
+      'Dudin: "Ser Aldric and I keep meaning to compare which army had worse food. It\'s a long list either way."',
+      'Dudin: "Rations rebuilt, crate restacked. Same rule as always \u2014 feed everyone first."',
+      'Dudin: "Joel doesn\'t come by the Hall much. When he does, it\'s like no time passed since the dorm."'
+    ],
     recruitLine: "Dudin sets down the ration crate he's been rebuilding all week. \"Joel already told me you'd ask eventually. Wasn't going to say no to backing up my old dorm-mate's whole family.\"",
     barks: [
       'Dudin: "Eat first, fight second. Same rule as always."',
@@ -10799,9 +10855,16 @@ const GUILD_MEMBERS = [
       'Dudin: "Joel taught me that too — feed everyone first, then hit hard."'
     ] },
   { id: 'jorvin', npcName: 'Jorvin', role: 'Engineer', icon: '🔧',
+    bountyArchetype: 'Utility',
+    hallSpot: 'the workbench, mid-repair on something',
     recruitReq: { type: 'trader_visits', visits: 10 },
     fieldBuff: { critPct: 0.03 },
     gatherMats: ['Gem Dust'],
+    hubBanter: [
+      'Jorvin: "Iris asked me to rig a trap last week. We\'re still arguing about whether that counts as engineering or just an elaborate insult to physics."',
+      'Jorvin: "Same principle as the old phone. Every problem has a seam if you look long enough."',
+      'Jorvin: "Admin desk to this. Honestly the technical problems got more interesting, not less."'
+    ],
     recruitLine: "Jorvin wipes his hands on a rag that hasn't been clean in years. \"Same admin desk, different apocalypse. Sure, I'll come find the weak point in whatever this is.\"",
     barks: [
       'Jorvin: "Everything has a weak point. Even this."',
@@ -10809,9 +10872,16 @@ const GUILD_MEMBERS = [
       'Jorvin: "There. Right there. That\'s the seam."'
     ] },
   { id: 'wahyu', npcName: 'Wahyu', role: 'Utility', icon: '👕',
+    bountyArchetype: 'Utility',
+    hallSpot: 'the mending table, always mid-stitch',
     recruitReq: { type: 'trader_visits', visits: 10 },
     fieldBuff: { goldPct: 0.04 },
     gatherMats: ['Gem Dust'],
+    hubBanter: [
+      'Wahyu: "Lewis tried to sell me a \'lightly used\' cloak this morning. It was mine. I sold it to him last week."',
+      'Wahyu: "Extra room in every seam. You never know what\'s worth stitching in later."',
+      'Wahyu: "Custom fit for everyone in this Hall by now. Occupational hazard of actually paying attention."'
+    ],
     recruitLine: "Wahyu grins, already measuring you for something. \"Guild work? Sure. Somebody's got to notice what's actually worth grabbing off this thing once it's down.\"",
     barks: [
       'Wahyu: "Custom fit, custom timing. I\'ll know when to move."',
@@ -10819,9 +10889,16 @@ const GUILD_MEMBERS = [
       'Wahyu: "Extra room in the seams. Extra room to work with."'
     ] },
   { id: 'jonathan', npcName: 'Jonathan', role: 'Striker', icon: '⚙️',
+    bountyArchetype: 'DPS',
+    hallSpot: 'wherever the most recent small explosion happened',
     recruitReq: { type: 'trader_visits', visits: 10 },
     fieldBuff: { atkPct: 0.04 },
     gatherMats: ['Fire Essence', 'Obsidian'],
+    hubBanter: [
+      'Jonathan: "Brada and I are building something in the back that definitely explodes. It\'s fine. Probably fine."',
+      'Jonathan: "Nobody\'s here to tell me it\'s not my job. Still love that for me, every single day."',
+      'Jonathan: "Whatever\'s trending, I\'m already three steps into it. Same as the old office, just with fewer consequences for being wrong."'
+    ],
     recruitLine: "Jonathan's already halfway to yes before you finish asking. \"Been chasing whatever's trending since the old office. This is definitely trending.\"",
     barks: [
       'Jonathan: "Never done this professionally before. Great time to start!"',
@@ -10829,9 +10906,16 @@ const GUILD_MEMBERS = [
       'Jonathan: "Same energy as fixing a car nobody asked me to fix."'
     ] },
   { id: 'lewis', npcName: 'Lewis', role: 'Opportunist', icon: '🧳',
+    bountyArchetype: 'Utility',
+    hallSpot: 'wherever the most foot traffic passes through',
     recruitReq: { type: 'trader_visits', visits: 10 },
     fieldBuff: { goldPct: 0.05 },
     gatherMats: ['Iron Ore', 'Herb Bundle'],
+    hubBanter: [
+      'Lewis: "I sold Wahyu his own cloak back this morning. He hasn\'t noticed yet. I\'m very proud of this."',
+      'Lewis: "Whatever\'s worth something, I get first look. That\'s not greed, that\'s just good business."',
+      'Lewis: "Terrible instincts, forever loyal. Two rows from San\'s desk for years and I\'d do it all again."'
+    ],
     recruitLine: "Lewis is already calculating margins before you've explained the mission. \"Guild work pays in reputation. Reputation's worth something eventually. I'm in.\"",
     barks: [
       'Lewis: "I could sell this thing\'s teeth. Probably. Later, though."',
@@ -10839,9 +10923,16 @@ const GUILD_MEMBERS = [
       'Lewis: "Whatever this drops, I get first look."'
     ] },
   { id: 'dr_aa', npcName: 'Dr. AA', role: 'Healer', icon: '🩺',
+    bountyArchetype: 'Support',
+    hallSpot: 'the healer\'s alcove, cart already half-packed',
     recruitReq: { type: 'trader_visits', visits: 10 },
     fieldBuff: { xpPct: 0.04 },
     gatherMats: ['Herb Bundle'],
+    hubBanter: [
+      'Dr. AA: "Sister Wren and I still haven\'t settled whether faith or medicine keeps this Hall standing. I say medicine. She\'s wrong. Lovingly wrong."',
+      'Dr. AA: "New ghost story, still no one to tell it to on the road. The Hall will have to do."',
+      'Dr. AA: "Take with food. Nobody ever does. I keep saying it anyway."'
+    ],
     recruitLine: "Dr. AA is already packing the cart. \"Guild work. Good. I've got a new ghost story and nobody to tell it to on the way there.\"",
     barks: [
       'Dr. AA: "Take with food. Not that anyone ever does."',
@@ -10849,9 +10940,16 @@ const GUILD_MEMBERS = [
       'Dr. AA: "Vitamins and ghost stories. Works every time."'
     ] },
   { id: 'iris', npcName: 'Iris', role: 'Scout', icon: '🦊',
+    bountyArchetype: 'Utility',
+    hallSpot: 'the sunny patch on the floor, with Ash',
     recruitReq: { type: 'kindling' },
     fieldBuff: { critPct: 0.04 },
     gatherMats: ['Frost Gem', 'Ice Crystal'],
+    hubBanter: [
+      'Iris: "Ash found a warm patch of sun by the window. We are not moving for the rest of the day. Guild business can wait ten minutes."',
+      'Iris: "Held a line alone for years. Having somewhere to actually come back to still doesn\'t feel real some mornings."',
+      'Iris: "Ash has opinions about everyone who walks through that door. Ash is usually right about them, too."'
+    ],
     recruitLine: "Iris and Ash don't need asking twice. \"Guild work. Finally, something with actual structure. Ash has opinions about structure.\"",
     barks: [
       'Iris: "Ash smells something. Ash is usually right."',
@@ -10896,17 +10994,148 @@ function checkGuildRecruitment() {
 // always out adventuring with San and never actually idle) can gather — identified by
 // recruitReq.type !== 'always', reusing the existing marker rather than adding a new
 // field. "Idle" specifically means recruited AND not currently fielded for Guild War.
+// Shared occupancy check — a member currently out on a Guild Bounty Mission dispatch
+// is unavailable for Idle Gathering or Guild War fielding until the mission is
+// collected. Used by getIdleGatheringGuildMembers(), toggleGuildWarField(), and the
+// bounty dispatch member-picker itself.
+function isGuildMemberOnBountyDispatch(id) {
+  return G.guildBountyMission.active && G.guildBountyMission.active.memberIds.includes(id);
+}
+
 function getIdleGatheringGuildMembers() {
   return GUILD_MEMBERS.filter(def =>
     def.recruitReq.type !== 'always' &&
     isGuildMemberRecruited(def.id) &&
     !G.guildWar.fielded.includes(def.id) &&
+    !isGuildMemberOnBountyDispatch(def.id) &&
     def.gatherMats
   );
 }
 
 function canCollectGuildMaterials() {
   return G.guildGather.lastCollectedDay !== G.gameDay && getIdleGatheringGuildMembers().length > 0;
+}
+
+// === GUILD BOUNTY MISSIONS ===
+// Squad-dispatch expedition system, distinct from the daily solo Bounty board. Pick up
+// to 4 recruited, unoccupied members, send them out — the job itself resolves fast
+// (5-15 real minutes, scaled down by squad strength and role diversity), but the real
+// gate is a 2-3 hour cooldown *after* collecting before the next dispatch is allowed.
+// 5 dispatches per real day. A member out on a dispatch is unavailable for Guild War
+// fielding or Idle Gathering until the mission is collected (see
+// isGuildMemberOnBountyDispatch()).
+const GUILD_BOUNTY_MAX_SQUAD = 4;
+const GUILD_BOUNTY_MAX_PER_DAY = 5;
+const GUILD_BOUNTY_BASE_DURATION_MIN = 10; // midpoint of the 5-15 min range
+const GUILD_BOUNTY_BASE_COOLDOWN_MIN = 150; // midpoint of the 2-3 hour range
+const GUILD_BOUNTY_ARCHETYPES = ['Tank', 'Support', 'DPS', 'Utility'];
+
+function resetGuildBountyMissionDailyIfNeeded() {
+  if (G.guildBountyMission.lastResetDay !== G.gameDay) {
+    G.guildBountyMission.lastResetDay = G.gameDay;
+    G.guildBountyMission.dispatchedToday = 0;
+  }
+}
+
+function getAvailableBountyMembers() {
+  return GUILD_MEMBERS.filter(def =>
+    def.recruitReq.type !== 'always' &&
+    isGuildMemberRecruited(def.id) &&
+    !G.guildWar.fielded.includes(def.id) &&
+    !isGuildMemberOnBountyDispatch(def.id)
+  );
+}
+
+function toggleBountyMemberSelection(id) {
+  const sel = G.guildBountyMission.selectedMembers;
+  const idx = sel.indexOf(id);
+  if (idx >= 0) {
+    sel.splice(idx, 1);
+  } else {
+    if (sel.length >= GUILD_BOUNTY_MAX_SQUAD) { lg('🎖️ A squad can only take ' + GUILD_BOUNTY_MAX_SQUAD + ' members.'); return; }
+    sel.push(id);
+  }
+  render();
+}
+
+// Sums every fieldBuff percentage across the squad (treated as overall squad strength
+// for this purpose, not just the specific stats it's normally used for in Guild War)
+// plus a diversity bonus for how many distinct archetypes are represented — a squad of
+// 4 all-Utility members gets no diversity bonus; one of each of the 4 archetypes gets
+// the full bonus. This is what "composition matters" actually means mechanically.
+function computeBountyMissionPreview(memberIds) {
+  let totalBuff = 0;
+  const archetypesPresent = new Set();
+  let goldPct = 0, xpPct = 0;
+  for (let id of memberIds) {
+    const def = getGuildMemberDef(id);
+    if (!def) continue;
+    if (def.bountyArchetype) archetypesPresent.add(def.bountyArchetype);
+    for (let stat in def.fieldBuff) {
+      totalBuff += def.fieldBuff[stat];
+      if (stat === 'goldPct') goldPct += def.fieldBuff[stat];
+      if (stat === 'xpPct') xpPct += def.fieldBuff[stat];
+    }
+  }
+  const diversityCount = archetypesPresent.size;
+  const diversityMult = 1 + (diversityCount > 1 ? (diversityCount - 1) * 0.05 : 0); // +5% per distinct archetype beyond the first, up to +15% for all 4
+
+  const durationMin = Math.max(5, Math.round(GUILD_BOUNTY_BASE_DURATION_MIN - totalBuff * 20));
+  const cooldownMin = Math.max(120, Math.round(GUILD_BOUNTY_BASE_COOLDOWN_MIN - totalBuff * 100));
+
+  const rank = getGuildRank();
+  const baseGold = 800 * rank * memberIds.length;
+  const baseXp = 600 * rank * memberIds.length;
+  const gold = Math.floor(baseGold * (1 + goldPct) * diversityMult);
+  const xp = Math.floor(baseXp * (1 + xpPct) * diversityMult);
+
+  return { durationMin, cooldownMin, gold, xp, diversityCount, diversityMult };
+}
+
+function canDispatchGuildBountyMission() {
+  resetGuildBountyMissionDailyIfNeeded();
+  return G.guildJoined &&
+    !G.guildBountyMission.active &&
+    Date.now() >= G.guildBountyMission.cooldownUntil &&
+    G.guildBountyMission.dispatchedToday < GUILD_BOUNTY_MAX_PER_DAY &&
+    G.guildBountyMission.selectedMembers.length > 0;
+}
+
+function dispatchGuildBountyMission() {
+  if (!canDispatchGuildBountyMission()) return;
+  const memberIds = [...G.guildBountyMission.selectedMembers];
+  const preview = computeBountyMissionPreview(memberIds);
+  const now = Date.now();
+  G.guildBountyMission.active = {
+    memberIds,
+    startTime: now,
+    resolveTime: now + preview.durationMin * 60000,
+    gold: preview.gold,
+    xp: preview.xp,
+    cooldownMin: preview.cooldownMin
+  };
+  G.guildBountyMission.dispatchedToday++;
+  G.guildBountyMission.selectedMembers = [];
+  const names = memberIds.map(id => getGuildMemberDef(id).npcName).join(', ');
+  lg('🎖️ Squad dispatched (' + names + ') \u2014 back in ' + preview.durationMin + 'm.');
+  render();
+}
+
+function isGuildBountyMissionReady() {
+  return G.guildBountyMission.active && Date.now() >= G.guildBountyMission.active.resolveTime;
+}
+
+function collectGuildBountyMission() {
+  if (!isGuildBountyMissionReady()) return;
+  const mission = G.guildBountyMission.active;
+  G.p.gold += mission.gold;
+  G.p.xp += mission.xp;
+  if (G.guildJoined) { G.guildRep += 30; G.guildRepBalance += 30; }
+  lg('🎖️ Squad returns! +' + mission.gold.toLocaleString() + 'G, +' + mission.xp.toLocaleString() + ' XP' + (G.guildJoined ? ', +30 Guild Rep' : '') + '.');
+  G.guildBountyMission.cooldownUntil = Date.now() + mission.cooldownMin * 60000;
+  G.guildBountyMission.active = null;
+  lvlup();
+  render();
 }
 
 // Picks a material actually needed by an owned, not-yet-maxed stronghold's next Guild
@@ -11160,6 +11389,7 @@ function toggleGuildWarField(id) {
   if (idx >= 0) {
     G.guildWar.fielded.splice(idx, 1);
   } else {
+    if (isGuildMemberOnBountyDispatch(id)) { lg('🎖️ That member is out on a Guild Bounty Mission right now.'); return; }
     if (G.guildWar.fielded.length >= getGuildWarMaxFielded()) { lg('🛡️ Only ' + getGuildWarMaxFielded() + ' guild members can be fielded per muster.'); return; }
     G.guildWar.fielded.push(id);
   }
@@ -11259,6 +11489,63 @@ const GUILD_WAR_RIVALS = [
     desc: "The oldest, toughest guild anyone's found out here. Everyone survives to turn six, or almost no one does — and they've never once lost that bet." }
 ];
 
+// Two of the six rivals get an actual recurring face rather than staying a faceless
+// muster forever — picked deliberately: The Kindling Rivals already narrate themselves
+// as "another pair-guild doing the exact same thing you are," the natural candidate for
+// rivalry softening into something warmer the more you fight them. The Ledger
+// Reclaimers' accountant-precision theme echoes Aisyah's own — Fen gets progressively
+// less formal as the encounter count climbs, same shape. Tracked per-rival in
+// G.guildWarRivalEncounters, keyed by rival name, incremented once per muster against
+// them regardless of win/loss.
+const GUILD_WAR_RIVAL_LEADERS = {
+  'The Kindling Rivals': {
+    name: 'Corran',
+    tiers: [
+      { max: 2, lines: [
+        'Corran: "Another muster, another pair-guild testing the ground. Nothing personal in it."',
+        'Corran: "You fight like people who\'ve actually had to. Good. So have we."'
+      ] },
+      { max: 9, lines: [
+        'Corran: "You again. I\'m starting to recognize the way you open a fight."',
+        'Corran: "Same story as us, out here. Different names on it. I respect that more than I expected to."',
+        'Corran: "Ash would probably like our scouts. Small mercy that they haven\'t met yet."'
+      ] },
+      { max: Infinity, lines: [
+        'Corran: "Honestly? I look forward to these now. Never thought I\'d say that about a rival muster."',
+        'Corran: "We should share a fire sometime. Not during a fight. After one."',
+        'Corran: "Still calling this a rivalry out of habit. Doesn\'t feel like one anymore."'
+      ] }
+    ]
+  },
+  'The Ledger Reclaimers': {
+    name: 'Fen',
+    tiers: [
+      { max: 2, lines: [
+        'Fen: "Precision wins musters. Sentiment does not. Let\'s begin."',
+        'Fen: "Three phases, exactly. We do not do sloppy, even in a friendly contest."'
+      ] },
+      { max: 9, lines: [
+        'Fen: "You\'ve gotten harder to predict. I\'ve had to revise my notes on you twice now."',
+        'Fen: "There is a version of this where I stop calling it \'the enemy\'s ledger\' and start calling it something else. We are not there yet. We are close."'
+      ] },
+      { max: Infinity, lines: [
+        'Fen: "I keep a separate column for you now. Not \'threat.\' Something closer to \'colleague.\'"',
+        'Fen: "Sloppy is still the one thing I refuse to be. Warm, apparently, I can manage after enough musters."'
+      ] }
+    ]
+  }
+};
+
+function getGuildWarRivalLine(rivalName) {
+  const leader = GUILD_WAR_RIVAL_LEADERS[rivalName];
+  if (!leader) return null;
+  const count = G.guildWarRivalEncounters[rivalName] || 0;
+  const tier = leader.tiers.find(t => count <= t.max);
+  if (!tier) return null;
+  return tier.lines[Math.floor(Math.random() * tier.lines.length)];
+}
+
+
 function getGuildWarScaledStats(playerLevel) {
   // Same anchor formula as the Frontier — proven safe at any level, and Guild War
   // opens at a similar band of the game (Lv 105+) so no separate curve is needed.
@@ -11297,6 +11584,9 @@ function spawnGuildWarEncounter() {
   G.cbt.en.push(rival);
 
   lg('⚔️ Guild War [Streak ' + streak + ']: ' + rival.n + ' musters against you!' + (streak > 0 ? ' (+' + Math.floor(streak * 6) + '% tougher)' : ''));
+  G.guildWarRivalEncounters[identity.n] = (G.guildWarRivalEncounters[identity.n] || 0) + 1;
+  const rivalLeaderLine = getGuildWarRivalLine(identity.n);
+  if (rivalLeaderLine) lg(rivalLeaderLine);
   guildWarBark();
   render();
 }
@@ -17535,7 +17825,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-08.64';
+const BUILD_ID = '2026-08-17.66';
 // =========================
 
 
@@ -17649,6 +17939,7 @@ function saveGame() {
     guildWarBestStreak: G.guildWar.bestStreak || 0,
     guildRosterRecruited: G.guildRoster.recruited || [],
     guildGatherLastCollectedDay: G.guildGather.lastCollectedDay,
+    guildBountyMission: G.guildBountyMission,
     guildWeeklyRewardLastClaimedWeek: G.guildWeeklyReward.lastClaimedWeek,
     visionMachineLastUseDay: G.visionMachine.lastUseDay,
     visionMachineJoelLetterCount: G.visionMachine.joelLetterCount || 0,
@@ -17954,6 +18245,7 @@ function loadGame() {
     G.guildWar.bestStreak = data.guildWarBestStreak || 0;
     G.guildRoster.recruited = data.guildRosterRecruited || [];
     G.guildGather.lastCollectedDay = data.guildGatherLastCollectedDay !== undefined ? data.guildGatherLastCollectedDay : -1;
+    if (data.guildBountyMission) G.guildBountyMission = data.guildBountyMission;
     G.guildWeeklyReward.lastClaimedWeek = data.guildWeeklyRewardLastClaimedWeek !== undefined ? data.guildWeeklyRewardLastClaimedWeek : -1;
     G.visionMachine.lastUseDay = data.visionMachineLastUseDay !== undefined ? data.visionMachineLastUseDay : -1;
     G.visionMachine.joelLetterCount = data.visionMachineJoelLetterCount || 0;
@@ -18975,7 +19267,37 @@ function rAchievements() {
   return h;
 }
 
+// Rank-up reactions — previously Rank crossing a threshold was a silent number change.
+// One flavor line per tier, checked cheaply on every render() rather than needing to
+// hook every individual G.guildRep += site scattered across contracts/combat/etc.
+const GUILD_RANK_UP_REACTIONS = {
+  2: 'The Guild takes notice \u2014 Guild Associate now. Same work, slightly better return on it.',
+  3: 'Word gets around fast in a Hall this size. Guild Adventurer, and the XP shows it.',
+  4: 'Guild Veteran. Somewhere in the Hall, somebody just started taking your name seriously.',
+  5: '"Guild Champion," Ser Aldric says, the one time he actually looks impressed. "That title used to mean something out here. Still does, apparently."',
+  6: 'Guildmaster. The whole Shop finally opens \u2014 and for once, nobody in the Hall seems surprised it happened.',
+  7: '"Guild Legend," Dudin says, mostly to himself. "The kind of reputation that outlasts the person who earned it. Try not to let it go to your head."',
+  8: 'Guild Paragon. Even the quiet ones nod when you walk through the Hall now.',
+  9: 'Guild Mythic. Whatever contracts are left barely register as a challenge anymore.',
+  10: '"Guild Eternal," Varel says, like he\'d been waiting a while to say it. "The Guild has nothing left to teach you. That was never really the point, though, was it."'
+};
+
+function checkGuildRankUp() {
+  if (!G.guildJoined) return;
+  const curRank = getGuildRank();
+  if (G.guildRankLastSeen === undefined) { G.guildRankLastSeen = curRank; return; } // first run after load — no false trigger
+  if (curRank > G.guildRankLastSeen) {
+    const line = GUILD_RANK_UP_REACTIONS[curRank];
+    if (line) lg('🛡️ ' + line);
+    G.guildRankLastSeen = curRank;
+  } else if (curRank !== G.guildRankLastSeen) {
+    G.guildRankLastSeen = curRank;
+  }
+}
+
 function render(){
+  checkGuildRankUp();
+
   // Session Recap takes priority over everything else, including the lightweight
   // AFK bypass paths below — the whole point is surfacing this the moment the user
   // actually returns, which is exactly when AFK mode is most likely to be active.
@@ -19102,6 +19424,7 @@ function render(){
   else if(G.state=='raid_room')h+=rRaidRoom();
   else if(G.state=='guild')h+=rGuild();
   else if(G.state=='guild_hub')h+=rGuildHub();
+  else if(G.state=='guild_bounty_missions')h+=rGuildBountyMissions();
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='guild_boss')h+=rGuildBoss();
   else if(G.state=='disciples')h+=rDisciples();
@@ -19158,6 +19481,7 @@ function attachEvents() {
     else if(a=='journal')setS('journal');
     else if(a=='guild')setS('guild');
     else if(a=='guild_hub')setS('guild_hub');
+    else if(a=='guild_bounty_missions')setS('guild_bounty_missions');
     else if(a=='stronghold')setS('stronghold');
     else if(a=='guild_boss')setS('guild_boss');
     else if(a=='disciples')setS('disciples');
@@ -21311,6 +21635,73 @@ function rFrayingFrontierRoom() {
   return h;
 }
 
+function rGuildBountyMissions() {
+  resetGuildBountyMissionDailyIfNeeded();
+  const bm = G.guildBountyMission;
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
+  h += '<div class="st" style="text-align:center;">🎖️ Guild Bounty Missions</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Dispatch a squad on a job. The job itself is quick \u2014 what actually takes time is the cooldown after, before the next squad can go out.</div>';
+
+  h += '<div class="panel panel-gold" style="text-align:center;">';
+  h += '<div class="panel-title" style="color:var(--gold);">' + bm.dispatchedToday + '/' + GUILD_BOUNTY_MAX_PER_DAY + ' dispatched today</div>';
+  h += '</div>';
+
+  if (bm.active) {
+    const ready = isGuildBountyMissionReady();
+    const names = bm.active.memberIds.map(id => { const d = getGuildMemberDef(id); return d.icon + ' ' + d.npcName; }).join(', ');
+    h += '<div class="panel' + (ready ? ' panel-gold' : '') + '" style="text-align:center;margin-top:12px;">';
+    h += '<div class="panel-title" style="' + (ready ? 'color:var(--gold);' : '') + '">' + (ready ? '✅ Squad Returned' : '⏳ Squad Out') + '</div>';
+    h += '<div class="btn-hint" style="margin:6px 0;">' + names + '</div>';
+    if (ready) {
+      h += '<div class="btn-hint" style="margin:6px 0;">+' + bm.active.gold.toLocaleString() + 'G, +' + bm.active.xp.toLocaleString() + ' XP waiting</div>';
+      h += '<button onclick="collectGuildBountyMission()" class="abtn" style="width:100%;">Collect</button>';
+    } else {
+      const remainMs = bm.active.resolveTime - Date.now();
+      const remainMin = Math.ceil(remainMs / 60000);
+      h += '<div class="btn-hint">Back in ' + remainMin + ' minute' + (remainMin === 1 ? '' : 's') + '.</div>';
+    }
+    h += '</div>';
+  } else if (Date.now() < bm.cooldownUntil) {
+    const remainMs = bm.cooldownUntil - Date.now();
+    const remainMin = Math.ceil(remainMs / 60000);
+    const h2 = Math.floor(remainMin / 60), m2 = remainMin % 60;
+    h += '<div class="panel" style="text-align:center;margin-top:12px;">';
+    h += '<div class="panel-title">🕐 Squad Resting</div>';
+    h += '<div class="btn-hint">Next dispatch available in ' + (h2 > 0 ? h2 + 'h ' : '') + m2 + 'm.</div>';
+    h += '</div>';
+  } else if (bm.dispatchedToday >= GUILD_BOUNTY_MAX_PER_DAY) {
+    h += '<div class="panel" style="text-align:center;margin-top:12px;"><div class="btn-hint">All ' + GUILD_BOUNTY_MAX_PER_DAY + ' dispatches used today. Check back tomorrow.</div></div>';
+  } else {
+    const available = getAvailableBountyMembers();
+    h += '<div class="panel-title" style="margin:14px 0 8px;">Choose a Squad (' + bm.selectedMembers.length + '/' + GUILD_BOUNTY_MAX_SQUAD + ')</div>';
+    if (available.length === 0) {
+      h += '<div class="panel" style="text-align:center;"><div class="btn-hint">No members available \u2014 recruit more, or unfield/undispatch someone.</div></div>';
+    } else {
+      for (let def of available) {
+        const selected = bm.selectedMembers.includes(def.id);
+        h += '<div class="panel' + (selected ? ' panel-gold' : '') + '" style="text-align:left;">';
+        h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+        h += '<div><span style="font-size:16px;">' + def.icon + '</span> <span style="font-weight:700;' + (selected ? 'color:var(--gold);' : '') + '">' + def.npcName + '</span> <span style="font-size:11px;color:var(--text-dim);">' + (def.bountyArchetype || '') + '</span></div>';
+        h += '<button onclick="toggleBountyMemberSelection(\'' + def.id + '\')" class="' + (selected ? 'abtn' : 'btn-outline-ghost') + '" style="margin:0;padding:4px 10px;font-size:11px;">' + (selected ? 'Selected' : 'Add') + '</button>';
+        h += '</div></div>';
+      }
+      if (bm.selectedMembers.length > 0) {
+        const preview = computeBountyMissionPreview(bm.selectedMembers);
+        h += '<div class="panel panel-gold" style="text-align:center;margin-top:10px;">';
+        h += '<div class="panel-title" style="color:var(--gold);">Squad Preview</div>';
+        h += '<div class="btn-hint" style="margin:6px 0;">Job: ~' + preview.durationMin + 'm \u00b7 Cooldown after: ~' + Math.floor(preview.cooldownMin / 60) + 'h ' + (preview.cooldownMin % 60) + 'm</div>';
+        h += '<div class="btn-hint" style="margin:6px 0;">Reward: ~' + preview.gold.toLocaleString() + 'G, ~' + preview.xp.toLocaleString() + ' XP' + (preview.diversityCount > 1 ? ' (+' + Math.floor((preview.diversityMult - 1) * 100) + '% for ' + preview.diversityCount + ' distinct roles)' : '') + '</div>';
+        h += '<button onclick="dispatchGuildBountyMission()" class="abtn" style="width:100%;">Dispatch Squad</button>';
+        h += '</div>';
+      }
+    }
+  }
+
+  h += '</div>';
+  return h;
+}
+
 function rGuildWar() {
   const unlocked = isGuildWarUnlocked();
   let h = '<div class="content">';
@@ -21852,6 +22243,75 @@ function rStrongholds() {
 // Weekly Reward and Idle Gathering cards, which are simple enough one-tap actions to
 // live here directly rather than needing their own screens at all (they used to be
 // duplicated onto the Guild War screen; this is now their only home).
+// Member-to-member banter — the one thing spoke-and-hub relationships (everyone
+// connects to San, nobody connects to each other) can't give the roster: proof this is
+// a community, not a contact list. Only shows when BOTH named members are idle at the
+// Hall at the same time (recruited, not fielded for Guild War) — genuinely emergent
+// rather than always-on, so it reads as "these two happen to both be here today."
+const GUILD_MEMBER_PAIR_BANTER = [
+  { members: ['dudin', 'ser_aldric'], lines: [
+    'Dudin: "Whose army had worse food, again?" Ser Aldric: "Mine. Always mine. I\'ve never once let you win that argument and I\'m not starting now."'
+  ] },
+  { members: ['lewis', 'wahyu'], lines: [
+    'Wahyu: "That\'s my cloak, Lewis." Lewis: "Was your cloak. Ownership\'s a fluid concept out here."'
+  ] },
+  { members: ['jorvin', 'iris'], lines: [
+    'Jorvin: "That trap is not engineering." Iris: "Ash thinks it\'s brilliant." Jorvin: "Ash is a fox."'
+  ] },
+  { members: ['mimi', 'aisy'], lines: [
+    'Mimi: "I knew you were behind me." Aisy: "No you didn\'t." Mimi: "...I know now."'
+  ] },
+  { members: ['sister_wren', 'dr_aa'], lines: [
+    'Sister Wren: "Faith holds this Hall together." Dr. AA: "Vitamins hold this Hall together." Sister Wren: "We are never once agreeing on this."'
+  ] },
+  { members: ['jonathan', 'brada'], lines: [
+    'Jonathan: "It only explodes a little." Brada: "That\'s exactly what worries me."'
+  ] },
+  { members: ['kw_liang', 'lewis'], lines: [
+    'Lewis: "You never say anything." KW Liang: "I hear everything. Different job."'
+  ] }
+];
+
+// 40% weight toward pair banter when one's actually available — otherwise falls back
+// to a single idle member's own line. Returns null if nobody's idle/recruited yet.
+function getGuildHubBanterLine() {
+  const idle = getIdleGatheringGuildMembers();
+  const idleIds = idle.map(d => d.id);
+
+  const validPairs = GUILD_MEMBER_PAIR_BANTER.filter(p => p.members.every(id => idleIds.includes(id)));
+  if (validPairs.length > 0 && Math.random() < 0.4) {
+    const pair = validPairs[Math.floor(Math.random() * validPairs.length)];
+    return pair.lines[Math.floor(Math.random() * pair.lines.length)];
+  }
+
+  const withBanter = idle.filter(d => d.hubBanter && d.hubBanter.length > 0);
+  if (withBanter.length > 0) {
+    const def = withBanter[Math.floor(Math.random() * withBanter.length)];
+    return def.hubBanter[Math.floor(Math.random() * def.hubBanter.length)];
+  }
+  return null;
+}
+
+// Pure flavor, no mechanical weight — a rotating rumor feed tying the Guild into the
+// wider "the practice is spreading" theme already established through Guild War's own
+// framing (rival guilds explicitly narrated as other survivor groups doing the same
+// thing) and the Kindling Network. One random line shown per Hub visit.
+const GUILD_NOTICE_BOARD = [
+  "Word from a Kindling Network contact: another pair-guild was spotted mustering three valleys over. Nobody's caught their name yet.",
+  "A recruit came by asking about joining. Left before anyone got a name. Second time this has happened this month.",
+  "The Ledger Reclaimers apparently keep records on every guild they've mustered against. Ours is reportedly 'thicker than expected.'",
+  "Someone left a note on the board asking if anyone's seen a fox and a rabbit traveling together near the Aftermath Roads. Iris and Liang have not commented.",
+  "The Emberwatch Vanguard lost a muster to someone else entirely last week. First time anyone's heard of that happening.",
+  "A rumor's going around that the Root Wardens have started leaving territory markers near the Grove, not as a threat \u2014 more like they're used to the company now.",
+  "Dudin's ration crate count is off again. Nobody's owning up to it. Nobody ever does.",
+  "Someone's been leaving spare bolts on Jorvin's workbench overnight. He hasn't figured out who yet, and has stopped trying to.",
+  "The Static Chorus reportedly salvaged something that still hums. Nobody local wants to be the one to ask what it does.",
+  "A traveling merchant asked if this was 'the guild with the fox scout.' Word apparently gets around.",
+  "The Contract Board's had the same unclaimed posting for two weeks running. Might be worth a look.",
+  "Someone carved a small, crooked star into the doorframe near the entrance. Nobody's admitted to it. Nobody's removed it either."
+];
+
+
 function rGuildHub() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🏰 Guild Hub</div>';
@@ -21862,6 +22322,16 @@ function rGuildHub() {
     h += '<div class="btn-hint" style="margin-top:6px;">The Guild opens its doors at Level 5. Keep adventuring.</div>';
     h += '</div></div>';
     return h;
+  }
+
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:10px;">The Mended Grove\'s hall isn\'t grand \u2014 a hearth, a workbench nobody\'s ever seen fully cleared, a shrine corner, a door someone\'s always standing near. Whoever\'s idle today is probably somewhere in it right now.</div>';
+
+  const noticeLine = GUILD_NOTICE_BOARD[Math.floor(Math.random() * GUILD_NOTICE_BOARD.length)];
+  h += '<div class="btn-hint" style="text-align:center;font-size:11px;color:var(--text-dim);margin-bottom:10px;padding:6px 8px;border:1px dashed var(--border);border-radius:8px;">📌 ' + noticeLine + '</div>';
+
+  const hubBanterLine = getGuildHubBanterLine();
+  if (hubBanterLine) {
+    h += '<div class="btn-hint" style="text-align:center;font-style:italic;margin-bottom:14px;padding:8px;background:var(--bg-hover);border-radius:8px;">' + hubBanterLine + '</div>';
   }
 
   const rank = getGuildRank();
@@ -21934,6 +22404,7 @@ function rGuildHub() {
     h += '<div class="panel' + (canCollectGuildMaterials() ? ' panel-gold' : '') + '" style="margin-top:12px;text-align:center;">';
     h += '<div class="panel-title" style="' + (canCollectGuildMaterials() ? 'color:var(--gold);' : '') + '">📦 Idle Roster Gathering</div>';
     h += '<div class="btn-hint" style="margin:6px 0;">' + idleGatherers.length + ' unfielded member' + (idleGatherers.length > 1 ? 's' : '') + ' gathering: ' + idleGatherers.map(d => d.icon + ' ' + d.npcName).join(', ') + '</div>';
+    h += '<div style="font-size:10px;color:var(--text-dim);text-align:left;margin:4px 0 8px;">' + idleGatherers.map(d => d.icon + ' ' + d.npcName + ' \u2014 ' + (d.hallSpot || 'somewhere in the Hall')).join('<br>') + '</div>';
     if (canCollectGuildMaterials()) {
       h += '<button onclick="collectGuildMemberMaterials()" class="abtn" style="width:100%;">Collect Today\'s Materials</button>';
     } else {
@@ -21941,6 +22412,22 @@ function rGuildHub() {
     }
     h += '</div>';
   }
+
+  // Guild Bounty Missions summary card
+  resetGuildBountyMissionDailyIfNeeded();
+  const bm = G.guildBountyMission;
+  h += '<div class="panel' + (isGuildBountyMissionReady() ? ' panel-gold' : '') + '" style="margin-top:12px;text-align:center;">';
+  h += '<div class="panel-title" style="' + (isGuildBountyMissionReady() ? 'color:var(--gold);' : '') + '">🎖️ Guild Bounty Missions</div>';
+  if (bm.active) {
+    h += '<div class="btn-hint" style="margin:6px 0;">' + (isGuildBountyMissionReady() ? 'Squad returned, ready to collect' : 'Squad out') + '</div>';
+  } else if (Date.now() < bm.cooldownUntil) {
+    const remainMin = Math.ceil((bm.cooldownUntil - Date.now()) / 60000);
+    h += '<div class="btn-hint" style="margin:6px 0;">Resting \u2014 next dispatch in ' + Math.floor(remainMin / 60) + 'h ' + (remainMin % 60) + 'm</div>';
+  } else {
+    h += '<div class="btn-hint" style="margin:6px 0;">' + bm.dispatchedToday + '/' + GUILD_BOUNTY_MAX_PER_DAY + ' used today \u2014 ready to dispatch</div>';
+  }
+  h += '<button onclick="setS(\'guild_bounty_missions\')" class="btn-outline-ghost" style="width:100%;margin-top:8px;">Open Bounty Missions</button>';
+  h += '</div>';
 
   h += '</div>';
   return h;
@@ -22060,6 +22547,7 @@ function rMenu(){
     ]},
     { title: '🏰 Guild & Stronghold', items: [
       {i:'🏰',l:'Guild Hub',a:'guild_hub'},
+      {i:'🎖️',l:'Guild Bounty Missions',a:'guild_bounty_missions'},
       {i:'🛡️',l:'Guild',a:'guild'},
       {i:'⚔️',l:'Guild War',a:'guild_war'},
       {i:'⚔️',l:'Guild Boss',a:'guild_boss'},
