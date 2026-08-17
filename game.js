@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-08 14:40 (Farseer quest recovery v2, Ser Aldric confirmed)';
+const APP_VERSION = '2026-08-17 09:35 (Busy Day Autopilot, batch round counter, daily quest count \u2192 15)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -4860,6 +4860,11 @@ storyJournal: {
   guildRoster: { recruited: [] }, // ids from GUILD_MEMBERS who've actually joined the Guild War roster
   guildGather: { lastCollectedDay: -1 }, // once-per-real-day materials from unfielded, non-core Guild Members
   guildWeeklyReward: { lastClaimedWeek: -1 }, // manual claim, tied to Guild Rank — lapses if not claimed that week
+  // "Busy Day" autopilot — auto-runs Stronghold Tasks + Bounties by actually traveling
+  // to the right zone and auto-fighting (same combat engine, same odds, just hands-off),
+  // then chains into a Mercenary batch. Deliberately does NOT touch AFK Adventure, Guild
+  // Boss, Guild War, Frontier, or Boss Rush — those stay manual on purpose.
+  busyDayAutopilot: { active: false, queue: [], queueIndex: 0, startTime: 0, completedCount: 0, skippedTargets: [], playerBrowsing: false, pendingAfterMercenary: false },
   visionMachine: { lastUseDay: -1, joelLetterCount: 0 }, // Varel Farseer's window — once per real day, 1M gold
   kindlingCommissions: { linesToday: 0, checksToday: 0, refreshDay: 0 }, // bounded daily ritual — 3 lines, 2 checks, resets once per game day
   guildBoss: { tierIndex: 0, currentHp: 0, lastAttemptDay: 0 }, // persistent HP across days — the whole recruited roster chips away at it together
@@ -10992,6 +10997,158 @@ function claimWeeklyGuildReward() {
   render();
 }
 
+// === BUSY DAY AUTOPILOT ===
+// Stronghold Tasks and Bounties are almost entirely kill_specific/boss_specific — they
+// genuinely require defeating a particular enemy, not something that can be honestly
+// one-click-granted. This actually travels to a zone where the target exists and
+// auto-fights there, same combat engine and same odds as playing it by hand, just
+// hands-off. 44 of 46 boss_specific targets across the game are ordinary zone-tied
+// bosses (findable via G.bosses' own zone field, spawning at their usual chance during
+// normal exploration) — only Dragon Hunt-exclusive dragons fall outside that and get
+// skipped with an honest note rather than silently failing. Mercenary runs through its
+// own existing real batch-runner rather than anything new. Deliberately does NOT touch
+// AFK Adventure, Guild Boss, Guild War, Frontier, or Boss Rush — those stay manual.
+const BUSY_DAY_AUTOMATABLE_TYPES = ['kill_specific', 'boss_specific', 'kill'];
+const BUSY_DAY_MERCENARY_BATCH_SIZE = 10;
+
+function findZoneIndexForTarget(targetName) {
+  const trashZone = G.zones.findIndex(z => z.en && z.en.includes(targetName));
+  if (trashZone >= 0) return trashZone;
+  const bossDef = G.bosses.find(b => b.n === targetName);
+  if (bossDef && bossDef.zone) {
+    const bossZone = G.zones.findIndex(z => z.n === bossDef.zone);
+    if (bossZone >= 0) return bossZone;
+  }
+  return -1;
+}
+
+function buildBusyDayQueue() {
+  const queue = [];
+  const skipped = [];
+
+  for (let task of G.strongholdTasks) {
+    if (task.done || !BUSY_DAY_AUTOMATABLE_TYPES.includes(task.t) || !task.target) continue;
+    const zi = findZoneIndexForTarget(task.target);
+    if (zi >= 0) queue.push({ kind: 'stronghold', id: task.id, target: task.target, zoneIndex: zi });
+    else skipped.push(task.target);
+  }
+
+  const today = G.gameDay;
+  for (let b of G.bounties) {
+    if (b.done || b.refreshDay !== today || !BUSY_DAY_AUTOMATABLE_TYPES.includes(b.t) || !b.target) continue;
+    const minLv = b.minLv || 1, maxLv = b.maxLv || 999;
+    if (G.p.lvl < minLv || G.p.lvl > maxLv) continue;
+    const zi = findZoneIndexForTarget(b.target);
+    if (zi >= 0) queue.push({ kind: 'bounty', id: b.id, target: b.target, zoneIndex: zi });
+    else skipped.push(b.target);
+  }
+
+  return { queue, skipped: [...new Set(skipped)] };
+}
+
+function isBusyDayQueueItemDone(item) {
+  if (item.kind === 'stronghold') {
+    const task = G.strongholdTasks.find(t => t.id === item.id);
+    return !task || task.done;
+  }
+  const b = G.bounties.find(x => x.id === item.id);
+  return !b || b.done;
+}
+
+function startBusyDayAutopilot() {
+  if (G.busyDayAutopilot.active) { lg('🚀 Already running.'); return; }
+  const { queue, skipped } = buildBusyDayQueue();
+  G.busyDayAutopilot.skippedTargets = skipped;
+  G.busyDayAutopilot.completedCount = 0;
+  G.busyDayAutopilot.startTime = Date.now();
+
+  const mercPending = getMercenaryTier() >= 0 && !G.mercenary.active; // mercenary is always repeatable, so just check it isn't already running
+  if (queue.length === 0 && !mercPending) {
+    lg('🚀 Nothing left to auto-complete right now \u2014 stronghold tasks, bounties, and mercenary are all clear.');
+    return;
+  }
+
+  G.busyDayAutopilot.queue = queue;
+  G.busyDayAutopilot.queueIndex = 0;
+  G.busyDayAutopilot.playerBrowsing = false;
+
+  lg('🚀 Busy Day Autopilot started \u2014 ' + queue.length + ' stronghold/bounty target' + (queue.length === 1 ? '' : 's') + ' queued' + (skipped.length > 0 ? ', ' + skipped.length + ' skipped (no reachable zone: ' + skipped.join(', ') + ')' : '') + '. Mercenary runs first.');
+
+  if (mercPending) {
+    G.busyDayAutopilot.pendingAfterMercenary = true;
+    startMercenaryBatch(BUSY_DAY_MERCENARY_BATCH_SIZE);
+  } else {
+    startBusyDayQueue();
+  }
+}
+
+function startBusyDayQueue() {
+  if (G.busyDayAutopilot.queue.length === 0) {
+    finishBusyDayAutopilot();
+    return;
+  }
+  G.busyDayAutopilot.active = true;
+  busyDayNextEncounter();
+}
+
+function busyDayNextEncounter() {
+  if (!G.busyDayAutopilot.active) return;
+  const item = G.busyDayAutopilot.queue[G.busyDayAutopilot.queueIndex];
+  if (!item) { finishBusyDayAutopilot(); return; }
+
+  // Same background-preserves-your-screen pattern as AFK Adventure/Grind.
+  const screenBeforeEncounter = G.state;
+  sc(item.zoneIndex, true);
+  if (G.cbt.on) {
+    G.cbt.autoCombat = true;
+    G.autoCombatHeartbeat = Date.now();
+    doAutoCombatTick();
+  }
+  if (!G.busyDayAutopilot.playerBrowsing && screenBeforeEncounter !== 'combat') {
+    // first encounter of the session — fine to show combat once so it's obvious it started
+  } else if (G.busyDayAutopilot.playerBrowsing && screenBeforeEncounter !== 'combat') {
+    G.state = screenBeforeEncounter;
+    render();
+  }
+}
+
+function advanceBusyDayQueue() {
+  const item = G.busyDayAutopilot.queue[G.busyDayAutopilot.queueIndex];
+  if (item && isBusyDayQueueItemDone(item)) {
+    G.busyDayAutopilot.completedCount++;
+    G.busyDayAutopilot.queueIndex++;
+  }
+  if (G.busyDayAutopilot.queueIndex >= G.busyDayAutopilot.queue.length) {
+    finishBusyDayAutopilot();
+    return;
+  }
+  setTimeout(busyDayNextEncounter, 900);
+}
+
+function finishBusyDayAutopilot() {
+  const elapsedMin = Math.round((Date.now() - G.busyDayAutopilot.startTime) / 60000);
+  lg('🚀 Busy Day Autopilot finished \u2014 ' + G.busyDayAutopilot.completedCount + ' stronghold/bounty target' + (G.busyDayAutopilot.completedCount === 1 ? '' : 's') + ' cleared in ~' + elapsedMin + 'm.' + (G.busyDayAutopilot.skippedTargets.length > 0 ? ' Skipped (no reachable zone): ' + G.busyDayAutopilot.skippedTargets.join(', ') + '.' : ''));
+  G.busyDayAutopilot.active = false;
+  G.busyDayAutopilot.queue = [];
+  G.busyDayAutopilot.queueIndex = 0;
+  G.cbt.autoCombat = isAutoCombatPreferred();
+  render();
+}
+
+function stopBusyDayAutopilot() {
+  lg('🚀 Busy Day Autopilot stopped manually \u2014 ' + G.busyDayAutopilot.completedCount + ' target' + (G.busyDayAutopilot.completedCount === 1 ? '' : 's') + ' completed before stopping.');
+  G.busyDayAutopilot.active = false;
+  G.busyDayAutopilot.queue = [];
+  G.busyDayAutopilot.queueIndex = 0;
+  G.cbt.autoCombat = isAutoCombatPreferred();
+  render();
+}
+
+function browseAwayFromBusyDay(screen) {
+  setS(screen);
+}
+
+
 
 function isGuildWarUnlocked() {
   return G.p.lvl >= GUILD_WAR_MIN_LEVEL && G.storyJournal.read.includes(GUILD_WAR_UNLOCK_CHAPTER);
@@ -15479,6 +15636,12 @@ function handleMercenaryVictory() {
   }
   G.mercenary.batchTotal = 0;
 
+  if (G.busyDayAutopilot.pendingAfterMercenary) {
+    G.busyDayAutopilot.pendingAfterMercenary = false;
+    startBusyDayQueue();
+    return;
+  }
+
   render();
 }
 
@@ -15501,6 +15664,13 @@ handleDefeat = function() {
     G.mercenary.current = null;
     G.mercenary.batchRemaining = 0; // a loss stops the batch outright — no silent continuation
     G.mercenary.batchTotal = 0;
+    if (G.busyDayAutopilot.pendingAfterMercenary) {
+      // A loss leaves the party at 1 HP — safer to stop the whole autopilot here and
+      // let the player decide to rest/retry, rather than diving straight into more
+      // auto-combat while critically low.
+      G.busyDayAutopilot.pendingAfterMercenary = false;
+      lg('🚀 Busy Day Autopilot stopped \u2014 the mercenary contract went badly, so the stronghold/bounty portion was skipped. Rest up before retrying.');
+    }
     G.state = 'mercenary';
     render();
   } else {
@@ -15945,6 +16115,36 @@ handleDefeat = function() {
     render();
   } else {
     _originalHandleDefeatForChainQuest();
+  }
+};
+
+// Busy Day Autopilot's fights are ordinary exploration combat — normal rewards, normal
+// bounty/stronghold-task progress tracking (checkBountyKill already fires from dozens of
+// kill-resolution points throughout combat regardless of how the fight was started, so
+// nothing special is needed there). This wrapper just calls straight through to whatever
+// the fully-assembled handleVictory already does, then checks afterward whether the
+// autopilot's current queue target got satisfied by that fight and advances if so.
+const _originalHandleVictoryForBusyDay = handleVictory;
+handleVictory = function() {
+  const wasBusyDayActive = G.busyDayAutopilot.active;
+  _originalHandleVictoryForBusyDay();
+  if (wasBusyDayActive && G.busyDayAutopilot.active) {
+    advanceBusyDayQueue();
+  }
+};
+
+// A loss during the autopilot stops it gracefully rather than looping forever against
+// something too strong — same "keep everything earned so far" spirit as every other
+// batch mode's defeat handling.
+const _originalHandleDefeatForBusyDay = handleDefeat;
+handleDefeat = function() {
+  const wasBusyDayActive = G.busyDayAutopilot.active;
+  _originalHandleDefeatForBusyDay();
+  if (wasBusyDayActive) {
+    lg('🚀 Busy Day Autopilot stopped \u2014 a fight went badly. ' + G.busyDayAutopilot.completedCount + ' target' + (G.busyDayAutopilot.completedCount === 1 ? '' : 's') + ' completed before stopping. Everything earned is kept.');
+    G.busyDayAutopilot.active = false;
+    G.busyDayAutopilot.queue = [];
+    G.busyDayAutopilot.queueIndex = 0;
   }
 };
 
@@ -16979,6 +17179,13 @@ function renderLogPanel() {
     h += '<span style="font-size:10px;color:var(--text-dim);">Running \u2014 tap to view</span>';
     h += '</div>';
   }
+  if (G.busyDayAutopilot.active && G.state !== 'combat') {
+    const bd = G.busyDayAutopilot;
+    h += '<div onclick="setS(\'combat\')" style="display:flex;justify-content:space-between;align-items:center;background:rgba(139,92,246,0.15);border:1px solid var(--accent);border-radius:10px;padding:6px 10px;margin-bottom:6px;cursor:pointer;">';
+    h += '<span style="font-size:12px;font-weight:700;color:var(--accent-light);">🚀 Busy Day \u2014 ' + (bd.queueIndex + 1) + '/' + bd.queue.length + ' (' + bd.completedCount + ' done)</span>';
+    h += '<span style="font-size:10px;color:var(--text-dim);">Running \u2014 tap to view</span>';
+    h += '</div>';
+  }
   h += '<div class="log-highlight ' + getLogElementClass(highlight) + '"><div class="lh-text">' + boldNumbers(highlight) + '</div></div>';
   h += '<div class="log-ticker" id="log">';
   h += tickerLines.map(m => '<div class="le ' + getLogElementClass(m) + '">' + boldNumbers(m) + '</div>').join('');
@@ -17164,6 +17371,9 @@ function setS(s){
   // silently cancelling the very first transition into the AFK bar view).
   if (G.endlessGrind.active && G.grindAfkMode) {
     G.endlessGrind.playerBrowsing = (s !== 'combat');
+  }
+  if (G.busyDayAutopilot.active) {
+    G.busyDayAutopilot.playerBrowsing = (s !== 'combat');
   }
   G.state=s;render();
 }
@@ -20289,6 +20499,19 @@ function rToday() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">📅 Today</div>';
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Everything worth a quick look, in one place \u2014 for whenever you\'ve got three minutes and nothing else to point them at.</div>';
+
+  // Busy Day Autopilot — auto-runs Stronghold Tasks, Bounties, and Mercenary. Deliberately
+  // leaves AFK Adventure, Guild Boss, Guild War, Frontier, and Boss Rush alone.
+  h += '<div class="panel' + (G.busyDayAutopilot.active ? ' panel-gold' : '') + '" style="text-align:center;">';
+  h += '<div class="panel-title" style="' + (G.busyDayAutopilot.active ? 'color:var(--gold);' : '') + '">🚀 Busy Day Autopilot</div>';
+  if (G.busyDayAutopilot.active) {
+    h += '<div class="btn-hint" style="margin:6px 0;">' + (G.busyDayAutopilot.queueIndex + 1) + '/' + G.busyDayAutopilot.queue.length + ' targets \u2014 ' + G.busyDayAutopilot.completedCount + ' completed so far</div>';
+    h += '<button onclick="stopBusyDayAutopilot()" class="btn-outline-ghost" style="width:100%;">Stop Autopilot</button>';
+  } else {
+    h += '<div class="btn-hint" style="margin:6px 0;">Auto-completes Stronghold Tasks, Bounties, and a Mercenary batch by actually traveling and fighting \u2014 real combat, hands-off. Leaves AFK Adventure, Guild Boss, Guild War, Frontier, and Boss Rush for you.</div>';
+    h += '<button onclick="startBusyDayAutopilot()" class="abtn" style="width:100%;">Run Busy Day Autopilot</button>';
+  }
+  h += '</div>';
 
   // Notifications toggle — local only (Focus completions, AFK Adventure boss kills),
   // not true push. Nothing can wake this from fully closed without a backend server.
