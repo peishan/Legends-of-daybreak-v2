@@ -18869,6 +18869,7 @@ function render(){
   else if(G.state=='raid_select')h+=rRaidSelect();
   else if(G.state=='raid_room')h+=rRaidRoom();
   else if(G.state=='guild')h+=rGuild();
+  else if(G.state=='guild_hub')h+=rGuildHub();
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='guild_boss')h+=rGuildBoss();
   else if(G.state=='disciples')h+=rDisciples();
@@ -18924,6 +18925,7 @@ function attachEvents() {
     else if(a=='runes')setS('runes');
     else if(a=='journal')setS('journal');
     else if(a=='guild')setS('guild');
+    else if(a=='guild_hub')setS('guild_hub');
     else if(a=='stronghold')setS('stronghold');
     else if(a=='guild_boss')setS('guild_boss');
     else if(a=='disciples')setS('disciples');
@@ -21067,6 +21069,7 @@ function rFrayingFrontierRoom() {
 function rGuildWar() {
   const unlocked = isGuildWarUnlocked();
   let h = '<div class="content">';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
   h += '<div class="st" style="text-align:center;">⚔️ Guild War</div>';
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Structured musters against other survivor guilds \u2014 competitive, not hostile. Field up to ' + getGuildWarMaxFielded() + ' recruited Guild members before you start; each one adds a small, permanent-for-the-run bonus, fights alongside you each turn, and a line or two along the way. Fielding capacity grows with Guild Rank.</div>';
 
@@ -21080,36 +21083,6 @@ function rGuildWar() {
   h += '<div class="panel-title" style="color:var(--gold);">Best Streak</div>';
   h += '<div style="font-size:24px;font-weight:700;margin:8px 0;color:var(--gold);">' + (G.guildWar.bestStreak || 0) + '</div>';
   h += '</div>';
-
-  // Weekly Guild Reward — separate from Guild Contracts (which already pay Rep weekly);
-  // this one is tied to Guild Rank specifically, manual claim, lapses if the week rolls
-  // over unclaimed.
-  const weeklyPreview = getWeeklyGuildRewardPreview();
-  h += '<div class="panel' + (isWeeklyGuildRewardAvailable() ? ' panel-gold' : '') + '" style="text-align:center;">';
-  h += '<div class="panel-title" style="' + (isWeeklyGuildRewardAvailable() ? 'color:var(--gold);' : '') + '">🏰 Weekly Guild Reward</div>';
-  if (isWeeklyGuildRewardAvailable()) {
-    h += '<div class="btn-hint" style="margin:6px 0;">+' + weeklyPreview.gold.toLocaleString() + 'G, +' + weeklyPreview.xp.toLocaleString() + ' XP, +' + weeklyPreview.matQty + 'x Iron Ore' + (weeklyPreview.rareMat ? ', +2x a rare stronghold material' : '') + '</div>';
-    h += '<button onclick="claimWeeklyGuildReward()" class="abtn" style="width:100%;">Claim This Week\'s Reward</button>';
-    h += '<div class="btn-hint" style="margin-top:4px;font-size:10px;">Lapses if not claimed before the week resets.</div>';
-  } else {
-    h += '<div class="btn-hint">' + (G.guildJoined ? 'Already claimed this week \u2014 check back after reset.' : 'Join the Guild to unlock weekly rewards.') + '</div>';
-  }
-  h += '</div>';
-
-  // Idle Guild Member material gathering — recruited-but-unfielded, non-core members
-  // passively gather crafting materials once per real day.
-  const idleGatherers = getIdleGatheringGuildMembers();
-  if (idleGatherers.length > 0) {
-    h += '<div class="panel' + (canCollectGuildMaterials() ? ' panel-gold' : '') + '" style="text-align:center;">';
-    h += '<div class="panel-title" style="' + (canCollectGuildMaterials() ? 'color:var(--gold);' : '') + '">📦 Idle Roster Gathering</div>';
-    h += '<div class="btn-hint" style="margin:6px 0;">' + idleGatherers.length + ' unfielded member' + (idleGatherers.length > 1 ? 's' : '') + ' gathering: ' + idleGatherers.map(d => d.icon + ' ' + d.npcName).join(', ') + '</div>';
-    if (canCollectGuildMaterials()) {
-      h += '<button onclick="collectGuildMemberMaterials()" class="abtn" style="width:100%;">Collect Today\'s Materials</button>';
-    } else {
-      h += '<div class="btn-hint">Already collected today \u2014 check back tomorrow.</div>';
-    }
-    h += '</div>';
-  }
 
   h += '<div class="panel-title" style="margin:14px 0 8px;">Guild Roster (' + G.guildWar.fielded.length + '/' + getGuildWarMaxFielded() + ' fielded)</div>';
   for (let def of GUILD_MEMBERS) {
@@ -21506,6 +21479,7 @@ function rGuildBoss() {
   const sessionActive = G.guildBossSession && G.guildBossSession.active;
 
   let h = '<div class="content">';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
   h += '<div class="st" style="text-align:center;">⚔️ Guild Boss</div>';
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">A true whole-guild siege \u2014 every recruited member attacks each day, not just whoever\'s fielded. Millions of HP, persistent across days, until the whole guild brings it down together.</div>';
 
@@ -21623,8 +21597,113 @@ function rStrongholds() {
   return h;
 }
 
+// === GUILD HUB ===
+// The single front door for every guild-facing system — Rank/Rep, Guild War, Guild
+// Boss, the Contract Board, the Weekly Reward, and Idle Roster Gathering all read the
+// same underlying G.guildRep / GUILD_RANKS / G.guildRoster, but previously had zero
+// shared entry point and were split across two different menu sections. This is a
+// dashboard, not a re-implementation: each card shows just enough live status to know
+// what's worth checking, then links out to that system's own full screen — except the
+// Weekly Reward and Idle Gathering cards, which are simple enough one-tap actions to
+// live here directly rather than needing their own screens at all (they used to be
+// duplicated onto the Guild War screen; this is now their only home).
+function rGuildHub() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">🏰 Guild Hub</div>';
+
+  if (!G.guildJoined) {
+    h += '<div class="panel" style="text-align:center;">';
+    h += '<div class="panel-title">🔒 Not Yet a Member</div>';
+    h += '<div class="btn-hint" style="margin-top:6px;">The Guild opens its doors at Level 5. Keep adventuring.</div>';
+    h += '</div></div>';
+    return h;
+  }
+
+  const rank = getGuildRank();
+  const rankDef = getGuildRankDef();
+  const nextRank = GUILD_RANKS.find(r => r.rank === rank + 1);
+
+  // Rank + reputation summary
+  h += '<div class="panel panel-gold" style="text-align:center;">';
+  h += '<div class="panel-title" style="color:var(--gold);">🛡️ ' + (rankDef ? rankDef.name : 'Unranked') + '</div>';
+  h += '<div style="font-size:22px;font-weight:800;margin:6px 0;color:var(--gold);">' + G.guildRep.toLocaleString() + ' Rep</div>';
+  if (nextRank) {
+    const pct = Math.min(100, Math.floor(((G.guildRep - rankDef.repReq) / (nextRank.repReq - rankDef.repReq)) * 100));
+    h += '<div class="pbar" style="margin:6px 0;"><div class="pbar-fill" style="width:' + pct + '%;"></div></div>';
+    h += '<div class="btn-hint">' + (nextRank.repReq - G.guildRep).toLocaleString() + ' Rep to ' + nextRank.name + '</div>';
+  } else {
+    h += '<div class="btn-hint" style="color:var(--gold);">Maximum rank reached.</div>';
+  }
+  h += '<button onclick="setS(\'guild\')" class="btn-outline-ghost" style="width:100%;margin-top:10px;">View Rank, Rep &amp; Shop</button>';
+  h += '</div>';
+
+  // Guild War card
+  const warUnlocked = isGuildWarUnlocked();
+  h += '<div class="panel" style="margin-top:12px;">';
+  h += '<div class="panel-row"><div class="panel-title">⚔️ Guild War</div>' + (warUnlocked ? '<div class="btn-hint">Best streak: ' + (G.guildWar.bestStreak || 0) + '</div>' : '') + '</div>';
+  if (warUnlocked) {
+    h += '<div class="btn-hint">' + G.guildWar.fielded.length + '/' + getGuildWarMaxFielded() + ' fielded' + (G.guildWar.active ? ' \u2014 muster in progress' : '') + '</div>';
+    h += '<button onclick="setS(\'guild_war\')" class="btn-outline-ghost" style="width:100%;margin-top:8px;">Open Guild War</button>';
+  } else {
+    h += '<div class="btn-hint">🔒 Unlocks at Level ' + GUILD_WAR_MIN_LEVEL + ', after meeting Iris &amp; Ash out past the Frontier.</div>';
+  }
+  h += '</div>';
+
+  // Guild Boss card
+  ensureGuildBossHp();
+  const tier = getGuildBossTier();
+  const hpPct = Math.max(0, Math.min(100, (G.guildBoss.currentHp / tier.hp) * 100));
+  h += '<div class="panel" style="margin-top:12px;">';
+  h += '<div class="panel-row"><div class="panel-title">🗡️ Guild Boss</div><div class="btn-hint">' + tier.n + '</div></div>';
+  h += '<div style="background:var(--bg-hover);border-radius:8px;height:12px;overflow:hidden;margin:6px 0;border:1px solid var(--border);">';
+  h += '<div style="background:linear-gradient(90deg,var(--danger),var(--gold));height:100%;width:' + hpPct + '%;"></div>';
+  h += '</div>';
+  h += '<div class="btn-hint">' + Math.floor(hpPct) + '% HP remaining \u2014 ' + (canAttemptGuildBossToday() ? 'ready to rally today' : 'already rallied today') + '</div>';
+  h += '<button onclick="setS(\'guild_boss\')" class="btn-outline-ghost" style="width:100%;margin-top:8px;">Open Guild Boss</button>';
+  h += '</div>';
+
+  // Contract Board card
+  const activeContracts = G.guildContracts.filter(c => c.refreshWeek === Math.floor(G.gameDay / 7));
+  const doneContracts = activeContracts.filter(c => c.done).length;
+  h += '<div class="panel" style="margin-top:12px;">';
+  h += '<div class="panel-row"><div class="panel-title">📋 Contract Board</div><div class="btn-hint">' + doneContracts + '/' + activeContracts.length + ' done this week</div></div>';
+  h += '<button onclick="setS(\'guild\')" class="btn-outline-ghost" style="width:100%;margin-top:8px;">View Contracts</button>';
+  h += '</div>';
+
+  // Weekly Guild Reward — actionable right here, no separate screen needed
+  const weeklyPreview = getWeeklyGuildRewardPreview();
+  h += '<div class="panel' + (isWeeklyGuildRewardAvailable() ? ' panel-gold' : '') + '" style="margin-top:12px;text-align:center;">';
+  h += '<div class="panel-title" style="' + (isWeeklyGuildRewardAvailable() ? 'color:var(--gold);' : '') + '">🎁 Weekly Guild Reward</div>';
+  if (isWeeklyGuildRewardAvailable()) {
+    h += '<div class="btn-hint" style="margin:6px 0;">+' + weeklyPreview.gold.toLocaleString() + 'G, +' + weeklyPreview.xp.toLocaleString() + ' XP, +' + weeklyPreview.matQty + 'x Iron Ore' + (weeklyPreview.rareMat ? ', +2x a rare stronghold material' : '') + '</div>';
+    h += '<button onclick="claimWeeklyGuildReward()" class="abtn" style="width:100%;">Claim This Week\'s Reward</button>';
+    h += '<div class="btn-hint" style="margin-top:4px;font-size:10px;">Lapses if not claimed before the week resets.</div>';
+  } else {
+    h += '<div class="btn-hint">Already claimed this week \u2014 check back after reset.</div>';
+  }
+  h += '</div>';
+
+  // Idle Roster Gathering — actionable right here, no separate screen needed
+  const idleGatherers = getIdleGatheringGuildMembers();
+  if (idleGatherers.length > 0) {
+    h += '<div class="panel' + (canCollectGuildMaterials() ? ' panel-gold' : '') + '" style="margin-top:12px;text-align:center;">';
+    h += '<div class="panel-title" style="' + (canCollectGuildMaterials() ? 'color:var(--gold);' : '') + '">📦 Idle Roster Gathering</div>';
+    h += '<div class="btn-hint" style="margin:6px 0;">' + idleGatherers.length + ' unfielded member' + (idleGatherers.length > 1 ? 's' : '') + ' gathering: ' + idleGatherers.map(d => d.icon + ' ' + d.npcName).join(', ') + '</div>';
+    if (canCollectGuildMaterials()) {
+      h += '<button onclick="collectGuildMemberMaterials()" class="abtn" style="width:100%;">Collect Today\'s Materials</button>';
+    } else {
+      h += '<div class="btn-hint">Already collected today \u2014 check back tomorrow.</div>';
+    }
+    h += '</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
 function rGuild() {
   let h = '<div class="content">';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
   h += '<div class="st" style="text-align:center;">🛡️ Adventurers\' Guild</div>';
 
   if (!G.guildJoined) {
@@ -21727,7 +21806,6 @@ function rMenu(){
       {i:'💀',l:'Boss Rush',a:'boss_rush'},
       {i:'🌫️',l:'The Fraying Frontier',a:'fraying_frontier'},
       {i:'🦊',l:'The Kindling Network',a:'kindling_network'},
-      {i:'⚔️',l:'Guild War',a:'guild_war'},
       {i:'📜',l:'The Sunken Archive',a:'chain_quest'},
       {i:'🌟',l:'Prestige',a:'prestige'},
     ]},
@@ -21736,7 +21814,9 @@ function rMenu(){
       {i:'📋',l:'Mercenary',a:'mercenary'},
     ]},
     { title: '🏰 Guild & Stronghold', items: [
+      {i:'🏰',l:'Guild Hub',a:'guild_hub'},
       {i:'🛡️',l:'Guild',a:'guild'},
+      {i:'⚔️',l:'Guild War',a:'guild_war'},
       {i:'⚔️',l:'Guild Boss',a:'guild_boss'},
       {i:'📚',l:'Teach a Disciple',a:'disciples'},
       {i:'👥',l:'Active Party',a:'party_selection'},
