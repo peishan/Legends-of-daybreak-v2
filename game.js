@@ -7320,6 +7320,13 @@ function finishRuneVault() {
 }
 
 
+// Total daily quests shown per day, guaranteed slot (Rest & Recover) included. The
+// template pool itself (DAILY_QUESTS, 15 entries) stays untouched — this only controls
+// how many get drawn from it. 15 uses the whole pool once with zero repeats; anything
+// above 15 needs the pool to cycle back through itself, which the loop below already
+// handles, so bumping this to 30 later is a one-line change, not a rewrite.
+const DAILY_QUEST_COUNT = 15;
+
 function generateDailyQuests() {
   // Only regenerate if it's a new game day
   if (G.dailyQuestSeed === G.gameDay && G.dailyQuests && G.dailyQuests.length > 0) {
@@ -7330,9 +7337,9 @@ function generateDailyQuests() {
   G.dailyQuests = [];
   G.dailyZonesVisited = []; // reset for Explorer's "2 different zones" tracking
 
-  // Rest & Recover is guaranteed every day rather than competing for one of the 3
-  // random slots below — it's simple enough (and its own daily reset flags depend on
-  // it enough elsewhere) that it shouldn't be possible to just never see it that day.
+  // Rest & Recover is guaranteed every day rather than competing for one of the random
+  // slots below — it's simple enough (and its own daily reset flags depend on it enough
+  // elsewhere) that it shouldn't be possible to just never see it that day.
   const restTemplate = DAILY_QUESTS.find(t => t.id === 'dq5');
   if (restTemplate) {
     G.dailyQuests.push({
@@ -7341,8 +7348,11 @@ function generateDailyQuests() {
     });
   }
 
-  const pool = DAILY_QUESTS.filter(t => t.id !== 'dq5');
-  for (let i = 0; i < 7 && pool.length > 0; i++) {
+  const randomSlots = DAILY_QUEST_COUNT - G.dailyQuests.length;
+  const baseline = DAILY_QUESTS.filter(t => t.id !== 'dq5');
+  let pool = [];
+  for (let i = 0; i < randomSlots; i++) {
+    if (pool.length === 0) pool = [...baseline]; // cycle back through the full set once exhausted
     const idx = Math.floor(Math.random() * pool.length);
     const template = pool.splice(idx, 1)[0];
     G.dailyQuests.push({
@@ -9916,6 +9926,7 @@ function continueBossRush() {
 // earned along the way), same behavior as ending the rush manually.
 function continueBossRushBatch(n) {
   G.bossRush.batchRemaining = Math.max(0, n - 1);
+  G.bossRush.batchTotal = n;
   continueBossRush();
 }
 
@@ -9960,6 +9971,7 @@ function continueFrayingFrontier() {
 // on defeat with everything earned along the way kept.
 function continueFrayingFrontierBatch(n) {
   G.frayingFrontier.batchRemaining = Math.max(0, n - 1);
+  G.frayingFrontier.batchTotal = n;
   continueFrayingFrontier();
 }
 
@@ -11140,6 +11152,7 @@ function continueGuildWar() {
 // Same batching pattern as Boss Rush and Fraying Frontier.
 function continueGuildWarBatch(n) {
   G.guildWar.batchRemaining = Math.max(0, n - 1);
+  G.guildWar.batchTotal = n;
   continueGuildWar();
 }
 
@@ -15400,6 +15413,7 @@ function getMercenaryTier() {
 // contract, which was turning into real repetitive strain over long sessions.
 function startMercenaryBatch(n) {
   G.mercenary.batchRemaining = Math.max(0, n - 1); // this call itself starts contract #1
+  G.mercenary.batchTotal = n;
   startMercenaryContract();
 }
 
@@ -15463,6 +15477,7 @@ function handleMercenaryVictory() {
     startMercenaryContract();
     return;
   }
+  G.mercenary.batchTotal = 0;
 
   render();
 }
@@ -15485,6 +15500,7 @@ handleDefeat = function() {
     G.mercenary.active = false;
     G.mercenary.current = null;
     G.mercenary.batchRemaining = 0; // a loss stops the batch outright — no silent continuation
+    G.mercenary.batchTotal = 0;
     G.state = 'mercenary';
     render();
   } else {
@@ -15713,6 +15729,7 @@ handleVictory = function() {
       continueBossRush();
       return;
     }
+    G.bossRush.batchTotal = 0; // batch genuinely over — clears the "Round X/Y" badge
 
     render();
   } else {
@@ -15731,6 +15748,7 @@ handleDefeat = function() {
     G.cbt.on = false;
     G.bossRush.active = false;
     G.bossRush.batchRemaining = 0;
+    G.bossRush.batchTotal = 0;
     G.currentBoss = null;
     G.state = 'menu';
     render();
@@ -15795,6 +15813,7 @@ handleVictory = function() {
       continueFrayingFrontier();
       return;
     }
+    G.frayingFrontier.batchTotal = 0;
 
     render();
   } else {
@@ -15837,6 +15856,7 @@ handleVictory = function() {
       continueGuildWar();
       return;
     }
+    G.guildWar.batchTotal = 0;
 
     render();
   } else {
@@ -15872,6 +15892,7 @@ handleDefeat = function() {
     G.cbt.on = false;
     G.frayingFrontier.active = false;
     G.frayingFrontier.batchRemaining = 0;
+    G.frayingFrontier.batchTotal = 0;
     G.currentBoss = null;
     G.state = 'menu';
     render();
@@ -15891,6 +15912,7 @@ handleDefeat = function() {
     G.cbt.on = false;
     G.guildWar.active = false;
     G.guildWar.batchRemaining = 0;
+    G.guildWar.batchTotal = 0;
     G.currentBoss = null;
     G.state = 'menu';
     render();
@@ -22298,6 +22320,23 @@ function rCbt() {
   if (G.statBooster && G.statBooster.expiresAt > Date.now()) {
     const sbMinsLeft = Math.ceil((G.statBooster.expiresAt - Date.now()) / 60000);
     badges.push({ icon: '💊', text: '+' + G.statBooster.val + ' ' + G.statBooster.stat.toUpperCase() + ' \u00b7 ' + sbMinsLeft + 'm', full: 'A supplement is active \u2014 +' + G.statBooster.val + ' ' + G.statBooster.stat.toUpperCase() + ' for the next ' + sbMinsLeft + ' minute' + (sbMinsLeft === 1 ? '' : 's') + '.', color: 'var(--gold)' });
+  }
+  // "Round X of Y" — visible progress during an active Take 5/10/25 batch (Boss Rush,
+  // Fraying Frontier, Guild War, Mercenary). batchTotal is the size originally
+  // requested; batchRemaining counts down as each fight resolves, so the current round
+  // is simply the difference between them — round 1 the instant the batch starts,
+  // climbing to round Y right as the last fight in the batch begins.
+  const batchModes = [
+    { obj: G.bossRush, label: 'Boss Rush' },
+    { obj: G.frayingFrontier, label: 'Frontier' },
+    { obj: G.guildWar, label: 'Guild War' },
+    { obj: G.mercenary, label: 'Mercenary' }
+  ];
+  for (let bm of batchModes) {
+    if (bm.obj && bm.obj.batchTotal > 1) {
+      const currentRound = bm.obj.batchTotal - bm.obj.batchRemaining;
+      badges.push({ icon: '🔁', text: 'Round ' + currentRound + '/' + bm.obj.batchTotal, full: bm.label + ' \u2014 running round ' + currentRound + ' of ' + bm.obj.batchTotal + ' queued.', color: 'var(--accent-light)' });
+    }
   }
 
   // === TOP STRIP: auto-combat + potion buttons and status badges share one row ===
