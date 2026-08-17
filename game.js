@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (The Uncatalogued Lv361-400 + World 4: The Steadfast Roads Lv410-490)';
+const APP_VERSION = '2026-08-17 (Menu visual overhaul: category colors, depth, badges, section flourish)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -585,6 +585,12 @@ const G = {
     { n: 'The Last Working Threshold', lv: 470, elem: 'none', d: "Still functional. Actually, provably, currently functional — the first door anyone here has found in this entire journey that would simply work, right now, if anyone understood it well enough to use it. Nobody does yet. That is the whole reason the Library World is going to need to exist.", en: ['A Threshold Guardian, Still Active', 'Something Protecting What Works', 'The Door\u2019s Own Ward'], loot: ['Proof This Door Still Works', 'A Working Threshold Fragment', 'The First Real Evidence'], xp: 4900, g: 2940, dg: 'impossible' },
     { n: 'What They Learned Not to Rush', lv: 480, elem: 'none', d: "The Roadwardens' own histories, finally legible — and their worst failures, honestly recorded, from exactly the same era where they, too, once rushed a door and paid for it immediately. They did not become careful by starting careful. They became careful the same way anyone does.", en: ['A Recorded Failure, Still Guarded', 'Something Protecting The Honest Account', 'A Lesson Left Deliberately Intact'], loot: ['The Roadwardens\u2019 Own Failures, Recorded Honestly', 'Proof Caution Was Learned, Not Innate', 'A Lesson Left For Whoever Came Next'], xp: 5000, g: 3000, dg: 'impossible' },
     { n: 'Proof It Can Be Done Gently', lv: 490, elem: 'none', d: "The last hall, and the point of all of it laid out plainly: a working method, complete, tested, survivable — proof, finally, undeniable, that a door can be opened on purpose, carefully, by people who took the time to actually deserve it. San does not have that method yet. She has, for the first time, real proof it exists.", en: ['The Method\u2019s Final Guardian', 'Something Protecting What Works', "A Roadwarden's Echo"], loot: ['The Roadwarden Method, Complete', 'Proof It Can Be Done Gently', 'A Working Precedent, Finally, At Last'], xp: 5400, g: 3240, dg: 'impossible' },
+    // === SEASON 3: THE LIBRARY WORLD (Lv 500) ===
+    // Single threshold zone, not a chain — the Library Research system that follows
+    // is a permanent hub/questline, not exploration content, same shape as Guild War
+    // or Teach a Disciple. This zone exists purely to mark the actual arrival, using
+    // the Roadwarden method earned at Lv490 rather than another blind door.
+    { n: 'The Door the Roadwardens Kept', lv: 500, elem: 'none', d: "The method works. Carefully, exactly the way the last hall promised, the door opens on purpose instead of by accident \u2014 and on the other side, impossibly, undamaged by anything the Breaking ever did: a library, whole, quiet, waiting, like it has simply been keeping the lights on for longer than anyone thought to come looking.", en: ['A Threshold Given Willingly', 'Something Welcoming, For Once', 'The Door\u2019s Last Guardian, Standing Down'], loot: ['A Door Opened On Purpose', 'Proof The Method Actually Works', 'The Library\u2019s Own Welcome'], xp: 5600, g: 3360, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -4755,6 +4761,72 @@ storyJournal: {
           { speaker: 'Aisyah', text: '"Do not tell her that," Aisyah says, something almost fond in the warning. "She will insist it is a competition, and then never admit she lost."' },
         ]
       }
+,{
+        id: 'journal_138',
+        title: 'The Door That Opened On Purpose',
+        chapter: 138,
+        unlockType: 'level',
+        unlockAt: 500,
+        icon: '🚪',
+        summary: 'The Roadwarden method works exactly as promised, and on the other side of a door finally opened carefully is something none of them expected: a library, whole, untouched by the Breaking, quietly waiting.',
+        scenes: [
+          { speaker: 'Narrator', text: 'You have opened a great many doors by now, one way or another \u2014 forced, found, given, earned. None of them have felt like this one. The method Varel translated from the Roadwardens\u2019 own notes is slow, deliberate, almost embarrassingly careful after everything else this journey has demanded of you. You follow it anyway. Precisely. On purpose.' },
+          { speaker: 'Mimi', text: '"It is not fighting us," Mimi says, quiet, watching the threshold hold steady instead of flinching the way every other door has. "I do not think it has ever had a reason to."' },
+          { speaker: 'Narrator', text: 'The door opens the way a door is supposed to open. No tearing, no cost extracted on the way through, no half-arrived thing scrambling to finish crossing behind you. Just a door, and then a room, and the room is impossible in a way that takes a moment to actually register.' },
+          { speaker: 'San', text: '"It is whole," you say, and your voice comes out smaller than you meant it to. Shelves, actual shelves, undamaged, reaching up further than the light comfortably reaches. Dust, but the ordinary kind \u2014 the kind that means time passed, not the kind that means something ended badly.' },
+          { speaker: 'Joel', text: '"Nothing about this world has been whole," Joel says, turning slowly, taking in a ceiling that has clearly never once needed a real repair. "Not once. Not anywhere we have been."' },
+          { speaker: 'Mezstorm', text: '"Somebody protected this," Mezstorm says, and there is something in her voice that has not been there since her own worst chapters \u2014 something close to hope, arriving carefully, like she does not quite trust it yet either.' },
+          { speaker: 'Narrator', text: 'A lamp somewhere further in flickers once, then holds steady, warm and entirely too welcoming for a place that has clearly been alone for a very long time.' },
+          { speaker: 'Eliz', text: '"Someone is here," Eliz says, certain the way she is always certain about the things that actually matter. "It does not feel dangerous. It feels like waiting."' },
+          { speaker: 'San', text: '"Then let us go find out what it has been waiting for," you say, and step properly through the door \u2014 the first one, in this entire long, strange journey, that opened for you instead of at you.' },
+        ]
+      }
+,{
+        id: 'journal_139',
+        title: 'Renn',
+        chapter: 139,
+        unlockType: 'level',
+        unlockAt: 505,
+        icon: '📖',
+        summary: 'The library\'s keeper turns out to be young, sharp, and centuries old — an alchemist who never meant to stop aging, and has had a very long time to turn that particular joke into armor.',
+        scenes: [
+          { speaker: 'Narrator', text: 'He is sitting cross-legged on top of a reading table, of all places, boots up on a stack of books that ought to make Sister Wren wince, spinning a small glass vial between two fingers like he has been doing it for so long his hands no longer need to think about it.' },
+          { speaker: '???', text: '"You are early," he says, not looking up. "Or I am late. I genuinely could not tell you which anymore. Time gets slippery when you stop actually needing to track it."' },
+          { speaker: 'Joel', text: 'Joel has a hand near his weapon out of pure habit. The stranger notices, and grins, entirely unbothered.' },
+          { speaker: '???', text: '"Relax. I have not had a reason to fight anyone in longer than your whole party combined has been alive. Renn," he says, finally looking up, hopping down off the table with an easy, unhurried motion. "Evergreen, if you want the whole thing. Alchemist. Archivist. Occasionally both at once, which is how I ended up like this."' },
+          { speaker: 'San', text: '"Like what?" you ask, and immediately regret how it sounds, because he is clearly, obviously young \u2014 barely past twenty, if that.' },
+          { speaker: 'Renn', text: '"Ah. That." He spreads his hands, rueful, like he has done this exact bit hundreds of times and still finds a way to enjoy it. "I was trying to cure something small. A joint ache, if you can believe that \u2014 an old injury, nothing dramatic. The formula worked. Spectacularly. It just also stopped me aging entirely, which was not remotely the part I was trying to fix."' },
+          { speaker: 'Mimi', text: '"How long ago was that," Mimi asks, careful, already suspecting the answer is going to be large.' },
+          { speaker: 'Renn', text: '"Long enough that I have stopped keeping an exact count. Rude of me, I know \u2014 an archivist who will not archive his own age. But precision stopped mattering somewhere around the second century. It all just became \u2018a long time,\u2019 after that." He says it lightly. Something underneath it is not light at all.' },
+          { speaker: 'Eliz', text: 'Eliz, who reads people the way some people read maps, tilts her head at him. "You are lonely," she says, plainly, the way she says most true things.' },
+          { speaker: 'Renn', text: 'For just a moment, the easy performance drops entirely. "Everyone I have ever mentored," he says, quiet, "everyone I have argued with, taught, loved \u2014 they all got to keep aging. I did not. I have had a great deal of practice being the one who stays exactly the same while everyone else finishes their whole life around me." A breath. Then the grin comes back, deliberate, chosen. "Anyway. Depressing tangent. You did not open a Roadwarden door to hear an old man complain about being young forever."' },
+          { speaker: 'San', text: '"Why are you actually still here? All this time?"' },
+          { speaker: 'Renn', text: '"Because someone has to keep the shelves standing," he says, simple. "And because, unlike literally everyone else who might have taken the job, I genuinely have the time to spare." His eyes go somewhere distant for a moment. "I have a feeling that is about to matter to you a great deal more than it has to anyone else who has ever walked through that door."' },
+        ]
+      }
+,{
+        id: 'journal_140',
+        title: 'The Honest Timescale',
+        chapter: 140,
+        unlockType: 'level',
+        unlockAt: 510,
+        icon: '⏳',
+        summary: 'Renn tells them plainly how long real, careful research actually takes — and San, Mezstorm, and Eliz each choose their own angle into the same question, beginning a search that will not resolve quickly, or soon, or possibly for a very long time.',
+        scenes: [
+          { speaker: 'Renn', text: '"I am going to tell you the truth, because you clearly did not come this far to be managed," Renn says, setting three empty chairs at the reading table like he already knew there would be exactly three of you asking. "A real route home \u2014 not a window, not a glimpse, an actual careful path \u2014 is not a season\u2019s work. It might not be a decade\u2019s work. I genuinely do not know yet, and I am not going to pretend otherwise to make this feel smaller than it is."' },
+          { speaker: 'San', text: '"How long have you been researching things like this?"' },
+          { speaker: 'Renn', text: '"On and off, longer than your grandmother\'s grandmother has been alive," he says, entirely matter-of-fact. "I do not say that to discourage you. I say it because I am uniquely qualified to be patient about this in a way none of you can actually afford to be, and I think that is going to matter. A lot."' },
+          { speaker: 'Joel', text: '"Then why keep trying? If it has taken this long already?"' },
+          { speaker: 'Renn', text: '"Because \u2018has not worked yet\u2019 and \u2018cannot work\u2019 are not the same sentence," Renn says, and for just a moment there is something old underneath the young face after all. "I intend to keep being the proof of that, for as long as it takes. Which, conveniently, is a very long time indeed."' },
+          { speaker: 'Narrator', text: 'He looks between the three of you \u2014 San, Mezstorm, Eliz \u2014 and something in his expression sharpens, genuinely interested for the first time since you arrived.' },
+          { speaker: 'Renn', text: '"Three of you, though. That is new. Most people who find this place come alone, or do not stay long enough to actually commit to anything. Pick your angle. I mean that literally \u2014 this is not one problem, it is several, and trying to solve all of them as one person is how you spend two centuries getting nowhere. I would know."' },
+          { speaker: 'San', text: '"The theory," you say, before you have fully decided to say it. "What a real channel would actually require. The mechanics of it."' },
+          { speaker: 'Mezstorm', text: '"Resonance," Mezstorm says, already sure. "Reaching across distance is already what I do, every single day. I want to know how far that actually goes, properly, instead of guessing."' },
+          { speaker: 'Eliz', text: '"Whether it survives anyone actually trying it," Eliz says, quiet and certain in the specific way only Eliz manages. "Whatever you build, San, Mez \u2014 I want to make sure it does not cost more than anyone is willing to pay to use it."' },
+          { speaker: 'Renn', text: '"Theory, resonance, and safety," Renn repeats, and something like real respect moves through his voice. "That is, annoyingly, almost exactly the right split. I could not have organized it better myself, and I have had considerably more practice." He claps his hands once, decisive. "Then let us begin. Properly. However long it actually takes."' },
+          { speaker: 'Narrator', text: 'Nobody in the room pretends this will be quick. Nobody pretends it will be easy, either. But for the first time since a phone stopped ringing and a window first opened on people who could not know they were being watched, the search for an actual way back stops being a hope kept quietly to one side, and becomes something real, chosen, and finally, deliberately, begun.' },
+        ]
+      }
     ]
   },
 
@@ -4921,6 +4993,24 @@ storyJournal: {
   guildBoss: { tierIndex: 0, currentHp: 0, lastAttemptDay: 0 }, // persistent HP across days — the whole recruited roster chips away at it together
   guildBossSession: { active: false, endTime: 0, tapCount: 0, sessionDamage: 0 }, // the current day's 90-second battle, not persisted — resets fresh each attempt
   disciples: [], // active mentorship threads — each tracks its own trajectory independently, delayed outcomes checked once per day
+  // Season 3's Library Research — deliberately open-ended, no coded "graduation" the
+  // way Disciples have. San/Mez/Eliz each research their own angle (theory/resonance/
+  // safety) in parallel, same delayed-dilemma pattern as Disciples, accumulating one
+  // shared totalBreakthroughs counter. The real ending (an actual route home) is
+  // intentionally NOT built yet — this system exists to make the search feel real and
+  // alive turn by turn, while the true payoff waits for whenever Season 8/9 content
+  // is actually written. Milestone flavor at intervals keeps long-term engagement
+  // meaningful without needing that ending ready now.
+  libraryResearch: {
+    unlocked: false,
+    totalBreakthroughs: 0,
+    milestonesSeen: [],
+    threads: {
+      san: { usedDilemmaIds: [], pendingOutcome: null, breakthroughs: 0, activeDilemmaId: null },
+      mezstorm: { usedDilemmaIds: [], pendingOutcome: null, breakthroughs: 0, activeDilemmaId: null },
+      eliz: { usedDilemmaIds: [], pendingOutcome: null, breakthroughs: 0, activeDilemmaId: null }
+    }
+  },
   activeDilemma: null, // { discipleId, dilemmaId } — which prompt is currently on screen awaiting a response
   logScreenFilter: 'all', // which category tab is active on the dedicated Combat Log screen
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
@@ -7064,6 +7154,10 @@ function checkDayAdvance() {
 
   // Resolve any disciple mentorship outcomes whose delay has now passed.
   checkDiscipleOutcomes();
+
+  // Resolve any Library Research outcomes whose delay has now passed — same
+  // once-per-day-advance pattern as Disciples.
+  checkLibraryResearchOutcomes();
 
   // Kindling Commissions reset on a new day — bounded, not accumulating.
   G.kindlingCommissions = { linesToday: 0, checksToday: 0, refreshDay: G.gameDay };
@@ -10742,6 +10836,246 @@ const DISCIPLE_DILEMMAS = [
   }
 ];
 
+// === LIBRARY RESEARCH DILEMMAS (Season 3) ===
+// 4 per researcher, matched to their actual angle — theory (San), resonance
+// (Mezstorm), safety (Eliz). Unlike Disciple dilemmas, options here don't shape a
+// personality across two axes — they just each carry a breakthroughValue (1-3) and a
+// delayDays, since the point isn't who someone becomes, it's how much real, hard-won
+// progress accumulates. Renn's outcome line closes every single one, regardless of
+// researcher, since he's the one actually reading the results back to them.
+const LIBRARY_RESEARCH_DILEMMAS = {
+  san: [
+    { id: 'san_framework', prompt: "Two old theoretical frameworks disagree about how a channel would actually have to work. Which do I chase first?",
+      options: [
+        { label: 'The framework that matches the Roadwarden method', breakthroughValue: 2, delayDays: 3,
+          outcome: "It held up. Slower going than the other one would have been, but it held up, and Renn confirms it does not contradict a single thing the Roadwardens actually left behind." },
+        { label: 'The bolder, less-proven framework', breakthroughValue: 3, delayDays: 5,
+          outcome: "It very nearly did not hold up. It also, eventually, produced something the safer framework never would have found on its own. Renn calls it 'reckless, and also correct,' which you have decided to take as a compliment." }
+      ] },
+    { id: 'san_old_text', prompt: "A badly damaged old text might describe exactly the mechanism I need — or might be about something else entirely. Do I spend the time reconstructing it?",
+      options: [
+        { label: 'Reconstruct it, carefully', breakthroughValue: 2, delayDays: 4,
+          outcome: "Weeks of careful work. It was, in fact, about something else entirely \u2014 but the reconstruction method itself turned out to matter more than the text ever would have." },
+        { label: 'Set it aside for now', breakthroughValue: 1, delayDays: 1,
+          outcome: "You moved on. Renn tucks the fragment away 'for later,' the same tone he uses about several hundred other things. You suspect 'later' means something different to him than it does to you." }
+      ] },
+    { id: 'san_small_working', prompt: "A small test working actually succeeded. Do I push further immediately, or document it and stop for now?",
+      options: [
+        { label: 'Push further, right away', breakthroughValue: 3, delayDays: 6,
+          outcome: "It went further than expected \u2014 and then stopped, cleanly, safely, exactly where Eliz's own warding work happened to catch it. Renn says that is either luck or good design. Nobody is fully sure which yet." },
+        { label: 'Document it and stop', breakthroughValue: 1, delayDays: 2,
+          outcome: "You stopped. Renn approves, in the specific way of someone who has watched enthusiasm outrun caution more times than he can count." }
+      ] },
+    { id: 'san_contradiction', prompt: "Two respected old sources flatly contradict each other on a basic point. Do I trust the more recent one, or the more detailed one?",
+      options: [
+        { label: 'Trust the more detailed source', breakthroughValue: 2, delayDays: 3,
+          outcome: "Detail won out. The more recent source, it turns out, was written by someone summarizing secondhand \u2014 confident, and wrong about one important thing." },
+        { label: 'Trust the more recent source', breakthroughValue: 2, delayDays: 3,
+          outcome: "Recency won out, this time. The detailed source was thorough about something that, as it happens, stopped being true a very long while ago." }
+      ] }
+  ],
+  mezstorm: [
+    { id: 'mez_strange_storm', prompt: "A storm near an old artifact is behaving in a way weather should not behave. Do I chase the anomaly directly, or study it from a careful distance first?",
+      options: [
+        { label: 'Chase it directly', breakthroughValue: 3, delayDays: 5,
+          outcome: "It answered. Not in words \u2014 in pressure, in a pull she recognized immediately, the same way she has always recognized a storm before it arrives. Renn writes down every single word she can find for what that actually felt like." },
+        { label: 'Study it from a careful distance', breakthroughValue: 1, delayDays: 2,
+          outcome: "Slower, safer, and she still learned something real: whatever caused it wants to be found. That is either promising or deeply concerning. Possibly both." }
+      ] },
+    { id: 'mez_reach', prompt: "Can lightning actually be made to \"reach\" further than it should, or is that just something that feels true because it is what she has always done?",
+      options: [
+        { label: 'Test it properly, at real range', breakthroughValue: 2, delayDays: 4,
+          outcome: "It reached further than physics has any right to allow. Not far enough. Not yet. But further, undeniably, than it should have." },
+        { label: 'Trust the instinct without testing it yet', breakthroughValue: 1, delayDays: 1,
+          outcome: "She held off testing it for now. Renn notes, dryly, that instinct and evidence are not actually enemies \u2014 just that one of them takes longer to write down." }
+      ] },
+    { id: 'mez_ritual', prompt: "A half-translated old resonance ritual might be exactly what is needed — or might just be someone's old superstition dressed up as a method. Attempt it, or keep translating first?",
+      options: [
+        { label: 'Attempt it now, carefully', breakthroughValue: 3, delayDays: 6,
+          outcome: "It worked, in a small, contained way nobody expected superstition to actually manage. Renn is delighted. Eliz, watching from the doorway, is significantly less delighted, and says so." },
+        { label: 'Finish translating it first', breakthroughValue: 1, delayDays: 3,
+          outcome: "The translation finished. It was, mostly, superstition \u2014 but buried inside it was one real, working principle nobody had noticed before." }
+      ] },
+    { id: 'mez_tolerance', prompt: "Pushing her own tolerance further might get real results faster. It also might not be worth what it costs. Push, or hold the current limit?",
+      options: [
+        { label: 'Push the limit', breakthroughValue: 3, delayDays: 5,
+          outcome: "She pushed. It cost her two exhausted days afterward and Eliz's very pointed silence, and it also produced the single largest jump in resonance range anyone has managed yet." },
+        { label: 'Hold the current limit', breakthroughValue: 1, delayDays: 2,
+          outcome: "She held steady. Slower progress, and Eliz, for once, says absolutely nothing critical about the decision at all." }
+      ] }
+  ],
+  eliz: [
+    { id: 'eliz_ward_seal', prompt: "A protective ward strong enough to matter might also be strong enough to seal something in by accident. Build it at full strength, or scale it back?",
+      options: [
+        { label: 'Build it at full strength', breakthroughValue: 2, delayDays: 4,
+          outcome: "Full strength held perfectly \u2014 and nothing got sealed in that should not have been. Eliz still checked it three separate times before she believed that herself." },
+        { label: 'Scale it back, safely', breakthroughValue: 1, delayDays: 2,
+          outcome: "Scaled back, exactly as planned. Less impressive, more certain. Eliz has never once needed the impressive version to feel like the work mattered." }
+      ] },
+    { id: 'eliz_scale_test', prompt: "Testing safety on something small first is slower, but testing at real scale immediately would actually prove something. Which does she choose?",
+      options: [
+        { label: 'Test at real scale', breakthroughValue: 3, delayDays: 5,
+          outcome: "It held, at real scale, on the first genuine attempt. Renn calls it either remarkable design or remarkable luck. Eliz, quietly, chooses to believe it was the design." },
+        { label: 'Test small first', breakthroughValue: 1, delayDays: 2,
+          outcome: "Small first, as always. It held small. That is one honest data point, and Eliz has never once resented an honest data point for being modest." }
+      ] },
+    { id: 'eliz_failure_text', prompt: "An old text describes, in detail, exactly what happens when a ward like this fails. Read it fully, or only skim what is needed to avoid the same mistake?",
+      options: [
+        { label: 'Read it fully, however hard it is', breakthroughValue: 2, delayDays: 3,
+          outcome: "She read all of it. It was hard to read. It was also exactly the kind of hard that means she now knows precisely which mistake never to make." },
+        { label: 'Skim only what is needed', breakthroughValue: 1, delayDays: 1,
+          outcome: "She skimmed it, took what she needed, moved on. Efficient. Renn does not push her to read more. Some kindnesses do not need to be argued for." }
+      ] },
+    { id: 'eliz_safe_vs_useful', prompt: "The safest possible version of this ward would also be nearly useless. How much usefulness is worth trading for how much safety?",
+      options: [
+        { label: 'Favor usefulness, carefully', breakthroughValue: 3, delayDays: 5,
+          outcome: "She found a version that is genuinely useful and still, by her own exacting standard, safe enough. It took her longer than either San or Mez\u2019s work has taken so far. She does not consider that a failure." },
+        { label: 'Favor safety, even if it is less useful', breakthroughValue: 1, delayDays: 2,
+          outcome: "She chose safety, plainly, without apologizing for it once. 'A ward that does nothing is safe,' she says. 'I would rather it did something. Just not yet, not until I am sure.'" }
+      ] }
+  ]
+};
+
+function isLibraryResearchUnlocked() {
+  return G.storyJournal.read.includes('journal_140');
+}
+
+function getLibraryResearchThread(researcher) {
+  return G.libraryResearch.threads[researcher];
+}
+
+function getNextLibraryResearchDilemma(researcher) {
+  const pool = LIBRARY_RESEARCH_DILEMMAS[researcher];
+  if (!pool) return null;
+  const thread = getLibraryResearchThread(researcher);
+  const unseen = pool.filter(d => !thread.usedDilemmaIds.includes(d.id));
+  const source = unseen.length > 0 ? unseen : pool;
+  return source[Math.floor(Math.random() * source.length)];
+}
+
+function respondToLibraryResearchDilemma(researcher, dilemmaId, optionIndex) {
+  const thread = getLibraryResearchThread(researcher);
+  if (!thread) return;
+  if (thread.pendingOutcome) { lg('📖 That thread is still waiting on its last result \u2014 give it time.'); return; }
+
+  const dilemma = LIBRARY_RESEARCH_DILEMMAS[researcher].find(d => d.id === dilemmaId);
+  if (!dilemma) return;
+  const option = dilemma.options[optionIndex];
+  if (!option) return;
+
+  if (!thread.usedDilemmaIds.includes(dilemmaId)) thread.usedDilemmaIds.push(dilemmaId);
+  thread.activeDilemmaId = null;
+  thread.pendingOutcome = {
+    researcher, dilemmaId, optionIndex,
+    resolveDay: G.gameDay + option.delayDays
+  };
+
+  lg('📖 ' + '"' + option.label + '." It will take time to see how that actually turns out.');
+  saveGame();
+}
+
+function startLibraryResearchDilemma(researcher) {
+  const thread = getLibraryResearchThread(researcher);
+  if (!thread || thread.pendingOutcome) return;
+  const dilemma = getNextLibraryResearchDilemma(researcher);
+  if (!dilemma) return;
+  thread.activeDilemmaId = dilemma.id;
+  render();
+}
+
+
+const LIBRARY_RESEARCH_MILESTONES = {
+  10: "Renn sets down his pen, for once, and just looks at the growing stack of notes for a long moment. \"Ten real, confirmed pieces,\" he says. \"That is more than some people manage in a lifetime of trying. I would know \u2014 I have outlived several of them.\"",
+  25: "\"Twenty-five,\" Renn says, quiet, turning the number over like it means something he had not quite let himself expect yet. \"This is no longer a hobby three people are indulging me in. This is real work. I want you to actually hear me say that.\"",
+  50: "Renn is uncharacteristically still for a long moment, looking at fifty breakthroughs' worth of notes spread across every surface the library has to offer. \"I have watched a great many people try this and stop,\" he says, finally. \"You have not stopped. I do not know yet where this ends. I am starting to believe it actually does, somewhere.\"",
+  100: "One hundred. Renn does not have a speech ready for this one \u2014 for once, the easy performance drops entirely, and he just sits with it, something unreadable moving across a face that has not aged in longer than anyone else in the room has been alive. \"Keep going,\" he finally says. \"I mean that as plainly as I have ever meant anything."
+};
+
+function checkLibraryResearchMilestones() {
+  const total = G.libraryResearch.totalBreakthroughs;
+  for (let threshold in LIBRARY_RESEARCH_MILESTONES) {
+    if (total >= threshold && !G.libraryResearch.milestonesSeen.includes(threshold)) {
+      G.libraryResearch.milestonesSeen.push(threshold);
+      lg('📖 ' + LIBRARY_RESEARCH_MILESTONES[threshold]);
+    }
+  }
+}
+
+// Checked once per day advance, same delayed-resolution pattern as Disciples. No
+// "graduation" here — this just keeps accumulating, indefinitely, by design.
+function checkLibraryResearchOutcomes() {
+  for (let researcher in G.libraryResearch.threads) {
+    const thread = G.libraryResearch.threads[researcher];
+    if (!thread.pendingOutcome) continue;
+    if (G.gameDay < thread.pendingOutcome.resolveDay) continue;
+
+    const dilemma = LIBRARY_RESEARCH_DILEMMAS[researcher].find(d => d.id === thread.pendingOutcome.dilemmaId);
+    const option = dilemma ? dilemma.options[thread.pendingOutcome.optionIndex] : null;
+    if (option) {
+      const names = { san: 'San', mezstorm: 'Mezstorm', eliz: 'Eliz' };
+      lg('📖 ' + names[researcher] + '\u2019s thread: ' + option.outcome);
+      thread.breakthroughs += option.breakthroughValue;
+      G.libraryResearch.totalBreakthroughs += option.breakthroughValue;
+      checkLibraryResearchMilestones();
+    }
+    thread.pendingOutcome = null;
+  }
+  saveGame();
+}
+
+function rLibraryResearch() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">📖 The Library</div>';
+
+  if (!isLibraryResearchUnlocked()) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🔒 A door, somewhere past everything mapped, that opens on purpose instead of by accident. Keep going.</div></div></div>';
+    return h;
+  }
+
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Nothing here resolves quickly. San, Mezstorm, and Eliz each work their own angle \u2014 what gets chosen shapes how much real progress accumulates, not who anyone becomes.</div>';
+
+  h += '<div class="panel panel-gold" style="text-align:center;">';
+  h += '<div class="panel-title" style="color:var(--gold);">Total Breakthroughs</div>';
+  h += '<div style="font-size:28px;font-weight:800;margin:6px 0;color:var(--gold);">' + G.libraryResearch.totalBreakthroughs + '</div>';
+  h += '<div class="btn-hint">However long it actually takes.</div>';
+  h += '</div>';
+
+  const researchers = [
+    { key: 'san', name: 'San', angle: 'Theory \u2014 what a real channel would actually require', icon: '🔮' },
+    { key: 'mezstorm', name: 'Mezstorm', angle: 'Resonance \u2014 how far reaching across distance can actually go', icon: '⛈️' },
+    { key: 'eliz', name: 'Eliz', angle: 'Safety \u2014 whether it survives anyone actually trying it', icon: '💚' }
+  ];
+
+  for (let r of researchers) {
+    const thread = getLibraryResearchThread(r.key);
+    h += '<div class="panel" style="margin-top:12px;">';
+    h += '<div class="panel-title">' + r.icon + ' ' + r.name + '</div>';
+    h += '<div class="btn-hint" style="margin:4px 0 8px;">' + r.angle + '</div>';
+    h += '<div class="btn-hint" style="margin-bottom:8px;">' + thread.breakthroughs + ' breakthrough' + (thread.breakthroughs === 1 ? '' : 's') + ' from this thread</div>';
+
+    if (thread.activeDilemmaId) {
+      const dilemma = LIBRARY_RESEARCH_DILEMMAS[r.key].find(d => d.id === thread.activeDilemmaId);
+      if (dilemma) {
+        h += '<div style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px;">';
+        h += '<div style="font-style:italic;margin-bottom:8px;">"' + dilemma.prompt + '"</div>';
+        for (let i = 0; i < dilemma.options.length; i++) {
+          h += '<button onclick="respondToLibraryResearchDilemma(\'' + r.key + '\',\'' + dilemma.id + '\',' + i + ')" class="abtn" style="width:100%;margin-bottom:6px;text-align:left;">' + dilemma.options[i].label + '</button>';
+        }
+        h += '</div>';
+      }
+    } else if (thread.pendingOutcome) {
+      const daysLeft = thread.pendingOutcome.resolveDay - G.gameDay;
+      h += '<div class="btn-hint" style="color:var(--gold);">🕯️ Waiting to see how it turns out' + (daysLeft > 0 ? ' (' + daysLeft + ' day' + (daysLeft === 1 ? '' : 's') + ')' : ' \u2014 check back soon') + '</div>';
+    } else {
+      h += '<button onclick="startLibraryResearchDilemma(\'' + r.key + '\')" class="btn-outline-ghost" style="width:100%;">Begin the Next Line of Research</button>';
+    }
+    h += '</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
 const GUILD_MEMBERS = [
   { id: 'mezstorm', npcName: 'Mezstorm', role: 'Stormsinger', icon: '⛈️',
     recruitReq: { type: 'always' }, // party-linked — recruited automatically the moment they're unlocked as a party candidate, see syncActivePartyFlags
@@ -11000,6 +11334,23 @@ const GUILD_MEMBERS = [
       'Iris: "I held a line alone for years. This is so much better."',
       'Iris: "Ash says hello. Ash means \'attack now.\'"',
       'Iris: "Ash catches what should have missed. Ash is always sure it was never actually going to miss at all."'
+    ] },
+  { id: 'renn', npcName: 'Renn Evergreen', role: 'Alchemist-Archivist', icon: '⚗️',
+    bountyArchetype: 'Support',
+    hallSpot: 'a corner stacked with books he swears he\'ll organize eventually',
+    recruitReq: { type: 'journal', journalId: 'journal_140' },
+    fieldBuff: { xpPct: 0.05 },
+    gatherMats: ['Gem Dust', 'Aether Shard'],
+    hubBanter: [
+      'Renn Evergreen: "People keep offering me advice for \'someone my age.\' I have stopped correcting them. It is funnier this way."',
+      'Renn Evergreen: "I do not miss aging. I miss everyone who did it alongside me."',
+      'Renn Evergreen: "Immortality was never the plan. The formula worked. I just never figured out how to unwork it."'
+    ],
+    recruitLine: "Renn is already halfway through cataloguing your entire arrival by the time you formally ask. \"Guild work. Sure. I have centuries free \u2014 might as well spend a few of them somewhere that actually needs the company.\"",
+    barks: [
+      'Renn Evergreen: "Two hundred years of reading and somehow this is still the part I never get tired of."',
+      'Renn Evergreen: "I have seen this exact mistake made before. Centuries ago. Still works the same way."',
+      'Renn Evergreen: "Patience is easy when you genuinely have unlimited time. I try not to let that make me smug about it."'
     ] }
 ];
 
@@ -17869,7 +18220,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.68';
+const BUILD_ID = '2026-08-17.71';
 // =========================
 
 
@@ -17962,6 +18313,7 @@ function saveGame() {
     guildBoss: G.guildBoss,
     activePartySelection: G.activePartySelection,
     disciples: G.disciples,
+    libraryResearch: G.libraryResearch,
     graduatedDisciples: G.graduatedDisciples || [],
     retroactiveGrowthApplied: G.retroactiveGrowthApplied,
     guildJoined: G.guildJoined,
@@ -18231,6 +18583,7 @@ function loadGame() {
     G.guildHallLevel = data.guildHallLevel || {};
     G.guildBoss = data.guildBoss || { tierIndex: 0, currentHp: 0, lastAttemptDay: 0 };
     G.disciples = data.disciples || [];
+    if (data.libraryResearch) G.libraryResearch = data.libraryResearch;
     G.graduatedDisciples = data.graduatedDisciples || [];
     // GUILD_MEMBERS is a code-level constant, reinitialized fresh from source on every
     // page load — any graduate pushed into it during a previous session is gone unless
@@ -19472,6 +19825,7 @@ function render(){
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='guild_boss')h+=rGuildBoss();
   else if(G.state=='disciples')h+=rDisciples();
+  else if(G.state=='library_research')h+=rLibraryResearch();
   else if(G.state=='party_selection')h+=rPartySelection();
   else if(G.state=='combat_log')h+=rCombatLog();
   else if(G.state=='dragon_hunt')h+=rDragonHunt();
@@ -19529,6 +19883,7 @@ function attachEvents() {
     else if(a=='stronghold')setS('stronghold');
     else if(a=='guild_boss')setS('guild_boss');
     else if(a=='disciples')setS('disciples');
+    else if(a=='library_research')setS('library_research');
     else if(a=='party_selection')setS('party_selection');
     else if(a=='dragon_hunt')setS('dragon_hunt');
     else if(a=='prestige')setS('prestige');
@@ -22596,6 +22951,44 @@ function rGuild() {
   return h;
 }
 
+// Small "something's waiting" indicator for menu cards — grounded only in state that
+// genuinely already exists (not decorative guesswork). Deliberately conservative: a
+// handful of well-defined cases rather than trying to cover every single menu item.
+function getMenuCardBadge(action) {
+  if (action === 'journal') {
+    return (G.storyJournal.unlocked || []).some(id => !(G.storyJournal.read || []).includes(id));
+  }
+  if (action === 'guild_hub') {
+    return isWeeklyGuildRewardAvailable() || canCollectGuildMaterials() ||
+      (isGuildBountyMissionReady && isGuildBountyMissionReady());
+  }
+  if (action === 'library_research') {
+    if (!isLibraryResearchUnlocked()) return false;
+    return Object.values(G.libraryResearch.threads).some(t => !t.pendingOutcome && !t.activeDilemmaId);
+  }
+  if (action === 'disciples') {
+    return (G.disciples || []).some(d => !d.graduated && !d.pendingOutcome);
+  }
+  if (action === 'today') {
+    return (G.dailyQuests || []).some(q => !q.done);
+  }
+  return false;
+}
+
+// Section theming — reusing the existing palette rather than inventing new colors, so
+// this stays visually consistent with everything else already built (Guild panels are
+// already gold, arcane/magic UI is already purple, etc).
+const MENU_SECTION_COLORS = {
+  '🐉 Legendary Hunts': '#ef4444',
+  '📋 Quick Work': '#3b82f6',
+  '🏰 Guild & Stronghold': '#f59e0b',
+  '🧙 Character': '#7c3aed',
+  '🎒 Manage': '#38bdf8',
+  '📖 Progress': '#f0abfc',
+  '🕯️ Other': '#10b981',
+  '⚙️ Settings': '#6b6560'
+};
+
 function rMenu(){
   const primary=[
     {i:'📖',l:'Daily Events',d:'A few short encounters, done in minutes',a:'event_deck'},
@@ -22622,11 +23015,8 @@ function rMenu(){
     ]},
     { title: '🏰 Guild & Stronghold', items: [
       {i:'🏰',l:'Guild Hub',a:'guild_hub'},
-      {i:'🎖️',l:'Guild Bounty Missions',a:'guild_bounty_missions'},
-      {i:'🛡️',l:'Guild',a:'guild'},
-      {i:'⚔️',l:'Guild War',a:'guild_war'},
-      {i:'⚔️',l:'Guild Boss',a:'guild_boss'},
       {i:'📚',l:'Teach a Disciple',a:'disciples'},
+      {i:'📖',l:'The Library',a:'library_research'},
       {i:'👥',l:'Active Party',a:'party_selection'},
       {i:'🗼',l:'Stronghold',a:'stronghold'},
     ]},
@@ -22685,9 +23075,13 @@ function rMenu(){
   h+='</div>';
 
   for(let sec of sections){
-    h+='<div class="menu-section-title">'+sec.title+'</div>';
-    h+='<div class="menu-grid-compact">';
-    for(let m of sec.items)h+='<div class="card card-compact" data-a="'+m.a+'"><div class="cicon-compact">'+m.i+'</div><div class="clabel-compact">'+m.l+'</div></div>';
+    const secColor = MENU_SECTION_COLORS[sec.title] || '#7c3aed';
+    h+='<div class="menu-section-title" style="--section-color:'+secColor+';">'+sec.title+'</div>';
+    h+='<div class="menu-grid-compact" style="--section-color:'+secColor+';">';
+    for(let m of sec.items){
+      const hasBadge = getMenuCardBadge(m.a);
+      h+='<div class="card card-compact" data-a="'+m.a+'"><div class="cicon-compact">'+m.i+(hasBadge ? '<span class="card-badge-dot"></span>' : '')+'</div><div class="clabel-compact">'+m.l+'</div></div>';
+    }
     h+='</div>';
   }
   // Theme toggle row
