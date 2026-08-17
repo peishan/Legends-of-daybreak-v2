@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Guild Bounty Missions: squad dispatch, composition bonus, cooldown-gated)';
+const APP_VERSION = '2026-08-17 (Guild Market: 6 trader-members sell from the Hall directly)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -17825,7 +17825,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.66';
+const BUILD_ID = '2026-08-17.67';
 // =========================
 
 
@@ -22409,6 +22409,37 @@ function rGuildHub() {
       h += '<button onclick="collectGuildMemberMaterials()" class="abtn" style="width:100%;">Collect Today\'s Materials</button>';
     } else {
       h += '<div class="btn-hint">Already collected today \u2014 check back tomorrow.</div>';
+    }
+    h += '</div>';
+  }
+
+  // Guild Market — stock from the 6 traders who are also recruited Guild Members
+  // (Dudin, Jorvin, Wahyu, Jonathan, Lewis, Dr. AA). Gated on isGuildMemberRecruited(),
+  // the same trigger every other piece of "are they actually in the guild yet" already
+  // uses (Hall banter, idle gathering, Guild War fielding) — so this naturally phases
+  // in exactly when each of them actually joins (Lv 100 + 10 shop visits), never
+  // before. The standalone Traders tab is untouched; everyone shops there as always,
+  // guild-affiliated or not, this whole Season and the next.
+  const guildTraderIds = ['dudin', 'jorvin', 'wahyu', 'jonathan', 'lewis', 'dr_aa'];
+  const guildTraders = [];
+  for (let id of guildTraderIds) {
+    if (!isGuildMemberRecruited(id)) continue;
+    const npc = G.npcs.find(n => n.n === getGuildMemberDef(id).npcName && n.t === 'trader');
+    if (npc) guildTraders.push(npc);
+  }
+  if (guildTraders.length > 0) {
+    h += '<div class="panel" style="margin-top:12px;">';
+    h += '<div class="panel-title" style="margin-bottom:8px;">🏪 Guild Market</div>';
+    h += '<div class="btn-hint" style="margin-bottom:10px;">' + guildTraders.length + ' guild member' + (guildTraders.length > 1 ? 's' : '') + ' trading out of the Hall directly.</div>';
+    for (let npc of guildTraders) {
+      h += '<div style="border-top:1px solid var(--border);padding-top:8px;margin-top:8px;">';
+      h += '<div style="font-weight:700;margin-bottom:4px;">' + npc.icon + ' ' + npc.n + '</div>';
+      for (let j = 0; j < npc.stock.length; j++) {
+        const item = npc.stock[j];
+        const canAfford = G.p.gold >= item.price;
+        h += '<button onclick="buyFromNPC(\'' + npc.n + '\',' + j + ')" class="' + (canAfford ? 'ib-u' : 'ib-e') + '" style="margin:2px 4px 2px 0;font-size:11px;">' + (canAfford ? item.n + ' (' + item.price + 'G)' : item.n + ' \u2014 need ' + item.price + 'G') + '</button>';
+      }
+      h += '</div>';
     }
     h += '</div>';
   }
