@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Senedra auto-heals/revives in combat \u2014 her paramedic background, made mechanical)';
+const APP_VERSION = '2026-08-17 (Dr. AA banter now callbacks the Robin/Jeff whereabouts chapter)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -182,8 +182,8 @@ const G = {
   party: [
     { n: 'Joel', t: 'The Steadfast', r: 'Tank', hp: 120, mhp: 120, atk: 6, def: 8, spd: 4, on: true, d: 'Your partner and shield. Never lets you fight alone. A steadfast man from a Philippine village, second of four, breadwinner, stray-feeder, yours. He does not ask why you are here. He asks if you will let him stand beside you while you find out.', b: '+10% Max HP', col: '#7c3aed', affinityBonuses: [], gear: null, base: { mhp: 120, atk: 6, def: 8, spd: 4 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Aisyah', t: 'Sisterblade', r: 'Rogue', hp: 70, mhp: 70, atk: 10, def: 4, spd: 9, on: true, d: 'Your sister, sharp-eyed and sharper-tongued. Your eldest sister, who spent decades teaching secondary school math in the old world before she taught you to fight. Now she teaches you the dangerous paths of Aethon. Family is complicated. Family with knives is complicated and useful.', b: '+20% Gold found', col: '#059669', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 10, def: 4, spd: 9 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'Mezstorm', t: 'Stormsinger', r: 'Mage', hp: 60, mhp: 60, atk: 12, def: 3, spd: 6, on: false, ul: 3, d: 'A wandering storm mage seeking purpose. He speaks to the storm. Sometimes, it answers. He was Mez once — your middle sister, estranged, hard, distant. The magic made a mistake. Rendered her male, like Edwin in the old tales. The memories are ghost-images now. Vague. Painful. Present.', b: '+15% Spell damage', col: '#0891b2', affinityBonuses: [], gear: null, base: { mhp: 60, atk: 12, def: 3, spd: 6 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'Eliz', t: 'Little Healer', r: 'Healer', hp: 65, mhp: 65, atk: 4, def: 5, spd: 5, on: false, ul: 4, d: 'A gentle soul with hands that mend wounds. She is your niece, Mez\'s daughter, autistic in the old world — which here means she experiences magic in textures and colors no one else can perceive. She cannot be reduced below 1 HP — a Guardian Spirit, the game calls it. You call it Eliz being Eliz. The girl who has always endured.', b: '+25% Healing potency. Guardian Spirit: Cannot be reduced below 1 HP.', col: '#db2777', passive: 'guardian_spirit', resurrect: { name: 'Breath of Life', cooldown: 0, maxCooldown: 5, healPct: 0.5, desc: 'Revives a fallen ally with 50% HP. 5-turn cooldown.' }, affinityBonuses: [], gear: null, base: { mhp: 65, atk: 4, def: 5, spd: 5 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Mezstorm', t: 'Stormsinger', r: 'Mage', hp: 60, mhp: 60, mp: 40, mmp: 40, atk: 12, def: 3, spd: 6, on: false, ul: 3, d: 'A wandering storm mage seeking purpose. He speaks to the storm. Sometimes, it answers. He was Mez once — your middle sister, estranged, hard, distant. The magic made a mistake. Rendered her male, like Edwin in the old tales. The memories are ghost-images now. Vague. Painful. Present.', b: '+15% Spell damage', col: '#0891b2', affinityBonuses: [], gear: null, base: { mhp: 60, atk: 12, def: 3, spd: 6, mmp: 40 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Eliz', t: 'Little Healer', r: 'Healer', hp: 65, mhp: 65, mp: 35, mmp: 35, atk: 4, def: 5, spd: 5, on: false, ul: 4, d: 'A gentle soul with hands that mend wounds. She is your niece, Mez\'s daughter, autistic in the old world — which here means she experiences magic in textures and colors no one else can perceive. She cannot be reduced below 1 HP — a Guardian Spirit, the game calls it. You call it Eliz being Eliz. The girl who has always endured.', b: '+25% Healing potency. Guardian Spirit: Cannot be reduced below 1 HP.', col: '#db2777', passive: 'guardian_spirit', resurrect: { name: 'Breath of Life', cooldown: 0, maxCooldown: 5, healPct: 0.5, desc: 'Revives a fallen ally with 50% HP. 5-turn cooldown.' }, affinityBonuses: [], gear: null, base: { mhp: 65, atk: 4, def: 5, spd: 5, mmp: 35 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Senedra', t: 'Swift Scout', r: 'Ranger', hp: 75, mhp: 75, atk: 8, def: 5, spd: 10, on: false, ul: 6, d: 'An eagle-eyed tracker from the northern woods. She learned this from her mother. From Aisyah. She finds secret paths where others see only walls. She offers you pemmican and speaks of trade routes and dried goods. The real money is in dried goods. They travel. They last. They sell.', b: '+20% Crit chance', col: '#ca8a04', affinityBonuses: [], gear: null, base: { mhp: 75, atk: 8, def: 5, spd: 10 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Zaki', t: 'Young Blade', r: 'Warrior', hp: 100, mhp: 100, atk: 9, def: 6, spd: 6, on: false, ul: 8, d: 'A hot-headed swordsman with a heart of gold. He is young. The firelight makes him look younger. He checks his pack seventeen times. Nervous, he admits. You tell him it is okay. You tell him checking is a kind of love. He wants to be brave like you. You do not feel brave. You feel tired. But you smile anyway.', b: '+15% Attack speed', col: '#dc2626', affinityBonuses: [], gear: null, base: { mhp: 100, atk: 9, def: 6, spd: 6 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Soel', t: 'The Familiar', r: 'Support', hp: 55, mhp: 55, atk: 5, def: 4, spd: 8, on: false, ul: 10, d: 'Your loyal spirit cat companion. He came with the rain. He chose you. That is rare. That is everything. He is not merely a cat. He is a spirit. He is a choice made flesh. He is the space between San and Joel — the letters overlapping, the sounds merging. He cannot be killed — he reforms from spirit flame.', b: '+10% All stats · Spirit Cat (unkillable)', col: '#7c2d12', spiritCat: true, affinityBonuses: [], gear: null, base: { mhp: 55, atk: 5, def: 4, spd: 8 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
@@ -193,6 +193,7 @@ const G = {
     { n: 'Dr. AA', t: 'Steady Hands', r: 'Healer', hp: 70, mhp: 70, atk: 5, def: 6, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Calm under pressure in the specific way only someone who has already seen the worst of it can be. Keeps a ghost story ready for the ride there, and a steady hand ready for whatever happens once you arrive.', b: '+20% Healing potency', col: '#0284c7', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 5, def: 6, spd: 5 }, eq: { weapon: { n: 'Old-World Medical Kit', slot: 'weapon', forCompanion: 'Dr. AA', r: 'rare', ilvl: 28, atk: 14, def: 10, d: "Field kit for Dr. AA. +14 ATK, +10 DEF" }, armor: { n: "Physician's Coat", slot: 'armor', forCompanion: 'Dr. AA', r: 'rare', ilvl: 28, def: 18, atk: 4, d: "Coat for Dr. AA. +18 DEF, +4 ATK" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Sister Wren', t: 'True Devotion', r: 'Healer', hp: 68, mhp: 68, atk: 4, def: 8, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Spent a long time devoted to something that was never real. Knows real when she finally gets to stand next to it \u2014 and stands between the party and whatever comes next, calling on the Temple\u2019s grace when it is needed.', b: '+10% Defense (party) \u00b7 Intercession (DEF buff) \u00b7 Temple\u2019s Grace (cure chance)', col: '#f0abfc', affinityBonuses: [], gear: null, base: { mhp: 68, atk: 4, def: 8, spd: 5 }, eq: { weapon: { n: 'Temple-Blessed Censer', slot: 'weapon', forCompanion: 'Sister Wren', r: 'rare', ilvl: 28, atk: 12, def: 12, d: "Censer for Sister Wren. +12 ATK, +12 DEF" }, armor: { n: 'Vestments of Intercession', slot: 'armor', forCompanion: 'Sister Wren', r: 'rare', ilvl: 28, def: 20, d: "Sacred vestments for Sister Wren. +20 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Ser Aldric', t: 'The Other Kind of Found', r: 'Knight', hp: 110, mhp: 110, atk: 7, def: 9, spd: 3, on: false, ul: 999, recruitGated: true, d: 'Spent a long time being found by things. Guild work feels like the other version of that \u2014 chosen instead of caught. Holds a line like it is a personal promise, because to him, it is.', b: '+15% Defense', col: '#57534e', affinityBonuses: [], gear: null, base: { mhp: 110, atk: 7, def: 9, spd: 3 }, eq: { weapon: { n: "The Other Kind of Found's Blade", slot: 'weapon', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, atk: 20, def: 14, d: "Sword for Ser Aldric. +20 ATK, +14 DEF" }, armor: { n: "Knight's Unbroken Plate", slot: 'armor', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, def: 26, d: "Heavy plate for Ser Aldric. +26 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Renn Evergreen', t: 'Alchemist-Archivist', r: 'Support', hp: 90, mhp: 90, mp: 60, mmp: 60, atk: 5, def: 6, spd: 4, on: false, ul: 999, recruitGated: true, d: 'Centuries old, permanently stuck looking barely past twenty — an alchemical formula that worked exactly as intended and not at all as he expected. Keeps the Library\u2019s shelves standing mostly out of habit, and because, unlike almost anyone else who might take the job, he genuinely has the time to spare.', b: '+5% XP gain (party)', col: '#a16207', affinityBonuses: [], gear: null, base: { mhp: 90, atk: 5, def: 6, spd: 4, mmp: 60 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Iris', t: 'Held Her Own', r: 'Scout', hp: 68, mhp: 68, atk: 9, def: 4, spd: 10, on: false, ul: 999, recruitGated: true, d: 'Held a line alone for years before the Guild gave her something better than solitude. Ash has never once left her side, and Ash is usually right.', b: '+15% Crit chance \u00b7 Ash (20% chance a missed attack lands anyway)', col: '#c2703d', affinityBonuses: [], gear: null, base: { mhp: 68, atk: 9, def: 4, spd: 10 }, eq: { weapon: { n: "Iris's Long Knives", slot: 'weapon', forCompanion: 'Iris', r: 'rare', ilvl: 28, atk: 25, spd: 9, d: "Twin knives for Iris. +25 ATK, +9 SPD" }, armor: { n: "Ash's Watch", slot: 'armor', forCompanion: 'Iris', r: 'rare', ilvl: 28, def: 15, spd: 7, d: "Light armor for Iris. +15 DEF, +7 SPD" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } }
   ],
 
@@ -5305,6 +5306,12 @@ storyJournal: {
     Zaki: { stage: 0, lastRestDay: -1 },
     Soel: { stage: 0, lastRestDay: -1 }
   },
+  // Dr. AA's medical kit — limited charges rather than MP or Wren's chance-based
+  // prayer, distinct texture matching his "Old-World Medical Kit" flavor. Refills to
+  // max on rest, same "restock between engagements, not mid-fight" logic a real field
+  // kit actually has, rather than being an unlimited resource like Senedra's use of
+  // the player's own potion inventory.
+  drAAKit: { charges: 3, maxCharges: 3 },
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
   afkAdventure: { active: false, zoneIndices: [], startTime: 0, startLevel: 1, legendaryItemsGained: [], totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null, eliteMode: false, visible: false, playerBrowsing: false },
   afkAdventurePicker: [], // temporary selection state while choosing zones, before starting
@@ -6095,6 +6102,14 @@ function recalcPartyMember(member) {
   member.spd = member.base.spd + bonus.spd;
   member.mhp = Math.max(1, member.base.mhp + bonus.hp);
   member.hp = Math.min(member.hp, member.mhp);
+  // Propagates base.mmp the same way mhp already does above — no gear in this game
+  // currently grants an mp stat, so there's no bonus to sum, just a direct sync.
+  // Without this, the growth loop in lvlup() could keep incrementing base.mmp
+  // forever while member.mmp itself stayed frozen at whatever it started at.
+  if (member.base.mmp !== undefined) {
+    member.mmp = member.base.mmp;
+    member.mp = Math.min(member.mp !== undefined ? member.mp : member.mmp, member.mmp);
+  }
   // Keep the legacy .gear field as a display-only aggregate for any older UI reading it
   member.gear = (bonus.atk || bonus.def || bonus.spd || bonus.hp) ? { n: 'Equipped Gear', atk: bonus.atk, def: bonus.def, spd: bonus.spd, hp: bonus.hp } : null;
 }
@@ -9120,6 +9135,41 @@ function tickWrenHealerAbilities() {
   }
 }
 
+// Dr. AA's medical kit — limited charges (refilled by resting, see completeRest()),
+// distinct from Wren's chance-based prayer and Eliz's cooldown ability. Triggers
+// deterministically once someone's genuinely hurt, not on a random roll, matching
+// "steady hands" — he doesn't wait around, he just doesn't have infinite supply.
+const DR_AA_HEAL_THRESHOLD = 0.40;
+const DR_AA_HEAL_PCT = 0.25;
+
+function isDrAAActive() {
+  return G.party.some(p => p.n === 'Dr. AA' && p.on && p.hp > 0);
+}
+
+function tickDrAAMedicalKit() {
+  if (!isDrAAActive() || G.drAAKit.charges <= 0) return;
+
+  let lowest = { name: 'San', pctHp: G.p.hp / G.p.mhp, isPlayer: true };
+  for (let p of G.party) {
+    if (p.on && p.hp > 0 && p.n !== 'Dr. AA') {
+      const pct = p.hp / p.mhp;
+      if (pct < lowest.pctHp) lowest = { name: p.n, pctHp: pct, isPlayer: false, ref: p };
+    }
+  }
+  if (lowest.pctHp >= DR_AA_HEAL_THRESHOLD) return;
+
+  G.drAAKit.charges--;
+  if (lowest.isPlayer) {
+    const healAmt = Math.floor(G.p.mhp * DR_AA_HEAL_PCT);
+    G.p.hp = Math.min(G.p.mhp, G.p.hp + healAmt);
+    lg('🩺 Dr. AA reaches for the kit \u2014 patches you up for ' + healAmt + ' HP. (' + G.drAAKit.charges + '/' + G.drAAKit.maxCharges + ' charges left)');
+  } else {
+    const healAmt = Math.floor(lowest.ref.mhp * DR_AA_HEAL_PCT);
+    lowest.ref.hp = Math.min(lowest.ref.mhp, lowest.ref.hp + healAmt);
+    lg('🩺 Dr. AA reaches for the kit \u2014 patches up ' + lowest.name + ' for ' + healAmt + ' HP. (' + G.drAAKit.charges + '/' + G.drAAKit.maxCharges + ' charges left)');
+  }
+}
+
 // === JOEL PALADIN ABILITIES: LAY ON HANDS, DIVINE STRENGTH, PROTECTION FROM EVIL, SMITE UNDEAD ===
 // Same standalone pattern as Eliz's abilities. Protection from Evil and Smite Undead are
 // checked directly at combat damage-calc time (see doEnemyAttack/doPartyAttack) since
@@ -11831,7 +11881,8 @@ const GUILD_MEMBERS = [
     hubBanter: [
       'Dr. AA: "Sister Wren and I still haven\'t settled whether faith or medicine keeps this Hall standing. I say medicine. She\'s wrong. Lovingly wrong."',
       'Dr. AA: "New ghost story, still no one to tell it to on the road. The Hall will have to do."',
-      'Dr. AA: "Take with food. Nobody ever does. I keep saying it anyway."'
+      'Dr. AA: "Take with food. Nobody ever does. I keep saying it anyway."',
+      'Dr. AA: "I still think about that day I told you about Robin. And Jeff." A pause, quieter. "No contract out here. No family name holding either of them up anymore. I meant what I said \u2014 this family collects debts. I am glad you kept collecting."'
     ],
     recruitLine: "Dr. AA is already packing the cart. \"Guild work. Good. I've got a new ghost story and nobody to tell it to on the way there.\"",
     barks: [
@@ -14490,6 +14541,7 @@ function finishPlayerTurn() {
   tickAilments();
   tickElizHealerAbilities();
   tickWrenHealerAbilities();
+  tickDrAAMedicalKit();
   tickJoelPaladinAbilities();
   tickZakiFighterAbilities();
   tickSoelWarmPresence();
@@ -15132,9 +15184,9 @@ function getEnemyIndex(enemy) {
 
 // Senedra's real-world occupation (paramedic, Brunei) made autonomous during combat.
 // Priority order: revive the dead first (highest urgency), then heal whoever's most
-// critically low HP — San or any active companion, since companions DO track hp/mhp
-// even though they don't track an mp pool — then MP, San-only, since she's currently
-// the sole character with an actual mana resource to refresh.
+// critically low HP — San or any active companion, since companions DO track hp/mhp —
+// then MP, checked across San plus Mezstorm/Eliz/Renn Evergreen, the three companions
+// who carry a real mana pool.
 function doSenedraAutoSupport() {
   const senedra = G.party.find(p => p.n === 'Senedra' && p.on && p.hp > 0);
   if (!senedra) return false;
@@ -15174,11 +15226,24 @@ function doSenedraAutoSupport() {
   }
 
   const manaPot = G.p.inv.find(i => i.t === 'pot' && i.eff === 'mana');
-  if (manaPot && G.p.mp < 20) {
-    G.p.mp = Math.min(G.p.mmp, G.p.mp + manaPot.v);
-    lg('🚑 Senedra: Uses ' + manaPot.n + ' to keep your spells going. +' + manaPot.v + ' MP.');
-    manaPot.q--; if (manaPot.q <= 0) { const idx = G.p.inv.indexOf(manaPot); G.p.inv.splice(idx, 1); }
-    return true;
+  if (manaPot) {
+    // San plus the three companions who now carry a real MP pool. Checked in this
+    // fixed order (San first, since her spells drive the most combat actions) rather
+    // than by lowest-percentage, since Senedra isn't expected to triage MP the same
+    // urgent way she triages HP.
+    const mpUsers = [{ name: 'San', isPlayer: true, mp: G.p.mp, mmp: G.p.mmp }]
+      .concat(['Mezstorm', 'Eliz', 'Renn Evergreen'].map(n => G.party.find(p => p.n === n && p.on && p.hp > 0)).filter(Boolean).map(p => ({ name: p.n, isPlayer: false, ref: p, mp: p.mp, mmp: p.mmp })));
+    const target = mpUsers.find(u => u.mp < u.mmp * 0.3);
+    if (target) {
+      if (target.isPlayer) {
+        G.p.mp = Math.min(G.p.mmp, G.p.mp + manaPot.v);
+      } else {
+        target.ref.mp = Math.min(target.ref.mmp, target.ref.mp + manaPot.v);
+      }
+      lg('🚑 Senedra: Uses ' + manaPot.n + ' on ' + target.name + '. +' + manaPot.v + ' MP.');
+      manaPot.q--; if (manaPot.q <= 0) { const idx = G.p.inv.indexOf(manaPot); G.p.inv.splice(idx, 1); }
+      return true;
+    }
   }
 
   return false;
@@ -15200,7 +15265,7 @@ function doAutoCombatTick() {
     // checked every tick while she's active, before the retreat check below, so she
     // gets a real chance to save someone rather than the fight just ending first.
     // Priority matches actual triage: revive the dead, then heal whoever's most
-    // critical, MP last (San only — companions don't track an MP pool at all).
+    // critical, then MP across all four characters who actually carry a mana pool.
     if (doSenedraAutoSupport()) {
       setTimeout(doAutoCombatTick, 800);
       return;
@@ -15925,6 +15990,12 @@ function completeRest() {
   // Affinity gain for resting together
   for (let p of G.party) { if (p.on) updateAffinity(p.n, 2); }
   checkLovetalkAndFamilyTies();
+  // Dr. AA's kit restocks between engagements, not mid-fight — same logic a real
+  // field kit actually has.
+  if (G.drAAKit.charges < G.drAAKit.maxCharges) {
+    G.drAAKit.charges = G.drAAKit.maxCharges;
+    if (isDrAAActive()) lg('🩺 Dr. AA restocks the kit. Ready again.');
+  }
   // Track rest_with quest progress
   for(let q of G.quests){
     if(!q.done && !q.expired && q.t==='rest_with' && G.party.find(p=>p.on && p.n===q.reqParty)){
@@ -17675,7 +17746,7 @@ function triggerLevelUpAnimation(newLevel) {
 // or by Guild recruitment (the six added later). Mimi and Brada are a linked pair —
 // selecting one selects both, together consuming 2 of the 4 slots, never split apart.
 const ACTIVE_PARTY_SLOTS = 4;
-const SWAPPABLE_PARTY_POOL = ['Mezstorm', 'Eliz', 'Senedra', 'Zaki', 'KW Liang', 'Mimi', 'Brada Shah', 'Dr. AA', 'Sister Wren', 'Ser Aldric', 'Iris'];
+const SWAPPABLE_PARTY_POOL = ['Mezstorm', 'Eliz', 'Senedra', 'Zaki', 'KW Liang', 'Mimi', 'Brada Shah', 'Dr. AA', 'Sister Wren', 'Ser Aldric', 'Iris', 'Renn Evergreen'];
 const LINKED_PARTY_PAIRS = [['Mimi', 'Brada Shah'], ['Senedra', 'Zaki']];
 // Maps a swappable party member's name to the Guild Member id that gates their
 // availability, for the six who are recruit-gated rather than level-gated.
@@ -17686,7 +17757,8 @@ const PARTY_MEMBER_GUILD_GATE = {
   'Dr. AA': 'dr_aa',
   'Sister Wren': 'sister_wren',
   'Ser Aldric': 'ser_aldric',
-  'Iris': 'iris'
+  'Iris': 'iris',
+  'Renn Evergreen': 'renn'
 };
 // The reverse relationship for the original four — becoming available as a party
 // candidate (by level) is what recruits them to the Guild roster, not the other way
@@ -17754,8 +17826,8 @@ function isPartyMemberUnlocked(p) {
 const COMPANION_LEVEL_GROWTH = {
   Joel:     { mhp: 12, atk: 1, def: 2, spd: 0 }, // The Steadfast — bulwark, more HP/DEF than offense
   Aisyah:   { mhp: 6,  atk: 2, def: 0, spd: 1 }, // Sisterblade — sharp and fast, fragile
-  Mezstorm: { mhp: 6,  atk: 2, def: 1, spd: 0 }, // Stormsinger — offense-focused caster
-  Eliz:     { mhp: 9,  atk: 1, def: 2, spd: 0 }, // Little Healer — durable support
+  Mezstorm: { mhp: 6,  atk: 2, def: 1, spd: 0, mmp: 4 }, // Stormsinger — offense-focused caster, real MP pool
+  Eliz:     { mhp: 9,  atk: 1, def: 2, spd: 0, mmp: 4 }, // Little Healer — durable support, real MP pool
   Senedra:  { mhp: 7,  atk: 2, def: 0, spd: 1 }, // Swift Scout — precision and speed
   Zaki:     { mhp: 10, atk: 2, def: 1, spd: 0 }, // Young Blade — balanced frontliner
   Soel:     { mhp: 8,  atk: 1, def: 1, spd: 1 }, // The Familiar — matches his all-stats passive
@@ -17766,6 +17838,7 @@ const COMPANION_LEVEL_GROWTH = {
   'Sister Wren': { mhp: 8,  atk: 1, def: 2, spd: 0 }, // True Devotion — protective, DEF-leaning healer
   'Ser Aldric':  { mhp: 11, atk: 1, def: 2, spd: 0 }, // The Other Kind of Found — even tankier than Joel, slower
   'Iris':        { mhp: 7,  atk: 2, def: 0, spd: 1 }, // Held Her Own — fast, offense-leaning scout, same shape as Senedra
+  'Renn Evergreen': { mhp: 8, atk: 1, def: 1, spd: 0, mmp: 5 }, // Alchemist-Archivist — support/utility caster, real MP pool
 };
 
 // Original starting stats (before any growth) and unlock level per companion — used only
@@ -17883,15 +17956,19 @@ function lvlup(){
     for(let p of G.party){
       if(isPartyMemberUnlocked(p)){
         if (!p.base) p.base = { mhp: p.mhp, atk: p.atk, def: p.def, spd: p.spd };
+        if (p.base.mmp === undefined) p.base.mmp = p.mmp || 0;
         const oldMhp = p.mhp, oldAtk = p.atk, oldDef = p.def, oldSpd = p.spd;
         const growth = COMPANION_LEVEL_GROWTH[p.n] || { mhp: 8, atk: 1, def: 1, spd: 0 };
         p.base.mhp += growth.mhp;
         p.base.atk += growth.atk;
         p.base.def += growth.def;
         p.base.spd += growth.spd;
+        if (growth.mmp) p.base.mmp += growth.mmp;
         const hpBefore = p.hp;
+        const mpBefore = p.mp || 0;
         recalcPartyMember(p);
         p.hp = Math.min(p.mhp, hpBefore + growth.mhp); // heal by the HP gained, same feel as before
+        if (growth.mmp) p.mp = Math.min(p.mmp, mpBefore + growth.mmp);
         // Only log for active members to avoid spam
         if(p.on){
           lg('📈 ' + p.n + ' grows with you! HP ' + oldMhp + '→' + p.mhp + ' ATK ' + oldAtk + '→' + p.atk + ' DEF ' + oldDef + '→' + p.def + (growth.spd ? ' SPD ' + oldSpd + '→' + p.spd : ''));
@@ -18830,7 +18907,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.84';
+const BUILD_ID = '2026-08-17.87';
 // =========================
 
 
@@ -18874,7 +18951,7 @@ function saveGame() {
 
 
     },
-    party: G.party.map(p => ({ n: p.n, t: p.t, r: p.r, hp: p.hp, mhp: p.mhp, atk: p.atk, def: p.def, spd: p.spd, on: p.on, ul: p.ul, unlocked: p.unlocked, d: p.d, b: p.b, col: p.col, affinityBonuses: p.affinityBonuses, gear: p.gear, base: p.base, eq: p.eq })),
+    party: G.party.map(p => ({ n: p.n, t: p.t, r: p.r, hp: p.hp, mhp: p.mhp, mp: p.mp, mmp: p.mmp, atk: p.atk, def: p.def, spd: p.spd, on: p.on, ul: p.ul, unlocked: p.unlocked, d: p.d, b: p.b, col: p.col, affinityBonuses: p.affinityBonuses, gear: p.gear, base: p.base, eq: p.eq })),
     quests: G.quests.map(q => ({ id: q.id, n: q.n, d: q.d, t: q.t, c: q.c, need: q.need, rw: q.rw, done: q.done })),
         bounties: G.bounties.map(b => ({ id: b.id, c: b.c, done: b.done, refreshDay: b.refreshDay })),
     questCollapsed: G.questCollapsed || {},
@@ -18956,6 +19033,7 @@ function saveGame() {
     bondingSeenScenes: G.bonding.seenScenes,
     lovetalk: G.lovetalk,
     familyTies: G.familyTies,
+    drAAKit: G.drAAKit,
     playerSpec: G.playerSpec,
     notificationsEnabled: G.notificationsEnabled,
     strongholdStipendDay: G.strongholdStipendDay,
@@ -19271,6 +19349,7 @@ function loadGame() {
     G.bonding.seenScenes = data.bondingSeenScenes || [];
     if (data.lovetalk) G.lovetalk = data.lovetalk;
     if (data.familyTies) G.familyTies = data.familyTies;
+    if (data.drAAKit) G.drAAKit = data.drAAKit;
     if (data.playerSpec) {
       G.playerSpec = data.playerSpec;
       if (G.playerSpec.path && typeof applySpecEffects === 'function') applySpecEffects();
@@ -19328,6 +19407,11 @@ function loadGame() {
         p.on = saved.on;
         p.unlocked = saved.unlocked || false;
         p.affinityBonuses = saved.affinityBonuses || [];
+        // Restored before recalcPartyMember() runs below, since recalc clamps mp to
+        // whatever mp already happens to be sitting on the object — without this, the
+        // three MP-carrying companions (Mezstorm/Eliz/Renn) would silently refill to
+        // full on every single reload instead of keeping whatever they actually had.
+        if (saved.mp !== undefined) p.mp = saved.mp;
 
         if (saved.base && saved.eq) {
           // Modern save format: restore directly
@@ -24817,7 +24901,7 @@ function rParty(){
   for(let p of G.party){
     const memberUnlocked = isPartyMemberUnlocked(p);
     const isBenched = memberUnlocked && SWAPPABLE_PARTY_POOL.includes(p.n) && !p.on;
-    h+='<div class="pcard '+(memberUnlocked?'':'locked')+'"><div class="pava" style="background:'+p.col+'20;border-color:'+p.col+'">'+(memberUnlocked?portraitImg(portraitFileNameFor(p.n), p.col+'30', p.n[0]):'<span style="font-size:20px">🔒</span>')+(memberUnlocked?'<span class="pava-role-badge" title="'+p.r+'">'+re(p.r)+'</span>':'')+'</div><div class="pinfo"><div class="pn">'+p.n+' <span class="pt">'+p.t+'</span></div><div class="pr" style="color:'+p.col+'">'+p.r+'</div><div class="pd">'+p.d+'</div><div class="pb">'+p.b+'</div>'+(isBenched?'<div class="btn-hint" style="color:var(--gold);margin:4px 0;">\ud83e\ude91 Benched \u2014 helping at the Guild right now</div>':'')+(memberUnlocked?'<div class="ps">HP:'+p.hp+'/'+p.mhp+' ATK:'+p.atk+(p.gear&&p.gear.atk?'(+'+p.gear.atk+')':'')+' DEF:'+p.def+(p.gear&&p.gear.def?'(+'+p.gear.def+')':'')+' SPD:'+p.spd+(p.gear&&p.gear.spd?'(+'+p.gear.spd+')':'')+(getBlessDef(p)?' <span style="color:var(--rest);font-weight:700;">🐱+10 DEF</span>':'')+'</div>':'')+(G.affinity[p.n]?'<div class="affinity-bar"><div class="affinity-fill '+getAffinityColor(G.affinity[p.n].val)+'" style="width:'+getAffinityBarPct(p.n)+'%"></div></div><div class="affinity-label">'+(G.affinity[p.n].val>=70?'💕 Close':G.affinity[p.n].val>=40?'💛 Friendly':G.affinity[p.n].val>=20?'💔 Distant':'💀 Strained')+' ('+G.affinity[p.n].val+')</div>':'')
+    h+='<div class="pcard '+(memberUnlocked?'':'locked')+'"><div class="pava" style="background:'+p.col+'20;border-color:'+p.col+'">'+(memberUnlocked?portraitImg(portraitFileNameFor(p.n), p.col+'30', p.n[0]):'<span style="font-size:20px">🔒</span>')+(memberUnlocked?'<span class="pava-role-badge" title="'+p.r+'">'+re(p.r)+'</span>':'')+'</div><div class="pinfo"><div class="pn">'+p.n+' <span class="pt">'+p.t+'</span></div><div class="pr" style="color:'+p.col+'">'+p.r+'</div><div class="pd">'+p.d+'</div><div class="pb">'+p.b+'</div>'+(isBenched?'<div class="btn-hint" style="color:var(--gold);margin:4px 0;">\ud83e\ude91 Benched \u2014 helping at the Guild right now</div>':'')+(memberUnlocked?'<div class="ps">HP:'+p.hp+'/'+p.mhp+(p.mmp?' MP:'+p.mp+'/'+p.mmp:'')+' ATK:'+p.atk+(p.gear&&p.gear.atk?'(+'+p.gear.atk+')':'')+' DEF:'+p.def+(p.gear&&p.gear.def?'(+'+p.gear.def+')':'')+' SPD:'+p.spd+(p.gear&&p.gear.spd?'(+'+p.gear.spd+')':'')+(getBlessDef(p)?' <span style="color:var(--rest);font-weight:700;">🐱+10 DEF</span>':'')+'</div>':'')+(G.affinity[p.n]?'<div class="affinity-bar"><div class="affinity-fill '+getAffinityColor(G.affinity[p.n].val)+'" style="width:'+getAffinityBarPct(p.n)+'%"></div></div><div class="affinity-label">'+(G.affinity[p.n].val>=70?'💕 Close':G.affinity[p.n].val>=40?'💛 Friendly':G.affinity[p.n].val>=20?'💔 Distant':'💀 Strained')+' ('+G.affinity[p.n].val+')</div>':'')
 +(G.affinityUnlocks[p.n]?'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">'+G.affinityUnlocks[p.n].map(function(u){var un=p.affinityBonuses&&p.affinityBonuses.includes(u.id);return '<span title="'+u.d+'" style="font-size:9px;padding:2px 6px;border-radius:8px;border:1px solid '+(un?'var(--xp);color:var(--xp);':'var(--border);color:var(--text-dim);opacity:0.6;')+'">'+(un?'🌟 ':'🔒 ')+u.n+' ('+u.th+')</span>';}).join('')+'</div>':'')+rGrowthAbilityBadge(p.n)+rCompanionPrestigeBadge(p.n)+'</div></div>';
     // === COMPANION EQUIPMENT (8 slots for most, reduced for Soel — see hiddenSlots) ===
     if(memberUnlocked){
