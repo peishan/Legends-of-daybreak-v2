@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (World 5: Where the Cats Never Left, Lv510-550, ch141-145, Soel\u2019s own arc)';
+const APP_VERSION = '2026-08-17 (ch146-147: San\u2019s parents, Ch.48 memory reveal, Mama gifts, how they fight)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -4920,6 +4920,63 @@ storyJournal: {
           { speaker: 'Narrator', text: 'And you understand it anyway, slow, the way you understand most things with him \u2014 quietly, all at once, a little late. This was always going to be a place cats kept, with or without a Guardian Spirit to call their own. He did not choose you because anything about you was special. No prophecy. No destiny wearing fur as a disguise.' },
           { speaker: 'San', text: '"You just decided," you say, soft, something settling in your chest that has been unsettled since a cardboard box in the rain, a lifetime and several worlds ago. "That was the whole reason. You just decided, and that was always going to be enough."' },
           { speaker: 'Narrator', text: 'Soel does not confirm it. He does not need to. He simply stays exactly where he is, warm and unbothered and entirely, quietly certain \u2014 and for once, that is the whole and complete answer, and nobody in this family needs it to be anything more than that.' },
+        ]
+      }
+,{
+        id: 'journal_146',
+        title: 'The Weight He Carried First',
+        chapter: 146,
+        unlockType: 'level',
+        unlockAt: 560,
+        icon: '🪢',
+        summary: 'San tells Joel where the fear of being left actually started — her father, her parents\' arranged marriage, her own dependency — and Joel gives back a harder, more honest version of a memory she thought she already knew the whole shape of.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The porch again, a different night, no particular reason for the conversation to start except that it is quiet enough, finally, for it to.' },
+          { speaker: 'San', text: '"My parents bickered constantly," you say, apropos of nothing Joel asked directly, watching the ordinary stars. "But they loved each other. Deeply. I want to start there, because the rest of it does not make sense without that part being true first."' },
+          { speaker: 'Joel', text: '"I am listening," Joel says, simple, and settles in the way he always does when he means it.' },
+          { speaker: 'San', text: '"My father was the eldest son of a fisherman. Poor, properly poor \u2014 worked a petrol station from the time he was young, juggled that against school the whole way through, became a teacher eventually, on sheer stubbornness more than anything else. He met my grandmother \u2014 my mother\'s mother \u2014 while he was looking for a room to rent."' },
+          { speaker: 'San', text: '"There was a classmate, before him. Someone with feelings for my mother. My grandmother did not support that match at all. She chose my father instead \u2014 for his honesty, she always said. It was arranged. My mother came from money. He came from none of it."' },
+          { speaker: 'Joel', text: '"That is a lot to carry into a marriage neither of them fully chose," Joel says, careful.' },
+          { speaker: 'San', text: '"He carried it his whole life. He believed, all the way down, that he could never actually give her the life she deserved. Every argument they ever had, some part of it was that belief, underneath. And then there were two miscarriages, back to back, before me. I do not think either of them ever said so directly, but I think some part of him decided that was his fault too."' },
+          { speaker: 'San', text: '"Even I was not quite what they expected, in the end. And I think their fear of losing anything else made them overprotective in a way that did not feel like protection from where I was standing. It made me dependent. On my exes, for rides, for money \u2014 on Lim, eventually, until he learned exactly how to turn that dependency into something he could use against me."' },
+          { speaker: 'Joel', text: 'He is quiet a moment, something working behind his eyes \u2014 not judgment, just the particular stillness of someone connecting a piece he has been holding onto for a while.' },
+          { speaker: 'Joel', text: '"Do you remember the girl," he says, slowly. "The one from the transportation story. The one from the fireside \u2014 the ledger, all of it. There was more to that, San. We quarreled about her, before that conversation ever happened. Properly quarreled."' },
+          { speaker: 'San', text: '"Oh," you say, and something shifts, a piece sliding into a socket you did not know was empty. "So you remembered?"' },
+          { speaker: 'Joel', text: '"I remembered tonight," Joel admits. "It has been coming back in pieces, honestly, since we crossed over. I think I told you all of this once, back in the old world, over months, in fragments. I think we both did, for each other. And then Aethon happened, and some of it just \u2014 scattered. Comes back when it comes back."' },
+          { speaker: 'San', text: '"Tell me the part I am apparently still missing," you say, and mean it.' },
+          { speaker: 'Joel', text: '"You kept the full amount from me," Joel says, plain, not unkind about it even now. "What you actually lent her. I found out later it was more than you had let on. I was not happy. I thought she was abusing your trust \u2014 your pity, honestly. You have always been too kind for your own accounting. I wanted you smarter with money. I did not want to watch someone leech off you and call it friendship."' },
+          { speaker: 'San', text: '"I hid it because I was afraid you would overthink it," you admit, the old shape of that fear still recognizable even now. "Afraid you would spiral on it. I was not used to trusting anyone with the full number yet. Not even you. Not then."' },
+          { speaker: 'Joel', text: '"I know," Joel says, gentle. "We worked through it. You did listen, eventually \u2014 you always have, even when trust was still something you were building toward rather than something you already had. I just do not think I ever told you, clearly, how afraid I was underneath being upset. Afraid that if I pushed too hard about it, you would decide I was not worth the honesty at all, and just \u2014 go quiet on me instead."' },
+          { speaker: 'San', text: '"I was afraid of the same thing, in the other direction," you tell him. "That if I told you everything, all at once, you would decide I was too much and walk away. We had real communication problems, back then \u2014 I got distracted so easily, missed half of what you actually meant more times than I am proud of. I was not always sure you would stay through that."' },
+          { speaker: 'Joel', text: '"I am still here," Joel says, simple, certain, reaching for your hand the way he always does when a thing needs saying with more than words. "I was always going to stay through that. I just had to get better at saying it plainly enough that you could actually hear it, distracted or not."' },
+        ]
+      }
+,{
+        id: 'journal_147',
+        title: 'How They Actually Fight',
+        chapter: 147,
+        unlockType: 'level',
+        unlockAt: 570,
+        icon: '🕊️',
+        summary: 'What San\'s generosity looks like now, aimed at Joel\'s whole family — and the plain, unglamorous truth about how she and Joel handle disagreement, nothing like the cold wars that came before either of them.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It is Joel who brings it up this time, turning something over slow, like he has been meaning to say it for a while and only just found the right unhurried evening for it.' },
+          { speaker: 'Joel', text: '"You have always done this," Joel says. "Not just for me. For all of them. Mama especially."' },
+          { speaker: 'San', text: '"I like buying her things," you say, simple, like it needs no more justification than that. "The soaps \u2014 I bought myself some I liked, sent a couple boxes through Lazada Philippines, because I wanted her to try them too. Not because she asked. Because I liked them, and I wanted her to have something I liked."' },
+          { speaker: 'Joel', text: '"The diaper bag," Joel says, and there is real warmth in it. "When my youngest brother took Mama\'s bag because he had nothing to carry baby Klyde\'s things in. You chipped in for a new one for him. The economical one, minimal, nothing fancy."' },
+          { speaker: 'San', text: '"I could not afford fancy," you say, honest about it. "My budget was never predictable enough for that. But economical was still something. Klyde is my nephew too, whatever the paperwork says. That was never a question for me."' },
+          { speaker: 'Joel', text: '"The polvorones," Joel says, and there is the faintest trace of genuine, fond confusion in it now. "Two boxes. You wanted to taste the flavor yourself \u2014 you had already bought the same ones in Brunei. I never quite understood why that meant Mama needed two boxes of her own as well. I was never upset about it. I was just \u2014 puzzled, a little, in a way I liked being puzzled."' },
+          { speaker: 'San', text: '"Because I wanted her to have something nice that had nothing to do with need," you say. "The bag I bought her, the same thing \u2014 I saw it, I liked it, I wanted her to have it. Not because she asked. Because wanting is allowed to just be wanting, sometimes, and I liked that I could be the reason she got to have something purely because someone thought of her."' },
+          { speaker: 'Joel', text: '"You did the safety setup for Klyde\'s household too," Joel says. "Economical, same as the bag. You never once treated any of it like it was optional."' },
+          { speaker: 'San', text: '"Mama went broke doing this for other people," you say, quieter now. "Lending money to relatives, over and over, until there was nothing left in reserve for herself. And then when she actually needed something \u2014 groceries, toiletries, small things \u2014 there was nobody left who could lend it back to her. I do not ever want her to feel that specific kind of alone. Not while I am someone who can help prevent it."' },
+          { speaker: 'Joel', text: 'He does not say anything for a moment, just watches you, something quietly, thoroughly moved in his face.' },
+          { speaker: 'Joel', text: '"You know," he says, eventually, "we disagree plenty. You and I. We are not immune to it."' },
+          { speaker: 'San', text: '"No," you agree. "We are not. But we do not do what my ex did. We do not go cold for days over it. We do not turn a disagreement into a whole silent war neither of us knows how to end."' },
+          { speaker: 'Joel', text: '"You asked me once, back in the old world, why I hold onto painful memories so tightly," you continue, remembering it clearly now, whether or not it counts as one of the pieces that scattered. "You told me plainly \u2014 you are not my exes. You are not my mother-in-law. I do not think I ever thanked you properly for saying that so directly. I needed to hear it said exactly that plainly."' },
+          { speaker: 'Joel', text: '"I meant it," Joel says. "I still mean it. I am not going to make you pay, slowly, for what someone else did to you. That was never going to be how this worked, not from the very first day."' },
+          { speaker: 'Narrator', text: 'Soel shifts against your leg, unbothered, entirely certain of his spot the way he is entirely certain of most things. Neither of you says anything else for a while. Nothing else needs saying.' },
+          { speaker: 'San', text: '"We disagree," you say, finally, soft. "We always will, probably. But we always come back to the same place after. We support each other. That has never once actually been in question, whatever else was."' },
+          { speaker: 'Joel', text: '"Always," Joel agrees, and pulls you in, and the ordinary stars keep doing the plain, unglamorous work of simply being stars, the same way this whole quiet stretch of the journey has been doing the plain work of simply, finally, letting the two of you rest in it.' },
         ]
       }
     ]
@@ -18315,7 +18372,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.73';
+const BUILD_ID = '2026-08-17.74';
 // =========================
 
 
