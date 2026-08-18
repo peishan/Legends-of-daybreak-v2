@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (ch149-153: Codex glimpse + Jovie; Vision Machine Past Memories, 19 vignettes)';
+const APP_VERSION = '2026-08-17 (Garden & Infirmary: Joel/Jovie brewing loop, 100%/200% elixirs, daily-capped)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5417,6 +5417,12 @@ storyJournal: {
   // kit actually has, rather than being an unlimited resource like Senedra's use of
   // the player's own potion inventory.
   drAAKit: { charges: 3 }, // maxCharges is computed via getDrAAKitMaxCharges(), not stored — Jovie's bonus charge needs to apply immediately once recruited, not wait for a manual sync
+  // Garden & Infirmary (unlocked alongside Jovie, journal_153) — Joel tends the
+  // stronghold garden, harvests feed Jovie's brewing, brewing feeds real recipes
+  // (including the exact same Elixir of Swift Growth items Temple sells, so this
+  // becomes a genuine alternative acquisition path, not a reskin).
+  garden: { lastTendDay: -1, harvestReadyAt: 0 },
+  infirmary: { brewing: null, lifetimePotionsMade: 0, rareHerbLastDay: -1, highTierBrewDay: -1 },
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
   afkAdventure: { active: false, zoneIndices: [], startTime: 0, startLevel: 1, legendaryItemsGained: [], totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null, eliteMode: false, visible: false, playerBrowsing: false },
   afkAdventurePicker: [], // temporary selection state while choosing zones, before starting
@@ -7312,6 +7318,156 @@ const VISION_MACHINE_MEMORIES = [
     { speaker: 'Narrator', text: 'Nobody says anything more meaningful than that. It does not need to be more meaningful than that.' }
   ] }
 ];
+
+// === GARDEN & INFIRMARY (unlocked alongside Jovie, journal_153) ===
+// Full loop: Joel tends the garden (once/day) -> harvest ready 4 real hours later ->
+// herbs go straight to inventory as Herb Bundle, same material 42 existing recipes
+// already use -> Jovie brews a chosen recipe (real-time countdown, varies by recipe)
+// -> collect once ready. Jovie's tier climbs with lifetime potions made, gating
+// access to stronger recipes — including two new high-tier growth elixirs (100%/200%
+// boost, well past Temple's 50% ceiling) that are capped at ONE brew per real day
+// each, separate from the existing "one active booster at a time" rule, specifically
+// so this can't be used to stockpile and chain permanent double/triple XP.
+const GARDEN_TEND_TO_HARVEST_HOURS = 4;
+const GARDEN_HARVEST_HERB_MIN = 3;
+const GARDEN_HARVEST_HERB_MAX = 6;
+
+const JOVIE_TIERS = [
+  { tier: 1, potionsReq: 0, name: 'Apprentice' },
+  { tier: 2, potionsReq: 10, name: 'Practiced' },
+  { tier: 3, potionsReq: 25, name: 'Skilled' },
+  { tier: 4, potionsReq: 50, name: 'Expert' },
+  { tier: 5, potionsReq: 100, name: 'Master' }
+];
+
+function getJovieTier() {
+  let tier = 1;
+  for (let t of JOVIE_TIERS) { if (G.infirmary.lifetimePotionsMade >= t.potionsReq) tier = t.tier; }
+  return tier;
+}
+
+// boostPct/durationMin drive the resulting item directly — same shape as the existing
+// TEMPLE_CONSUMABLES growth elixirs, so getBattleRewardXpBoost-style code that reads
+// eff:'xp_boost' items keeps working unmodified for anything brewed here too.
+const JOVIE_RECIPES = [
+  { id: 'field_tonic', n: "Jovie's Field Tonic", tierReq: 1, herbCost: 2, brewMinutes: 15, eff: 'heal', v: 50, r: 'common' },
+  { id: 'esg_30', n: 'Elixir of Swift Growth', tierReq: 1, herbCost: 3, brewMinutes: 30, eff: 'xp_boost', v: 30, boostPct: 0.5, r: 'rare' },
+  { id: 'esg_2h', n: 'Elixir of Swift Growth (2 Hour)', tierReq: 1, herbCost: 6, brewMinutes: 45, eff: 'xp_boost', v: 120, boostPct: 0.5, r: 'rare' },
+  { id: 'esg_4h', n: 'Elixir of Swift Growth (4 Hour)', tierReq: 2, herbCost: 10, brewMinutes: 60, eff: 'xp_boost', v: 240, boostPct: 0.5, r: 'epic' },
+  { id: 'esg_8h', n: 'Elixir of Swift Growth (8 Hour)', tierReq: 3, herbCost: 16, brewMinutes: 90, eff: 'xp_boost', v: 480, boostPct: 0.5, r: 'epic' },
+  { id: 'esg_10h', n: 'Elixir of Swift Growth (10 Hour)', tierReq: 4, herbCost: 20, brewMinutes: 100, eff: 'xp_boost', v: 600, boostPct: 0.5, r: 'epic' },
+  { id: 'esg_12h', n: 'Elixir of Swift Growth (12 Hour)', tierReq: 4, herbCost: 24, brewMinutes: 120, eff: 'xp_boost', v: 720, boostPct: 0.5, r: 'legendary' },
+  { id: 'clarity_draught', n: 'Draught of Clarity', tierReq: 3, herbCost: 12, brewMinutes: 75, eff: 'mana', v: 60, r: 'rare' },
+  // High-tier growth elixirs — 100%/200%, well past Temple's 50% ceiling, each capped
+  // to one brew per real day (shared cap across both, see canBrewHighTierToday()).
+  { id: 'potent_30', n: "Jovie's Potent Growth Elixir", tierReq: 3, herbCost: 12, brewMinutes: 60, eff: 'xp_boost', v: 30, boostPct: 1.0, r: 'epic', highTier: true },
+  { id: 'potent_2h', n: "Jovie's Potent Growth Elixir (2 Hour)", tierReq: 4, herbCost: 20, brewMinutes: 90, eff: 'xp_boost', v: 120, boostPct: 1.0, r: 'legendary', highTier: true },
+  { id: 'volatile_30', n: "Jovie's Volatile Growth Elixir", tierReq: 5, herbCost: 20, rareHerbCost: 3, brewMinutes: 90, eff: 'xp_boost', v: 30, boostPct: 2.0, r: 'legendary', highTier: true }
+];
+
+function isGardenUnlocked() {
+  return isGuildMemberRecruited('jovie');
+}
+
+function canTendGarden() {
+  return isGardenUnlocked() && G.garden.lastTendDay !== G.gameDay && G.garden.harvestReadyAt === 0;
+}
+function tendGarden() {
+  if (!canTendGarden()) return;
+  G.garden.lastTendDay = G.gameDay;
+  G.garden.harvestReadyAt = Date.now() + GARDEN_TEND_TO_HARVEST_HOURS * 3600000;
+  lg('🌿 Joel tends the garden. Ready to harvest in ' + GARDEN_TEND_TO_HARVEST_HOURS + ' hours.');
+  render();
+}
+function canHarvestGarden() {
+  return G.garden.harvestReadyAt > 0 && Date.now() >= G.garden.harvestReadyAt;
+}
+function harvestGarden() {
+  if (!canHarvestGarden()) return;
+  const qty = GARDEN_HARVEST_HERB_MIN + Math.floor(Math.random() * (GARDEN_HARVEST_HERB_MAX - GARDEN_HARVEST_HERB_MIN + 1));
+  addI({ n: 'Herb Bundle', t: 'mat', q: qty, r: 'common' });
+  G.garden.harvestReadyAt = 0;
+  lg('🌿 Joel harvests the garden \u2014 +' + qty + ' Herb Bundle.');
+  render();
+}
+
+function canBrewHighTierToday() {
+  return G.infirmary.highTierBrewDay !== G.gameDay;
+}
+
+function getHerbBundleCount() {
+  const it = G.p.inv.find(i => i.n === 'Herb Bundle');
+  return it ? it.q : 0;
+}
+function getRareHerbCount() {
+  const it = G.p.inv.find(i => i.n === 'Rare Herb');
+  return it ? it.q : 0;
+}
+function consumeMaterial(name, qty) {
+  const idx = G.p.inv.findIndex(i => i.n === name);
+  if (idx === -1) return false;
+  G.p.inv[idx].q -= qty;
+  if (G.p.inv[idx].q <= 0) G.p.inv.splice(idx, 1);
+  return true;
+}
+
+function canStartInfirmaryBrew(recipeId) {
+  const recipe = JOVIE_RECIPES.find(r => r.id === recipeId);
+  if (!recipe) return false;
+  if (G.infirmary.brewing) return false;
+  if (getJovieTier() < recipe.tierReq) return false;
+  if (getHerbBundleCount() < recipe.herbCost) return false;
+  if (recipe.rareHerbCost && getRareHerbCount() < recipe.rareHerbCost) return false;
+  if (recipe.highTier && !canBrewHighTierToday()) return false;
+  return true;
+}
+function startInfirmaryBrew(recipeId) {
+  if (!canStartInfirmaryBrew(recipeId)) { lg('🧪 Can\u2019t start that brew yet \u2014 check tier, herbs, or today\u2019s high-tier limit.'); return; }
+  const recipe = JOVIE_RECIPES.find(r => r.id === recipeId);
+  consumeMaterial('Herb Bundle', recipe.herbCost);
+  if (recipe.rareHerbCost) consumeMaterial('Rare Herb', recipe.rareHerbCost);
+  if (recipe.highTier) G.infirmary.highTierBrewDay = G.gameDay;
+  G.infirmary.brewing = { recipeId, readyAt: Date.now() + recipe.brewMinutes * 60000 };
+  lg('🧪 Jovie starts brewing ' + recipe.n + '. Ready in ' + recipe.brewMinutes + ' minutes.');
+  render();
+}
+function canCollectInfirmaryBrew() {
+  return G.infirmary.brewing && Date.now() >= G.infirmary.brewing.readyAt;
+}
+function collectInfirmaryBrew() {
+  if (!canCollectInfirmaryBrew()) return;
+  const recipe = JOVIE_RECIPES.find(r => r.id === G.infirmary.brewing.recipeId);
+  if (recipe) {
+    const item = { n: recipe.n, t: 'pot', eff: recipe.eff, v: recipe.v, q: 1, r: recipe.r };
+    if (recipe.boostPct) item.boostPct = recipe.boostPct;
+    addI(item);
+    G.infirmary.lifetimePotionsMade = (G.infirmary.lifetimePotionsMade || 0) + 1;
+    lg('🧪 Brew complete: ' + recipe.n + '.');
+    checkAchievements();
+  }
+  G.infirmary.brewing = null;
+  render();
+}
+
+function canGatherRareHerbs() {
+  return getJovieTier() >= 3 && G.infirmary.rareHerbLastDay !== G.gameDay;
+}
+function gatherRareHerbsWithJovie() {
+  if (!canGatherRareHerbs()) return;
+  G.infirmary.rareHerbLastDay = G.gameDay;
+  const xp = 200 + getJovieTier() * 100;
+  G.p.xp += xp;
+  const found = Math.random() < 0.6;
+  let msg = '🌿 Jovie: "Good ground today." +' + xp.toLocaleString() + ' XP';
+  if (found) {
+    addI({ n: 'Rare Herb', t: 'mat', q: 1, r: 'rare' });
+    msg += ', +1 Rare Herb';
+  }
+  lg(msg + '.');
+  lvlup();
+  render();
+}
+
 
 function getAffinityUnlockBonus(type) {
   let bonus = 0;
@@ -19372,7 +19528,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.91';
+const BUILD_ID = '2026-08-17.92';
 // =========================
 
 
@@ -19503,6 +19659,8 @@ function saveGame() {
     lovetalk: G.lovetalk,
     familyTies: G.familyTies,
     drAAKit: G.drAAKit,
+    garden: G.garden,
+    infirmary: G.infirmary,
     playerSpec: G.playerSpec,
     notificationsEnabled: G.notificationsEnabled,
     strongholdStipendDay: G.strongholdStipendDay,
@@ -19823,6 +19981,8 @@ function loadGame() {
     if (data.lovetalk) G.lovetalk = data.lovetalk;
     if (data.familyTies) G.familyTies = data.familyTies;
     if (data.drAAKit) G.drAAKit = data.drAAKit;
+    if (data.garden) G.garden = data.garden;
+    if (data.infirmary) G.infirmary = data.infirmary;
     if (data.playerSpec) {
       G.playerSpec = data.playerSpec;
       if (G.playerSpec.path && typeof applySpecEffects === 'function') applySpecEffects();
@@ -20999,6 +21159,7 @@ function render(){
   else if(G.state=='story_so_far')h+=rStorySoFar();
   else if(G.state=='cellphone')h+=rCellphone();
   else if(G.state=='guild_cafe')h+=rGuildCafe();
+  else if(G.state=='garden_infirmary')h+=rGardenInfirmary();
   else if(G.state=='guild_bounty_missions')h+=rGuildBountyMissions();
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='guild_boss')h+=rGuildBoss();
@@ -21060,6 +21221,7 @@ function attachEvents() {
     else if(a=='story_so_far')setS('story_so_far');
     else if(a=='cellphone')setS('cellphone');
     else if(a=='guild_cafe')setS('guild_cafe');
+    else if(a=='garden_infirmary')setS('garden_infirmary');
     else if(a=='guild_bounty_missions')setS('guild_bounty_missions');
     else if(a=='stronghold')setS('stronghold');
     else if(a=='guild_boss')setS('guild_boss');
@@ -24275,6 +24437,77 @@ function drinkWithCompanions(key) {
   render();
 }
 
+function rGardenInfirmary() {
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
+  h += '<div class="st" style="text-align:center;">🌿 Garden & Infirmary</div>';
+
+  if (!isGardenUnlocked()) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🔒 Recruit Jovie to unlock the garden and her brewing.</div></div></div>';
+    return h;
+  }
+
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Joel tends what grows. Jovie turns it into something useful.</div>';
+
+  // Garden
+  h += '<div class="panel-title" style="margin-bottom:8px;">🌿 The Garden</div>';
+  h += '<div class="panel" style="margin-bottom:16px;">';
+  if (canHarvestGarden()) {
+    h += '<div class="btn-hint" style="margin-bottom:8px;">Ready to harvest.</div>';
+    h += '<button onclick="harvestGarden()" class="abtn" style="width:100%;">Harvest</button>';
+  } else if (G.garden.harvestReadyAt > 0) {
+    const minsLeft = Math.ceil((G.garden.harvestReadyAt - Date.now()) / 60000);
+    h += '<div class="btn-hint">Growing \u2014 ready in ' + Math.floor(minsLeft / 60) + 'h ' + (minsLeft % 60) + 'm.</div>';
+  } else if (canTendGarden()) {
+    h += '<div class="btn-hint" style="margin-bottom:8px;">Nothing planted right now.</div>';
+    h += '<button onclick="tendGarden()" class="abtn" style="width:100%;">Joel Tends the Garden</button>';
+  } else {
+    h += '<div class="btn-hint">Already tended today \u2014 back tomorrow.</div>';
+  }
+  h += '<div class="btn-hint" style="margin-top:8px;">Herb Bundle in bag: ' + getHerbBundleCount() + ' \u00b7 Rare Herb: ' + getRareHerbCount() + '</div>';
+  h += '</div>';
+
+  // Infirmary
+  const tier = getJovieTier();
+  const tierDef = JOVIE_TIERS.find(t => t.tier === tier);
+  h += '<div class="panel-title" style="margin-bottom:8px;">🧪 The Infirmary \u2014 Jovie (' + tierDef.name + ', Tier ' + tier + ')</div>';
+
+  if (G.infirmary.brewing) {
+    const recipe = JOVIE_RECIPES.find(r => r.id === G.infirmary.brewing.recipeId);
+    h += '<div class="panel' + (canCollectInfirmaryBrew() ? ' panel-gold' : '') + '" style="margin-bottom:12px;text-align:center;">';
+    if (canCollectInfirmaryBrew()) {
+      h += '<div class="panel-title" style="color:var(--gold);">Ready: ' + recipe.n + '</div>';
+      h += '<button onclick="collectInfirmaryBrew()" class="abtn" style="width:100%;margin-top:6px;">Collect</button>';
+    } else {
+      const minsLeft = Math.ceil((G.infirmary.brewing.readyAt - Date.now()) / 60000);
+      h += '<div class="btn-hint">Brewing ' + recipe.n + ' \u2014 ' + minsLeft + 'm left</div>';
+    }
+    h += '</div>';
+  } else {
+    h += '<div class="btn-hint" style="margin-bottom:8px;">' + G.infirmary.lifetimePotionsMade + ' potions brewed lifetime' + (tier < 5 ? ' \u2014 ' + (JOVIE_TIERS.find(t => t.tier === tier + 1).potionsReq - G.infirmary.lifetimePotionsMade) + ' more to Tier ' + (tier + 1) : '') + '.</div>';
+    for (let recipe of JOVIE_RECIPES) {
+      if (recipe.tierReq > tier) continue;
+      const can = canStartInfirmaryBrew(recipe.id);
+      h += '<div class="panel" style="margin-bottom:8px;' + (can ? '' : 'opacity:0.6;') + '">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+      h += '<div><div style="font-weight:700;">' + recipe.n + '</div><div class="btn-hint">' + recipe.herbCost + ' Herb Bundle' + (recipe.rareHerbCost ? ', ' + recipe.rareHerbCost + ' Rare Herb' : '') + ' \u00b7 ' + recipe.brewMinutes + 'm' + (recipe.highTier ? ' \u00b7 1/day' : '') + '</div></div>';
+      h += '<button onclick="startInfirmaryBrew(\'' + recipe.id + '\')" class="' + (can ? 'abtn' : 'btn-outline-ghost') + '" style="margin:0;white-space:nowrap;" ' + (can ? '' : 'disabled') + '>Brew</button>';
+      h += '</div></div>';
+    }
+  }
+
+  if (tier >= 3) {
+    h += '<div class="panel' + (canGatherRareHerbs() ? ' panel-gold' : '') + '" style="margin-top:12px;text-align:center;">';
+    h += '<div class="panel-title" style="' + (canGatherRareHerbs() ? 'color:var(--gold);' : '') + '">Gather Rare Herbs with Jovie</div>';
+    h += '<div class="btn-hint" style="margin:6px 0;">Once a day. XP, plus a chance at Rare Herb.</div>';
+    h += '<button onclick="gatherRareHerbsWithJovie()" class="' + (canGatherRareHerbs() ? 'abtn' : 'btn-outline-ghost') + '" style="width:100%;" ' + (canGatherRareHerbs() ? '' : 'disabled') + '>' + (canGatherRareHerbs() ? 'Gather' : 'Already done today') + '</button>';
+    h += '</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
 function rGuildCafe() {
   let h = '<div class="content">';
   h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
@@ -24455,6 +24688,16 @@ function rGuildHub() {
   h += '<div class="btn-hint" style="margin:6px 0;">Drinks, rumors, and a counter Zaki runs himself.</div>';
   h += '<button onclick="setS(\'guild_cafe\')" class="btn-outline-ghost" style="width:100%;">Visit the Cafe</button>';
   h += '</div>';
+
+  // Garden & Infirmary summary card — only shows once Jovie's actually recruited
+  if (isGardenUnlocked()) {
+    const gardenReady = canHarvestGarden() || canCollectInfirmaryBrew();
+    h += '<div class="panel' + (gardenReady ? ' panel-gold' : '') + '" style="margin-top:12px;text-align:center;">';
+    h += '<div class="panel-title" style="' + (gardenReady ? 'color:var(--gold);' : '') + '">🌿 Garden & Infirmary</div>';
+    h += '<div class="btn-hint" style="margin:6px 0;">Joel\u2019s garden, Jovie\u2019s brewing.</div>';
+    h += '<button onclick="setS(\'garden_infirmary\')" class="btn-outline-ghost" style="width:100%;">Visit</button>';
+    h += '</div>';
+  }
 
   // Stronghold summary card — Guild Hall progression lives inside Strongholds, and
   // strongholds already pay Guild Rep directly on siege defense, so this belongs here
