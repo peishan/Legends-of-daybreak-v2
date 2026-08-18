@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Stronghold cross-linked with Guild Hub: summary card + back-link)';
+const APP_VERSION = '2026-08-17 (Temple expanded: Rank 6-10, Brother Corin\u2019s Trials Lv200+, Wren banter fix)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5144,6 +5144,7 @@ storyJournal: {
   guildJoined: false, // The Guild — separate from any Stronghold, auto-joins at level 5
   guildRep: 0, // lifetime reputation total, determines rank, never spent
   templeRep: 0, // lifetime temple reputation, mirrors guildRep pattern
+  templeTrial: { tier: 1, currentHp: null, lastAttemptDay: -1 }, // Brother Corin's repeatable Trials, Lv200+
   templeHunt: { active: false, currentBossName: null },
   guildRepBalance: 0, // spendable reputation currency for the Guild Shop
   dragonHunt: { active: false, currentId: null, cleared: {} }, // legendary optional superbosses, repeatable; cleared keyed by dragon id
@@ -8068,8 +8069,85 @@ const TEMPLE_RANKS = [
   { rank: 2, name: 'Temple Devotee', repReq: 100, desc: '10% off all temple services.', discountPct: 0.10 },
   { rank: 3, name: 'Temple Confessor', repReq: 300, desc: 'Another 10% off (20% total), and the Trinket shelf opens.', discountPct: 0.10 },
   { rank: 4, name: 'Temple Blessed', repReq: 700, desc: 'A lasting blessing: +8% Max HP.', hpPct: 0.08 },
-  { rank: 5, name: 'Temple Chosen', repReq: 1500, desc: 'Another 15% off (35% total), and the full Temple Shop opens \u2014 including Disease Cure Potions.', discountPct: 0.15 }
+  { rank: 5, name: 'Temple Chosen', repReq: 1500, desc: 'Another 15% off (35% total), and the full Temple Shop opens \u2014 including Disease Cure Potions.', discountPct: 0.15 },
+  // Ranks 6-10 added alongside the Temple Trials (Brother Corin's arrival, Lv200+) \u2014
+  // the original chain capped progression at Rank 5 around Lv60, leaving Temple Rep
+  // static for the entire rest of the game. This gives it somewhere to keep going.
+  { rank: 6, name: 'Temple Sentinel', repReq: 3000, desc: 'Another +8% Max HP (16% total), and the Temple Trials open properly.', hpPct: 0.08 },
+  { rank: 7, name: 'Temple Vigilant', repReq: 6000, desc: 'Another 10% off (45% total).', discountPct: 0.10 },
+  { rank: 8, name: 'Temple Anointed', repReq: 12000, desc: 'Another +8% Max HP (24% total).', hpPct: 0.08 },
+  { rank: 9, name: 'Temple Ascendant', repReq: 22000, desc: 'A final 10% off (55% total, discounts cap here).', discountPct: 0.10 },
+  { rank: 10, name: 'Temple Eternal', repReq: 40000, desc: 'The highest standing the temple has ever formally recognized: another +8% Max HP (32% total), and Brother Corin\'s personal respect \u2014 for what that\'s worth from a man who does not give it easily.', hpPct: 0.08 }
 ];
+
+// === TEMPLE TRIALS (Brother Corin's arrival, Lv200+) ===
+// Sister Wren's chain ended around Lv60 with her joining the Guild, leaving Temple
+// Rank frozen at its cap for the entire rest of the game. Repeatable rather than
+// another fixed story chain, deliberately — one persistent trial boss whose tier
+// climbs as the previous one falls, once-per-day attempt, same shape as Guild Boss.
+// 8 tiers spanning Lv200-550, HP/reward numbers grounded against the same scaling
+// formula used everywhere else this session, not picked arbitrarily.
+const TEMPLE_TRIAL_TIERS = [
+  { tier: 1, n: 'What the Vigil First Demands', anchorLv: 200, hp: 754508, xp: 365936, g: 261814, templeRep: 400,
+    desc: "Brother Corin does not call it a test of strength. He calls it a test of whether conviction survives contact with something that actually pushes back." },
+  { tier: 2, n: 'The Doubt He Never Named', anchorLv: 250, hp: 975238, xp: 472990, g: 338407, templeRep: 550,
+    desc: "He lost someone the temple's own magic could not save. He has never once said her name out loud during a Trial. He does not need to. Everyone already understands." },
+  { tier: 3, n: 'A Faith Tested on Purpose', anchorLv: 300, hp: 1202733, xp: 583325, g: 417348, templeRep: 700,
+    desc: "Not tested by accident this time \u2014 tested deliberately, on his own terms, in a room he built specifically to keep asking himself the same hard question." },
+  { tier: 4, n: 'What Devotion Actually Costs', anchorLv: 350, hp: 1436011, xp: 696465, g: 498295, templeRep: 900,
+    desc: "Sister Wren paid a different cost for hers \u2014 years devoted to something false. His cost was different, and no less real for being ordinary grief instead of a cult." },
+  { tier: 5, n: 'The Vigil, Renewed', anchorLv: 400, hp: 1674359, xp: 812064, g: 581002, templeRep: 1150,
+    desc: "He does not claim the doubt is gone. He claims it stopped being the only thing in the room with him, which he has decided is close enough to faith to keep going on." },
+  { tier: 6, n: 'What the Temple Still Holds', anchorLv: 450, hp: 1917229, xp: 929856, g: 665278, templeRep: 1450,
+    desc: "Whole, unlike so much else the Breaking touched. He has never fully explained why he thinks that matters as much as it clearly does to him." },
+  { tier: 7, n: 'The Last Honest Question', anchorLv: 500, hp: 2164189, xp: 1049631, g: 750973, templeRep: 1800,
+    desc: "Not whether the gods are real. Whether showing up anyway, real or not, was ever actually the point in the first place." },
+  { tier: 8, n: "Brother Corin's Own Answer", anchorLv: 550, hp: 2414887, xp: 1171220, g: 837965, templeRep: 2200,
+    desc: "He has one, finally, after all these tiers of asking. He still will not say it out loud. He just keeps showing up, tier after tier, and lets that be the answer instead." }
+];
+
+function isTempleTrialsUnlocked() {
+  return G.p.lvl >= 200;
+}
+function getTempleTrialTier() {
+  return TEMPLE_TRIAL_TIERS[Math.min(G.templeTrial.tier - 1, TEMPLE_TRIAL_TIERS.length - 1)];
+}
+function ensureTempleTrialHp() {
+  if (G.templeTrial.currentHp === null || G.templeTrial.currentHp === undefined) {
+    G.templeTrial.currentHp = getTempleTrialTier().hp;
+  }
+}
+function canAttemptTempleTrialToday() {
+  return G.templeTrial.lastAttemptDay !== G.gameDay;
+}
+function attemptTempleTrial() {
+  if (!isTempleTrialsUnlocked()) { lg('🙏 Brother Corin is not ready for you yet. Come back at Level 200.'); return; }
+  if (!canAttemptTempleTrialToday()) { lg('🙏 Already faced the Vigil today. Come back tomorrow.'); return; }
+  ensureTempleTrialHp();
+  G.templeTrial.lastAttemptDay = G.gameDay;
+  const tier = getTempleTrialTier();
+  // Simple, deterministic-feeling damage roll rather than a full combat encounter —
+  // same lightweight spirit as the daily stipend, not meant to need party management.
+  const dmg = Math.floor(tier.hp * (0.10 + Math.random() * 0.08));
+  G.templeTrial.currentHp = Math.max(0, G.templeTrial.currentHp - dmg);
+  lg('🙏 You strike the Vigil for ' + dmg.toLocaleString() + ' damage. (' + G.templeTrial.currentHp.toLocaleString() + '/' + tier.hp.toLocaleString() + ' remaining)');
+  if (G.templeTrial.currentHp <= 0) {
+    G.p.xp += tier.xp;
+    G.p.gold += tier.g;
+    addTempleRep(tier.templeRep);
+    lg('🙏 ' + tier.n + ' falls! +' + tier.xp.toLocaleString() + ' XP, +' + tier.g.toLocaleString() + 'G.');
+    if (G.templeTrial.tier < TEMPLE_TRIAL_TIERS.length) {
+      G.templeTrial.tier++;
+      G.templeTrial.currentHp = getTempleTrialTier().hp;
+      lg('🙏 Brother Corin raises the next tier: ' + getTempleTrialTier().n + '.');
+    } else {
+      G.templeTrial.currentHp = getTempleTrialTier().hp;
+      lg('🙏 The Vigil resets at its highest tier. Brother Corin has nothing higher to offer yet.');
+    }
+  }
+  lvlup();
+  render();
+}
 
 const TEMPLE_TRINKETS = [
   { n: 'Blessed Charm', slot: 'ring', minRank: 3, cost: 120, def: 4, hpRegen: 2, r: 'rare', d: 'A small warmth against the cold. Nothing dramatic. Just steady.' },
@@ -11388,7 +11466,7 @@ const GUILD_MEMBERS = [
     hubBanter: [
       'Sister Wren: "Dr. AA and I argue about whether faith or medicine actually holds this Hall together. We\'ve never once settled it. I don\'t think we\'re supposed to."',
       'Sister Wren: "I light the same candle every evening. Not for anyone in particular anymore. Just for the habit of it."',
-      'Sister Wren: "Real devotion doesn\'t need an audience. Took me a long time and a very false doctrine to actually learn that."'
+      'Sister Wren: "I visit the Temple of Resurrection sometimes now. Not to atone \u2014 I don\'t think that\'s what this is. Just to sit somewhere real, on purpose, for once."'
     ],
     recruitLine: "Sister Wren doesn't hesitate. \"I spent a long time devoted to something that was never real. I know real when I finally get to stand next to it.\"",
     barks: [
@@ -18418,7 +18496,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.76';
+const BUILD_ID = '2026-08-17.77';
 // =========================
 
 
@@ -18517,6 +18595,7 @@ function saveGame() {
     guildJoined: G.guildJoined,
     guildRep: G.guildRep,
     templeRep: G.templeRep,
+    templeTrial: G.templeTrial,
     companionPrestige: G.companionPrestige,
     expBooster: G.expBooster || null,
     statBooster: G.statBooster || null,
@@ -18795,6 +18874,7 @@ function loadGame() {
     G.guildJoined = data.guildJoined || false;
     G.guildRep = data.guildRep || 0;
     G.templeRep = data.templeRep || 0;
+    if (data.templeTrial) G.templeTrial = data.templeTrial;
     G.companionPrestige = data.companionPrestige || {};
     G.expBooster = data.expBooster || null;
     G.statBooster = data.statBooster || null;
@@ -24856,6 +24936,26 @@ function rTemple() {
   }
   if (rankDef) h2 += '<div style="font-size:11px;color:var(--text-dim);margin-top:6px;">' + rankDef.desc + '</div>';
   h2 += '</div>';
+
+  // Temple Trials — Brother Corin's repeatable Trials, Lv200+. Same shape as Guild
+  // Boss: one persistent trial with HP that carries across attempts, tier climbs once
+  // the previous one falls, once-per-real-day attempt.
+  if (isTempleTrialsUnlocked()) {
+    ensureTempleTrialHp();
+    const trialTier = getTempleTrialTier();
+    const hpPct = Math.max(0, Math.min(100, (G.templeTrial.currentHp / trialTier.hp) * 100));
+    const canTrial = canAttemptTempleTrialToday();
+    h2 += '<div class="panel' + (canTrial ? ' panel-gold' : '') + '" style="text-align:left;margin-bottom:12px;">';
+    h2 += '<div class="panel-row"><div class="panel-title' + (canTrial ? ' panel-title-gold' : '') + '">\uD83D\uDD6F\uFE0F The Temple Trials</div><div class="btn-hint">Tier ' + trialTier.tier + '/' + TEMPLE_TRIAL_TIERS.length + '</div></div>';
+    h2 += '<div style="font-size:12px;font-weight:700;margin:4px 0;">' + trialTier.n + '</div>';
+    h2 += '<div style="font-size:11px;color:var(--text-dim);margin-bottom:6px;">' + trialTier.desc + '</div>';
+    h2 += '<div style="background:var(--bg-hover);border-radius:8px;height:10px;overflow:hidden;margin:6px 0;border:1px solid var(--border);"><div style="background:linear-gradient(90deg,var(--danger),var(--gold));height:100%;width:' + hpPct + '%;"></div></div>';
+    h2 += '<div class="btn-hint" style="margin-bottom:8px;">' + Math.floor(hpPct) + '% remaining</div>';
+    h2 += '<button onclick="attemptTempleTrial()" class="' + (canTrial ? 'abtn' : 'btn-outline-ghost') + '" style="width:100%;">' + (canTrial ? 'Face Brother Corin\u2019s Trial' : 'Already faced today \u2014 back tomorrow') + '</button>';
+    h2 += '</div>';
+  } else {
+    h2 += '<div class="panel" style="text-align:center;margin-bottom:12px;"><div class="btn-hint">\uD83D\uDD12 Brother Corin\u2019s Temple Trials unlock at Level 200.</div></div>';
+  }
 
   const cureCost = getTempleCost(TEMPLE_CURE_COST);
   const healCost = getTempleCost(site ? site.cost : 0);
