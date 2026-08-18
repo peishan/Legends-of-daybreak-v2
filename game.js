@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fixed: companion gear now scales with player level, same as San\u2019s own gear)';
+const APP_VERSION = '2026-08-17 (CRITICAL FIX: zones above Lv200 were invisible on Explore screen \u2014 added 3 tabs)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -18584,7 +18584,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.79';
+const BUILD_ID = '2026-08-17.80';
 // =========================
 
 
@@ -23764,6 +23764,15 @@ const ZONE_MAP_TABS = [
 // through Zul. Gated on having actually read the bridge chapter, not just hitting
 // a level, so the transition lands with the story rather than silently on a number.
 const VERDANT_REACH_TAB = { label: 'The Verdant Reach', min: 56, max: 200 };
+// Added alongside the audit that found zones above Lv200 had become completely
+// unreachable through the normal Explore screen — getActiveZoneMapTabs() was
+// returning ONLY the Verdant Reach tab (max 200) once past Level 56, silently
+// hiding every zone from World 1 onward. These extend proper coverage through
+// everything currently built, with real headroom (up to 700) for whatever comes
+// after World 5 rather than needing this exact fix repeated again next expansion.
+const FRACTURED_WORLDS_TAB = { label: 'The Fractured Worlds', min: 201, max: 360 };
+const BEYOND_THE_ROADS_TAB = { label: 'Beyond the Roads', min: 361, max: 490 };
+const THE_LIBRARY_AND_BEYOND_TAB = { label: 'The Library & Beyond', min: 491, max: 700 };
 const VERDANT_REACH_BRIDGE_CHAPTER = 'journal_069'; // "What the World Let Go Of" — comes after the 6 backstory chapters (62-67) and the charging/parents chapter (68). Written and live.
 
 function hasEnteredVerdantReach() {
@@ -23782,7 +23791,7 @@ function isInVerdantReachTabMode() {
 }
 
 function getActiveZoneMapTabs() {
-  return isInVerdantReachTabMode() ? [VERDANT_REACH_TAB] : ZONE_MAP_TABS;
+  return isInVerdantReachTabMode() ? [VERDANT_REACH_TAB, FRACTURED_WORLDS_TAB, BEYOND_THE_ROADS_TAB, THE_LIBRARY_AND_BEYOND_TAB] : ZONE_MAP_TABS;
 }
 
 function setExploreMapTab(idx) {
