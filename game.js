@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Menu visual overhaul: category colors, depth, badges, section flourish)';
+const APP_VERSION = '2026-08-17 (Chapter art 28-34 re-added, Ch.32 pointed at new Ghibli-style regen)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -18220,7 +18220,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.71';
+const BUILD_ID = '2026-08-17.72';
 // =========================
 
 
@@ -23428,7 +23428,21 @@ const CHAPTER_ART = {
   "The Widow's Watch": 'chapter26-widows-watch.jpg',
   'journal_026': 'chapter26-widows-watch.jpg',
   'The Roads Senedra Walked': 'chapter27-roads-senedra-walked.jpg',
-  'journal_027': 'chapter27-roads-senedra-walked.jpg'
+  'journal_027': 'chapter27-roads-senedra-walked.jpg',
+  'The Room That Waited': 'chapter28-room-that-waited.jpg',
+  'journal_028': 'chapter28-room-that-waited.jpg',
+  'The Boy Who Stopped Checking': 'chapter29-boy-who-stopped-checking.jpg',
+  'journal_029': 'chapter29-boy-who-stopped-checking.jpg',
+  'The Storm That Never Broke': 'chapter30-storm-that-never-broke.jpg',
+  'journal_030': 'chapter30-storm-that-never-broke.jpg',
+  'What the Ember Remembers': 'chapter31-what-ember-remembers.jpg',
+  'journal_031': 'chapter31-what-ember-remembers.jpg',
+  'What the Ledger Never Said': 'chapter32-ledger-never-said.jpg',
+  'journal_032': 'chapter32-ledger-never-said.jpg',
+  'The Version That Stopped Pretending': 'chapter33-version-that-stopped-pretending.jpg',
+  'journal_033': 'chapter33-version-that-stopped-pretending.jpg',
+  'The Door Someone Built on Purpose': 'chapter34-door-built-on-purpose.jpg',
+  'journal_034': 'chapter34-door-built-on-purpose.jpg'
 };
 function getChapterArt(key) {
   const file = CHAPTER_ART[key];
