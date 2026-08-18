@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Chapter art 28-34 re-added, Ch.32 pointed at new Ghibli-style regen)';
+const APP_VERSION = '2026-08-17 (World 5: Where the Cats Never Left, Lv510-550, ch141-145, Soel\u2019s own arc)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -591,6 +591,18 @@ const G = {
     // or Teach a Disciple. This zone exists purely to mark the actual arrival, using
     // the Roadwarden method earned at Lv490 rather than another blind door.
     { n: 'The Door the Roadwardens Kept', lv: 500, elem: 'none', d: "The method works. Carefully, exactly the way the last hall promised, the door opens on purpose instead of by accident \u2014 and on the other side, impossibly, undamaged by anything the Breaking ever did: a library, whole, quiet, waiting, like it has simply been keeping the lights on for longer than anyone thought to come looking.", en: ['A Threshold Given Willingly', 'Something Welcoming, For Once', 'The Door\u2019s Last Guardian, Standing Down'], loot: ['A Door Opened On Purpose', 'Proof The Method Actually Works', 'The Library\u2019s Own Welcome'], xp: 5600, g: 3360, dg: 'impossible' },
+    // === WHERE THE CATS NEVER LEFT (Lv 510-550) ===
+    // Deliberately not 'impossible' difficulty like everything else at this level range
+    // — these zones are meant to be genuinely easy for a party this strong. Nothing
+    // here is a threat. That is the actual point, mechanically as well as narratively:
+    // a rest beat after committing to the Library, before the research questline settles
+    // into its permanent background hum. Soel's own world, never previously explored —
+    // present since Chapter 1, never once given his own arc until now.
+    { n: 'The Path Only Soel Knew', lv: 510, elem: 'none', d: "He simply starts walking, one afternoon, in a direction nobody suggested and nobody questions — and for the first time in this entire journey, Soel is the one leading. Not toward danger. Not toward a door. Just forward, certain, the way a cat is certain about the one specific patch of sun that matters.", en: ['A Curious Stray', 'Something Sunning Itself', 'A Watchful Tabby'], loot: ['A Well-Worn Path', 'Soel\u2019s Own Certainty', 'Pawprints Older Than the Road'], xp: 5650, g: 3390, dg: 'low' },
+    { n: 'The Place Cats Kept Anyway', lv: 520, elem: 'none', d: "Not ruins. Not abandoned. Tended — a small waystation nobody official has staffed in years, roof half-mended, well half-cleared, garden half-wild, every single unfinished repair somehow never quite falling all the way to disrepair. Something has been keeping this place standing, in the small, patient, unglamorous way that only ever gets noticed once you stop to actually look.", en: ['A Household Cat, Unbothered', 'Something Napping in the Rafters', 'A Kitten, Deeply Unafraid'], loot: ['A Half-Mended Roof Tile', 'Garden Herbs, Somehow Still Thriving', 'Proof Someone Has Been Here All Along'], xp: 5700, g: 3420, dg: 'low' },
+    { n: 'An Ordinary Afternoon of Fixing Things', lv: 530, elem: 'none', d: "Nobody asks the party to be heroes here. The well needs clearing. The roof needs finishing, properly this time. San re-shelves a small pile of books nobody's opened in years, out of habit more than need. It is, entire, the most unremarkable afternoon anyone in this party has had in longer than they can actually count. Nobody complains about that even once.", en: ['A Cat Supervising Closely', 'Something Unbothered by the Work', 'A Barn Cat, Mildly Helpful'], loot: ['A Properly Finished Roof', 'A Well, Actually Clear', 'An Afternoon With Nothing Urgent In It'], xp: 5750, g: 3450, dg: 'low' },
+    { n: 'What Joel and San Never Get, Usually', lv: 540, elem: 'none', d: "No crisis waiting. No grief to process. No door to open carefully or badly. Just an evening, a porch, two cups of something warm, and the specific, uncomplicated quiet of two people who have earned an ordinary night together and, for once, actually get to have one.", en: ['A Cat, Entirely Uninterested', 'Something Purring Nearby', 'A Sleepy Guardian'], loot: ['A Warm, Uneventful Evening', 'Two Cups, Both Empty Now', 'Nothing Urgent At All'], xp: 5800, g: 3480, dg: 'low' },
+    { n: 'Wherever Soel Actually Came From', lv: 550, elem: 'none', d: "Not a dramatic origin. Not a hidden destiny. Just the plain, gentle truth, offered without ceremony: this was always going to be a place cats kept, with or without a Guardian Spirit to call their own — and Soel, San understands now, did not choose her because anything about her was special. He chose her the way any cat chooses anyone. Because he decided to. Because that was, quietly, always enough.", en: ['An Old Cat, Watching', 'Something Content, Finally', 'The Last Kitten of the Litter'], loot: ['A Small, Unremarkable Truth', 'Proof Some Choices Need No Reason', 'Soel\u2019s Own Quiet Answer'], xp: 5900, g: 3540, dg: 'low' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -4825,6 +4837,89 @@ storyJournal: {
           { speaker: 'Eliz', text: '"Whether it survives anyone actually trying it," Eliz says, quiet and certain in the specific way only Eliz manages. "Whatever you build, San, Mez \u2014 I want to make sure it does not cost more than anyone is willing to pay to use it."' },
           { speaker: 'Renn', text: '"Theory, resonance, and safety," Renn repeats, and something like real respect moves through his voice. "That is, annoyingly, almost exactly the right split. I could not have organized it better myself, and I have had considerably more practice." He claps his hands once, decisive. "Then let us begin. Properly. However long it actually takes."' },
           { speaker: 'Narrator', text: 'Nobody in the room pretends this will be quick. Nobody pretends it will be easy, either. But for the first time since a phone stopped ringing and a window first opened on people who could not know they were being watched, the search for an actual way back stops being a hope kept quietly to one side, and becomes something real, chosen, and finally, deliberately, begun.' },
+        ]
+      }
+,{
+        id: 'journal_141',
+        title: 'The Path Only Soel Knew',
+        chapter: 141,
+        unlockType: 'level',
+        unlockAt: 510,
+        icon: '🐾',
+        summary: 'For the first time in this entire journey, Soel is the one leading — certain, unhurried, headed somewhere nobody else knew existed.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It happens without ceremony, the way most true things in this family tend to. Renn is still cataloguing. San and Mez and Eliz have not even finished their first real week of research. And Soel, mid-afternoon, simply stands up, stretches, and starts walking — not toward the door, not toward anything anyone recognizes, just forward, with the specific, unbothered certainty of a cat who has somewhere to be.' },
+          { speaker: 'Joel', text: '"He has never done that before," Joel says, watching him go. "Led. He follows. He supervises. He judges people\u2019s cooking. He does not lead."' },
+          { speaker: 'San', text: '"He is doing it now," you say, already getting up. Something in you does not want to let this pass unfollowed \u2014 seven chapters, a hundred and forty of them if you count honestly, and Soel has never once asked for anything back. "I think we should go."' },
+          { speaker: 'Narrator', text: 'Aisyah falls in without needing to be asked twice, which is its own small unspoken thing \u2014 she has not stopped moving in longer than anyone has bothered to track, and something about a cat choosing a direction, for once, seems to loosen something in her posture.' },
+          { speaker: 'Aisyah', text: '"Family business should stay in the family," she says, half a joke, following anyway. "Even when the family in question has four legs and opinions about tuna."' },
+          { speaker: 'Narrator', text: 'The path is old. Not maintained-old, not ruin-old \u2014 walked-old, the specific kind of wear that only happens when something keeps choosing the same route, over and over, for longer than anyone has been keeping count. Soel does not look back to check if you are following. He has never needed to. He already knows.' },
+        ]
+      }
+,{
+        id: 'journal_142',
+        title: 'The Place Cats Kept Anyway',
+        chapter: 142,
+        unlockType: 'level',
+        unlockAt: 520,
+        icon: '🏚️',
+        summary: 'A small waystation, half-mended, half-wild, and somehow never quite falling all the way to ruin — kept standing, patiently, by something nobody official ever assigned the job.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It should be a ruin. Every honest measure says it should be a ruin \u2014 roof half-gone, well long unclear, garden gone properly wild. And yet it stands, in the specific, unglamorous way a thing stands when someone has been quietly, patiently keeping it from finishing the job of falling down.' },
+          { speaker: 'Eliz', text: '"It is not sad," Eliz says, certain, the way she is certain about the things that actually matter. "I thought it would feel sad. Forgotten places usually do. This one does not."' },
+          { speaker: 'Narrator', text: 'Cats are everywhere, once you actually start looking \u2014 in the rafters, on the warm stones, curled in the one patch of unbroken roof tile like they filed a claim on it generations ago. None of them startle at the party\u2019s arrival. None of them seem particularly surprised, either, the way you are never surprised by family showing up eventually.' },
+          { speaker: 'San', text: '"This is his," you say, slow, understanding arriving the way understanding usually does with Soel \u2014 quietly, all at once, a little late. "Not ours. Not something he found. Something he kept."' },
+          { speaker: 'Joel', text: '"Then I suppose we\u2019re the guests here," Joel says, and there is something unguarded in his voice, something that has not had room to surface in a very long time. "For once. Just guests. Nothing more required of us than that."' },
+        ]
+      }
+,{
+        id: 'journal_143',
+        title: 'An Ordinary Afternoon of Fixing Things',
+        chapter: 143,
+        unlockType: 'level',
+        unlockAt: 530,
+        icon: '🔨',
+        summary: 'Nobody asks the party to be heroes. The roof needs finishing. The well needs clearing. It is the most unremarkable afternoon anyone has had in longer than they can count, and nobody complains about that even once.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Nobody assigns the work. Nobody frames it as a quest, a task, a thing owed. Dudin simply looks at the half-finished roof, makes a small sound of professional disapproval, and starts sorting tiles. Jorvin finds the well and mutters about the drainage. San, without quite deciding to, starts re-shelving a small pile of books nobody has opened in years, out of habit more than need.' },
+          { speaker: 'Aisyah', text: '"I do not actually know how to fix a roof," Aisyah admits, watching Dudin work, something almost relaxed in her voice. "I know how to steal things off one. This feels like it should translate. It is not translating."' },
+          { speaker: 'Narrator', text: 'It is, entire, an ordinary afternoon. Nothing threatens it. Nothing interrupts it. The sun moves, slow and unbothered, and by the time it starts to set, the roof holds, the well runs clear, and a small stack of books sit properly shelved for the first time in longer than anyone here can actually measure.' },
+          { speaker: 'Mezstorm', text: '"I keep waiting for something to go wrong," Mezstorm admits, quiet, watching the light change. "Nothing has. I do not entirely know what to do with an afternoon that just stays what it started as."' },
+          { speaker: 'Senedra', text: '"You let it," Senedra says, simply, already halfway into a second cup of something warm. "That is genuinely the whole trick. You just let it."' },
+        ]
+      }
+,{
+        id: 'journal_144',
+        title: 'What Joel and San Never Get, Usually',
+        chapter: 144,
+        unlockType: 'level',
+        unlockAt: 540,
+        icon: '🍵',
+        summary: 'No crisis waiting. No grief to process. No door to open carefully or badly. Just a porch, two cups of something warm, and an ordinary night they finally, actually get to have.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The porch is small, worn smooth by however many years of whoever sat here before you. Soel claims the space between your feet without asking, the way he always has, since a rainy porch in a life that does not exist anymore. Joel hands you a cup of something warm that neither of you can quite name and both of you drink anyway.' },
+          { speaker: 'San', text: '"No crisis," you say, testing the sentence, half-expecting it to prove itself wrong the moment you say it out loud. "No door. No grief that needs carrying anywhere tonight. Just this."' },
+          { speaker: 'Joel', text: '"Just this," Joel agrees, and something in his shoulders lets go that you do not think you have ever actually seen let go before \u2014 not fully, not like this. "I keep thinking I should feel guilty about how good this feels. I am choosing, tonight, not to."' },
+          { speaker: 'Narrator', text: 'Neither of you says anything else for a while. Nothing needs saying. The stars are ordinary here, unremarkable, no swirling portals, no impossible thrones, no warnings dressed as wards \u2014 just stars, doing the plain, unglamorous work of simply being stars, the same way this whole small forgotten place does the plain work of simply, quietly, being kept.' },
+          { speaker: 'San', text: '"I could stay a while," you say, and mean it more plainly than you have meant anything in a very long time. "Not forever. Just \u2014 a while. Long enough."' },
+          { speaker: 'Joel', text: '"Then let\u2019s stay a while," Joel says, and pulls you in, and for once, for one whole uncomplicated evening, that is the entire plan. Nothing more required of either of you than that.' },
+        ]
+      }
+,{
+        id: 'journal_145',
+        title: 'Wherever Soel Actually Came From',
+        chapter: 145,
+        unlockType: 'level',
+        unlockAt: 550,
+        icon: '🐈',
+        summary: 'Not a dramatic origin, not a hidden destiny — just the plain, gentle truth. Soel did not choose San because anything about her was special. He chose her the way any cat chooses anyone. Because he decided to.',
+        scenes: [
+          { speaker: 'Narrator', text: 'You find him on the last afternoon, curled in a patch of sun that has clearly been his for longer than you have known him, watching the place the way an old cat watches something he already trusts to keep standing without his supervision.' },
+          { speaker: 'San', text: '"Is this where you\u2019re from?" you ask, sitting beside him, not really expecting an answer, the way you never really expect one and somehow always get exactly the right amount anyway.' },
+          { speaker: 'Soel', text: 'Soel does not answer in words. He never has. He just leans, unhurried, into your hand, the specific weight of a cat who has already decided the question does not actually need a bigger answer than this.' },
+          { speaker: 'Narrator', text: 'And you understand it anyway, slow, the way you understand most things with him \u2014 quietly, all at once, a little late. This was always going to be a place cats kept, with or without a Guardian Spirit to call their own. He did not choose you because anything about you was special. No prophecy. No destiny wearing fur as a disguise.' },
+          { speaker: 'San', text: '"You just decided," you say, soft, something settling in your chest that has been unsettled since a cardboard box in the rain, a lifetime and several worlds ago. "That was the whole reason. You just decided, and that was always going to be enough."' },
+          { speaker: 'Narrator', text: 'Soel does not confirm it. He does not need to. He simply stays exactly where he is, warm and unbothered and entirely, quietly certain \u2014 and for once, that is the whole and complete answer, and nobody in this family needs it to be anything more than that.' },
         ]
       }
     ]
@@ -18220,7 +18315,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.72';
+const BUILD_ID = '2026-08-17.73';
 // =========================
 
 
