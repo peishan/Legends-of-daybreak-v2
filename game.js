@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Dr. AA banter now callbacks the Robin/Jeff whereabouts chapter)';
+const APP_VERSION = '2026-08-17 (Story So Far rebuilt (was lost) + new Cellphone: selfies + 11 message threads)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5318,7 +5318,19 @@ storyJournal: {
   afkAdventureEliteToggle: false, // temporary picker-screen toggle, before starting
   notificationsEnabled: false,
   companionPrestige: {}, // { CompanionName: 'pathKey' } once chosen, absent until then
-  mercenary: { active: false, current: null, completed: 0, batchRemaining: 0 }, // current offered contract, if any; completed drives tier scaling; batchRemaining lets several contracts auto-chain without re-tapping "Take the Job" each time
+  mercenary: { active: false, current: null, completed: 0, batchRemaining: 0 }, // current offered contract, if any; completed drives tier scaling (and is already lifetime, never reset — Blitz reuses it directly); batchRemaining lets several contracts auto-chain without re-tapping "Take the Job" each time
+  // === BLITZ MODE (Lv200+) ===
+  // Mercenary Blitz: once per real day, instantly grants one contract's worth of
+  // reward at your current best-cleared tier — no combat, exact same formula a real
+  // contract would use. Dragon Hunt Blitz: unlocks per-dragon the first time you clear
+  // that dragon for real that day, then repeatable up to a daily cap, exact same
+  // reward package (hoard, legendary/epic gear) a real kill grants.
+  mercenaryBlitz: { lastBlitzDay: -1, yesterdayPeakTier: 0 },
+  dragonHuntBlitz: {}, // keyed by dragon id: { clearedTodayDay, blitzesUsedToday }
+  // Missed-Day Catch-Up: appears only after an actual missed real day, grants averaged
+  // (not maximum) rewards for Daily Quests, Bounties, and Guild idle gathering only —
+  // explicitly excludes Disciples, Guild War, Guild Boss, and Temple Trials.
+  missedDayCatchup: { available: false, forDay: -1, incompleteQuestCount: 0, incompleteBountyCount: 0, guildGatherMissed: false },
   prestige: { count: 0, xpBonusPct: 0, goldBonusPct: 0 }, // permanent bonuses banked from past resets
   strongholdSiege: {}, // per-stronghold: { active: bool, day: gameDay } — under attack or not
   siegeDefense: { active: false, strongholdId: null, wave: 0, maxWaves: 3 },
@@ -7606,6 +7618,10 @@ function checkDayAdvance() {
   // player level, and got punishing fast for anyone doing this repeatable content
   // often. Resetting daily keeps escalation contained to a single day's grinding.
   if (G.mercenary.completed > 0) {
+    // Captured before the reset below wipes it — Mercenary Blitz explicitly uses
+    // yesterday's peak tier, not today's (which would otherwise always read as
+    // freshly reset to 0 the moment Blitz becomes available each morning).
+    G.mercenaryBlitz.yesterdayPeakTier = getMercenaryTier();
     lg('📋 Mercenary contracts reset for the day \u2014 tier back to 1.');
     G.mercenary.completed = 0;
   }
@@ -7646,6 +7662,28 @@ function checkDayAdvance() {
   G.loginClaimed = false;
   G.p.focusMinutesToday = 0;
     G.p.focusSessionsToday = 0;
+  // Missed-Day Catch-Up detection — captured right before generateDailyQuests() wipes
+  // whatever was left incomplete. Deliberately about forgotten dailies, not absence:
+  // this fires even after a single day the player was actually present for, as long
+  // as quests/bounties/gathering were left undone when the day rolled over. Only
+  // covers the three systems that reset once per day — explicitly not Disciples,
+  // Guild War, Guild Boss, or Temple Trials.
+  const dayThatJustEnded = G.gameDay - 1;
+  const incompleteQuestCount = (G.dailyQuests || []).filter(q => !q.done).length;
+  const incompleteBounties = (G.bounties || []).filter(b => !b.done && b.refreshDay !== G.gameDay);
+  const guildGatherMissed = G.guildJoined && G.guildGather.lastCollectedDay !== dayThatJustEnded && G.guildGather.lastCollectedDay < dayThatJustEnded;
+  if (incompleteQuestCount > 0 || incompleteBounties.length > 0 || guildGatherMissed) {
+    G.missedDayCatchup = {
+      available: true,
+      forDay: dayThatJustEnded,
+      incompleteQuestCount,
+      incompleteBountyXp: incompleteBounties.reduce((s, b) => s + (b.rw && b.rw.xp ? b.rw.xp : 0), 0),
+      incompleteBountyGold: incompleteBounties.reduce((s, b) => s + (b.rw && b.rw.g ? b.rw.g : 0), 0),
+      incompleteBountyCount: incompleteBounties.length,
+      guildGatherMissed
+    };
+    lg('📋 Yesterday\u2019s dailies went unfinished \u2014 a Catch-Up is waiting for you.');
+  }
   generateDailyQuests();
   generateDailyEventDeck();
   saveGame();
@@ -10415,6 +10453,57 @@ function startDragonHunt(dragonId) {
   render();
 }
 
+// === DRAGON HUNT BLITZ (Lv200+) ===
+// Unlocks per-dragon the first time that specific dragon is cleared for real on a
+// given real day, then repeatable up to a daily cap. Grants the exact same reward
+// package a real kill does — same xp/gold/hoard/legendary+epic gear formula as
+// handleDragonHuntVictory(), just without the actual fight.
+const DRAGON_HUNT_BLITZ_MIN_LEVEL = 200;
+const DRAGON_HUNT_BLITZ_MAX_PER_DAY = 3;
+
+function canBlitzDragon(dragonId) {
+  if (G.p.lvl < DRAGON_HUNT_BLITZ_MIN_LEVEL) return false;
+  const entry = G.dragonHuntBlitz[dragonId];
+  if (!entry || entry.clearedTodayDay !== G.gameDay) return false; // must have cleared it for real today first
+  return (entry.blitzesUsedToday || 0) < DRAGON_HUNT_BLITZ_MAX_PER_DAY;
+}
+
+function blitzDragon(dragonId) {
+  if (!canBlitzDragon(dragonId)) { lg('🐉 That dragon isn\u2019t Blitz-ready \u2014 clear it for real today first, or the daily Blitz cap is already used.'); return; }
+  const dragon = getDragonById(dragonId);
+  if (!dragon) return;
+
+  const stats = dragon.scaled ? getElderDragonStats(G.p.lvl) : dragon;
+  const txp = Math.floor(stats.xp * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
+  const tg2 = Math.floor(stats.g * getPrestigeGoldMult());
+  G.p.xp += txp;
+  G.p.gold += tg2;
+  G.p.bossKills = (G.p.bossKills || 0) + 1;
+  checkBountyKill(dragon.n, true);
+  G.dragonHunt.cleared = G.dragonHunt.cleared || {};
+  G.dragonHunt.cleared[dragonId] = (G.dragonHunt.cleared[dragonId] || 0) + 1;
+  checkAchievements();
+
+  const hoardGold = stats.hoardGoldMin + Math.floor(Math.random() * (stats.hoardGoldMax - stats.hoardGoldMin));
+  G.p.gold += hoardGold;
+
+  lg('⚡ Dragon Hunt Blitz: ' + dragon.n + ' falls instantly! +' + txp.toLocaleString() + ' XP, +' + tg2.toLocaleString() + 'G, +' + hoardGold.toLocaleString() + 'G hoard.');
+
+  const hoardSlots = ['weapon', 'armor', 'amulet'];
+  for (let slot of hoardSlots) {
+    const item = generateItem(slot, stats.itemLevel, 'legendary');
+    if (item) { addI(item); lg('✨ HOARD: ' + item.n + ' (Legendary)'); }
+  }
+  const epicSlots = ['ring', 'head', 'hands'];
+  const epicSlot = epicSlots[Math.floor(Math.random() * epicSlots.length)];
+  const epicItem = generateItem(epicSlot, stats.itemLevel, 'epic');
+  if (epicItem) { addI(epicItem); lg('✨ HOARD: ' + epicItem.n + ' (Epic)'); }
+
+  G.dragonHuntBlitz[dragonId].blitzesUsedToday = (G.dragonHuntBlitz[dragonId].blitzesUsedToday || 0) + 1;
+  lvlup();
+  render();
+}
+
 function handleDragonHuntVictory() {
   const dragon = getDragonById(G.dragonHunt.currentId) || DRAGONS[0];
   // Scaled dragons carry no static hoard/itemLevel of their own — pull the numbers
@@ -10430,6 +10519,11 @@ function handleDragonHuntVictory() {
   checkBountyKill(dragon.n, true);
   G.dragonHunt.cleared = G.dragonHunt.cleared || {};
   G.dragonHunt.cleared[dragon.id] = (G.dragonHunt.cleared[dragon.id] || 0) + 1;
+  // Marks this dragon Blitz-ready for the rest of today — a real clear is always
+  // required before Blitz unlocks, every single day, not just the first time.
+  if (!G.dragonHuntBlitz[dragon.id]) G.dragonHuntBlitz[dragon.id] = { clearedTodayDay: -1, blitzesUsedToday: 0 };
+  G.dragonHuntBlitz[dragon.id].clearedTodayDay = G.gameDay;
+  G.dragonHuntBlitz[dragon.id].blitzesUsedToday = 0;
   checkAchievements();
 
   lg('🎉 ' + dragon.n.toUpperCase() + ' FALLS! +' + txp + ' XP, +' + tg2 + 'G');
@@ -12128,6 +12222,44 @@ function getGatherableRareStrongholdMat() {
   }
   if (candidates.length === 0) return null;
   return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+// === MISSED-DAY CATCH-UP ===
+// Averaged (not maximum) rewards — a genuine catch-up, not a full-value freebie for
+// skipping the actual content. Only the three systems that reset once per day:
+// Daily Quests, Bounties, Guild idle gathering. Never Disciples, Guild War, Guild
+// Boss, or Temple Trials.
+const MISSED_DAY_CATCHUP_AVERAGE_FACTOR = 0.7;
+
+function claimMissedDayCatchup() {
+  if (!G.missedDayCatchup.available) return;
+  const c = G.missedDayCatchup;
+
+  // Daily Quests — averaged across the whole DAILY_QUESTS pool, since the specific
+  // quests that went unfinished aren't preserved once generateDailyQuests() regenerated.
+  const avgQuestXp = DAILY_QUESTS.reduce((s, q) => s + q.rw.xp, 0) / DAILY_QUESTS.length;
+  const avgQuestGold = DAILY_QUESTS.reduce((s, q) => s + q.rw.g, 0) / DAILY_QUESTS.length;
+  const questXp = Math.floor(avgQuestXp * c.incompleteQuestCount * MISSED_DAY_CATCHUP_AVERAGE_FACTOR);
+  const questGold = Math.floor(avgQuestGold * c.incompleteQuestCount * MISSED_DAY_CATCHUP_AVERAGE_FACTOR);
+
+  const bountyXp = Math.floor((c.incompleteBountyXp || 0) * MISSED_DAY_CATCHUP_AVERAGE_FACTOR);
+  const bountyGold = Math.floor((c.incompleteBountyGold || 0) * MISSED_DAY_CATCHUP_AVERAGE_FACTOR);
+
+  const totalXp = questXp + bountyXp;
+  const totalGold = questGold + bountyGold;
+  G.p.xp += totalXp;
+  G.p.gold += totalGold;
+
+  let msg = '📋 Catch-Up claimed: +' + totalXp.toLocaleString() + ' XP, +' + totalGold.toLocaleString() + 'G';
+  if (c.guildGatherMissed && G.guildJoined) {
+    collectGuildMemberMaterials();
+    msg += ', guild materials collected';
+  }
+  lg(msg + '.');
+
+  G.missedDayCatchup = { available: false, forDay: -1, incompleteQuestCount: 0, incompleteBountyCount: 0, incompleteBountyXp: 0, incompleteBountyGold: 0, guildGatherMissed: false };
+  lvlup();
+  render();
 }
 
 function collectGuildMemberMaterials() {
@@ -16973,6 +17105,57 @@ function startMercenaryContract() {
   render();
 }
 
+// === MERCENARY BLITZ (Lv200+) ===
+// Computes the exact same enemy composition and reward formula a real contract at the
+// player's current tier would use (mage + cleric + tier-scaled bandit count, same gold/
+// xp multipliers), without ever touching G.cbt.en or starting real combat.
+const MERCENARY_BLITZ_MIN_LEVEL = 200;
+
+function canBlitzMercenary() {
+  return G.p.lvl >= MERCENARY_BLITZ_MIN_LEVEL && G.mercenaryBlitz.lastBlitzDay !== G.gameDay && !G.mercenary.active;
+}
+
+function getMercenaryBlitzReward() {
+  const zoneLv = Math.max(1, Math.min(G.p.lvl, 50));
+  // Explicitly yesterday's peak tier, captured just before the daily reset wipes
+  // G.mercenary.completed — reading getMercenaryTier() live here would always show 0,
+  // since Blitz only ever becomes available after that same reset has already run.
+  const tier = G.mercenaryBlitz.yesterdayPeakTier || 0;
+  const baseMelee = 2; // average of the real contract's 1-3 enemyCount range
+  const meleeCount = baseMelee + Math.min(3, Math.floor(tier / 2));
+  const goldMult = 1.4 + tier * 0.05;
+  const xpMult = 1.25 + tier * 0.07;
+
+  const mage = generateRaidEliteEnemy('Bandit Mage', zoneLv);
+  const cleric = generateRaidEliteEnemy('Bandit Cleric', zoneLv);
+  let totalXp = mage.xp + cleric.xp;
+  let totalGold = Math.floor(mage.g * goldMult) + Math.floor(cleric.g * goldMult);
+  for (let i = 0; i < meleeCount; i++) {
+    const name = ROAD_BANDITS[Math.floor(Math.random() * ROAD_BANDITS.length)];
+    const e = generateRaidEliteEnemy(name, zoneLv);
+    totalXp += e.xp;
+    totalGold += Math.floor(e.g * goldMult);
+  }
+  totalXp = Math.floor(totalXp * xpMult);
+
+  const txp = Math.floor(totalXp * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
+  const tg2 = Math.floor(totalGold * getPrestigeGoldMult());
+  return { txp, tg2, tier };
+}
+
+function blitzMercenary() {
+  if (!canBlitzMercenary()) { lg('⚡ Mercenary Blitz already used today, or not unlocked yet (Lv200+).'); return; }
+  const reward = getMercenaryBlitzReward();
+  G.p.xp += reward.txp;
+  G.p.gold += reward.tg2;
+  G.mercenary.completed = (G.mercenary.completed || 0) + 1;
+  G.mercenaryBlitz.lastBlitzDay = G.gameDay;
+  checkAchievements();
+  lg('⚡ Mercenary Blitz: instant contract cleared at Tier ' + (reward.tier + 1) + '. +' + reward.txp.toLocaleString() + ' XP, +' + reward.tg2.toLocaleString() + 'G.');
+  lvlup();
+  render();
+}
+
 function handleMercenaryVictory() {
   const contract = G.mercenary.current;
   const txp = Math.floor(G.cbt.en.reduce((s, e) => s + e.xp, 0) * getPrestigeXpMult() * getExpBoosterMult() * (1 + getAllyXpBonus()));
@@ -18907,7 +19090,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.87';
+const BUILD_ID = '2026-08-17.90';
 // =========================
 
 
@@ -19025,6 +19208,9 @@ function saveGame() {
     guildGatherLastCollectedDay: G.guildGather.lastCollectedDay,
     guildBountyMission: G.guildBountyMission,
     guildCafePairingsTried: G.guildCafePairingsTried,
+    mercenaryBlitz: G.mercenaryBlitz,
+    dragonHuntBlitz: G.dragonHuntBlitz,
+    missedDayCatchup: G.missedDayCatchup,
     guildWeeklyRewardLastClaimedWeek: G.guildWeeklyReward.lastClaimedWeek,
     visionMachineLastUseDay: G.visionMachine.lastUseDay,
     visionMachineJoelLetterCount: G.visionMachine.joelLetterCount || 0,
@@ -19337,6 +19523,9 @@ function loadGame() {
     G.guildGather.lastCollectedDay = data.guildGatherLastCollectedDay !== undefined ? data.guildGatherLastCollectedDay : -1;
     if (data.guildBountyMission) G.guildBountyMission = data.guildBountyMission;
     G.guildCafePairingsTried = data.guildCafePairingsTried || [];
+    if (data.mercenaryBlitz) G.mercenaryBlitz = data.mercenaryBlitz;
+    if (data.dragonHuntBlitz) G.dragonHuntBlitz = data.dragonHuntBlitz;
+    if (data.missedDayCatchup) G.missedDayCatchup = data.missedDayCatchup;
     G.guildWeeklyReward.lastClaimedWeek = data.guildWeeklyRewardLastClaimedWeek !== undefined ? data.guildWeeklyRewardLastClaimedWeek : -1;
     G.visionMachine.lastUseDay = data.visionMachineLastUseDay !== undefined ? data.visionMachineLastUseDay : -1;
     G.visionMachine.joelLetterCount = data.visionMachineJoelLetterCount || 0;
@@ -20523,6 +20712,8 @@ function render(){
   else if(G.state=='raid_room')h+=rRaidRoom();
   else if(G.state=='guild')h+=rGuild();
   else if(G.state=='guild_hub')h+=rGuildHub();
+  else if(G.state=='story_so_far')h+=rStorySoFar();
+  else if(G.state=='cellphone')h+=rCellphone();
   else if(G.state=='guild_cafe')h+=rGuildCafe();
   else if(G.state=='guild_bounty_missions')h+=rGuildBountyMissions();
   else if(G.state=='stronghold')h+=rStrongholds();
@@ -20582,6 +20773,8 @@ function attachEvents() {
     else if(a=='journal')setS('journal');
     else if(a=='guild')setS('guild');
     else if(a=='guild_hub')setS('guild_hub');
+    else if(a=='story_so_far')setS('story_so_far');
+    else if(a=='cellphone')setS('cellphone');
     else if(a=='guild_cafe')setS('guild_cafe');
     else if(a=='guild_bounty_missions')setS('guild_bounty_missions');
     else if(a=='stronghold')setS('stronghold');
@@ -21927,6 +22120,24 @@ function rToday() {
   h += '<div class="st" style="text-align:center;">📅 Today</div>';
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Everything worth a quick look, in one place \u2014 for whenever you\'ve got three minutes and nothing else to point them at.</div>';
 
+  // Missed-Day Catch-Up — only shows when yesterday's dailies/bounties/gathering
+  // were actually left unfinished, not just because a real day passed. Averaged
+  // rewards, not maximum; Disciples/Guild War/Guild Boss/Temple Trials never included.
+  if (G.missedDayCatchup.available) {
+    const c = G.missedDayCatchup;
+    h += '<div class="panel panel-gold" style="text-align:center;">';
+    h += '<div class="panel-title" style="color:var(--gold);">📋 Missed-Day Catch-Up</div>';
+    h += '<div class="btn-hint" style="margin:6px 0;">Yesterday\u2019s dailies went unfinished: ';
+    let parts = [];
+    if (c.incompleteQuestCount > 0) parts.push(c.incompleteQuestCount + ' daily quest' + (c.incompleteQuestCount > 1 ? 's' : ''));
+    if (c.incompleteBountyCount > 0) parts.push(c.incompleteBountyCount + ' bount' + (c.incompleteBountyCount > 1 ? 'ies' : 'y'));
+    if (c.guildGatherMissed) parts.push('guild gathering');
+    h += parts.join(', ') + '.</div>';
+    h += '<div class="btn-hint" style="margin-bottom:8px;">Averaged rewards \u2014 not the full value, just enough to not lose the day entirely.</div>';
+    h += '<button onclick="claimMissedDayCatchup()" class="abtn" style="width:100%;">Claim Catch-Up</button>';
+    h += '</div>';
+  }
+
   // Busy Day Autopilot — auto-runs Stronghold Tasks, Bounties, and Mercenary. Deliberately
   // leaves AFK Adventure, Guild Boss, Guild War, Frontier, and Boss Rush alone.
   h += '<div class="panel' + (G.busyDayAutopilot.active ? ' panel-gold' : '') + '" style="text-align:center;">';
@@ -22124,6 +22335,18 @@ function rMercenary() {
   h += '<div class="panel-row"><div class="panel-title">' + (mercTier > 0 ? '🏅 Tier ' + (mercTier + 1) : 'Tier 1') + '</div><div class="btn-hint">' + completed + ' contracts completed</div></div>';
   h += '<div class="qp"><div class="pbar"><div class="pfill" style="width:' + Math.floor((intoTier / MERCENARY_CONTRACTS_PER_TIER) * 100) + '%"></div></div><span class="ptxt">' + intoTier + '/' + MERCENARY_CONTRACTS_PER_TIER + ' to Tier ' + (mercTier + 2) + '</span></div>';
   h += '</div>';
+
+  // Mercenary Blitz (Lv200+) — one instant contract at yesterday's peak tier, once
+  // per real day. Uses G.mercenaryBlitz.yesterdayPeakTier specifically, captured
+  // right before the daily reset wipes today's live tier back to 0.
+  if (G.p.lvl >= MERCENARY_BLITZ_MIN_LEVEL) {
+    const canBlitz = canBlitzMercenary();
+    h += '<div class="panel' + (canBlitz ? ' panel-gold' : '') + '" style="text-align:center;">';
+    h += '<div class="panel-title" style="' + (canBlitz ? 'color:var(--gold);' : '') + '">⚡ Mercenary Blitz</div>';
+    h += '<div class="btn-hint" style="margin:6px 0;">Instant contract at yesterday\u2019s peak tier (Tier ' + ((G.mercenaryBlitz.yesterdayPeakTier || 0) + 1) + '). Once per day.</div>';
+    h += '<button onclick="blitzMercenary()" class="' + (canBlitz ? 'abtn' : 'btn-outline-ghost') + '" style="width:100%;" ' + (canBlitz ? '' : 'disabled') + '>' + (canBlitz ? 'Blitz Now' : 'Already used today') + '</button>';
+    h += '</div>';
+  }
 
   h += '<div class="panel panel-gold">';
   h += '<div class="panel-title" style="color:var(--gold);">' + contract.title + (mercTier > 0 ? ' [Tier ' + (mercTier + 1) + ']' : '') + '</div>';
@@ -22337,6 +22560,14 @@ function rDragonHunt() {
 
     if (unlocked) {
       h += '<button onclick="startDragonHunt(\'' + dragon.id + '\')" class="abtn" style="width:100%;">🐉 Wake the Wyrm</button>';
+      // Dragon Hunt Blitz (Lv200+) — unlocks per-dragon only after a real clear that
+      // same day, then repeatable up to the daily cap.
+      if (G.p.lvl >= DRAGON_HUNT_BLITZ_MIN_LEVEL) {
+        const blitzReady = canBlitzDragon(dragon.id);
+        const blitzEntry = G.dragonHuntBlitz[dragon.id];
+        const blitzesUsed = (blitzEntry && blitzEntry.blitzesUsedToday) || 0;
+        h += '<button onclick="blitzDragon(\'' + dragon.id + '\')" class="' + (blitzReady ? 'abtn' : 'btn-outline-ghost') + '" style="width:100%;margin-top:6px;' + (blitzReady ? '' : 'opacity:0.5;') + '" ' + (blitzReady ? '' : 'disabled') + '>' + (blitzReady ? '⚡ Blitz (' + blitzesUsed + '/' + DRAGON_HUNT_BLITZ_MAX_PER_DAY + ' used today)' : '⚡ Blitz \u2014 clear for real today first') + '</button>';
+      }
     } else {
       h += '<div class="btn-hint">🔒 Unlocks at Level ' + dragon.unlockLevel + ' (currently Level ' + G.p.lvl + ')</div>';
     }
@@ -24097,6 +24328,8 @@ function rMenu(){
     {i:'🎯',l:'Adventure Farming',d:'Set the party loose, keep grinding while you\'re away',a:'afk_adventure'},
     {i:'⚔️',l:'Raid Mode',d:'Boss gauntlets + elites',a:'raid_select'},
     {i:'⛪',l:'Temple',d:'Blessings, cures, and revival',a:'temple'},
+    {i:'📜',l:'The Story So Far',d:'Cover art and the cast, season by season',a:'story_so_far'},
+    {i:'📱',l:'The Cellphone',d:'Recovered selfies and old message threads',a:'cellphone'},
   ];
   const sections=[
     { title: '🐉 Legendary Hunts', items: [
@@ -24549,7 +24782,43 @@ const CHAPTER_ART = {
   'The Version That Stopped Pretending': 'chapter33-version-that-stopped-pretending.jpg',
   'journal_033': 'chapter33-version-that-stopped-pretending.jpg',
   'The Door Someone Built on Purpose': 'chapter34-door-built-on-purpose.jpg',
-  'journal_034': 'chapter34-door-built-on-purpose.jpg'
+  'journal_034': 'chapter34-door-built-on-purpose.jpg',
+  'The Tribunal of Every Echo': 'chapter35-tribunal-of-every-echo.jpg',
+  'journal_035': 'chapter35-tribunal-of-every-echo.jpg',
+  'The First Break': 'chapter36-first-break.jpg',
+  'journal_036': 'chapter36-first-break.jpg',
+  'The Slow Work': 'chapter37-slow-work.jpg',
+  'journal_037': 'chapter37-slow-work.jpg',
+  'A Setback Is Not a Failure': 'chapter38-setback-is-not-a-failure.jpg',
+  'journal_038': 'chapter38-setback-is-not-a-failure.jpg',
+  'What Happens After': 'chapter39-what-happens-after.jpg',
+  'journal_039': 'chapter39-what-happens-after.jpg',
+  'The Whole Family': 'chapter40-whole-family.jpg',
+  'journal_040': 'chapter40-whole-family.jpg',
+  'Daybreak': 'chapter41-daybreak.jpg',
+  'journal_041': 'chapter41-daybreak.jpg',
+  'Enough, Without Asking': 'chapter42-enough-without-asking.jpg',
+  'journal_042': 'chapter42-enough-without-asking.jpg',
+  'The Question Neither of Them Answers': 'chapter43-question-neither-answers.jpg',
+  'journal_043': 'chapter43-question-neither-answers.jpg',
+  'The Weight Learns to Rest': 'chapter44-weight-learns-to-rest.jpg',
+  'journal_044': 'chapter44-weight-learns-to-rest.jpg',
+  'The Two Before Me': 'chapter45-two-before-me.jpg',
+  'journal_045': 'chapter45-two-before-me.jpg',
+  'Before He Learned to Guard': 'chapter46-before-he-learned-to-guard.jpg',
+  'journal_046': 'chapter46-before-he-learned-to-guard.jpg',
+  'What Family Costs': 'chapter47-what-family-costs.jpg',
+  'journal_047': 'chapter47-what-family-costs.jpg',
+  'Never Really a Loan': 'chapter48-never-really-a-loan.jpg',
+  'journal_048': 'chapter48-never-really-a-loan.jpg',
+  'The First Step Beyond': 'chapter49-first-step-beyond.jpg',
+  'journal_049': 'chapter49-first-step-beyond.jpg',
+  'Every Name the Tide Kept': 'chapter50-every-name-tide-kept.jpg',
+  'journal_050': 'chapter50-every-name-tide-kept.jpg',
+  'A Debt With No Owner': 'chapter51-debt-with-no-owner.jpg',
+  'journal_051': 'chapter51-debt-with-no-owner.jpg',
+  'What Was Owed, Surfacing': 'chapter52-what-was-owed-surfacing.jpg',
+  'journal_052': 'chapter52-what-was-owed-surfacing.jpg'
 };
 function getChapterArt(key) {
   const file = CHAPTER_ART[key];
@@ -24561,6 +24830,196 @@ function getChapterArt(key) {
 // like the VN view's backdrop image.
 function getChapterArtFile(key) {
   return CHAPTER_ART[key] || '';
+}
+
+// === THE STORY SO FAR ===
+// Season-gated cover/glossary art gallery — rebuilt after being lost to a silent
+// reversion, same failure mode CHAPTER_ART hit earlier this session. Season 1 content
+// is always visible; Season 2 content stays locked until the actual Season 2 chapter
+// (journal_092, "Not Recovering. Beginning.") has been read, matching the same
+// boundary used everywhere else Season 1/2 gating already happens.
+const STORY_SO_FAR_ART = {
+  seriesCover: 'cover-series.jpg',
+  season1Cover: 'cover-season1.jpg',
+  season1Glossary: 'glossary-season1-part1.jpg',
+  season2Cover: 'cover-season2.jpg',
+  season2Glossary: 'glossary-season2-allies.jpg'
+};
+
+function hasEnteredSeason2() {
+  return (G.storyJournal.read || []).includes('journal_092');
+}
+
+function rStorySoFar() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">📖 The Story So Far</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Everything the journey has been, gathered in one place.</div>';
+
+  h += '<img src="story-art/' + STORY_SO_FAR_ART.seriesCover + '" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:16px;" onerror="this.style.display=\'none\';" alt="">';
+
+  h += '<div class="panel-title" style="margin-bottom:8px;">Season One</div>';
+  h += '<img src="story-art/' + STORY_SO_FAR_ART.season1Cover + '" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px;" onerror="this.style.display=\'none\';" alt="">';
+  h += '<div class="btn-hint" style="margin-bottom:8px;">The Cast, So Far</div>';
+  h += '<img src="story-art/' + STORY_SO_FAR_ART.season1Glossary + '" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:20px;" onerror="this.style.display=\'none\';" alt="">';
+
+  h += '<div class="panel-title" style="margin-bottom:8px;">Season Two</div>';
+  if (hasEnteredSeason2()) {
+    h += '<img src="story-art/' + STORY_SO_FAR_ART.season2Cover + '" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px;" onerror="this.style.display=\'none\';" alt="">';
+    h += '<div class="btn-hint" style="margin-bottom:8px;">The Allies Who Followed</div>';
+    h += '<img src="story-art/' + STORY_SO_FAR_ART.season2Glossary + '" loading="lazy" style="width:100%;border-radius:12px;" onerror="this.style.display=\'none\';" alt="">';
+  } else {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🔒 Locked until Season Two begins.</div></div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+// === THE CELLPHONE ===
+// A recovered phone, mostly intact — selfies from before, and text threads that came
+// back in fragments rather than whole. Short messages throughout is deliberate, not a
+// content-scope shortcut: some of what didn't survive the crossing is simply gone,
+// same spirit as the memory-lag idea established elsewhere (San and Joel's own
+// half-remembered conversations). A few threads carry a [message lost] gap on purpose.
+const SELFIE_PHOTOS = [];
+for (let i = 1; i <= 17; i++) SELFIE_PHOTOS.push('selfies/selfie' + String(i).padStart(2, '0') + '.jpg');
+
+const CELLPHONE_THREADS = [
+  { id: 'mama', name: "Mama", icon: '👩', messages: [
+    { from: 'them', text: 'Have you eaten?' },
+    { from: 'san', text: 'Not yet, on it now' },
+    { from: 'them', text: "Don't skip meals. I worry." },
+    { from: 'san', text: 'I know I know 😅' },
+    { from: 'them', text: 'Call me this weekend?' },
+    { from: 'san', text: 'Yes I will, love you' },
+    { from: 'lost', text: '[message lost]' }
+  ] },
+  { id: 'joel', name: 'Joel 💜', icon: '💜', messages: [
+    { from: 'them', text: 'thinking about you' },
+    { from: 'san', text: "you always say that at the worst times, i'm at work 😂" },
+    { from: 'them', text: 'so? still true' },
+    { from: 'san', text: 'ok fine. thinking about you too' },
+    { from: 'them', text: "good. that's all i needed" },
+    { from: 'san', text: 'smooth talker' },
+    { from: 'them', text: 'only for you' }
+  ] },
+  { id: 'dad', name: 'Papa', icon: '👨', messages: [
+    { from: 'them', text: 'Did you sleep enough?' },
+    { from: 'san', text: 'Yes Papa' },
+    { from: 'them', text: 'You always say yes' },
+    { from: 'san', text: "Because it's usually true now 😊" },
+    { from: 'them', text: "Good. That's all I want to hear." },
+    { from: 'san', text: 'Love you Pa' }
+  ] },
+  { id: 'mama_joel', name: 'Mama, Joel & Me', icon: '👨‍👩‍👧', messages: [
+    { from: 'them', text: 'Joel, has she been eating properly?', who: 'Mama' },
+    { from: 'them', text: 'Trying my best Mama 😅', who: 'Joel' },
+    { from: 'san', text: "I'm right here!!" },
+    { from: 'them', text: 'Good. Keep trying, Joel.', who: 'Mama' },
+    { from: 'them', text: 'Yes ma\'am', who: 'Joel' }
+  ] },
+  { id: 'work', name: 'Work 💼', icon: '💼', messages: [
+    { from: 'them', text: 'meeting moved to 3pm', who: 'Jonathan' },
+    { from: 'them', text: "again? that's the third time", who: 'Lewis' },
+    { from: 'them', text: "at least it's not a monday meeting", who: 'Mimi' },
+    { from: 'san', text: 'small mercies 😩' },
+    { from: 'them', text: 'just send me the notes after, I have another call', who: 'Aisy' },
+    { from: 'them', text: 'will do', who: 'Jonathan' }
+  ] },
+  { id: 'senedra', name: 'Senedra', icon: '🏹', messages: [
+    { from: 'them', text: 'Aunty San! did you see the package came' },
+    { from: 'san', text: 'yes!! looks good on you' },
+    { from: 'them', text: 'thank you 🥰' }
+  ] },
+  { id: 'zaki', name: 'Zaki', icon: '🎒', messages: [
+    { from: 'them', text: 'Aunty, quick question about savings accounts' },
+    { from: 'san', text: 'go ahead' },
+    { from: 'them', text: 'which bank did you use for your emergency fund' },
+    { from: 'san', text: "I'll send you the details" }
+  ] },
+  { id: 'sisters', name: 'Sisters 🌙', icon: '🌙', messages: [
+    { from: 'them', text: 'family dinner sunday?', who: 'Aisyah' },
+    { from: 'them', text: 'I might be late', who: 'Mez' },
+    { from: 'san', text: "you're always late" },
+    { from: 'them', text: 'and yet you all still wait for me', who: 'Mez' },
+    { from: 'them', text: 'because we love you, unfortunately', who: 'Aisyah' }
+  ] },
+  { id: 'mimi', name: 'Mimi', icon: '☕', messages: [
+    { from: 'them', text: 'lunch today?' },
+    { from: 'san', text: 'yes pls, I need the break' },
+    { from: 'them', text: 'the usual place?' },
+    { from: 'san', text: 'obviously' }
+  ] },
+  { id: 'aisyah_money', name: 'Aisyah', icon: '💸', messages: [
+    { from: 'them', text: 'help me pay my bills this month?' },
+    { from: 'san', text: "sent, let me know if it's not enough" },
+    { from: 'them', text: 'thank you thank you' },
+    { from: 'lost', text: '[message lost]' },
+    { from: 'them', text: 'help me buy this and put it on my tab' },
+    { from: 'san', text: "ok done, don't stress" },
+    { from: 'lost', text: '[message lost]' },
+    { from: 'san', text: "here's allowance for this month" },
+    { from: 'them', text: "you don't have to keep doing this" },
+    { from: 'san', text: 'I want to. let me.' }
+  ] },
+  { id: 'shopper', name: 'Personal Shoppers 🛍️', icon: '🛍️', messages: [
+    { from: 'them', text: 'found a good deal on the thing you wanted', who: 'Aisyah' },
+    { from: 'them', text: 'link?', who: 'Liang' },
+    { from: 'them', text: 'sending now', who: 'Aisyah' },
+    { from: 'san', text: 'you two are worse than a shopping app' },
+    { from: 'them', text: "we prefer 'efficient'", who: 'Liang' }
+  ] }
+];
+
+function rCellphone() {
+  const tab = G.cellphoneTab || 'photos';
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">📱 The Cellphone</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Recovered, mostly intact. Some of it didn\u2019t make the crossing whole.</div>';
+
+  h += '<div style="display:flex;gap:8px;margin-bottom:16px;">';
+  h += '<button onclick="G.cellphoneTab=\'photos\';render();" class="' + (tab === 'photos' ? 'abtn' : 'btn-outline-ghost') + '" style="flex:1;">📷 Photos</button>';
+  h += '<button onclick="G.cellphoneTab=\'messages\';render();" class="' + (tab === 'messages' ? 'abtn' : 'btn-outline-ghost') + '" style="flex:1;">💬 Messages</button>';
+  h += '</div>';
+
+  if (tab === 'photos') {
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
+    for (let src of SELFIE_PHOTOS) {
+      h += '<img src="' + src + '" loading="lazy" style="width:100%;border-radius:10px;aspect-ratio:1;object-fit:cover;" onerror="this.style.display=\'none\';" alt="">';
+    }
+    h += '</div>';
+  } else {
+    if (G.cellphoneOpenThread) {
+      const thread = CELLPHONE_THREADS.find(t => t.id === G.cellphoneOpenThread);
+      if (thread) {
+        h += '<button onclick="G.cellphoneOpenThread=null;render();" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 All Threads</button>';
+        h += '<div class="panel-title" style="margin-bottom:10px;">' + thread.icon + ' ' + thread.name + '</div>';
+        for (let m of thread.messages) {
+          if (m.from === 'lost') {
+            h += '<div style="text-align:center;font-style:italic;color:var(--text-dim);margin:8px 0;font-size:12px;">' + m.text + '</div>';
+          } else {
+            const isSan = m.from === 'san';
+            h += '<div style="display:flex;justify-content:' + (isSan ? 'flex-end' : 'flex-start') + ';margin-bottom:6px;">';
+            h += '<div style="max-width:75%;padding:8px 12px;border-radius:14px;background:' + (isSan ? 'var(--accent)' : 'var(--bg-hover)') + ';">';
+            if (m.who) h += '<div style="font-size:10px;opacity:0.7;margin-bottom:2px;">' + m.who + '</div>';
+            h += '<div style="font-size:13px;">' + m.text + '</div>';
+            h += '</div></div>';
+          }
+        }
+      }
+    } else {
+      for (let thread of CELLPHONE_THREADS) {
+        h += '<div class="panel" style="margin-bottom:8px;cursor:pointer;" onclick="G.cellphoneOpenThread=\'' + thread.id + '\';render();">';
+        h += '<div style="display:flex;align-items:center;gap:10px;">';
+        h += '<div style="font-size:22px;">' + thread.icon + '</div>';
+        h += '<div><div style="font-weight:700;">' + thread.name + '</div><div class="btn-hint">' + thread.messages.length + ' messages</div></div>';
+        h += '</div></div>';
+      }
+    }
+  }
+
+  h += '</div>';
+  return h;
 }
 
 const SPELL_ICONS = {
