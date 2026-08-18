@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (ch148: The Lunch Before She Left + Zaki\u2019s Guild Cafe: drinks, rumors, banter)';
+const APP_VERSION = '2026-08-17 (Stronghold cross-linked with Guild Hub: summary card + back-link)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -9474,6 +9474,27 @@ function getTotalGuildHallGoldBonus() {
   return total;
 }
 
+// Used by the Guild Hub's Stronghold summary card — true if any claimed stronghold has
+// a next Guild Hall tier the player can currently afford (gold and materials both).
+function isAnyGuildHallUpgradeAffordable() {
+  for (let id in STRONGHOLDS) {
+    if (!G.strongholds[id]) continue;
+    const def = STRONGHOLDS[id];
+    const nextTier = def.guildHall.find(t => t.level === getGuildHallLevel(id) + 1);
+    if (!nextTier) continue;
+    if (G.p.gold < nextTier.cost) continue;
+    if (nextTier.mats) {
+      const missing = Object.entries(nextTier.mats).some(([mn, mq]) => {
+        const iv = G.p.inv.find(x => x.n === mn);
+        return !iv || iv.q < mq;
+      });
+      if (missing) continue;
+    }
+    return true;
+  }
+  return false;
+}
+
 function upgradeGuildHall(strongholdId) {
   const def = STRONGHOLDS[strongholdId];
   if (!def || !G.strongholds[strongholdId]) return;
@@ -18397,7 +18418,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.75';
+const BUILD_ID = '2026-08-17.76';
 // =========================
 
 
@@ -22733,6 +22754,7 @@ function rGuildBoss() {
 
 function rStrongholds() {
   let h = '<div class="content">';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
   h += '<div class="st" style="text-align:center;">🗼 Strongholds</div>';
 
   // Maps each stronghold to the boss that unlocks it — used only for the locked-state
@@ -23196,6 +23218,19 @@ function rGuildHub() {
   h += '<div class="panel-title">\u2615 Zaki\u2019s Guild Cafe</div>';
   h += '<div class="btn-hint" style="margin:6px 0;">Drinks, rumors, and a counter Zaki runs himself.</div>';
   h += '<button onclick="setS(\'guild_cafe\')" class="btn-outline-ghost" style="width:100%;">Visit the Cafe</button>';
+  h += '</div>';
+
+  // Stronghold summary card — Guild Hall progression lives inside Strongholds, and
+  // strongholds already pay Guild Rep directly on siege defense, so this belongs here
+  // as much as anything else on the Hub, even though Stronghold keeps its own full
+  // screen (too substantial to fold into a card-only panel the way Weekly Reward and
+  // Idle Gathering did).
+  const claimedStrongholdCount = Object.keys(G.strongholds).filter(id => G.strongholds[id]).length;
+  const hallUpgradeReady = isAnyGuildHallUpgradeAffordable();
+  h += '<div class="panel' + (hallUpgradeReady ? ' panel-gold' : '') + '" style="margin-top:12px;text-align:center;">';
+  h += '<div class="panel-title" style="' + (hallUpgradeReady ? 'color:var(--gold);' : '') + '">🗼 Strongholds</div>';
+  h += '<div class="btn-hint" style="margin:6px 0;">' + claimedStrongholdCount + ' claimed' + (hallUpgradeReady ? ' \u2014 a Guild Hall upgrade is ready to build' : '') + '</div>';
+  h += '<button onclick="setS(\'stronghold\')" class="btn-outline-ghost" style="width:100%;">Open Strongholds</button>';
   h += '</div>';
 
   // Guild Bounty Missions summary card
