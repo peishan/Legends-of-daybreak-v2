@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (CRITICAL FIX: zones above Lv200 were invisible on Explore screen \u2014 added 3 tabs)';
+const APP_VERSION = '2026-08-17 (Senedra auto-heals/revives in combat \u2014 her paramedic background, made mechanical)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -256,6 +256,57 @@ const G = {
       { th: 100, id: 'nine_lives', n: 'Nine Lives', d: '+25% Max HP, +3 DEF', fx: { hpPct: 0.25, def: 3 } },
       { th: 150, id: 'ancient_spirit', n: 'Ancient Spirit', d: '+30% Max HP, +4 DEF', fx: { hpPct: 0.30, def: 4 } },
       { th: 200, id: 'eternal_familiar', n: 'Eternal Familiar', d: '+40% Max HP, +5 DEF, +5 ATK', fx: { hpPct: 0.40, def: 5, atk: 5 } }
+    ],
+    // The 7 swappable Guild War members added alongside G.affinity above — same 5-tier
+    // shape as the original 7, thematically matched to each one's established role.
+    'KW Liang': [
+      { th: 40, id: 'quiet_step', n: 'Quiet Step', d: '+10% Crit chance', fx: { critPct: 0.10 } },
+      { th: 70, id: 'snowballs_nose', n: "Snowball's Nose", d: '+15% Crit chance', fx: { critPct: 0.15 } },
+      { th: 100, id: 'never_missed', n: 'Never Missed a Thing', d: '+25% Crit chance', fx: { critPct: 0.25 } },
+      { th: 150, id: 'old_habits', n: 'Old Habits, Kept Well', d: '+8 DEF, +5 ATK', fx: { def: 8, atk: 5 } },
+      { th: 200, id: 'the_whole_room', n: 'Reads the Whole Room', d: '+35% Crit chance', fx: { critPct: 0.35 } }
+    ],
+    Mimi: [
+      { th: 40, id: 'first_glimpse', n: 'First Glimpse', d: '+10% Spell damage', fx: { spellDmgPct: 0.10 } },
+      { th: 70, id: 'clearer_sight', n: 'Clearer Sight', d: '+15% Spell damage', fx: { spellDmgPct: 0.15 } },
+      { th: 100, id: 'dreamsight_true', n: 'Dreamsight, True', d: '+25% Spell damage', fx: { spellDmgPct: 0.25 } },
+      { th: 150, id: 'already_knew', n: 'Already Knew You\u2019d Ask', d: '+8 ATK, +5 DEF', fx: { atk: 8, def: 5 } },
+      { th: 200, id: 'the_shape_of_it', n: 'The Shape of It, Before It Happens', d: '+35% Spell damage', fx: { spellDmgPct: 0.35 } }
+    ],
+    'Brada Shah': [
+      { th: 40, id: 'lining_up', n: 'Lining Up the Shot', d: '+10% Attack damage', fx: { atkPct: 0.10 } },
+      { th: 70, id: 'patient_hands', n: 'Patient Hands', d: '+15% Attack damage', fx: { atkPct: 0.15 } },
+      { th: 100, id: 'never_rushed', n: 'Never Once Rushed', d: '+25% Attack damage', fx: { atkPct: 0.25 } },
+      { th: 150, id: 'siege_line_steady', n: 'Siege-Line Steady', d: '+8 DEF, +5 ATK', fx: { def: 8, atk: 5 } },
+      { th: 200, id: 'impossible_to_rush', n: 'Impossible to Rush, Devastating on Arrival', d: '+35% Attack damage', fx: { atkPct: 0.35 } }
+    ],
+    'Dr. AA': [
+      { th: 40, id: 'steady_hands', n: 'Steady Hands', d: '+10% Healing potency', fx: { healPct: 0.10 } },
+      { th: 70, id: 'the_right_diagnosis', n: 'The Right Diagnosis', d: '+15% Healing potency', fx: { healPct: 0.15 } },
+      { th: 100, id: 'science_and_service', n: 'A Mind of Science, a Heart of Service', d: '+25% Healing potency', fx: { healPct: 0.25 } },
+      { th: 150, id: 'fighting_shape', n: 'Keeps the Party in Fighting Shape', d: '+8 DEF, +5 ATK', fx: { def: 8, atk: 5 } },
+      { th: 200, id: 'never_lost_one', n: 'Has Never Once Lost One', d: '+35% Healing potency', fx: { healPct: 0.35 } }
+    ],
+    'Sister Wren': [
+      { th: 40, id: 'the_line_holds', n: 'The Line Holds', d: '+10% Defense', fx: { defPct: 0.10 } },
+      { th: 70, id: 'true_devotion', n: 'True Devotion', d: '+15% Defense', fx: { defPct: 0.15 } },
+      { th: 100, id: 'temples_grace', n: 'The Temple\u2019s Grace', d: '+25% Defense', fx: { defPct: 0.25 } },
+      { th: 150, id: 'real_this_time', n: 'Real, This Time', d: '+8 DEF, +5 ATK', fx: { def: 8, atk: 5 } },
+      { th: 200, id: 'stands_between', n: 'Stands Between You and Whatever Comes Next', d: '+35% Defense', fx: { defPct: 0.35 } }
+    ],
+    'Ser Aldric': [
+      { th: 40, id: 'honorable_line', n: 'The Honorable Line', d: '+10% Max HP', fx: { hpPct: 0.10 } },
+      { th: 70, id: 'unwavering_duty', n: 'Unwavering Duty', d: '+15% Max HP', fx: { hpPct: 0.15 } },
+      { th: 100, id: 'protector_earned', n: 'A Protector, Earned', d: '+25% Max HP', fx: { hpPct: 0.25 } },
+      { th: 150, id: 'leads_with_courage', n: 'Leads With Courage', d: '+8 DEF, +5 ATK', fx: { def: 8, atk: 5 } },
+      { th: 200, id: 'unwavering_still', n: 'Unwavering, Still', d: '+20% Max HP, +5 DEF', fx: { hpPct: 0.20, def: 5 } }
+    ],
+    Iris: [
+      { th: 40, id: 'ashs_instinct', n: 'Ash\u2019s Instinct', d: '+10% Crit chance', fx: { critPct: 0.10 } },
+      { th: 70, id: 'held_a_line_alone', n: 'Held a Line Alone, for Years', d: '+15% Crit chance', fx: { critPct: 0.15 } },
+      { th: 100, id: 'never_actually_missing', n: 'Never Actually Missing', d: '+25% Crit chance', fx: { critPct: 0.25 } },
+      { th: 150, id: 'this_is_better', n: 'This Is So Much Better', d: '+8 DEF, +5 ATK', fx: { def: 8, atk: 5 } },
+      { th: 200, id: 'ash_and_iris', n: 'Ash and Iris, Both Sure', d: '+35% Crit chance', fx: { critPct: 0.35 } }
     ]
   },
 
@@ -984,7 +1035,19 @@ const G = {
     Eliz: { val: 30, max: 100, lastInteract: Date.now(), decayRate: 0.03 },
     Senedra: { val: 20, max: 100, lastInteract: Date.now(), decayRate: 0.02 },
     Zaki: { val: 20, max: 100, lastInteract: Date.now(), decayRate: 0.02 },
-    Soel: { val: 80, max: 100, lastInteract: Date.now(), decayRate: 0.08 }
+    Soel: { val: 80, max: 100, lastInteract: Date.now(), decayRate: 0.08 },
+    // Added alongside the audit that found these 7 swappable members could legitimately
+    // enter G.party (and therefore the Gift screen) but had no G.affinity entry at all —
+    // gifting them silently spent gold for zero effect, since updateAffinity() no-ops on
+    // a missing key. Starting values kept low/neutral since none of them have the
+    // established history the original 7 carry in from Season 1.
+    'KW Liang': { val: 15, max: 100, lastInteract: Date.now(), decayRate: 0.02 },
+    Mimi: { val: 15, max: 100, lastInteract: Date.now(), decayRate: 0.02 },
+    'Brada Shah': { val: 15, max: 100, lastInteract: Date.now(), decayRate: 0.02 },
+    'Dr. AA': { val: 15, max: 100, lastInteract: Date.now(), decayRate: 0.02 },
+    'Sister Wren': { val: 15, max: 100, lastInteract: Date.now(), decayRate: 0.02 },
+    'Ser Aldric': { val: 15, max: 100, lastInteract: Date.now(), decayRate: 0.02 },
+    Iris: { val: 15, max: 100, lastInteract: Date.now(), decayRate: 0.02 }
   },
 
   soelCommentary: [
@@ -5226,6 +5289,22 @@ storyJournal: {
   logScreenFilter: 'all', // which category tab is active on the dedicated Combat Log screen
   strongholdCosmetics: {}, // purely cosmetic gold sink, keyed by cosmetic id
   bonding: { seenScenes: [] }, // one-time bonding scenes already triggered
+  // Lovetalk (San & Joel only) and Family Ties (Aisyah/Mezstorm/Eliz/Senedra/Zaki/Soel)
+  // — BG2-style stateful, sequential companion content, triggered off resting the same
+  // way BG2's actual lovetalks work. Deliberately separate from the porch chapters
+  // (144/146/147/148), which stay as fixed story beats — this is the ongoing,
+  // repeatable thread underneath them. Gated at Lv200 rather than earlier, since the
+  // porch chapters already carry San/Joel's relationship to real depth by the 500s;
+  // starting here gives Lovetalk room to build toward that rather than trailing it.
+  lovetalk: { stage: 0, lastRestDay: -1 },
+  familyTies: {
+    Aisyah: { stage: 0, lastRestDay: -1 },
+    Mezstorm: { stage: 0, lastRestDay: -1 },
+    Eliz: { stage: 0, lastRestDay: -1 },
+    Senedra: { stage: 0, lastRestDay: -1 },
+    Zaki: { stage: 0, lastRestDay: -1 },
+    Soel: { stage: 0, lastRestDay: -1 }
+  },
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
   afkAdventure: { active: false, zoneIndices: [], startTime: 0, startLevel: 1, legendaryItemsGained: [], totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null, eliteMode: false, visible: false, playerBrowsing: false },
   afkAdventurePicker: [], // temporary selection state while choosing zones, before starting
@@ -7011,6 +7090,25 @@ function applyAffinityUnlockFx(member, u) {
   if (typeof recalcPartyMember === 'function') recalcPartyMember(member);
 }
 
+// Sums fx[statKey] across every affinity unlock a member has actually claimed — the
+// generic counterpart to applyAffinityUnlockFx() above, which only ever handled
+// hp/hpPct/atk/def directly. Before this, every percentage-type bonus (spellDmgPct,
+// critPct, healPct, goldPct, defPct, atkPct) unlocked correctly and displayed
+// correctly, but nothing in combat ever actually read it — only Joel's two unlocks
+// had hardcoded checks. This makes ANY fx key on ANY member's unlock ladder work
+// automatically, without needing a new hardcoded check every time one gets added.
+function getAffinityBonusPct(memberName, statKey) {
+  const member = G.party.find(p => p.n === memberName);
+  if (!member || !member.affinityBonuses || member.affinityBonuses.length === 0) return 0;
+  const defs = G.affinityUnlocks[memberName];
+  if (!defs) return 0;
+  let total = 0;
+  for (let u of defs) {
+    if (member.affinityBonuses.includes(u.id) && u.fx && u.fx[statKey]) total += u.fx[statKey];
+  }
+  return total;
+}
+
 function updateAffinity(partyMemberName, amount) {
   if (!G.affinity[partyMemberName]) return;
   // Soel's Bonding Catalyst — boosts affinity GAIN itself for every other companion
@@ -7049,6 +7147,68 @@ function checkAffinityDecay() {
       aff.lastInteract = now;
     }
   }
+}
+
+const LOVETALK_FAMILY_TIES_MIN_LEVEL = 200;
+// BG2's actual trigger is probabilistic on rest, not guaranteed — same spirit here.
+// Capped at one real day between any two triggers (Lovetalk or a single Family Ties
+// character) so a rest-spam session can't burn through the whole pool in an afternoon.
+const LOVETALK_TRIGGER_CHANCE = 0.35;
+const FAMILY_TIES_TRIGGER_CHANCE = 0.25;
+
+function checkLovetalkAndFamilyTies() {
+  if (G.p.lvl < LOVETALK_FAMILY_TIES_MIN_LEVEL) return;
+
+  // Lovetalk — requires Joel actually in the active party, same as any companion-scene
+  // gate elsewhere in this file.
+  const joelPresent = G.party.some(p => p.n === 'Joel' && p.on && p.hp > 0);
+  if (joelPresent && G.lovetalk.stage < LOVETALK_STAGES.length && G.lovetalk.lastRestDay !== G.gameDay) {
+    if (Math.random() < LOVETALK_TRIGGER_CHANCE) {
+      G.lovetalk.lastRestDay = G.gameDay;
+      triggerLovetalkStage();
+      return; // one trigger per rest, Lovetalk takes priority over Family Ties
+    }
+  }
+
+  // Family Ties — one eligible character at a time, picked at random among whoever's
+  // actually present and still has stages left.
+  const eligible = Object.keys(FAMILY_TIES_STAGES).filter(name => {
+    const ft = G.familyTies[name];
+    const present = G.party.some(p => p.n === name && p.on && p.hp > 0);
+    return present && ft.stage < FAMILY_TIES_STAGES[name].length && ft.lastRestDay !== G.gameDay;
+  });
+  if (eligible.length > 0 && Math.random() < FAMILY_TIES_TRIGGER_CHANCE) {
+    const name = eligible[Math.floor(Math.random() * eligible.length)];
+    G.familyTies[name].lastRestDay = G.gameDay;
+    triggerFamilyTiesStage(name);
+  }
+}
+
+function triggerLovetalkStage() {
+  const stageData = LOVETALK_STAGES[G.lovetalk.stage];
+  G.lovetalk.stage++;
+  G.lovetalkSceneQueue = { type: 'lovetalk', data: stageData };
+  lg('💜 Lovetalk: ' + stageData.title + ' \u2014 open the log to read it.');
+  showToast('💜 A quiet moment with Joel', 'gold');
+  showLovetalkFamilyTiesScene();
+}
+
+function triggerFamilyTiesStage(name) {
+  const stageData = FAMILY_TIES_STAGES[name][G.familyTies[name].stage];
+  G.familyTies[name].stage++;
+  G.lovetalkSceneQueue = { type: 'familyTies', companion: name, data: stageData };
+  lg(stageData.icon + ' Family Ties (' + name + '): ' + stageData.title);
+  showToast(stageData.icon + ' A moment with ' + name, 'gold');
+  showLovetalkFamilyTiesScene();
+}
+
+function showLovetalkFamilyTiesScene() {
+  if (!G.lovetalkSceneQueue) return;
+  for (let scene of G.lovetalkSceneQueue.data.scenes) {
+    lg((scene.speaker !== 'Narrator' ? scene.speaker + ': ' : '') + scene.text);
+  }
+  G.lovetalkSceneQueue = null;
+  render();
 }
 
 function getAffinityColor(val) {
@@ -13374,6 +13534,17 @@ function doPartyAttack(member, noBonus) {
     }
   }
   
+  // Affinity-unlocked crit chance (Senedra/KW Liang/Iris's ladders) — upgrades a
+  // normal hit into a crit after the fact rather than touching DICE.attackRoll
+  // itself, since isCrit needs to be settled before damageRoll() reads it below.
+  if (!attackResult.isCrit) {
+    const affinityCritPct = getAffinityBonusPct(member.n, 'critPct');
+    if (affinityCritPct > 0 && Math.random() < affinityCritPct) {
+      attackResult.isCrit = true;
+      lg('✨ ' + member.n + '\u2019s bond sharpens the strike into a critical hit!');
+    }
+  }
+
   const damageResult = DICE.damageRoll({
     diceExpr: '1d6',
     abilityScore: abilityScore,
@@ -13381,6 +13552,12 @@ function doPartyAttack(member, noBonus) {
   });
   
   let finalDamage = Math.max(1, damageResult.total - Math.floor((target.def || 0) / 3));
+  // Affinity-unlocked damage bonuses — generic percentage read from whichever unlock
+  // ladder this specific member actually has (atkPct for physical attackers like
+  // Brada Shah, spellDmgPct for casters like Mimi/Mezstorm). A member only ever has
+  // one of these two keys on their own ladder, so there's no double-counting risk.
+  const affinityDmgPct = getAffinityBonusPct(member.n, 'atkPct') + getAffinityBonusPct(member.n, 'spellDmgPct');
+  if (affinityDmgPct > 0) finalDamage = Math.floor(finalDamage * (1 + affinityDmgPct));
   const isChampion = member.n === 'Joel' && hasCompanionPrestige('Joel', 'champion');
   const isSmiteUndead = member.n === 'Joel' && G.p.lvl >= JOEL_SMITE_UNDEAD_UNLOCK && !isChampion && getEnemyArchetype(target.n) === 'undead';
   const isJudgment = isChampion && G.p.lvl >= JOEL_SMITE_UNDEAD_UNLOCK;
@@ -13631,7 +13808,11 @@ function doEnemyAttack(enemy) {
   }
     
   // target.def already includes equipped gear bonuses via recalcPartyMember()
-  const targetAC = target === G.p ? getPlayerAC() : 10 + Math.floor(((target.def || 0) + getBlessDef(target)) / 2);
+  // Affinity-unlocked defense (Sister Wren/Ser Aldric's ladders) boosts the target's
+  // own effective def specifically for this roll, same spirit as gear — makes them
+  // genuinely harder to actually hit, not just a flat damage-reduction afterthought.
+  const affinityDefBonus = target !== G.p && target.n ? Math.floor((target.def || 0) * getAffinityBonusPct(target.n, 'defPct')) : 0;
+  const targetAC = target === G.p ? getPlayerAC() : 10 + Math.floor(((target.def || 0) + affinityDefBonus + getBlessDef(target)) / 2);
   const attackResult = DICE.attackRoll({
     attackerLevel: G.zones.find(z => z.en.includes(enemy.n))?.lv || 1,
     abilityScore: enemy.atk * 2,
@@ -14949,6 +15130,60 @@ function getEnemyIndex(enemy) {
   return G.cbt.en.findIndex(e => e === enemy);
 }
 
+// Senedra's real-world occupation (paramedic, Brunei) made autonomous during combat.
+// Priority order: revive the dead first (highest urgency), then heal whoever's most
+// critically low HP — San or any active companion, since companions DO track hp/mhp
+// even though they don't track an mp pool — then MP, San-only, since she's currently
+// the sole character with an actual mana resource to refresh.
+function doSenedraAutoSupport() {
+  const senedra = G.party.find(p => p.n === 'Senedra' && p.on && p.hp > 0);
+  if (!senedra) return false;
+
+  const dead = getDeadParty();
+  if (dead.length > 0) {
+    const revive = G.p.inv.find(i => i.t === 'revive');
+    if (revive) {
+      const target = dead[0];
+      target.hp = Math.floor(target.mhp * (revive.v / 100));
+      target.on = true;
+      lg('🚑 Senedra: "Not on my watch." Uses ' + revive.n + ' \u2014 ' + target.n + ' revived with ' + target.hp + ' HP!');
+      revive.q--; if (revive.q <= 0) { const idx = G.p.inv.indexOf(revive); G.p.inv.splice(idx, 1); }
+      return true;
+    }
+  }
+
+  const healPot = G.p.inv.find(i => (i.t === 'pot' || i.t === 'food' || i.t === 'drink') && i.eff === 'heal');
+  if (healPot) {
+    let lowest = { name: 'San', pctHp: G.p.hp / G.p.mhp, isPlayer: true };
+    for (let p of G.party) {
+      if (p.on && p.hp > 0) {
+        const pct = p.hp / p.mhp;
+        if (pct < lowest.pctHp) lowest = { name: p.n, pctHp: pct, isPlayer: false, ref: p };
+      }
+    }
+    if (lowest.pctHp < 0.5) {
+      if (lowest.isPlayer) {
+        G.p.hp = Math.min(G.p.mhp, G.p.hp + healPot.v);
+      } else {
+        lowest.ref.hp = Math.min(lowest.ref.mhp, lowest.ref.hp + healPot.v);
+      }
+      lg('🚑 Senedra: Uses ' + healPot.n + ' on ' + lowest.name + '. +' + healPot.v + ' HP.');
+      healPot.q--; if (healPot.q <= 0) { const idx = G.p.inv.indexOf(healPot); G.p.inv.splice(idx, 1); }
+      return true;
+    }
+  }
+
+  const manaPot = G.p.inv.find(i => i.t === 'pot' && i.eff === 'mana');
+  if (manaPot && G.p.mp < 20) {
+    G.p.mp = Math.min(G.p.mmp, G.p.mp + manaPot.v);
+    lg('🚑 Senedra: Uses ' + manaPot.n + ' to keep your spells going. +' + manaPot.v + ' MP.');
+    manaPot.q--; if (manaPot.q <= 0) { const idx = G.p.inv.indexOf(manaPot); G.p.inv.splice(idx, 1); }
+    return true;
+  }
+
+  return false;
+}
+
 function doAutoCombatTick() {
   if (!G.cbt.on || !G.cbt.autoCombat) return;
   
@@ -14958,6 +15193,16 @@ function doAutoCombatTick() {
     if (G.cbt.en.every(e => e.hp <= 0)) {
       G.cbt.autoCombat = false;
       G.autoCombatHeartbeat = 0;
+      return;
+    }
+
+    // Senedra's real-world occupation (paramedic, Brunei) made autonomous in combat —
+    // checked every tick while she's active, before the retreat check below, so she
+    // gets a real chance to save someone rather than the fight just ending first.
+    // Priority matches actual triage: revive the dead, then heal whoever's most
+    // critical, MP last (San only — companions don't track an MP pool at all).
+    if (doSenedraAutoSupport()) {
+      setTimeout(doAutoCombatTick, 800);
       return;
     }
     
@@ -15679,6 +15924,7 @@ function completeRest() {
   checkDailyQuests('rest', 1);
   // Affinity gain for resting together
   for (let p of G.party) { if (p.on) updateAffinity(p.n, 2); }
+  checkLovetalkAndFamilyTies();
   // Track rest_with quest progress
   for(let q of G.quests){
     if(!q.done && !q.expired && q.t==='rest_with' && G.party.find(p=>p.on && p.n===q.reqParty)){
@@ -18584,7 +18830,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.80';
+const BUILD_ID = '2026-08-17.84';
 // =========================
 
 
@@ -18708,6 +18954,8 @@ function saveGame() {
     chainQuests: G.chainQuests || {},
     strongholdCosmetics: G.strongholdCosmetics,
     bondingSeenScenes: G.bonding.seenScenes,
+    lovetalk: G.lovetalk,
+    familyTies: G.familyTies,
     playerSpec: G.playerSpec,
     notificationsEnabled: G.notificationsEnabled,
     strongholdStipendDay: G.strongholdStipendDay,
@@ -19021,6 +19269,8 @@ function loadGame() {
     G.activeChainQuestId = null;
     G.strongholdCosmetics = data.strongholdCosmetics || {};
     G.bonding.seenScenes = data.bondingSeenScenes || [];
+    if (data.lovetalk) G.lovetalk = data.lovetalk;
+    if (data.familyTies) G.familyTies = data.familyTies;
     if (data.playerSpec) {
       G.playerSpec = data.playerSpec;
       if (G.playerSpec.path && typeof applySpecEffects === 'function') applySpecEffects();
@@ -22624,6 +22874,205 @@ const BONDING_LOCATIONS = [
 // One-time scenes, unlocked by affinity. Each triggers once, ever, the first time you
 // visit any Bonding location after crossing its threshold. minAffinity values are
 // deliberately reachable at the affinity levels normal play already produces.
+// === LOVETALK (San & Joel only) ===
+// 6 stages, gated Lv200+, one real day apart minimum, triggered probabilistically off
+// resting. Deliberately smaller and quieter than the porch chapters — reaffirmation
+// and continued intimacy rather than big revelations, since the heavy history is
+// already carried by 144/146/147/148.
+const LOVETALK_STAGES = [
+  { stage: 1, title: 'A Small Thing, Never Said', icon: '💜',
+    scenes: [
+      { speaker: 'Narrator', text: 'It comes up for no real reason, the fire between you doing most of the talking, the way it usually does when something true is about to surface.' },
+      { speaker: 'Joel', text: '"I still check that you\u2019re breathing," Joel admits, quiet, like he\u2019s deciding whether to actually say it as he goes. "Some nights. I do not tell you because it sounds like I do not trust the world to just let you stay. I do not, particularly. I trust you. The world, less so."' },
+      { speaker: 'San', text: '"I do the same thing," you tell him, and something in his face eases at that, like he expected to be the only one carrying it. "I just never said it out loud either."' },
+      { speaker: 'Joel', text: '"Then we are both just checking," Joel says, and takes your hand like that settles something neither of you needed to make a bigger deal of than it already was.' }
+    ] },
+  { stage: 2, title: 'Something Light, For Once', icon: '😄',
+    scenes: [
+      { speaker: 'Narrator', text: 'Not every evening needs to carry weight. This one, mercifully, does not.' },
+      { speaker: 'San', text: '"If you had to fight one enemy we\u2019ve faced with absolutely no weapon, just your bare hands, which one?"' },
+      { speaker: 'Joel', text: '"The Frost Queen," Joel says instantly, no hesitation. "She dances. I would just ask her to dance instead. Problem solved."' },
+      { speaker: 'San', text: '"That is not fighting her. That is negotiating."' },
+      { speaker: 'Joel', text: '"I have never once lost a fight I successfully avoided," Joel says, entirely serious, and you laugh hard enough that Soel opens one eye to judge you both.' }
+    ] },
+  { stage: 3, title: 'The Fear He Finally Names', icon: '😰',
+    scenes: [
+      { speaker: 'Narrator', text: 'This one takes longer to arrive. You can tell by the way he sits with it first, turning it over before he lets it out.' },
+      { speaker: 'Joel', text: '"I am afraid, some days, that I am not actually enough of a reason to stay," Joel says, finally, not looking at you directly. "Not compared to everything else you have already survived leaving behind."' },
+      { speaker: 'San', text: '"You are not a reason I stay instead of something else," you tell him, careful, wanting to get this exactly right. "You are not competing with anything. You are just where I actually want to be."' },
+      { speaker: 'Joel', text: '"I needed to hear that said plainly," Joel admits. "Not implied. Said."' },
+      { speaker: 'San', text: '"Then I will keep saying it," you tell him, "for as long as you need it said."' }
+    ] },
+  { stage: 4, title: 'Nothing That Needs Words', icon: '🤍',
+    scenes: [
+      { speaker: 'Narrator', text: 'Some evenings do not need dialogue to be the whole point. This is one of them.' },
+      { speaker: 'Narrator', text: 'He does not say anything when he sits down beside you. He just does — close, quiet, his shoulder against yours, the two of you watching whatever the fire is doing without needing to narrate it to each other.' },
+      { speaker: 'Narrator', text: 'Soel claims the space between your feet, unbothered, the way he always has. Nobody moves for a long while. Nobody needs to.' },
+      { speaker: 'San', text: '"This," you say, eventually, quiet, not really a full sentence. Joel understands it anyway. He always does, now.' }
+    ] },
+  { stage: 5, title: 'Choosing You Again', icon: '💍',
+    scenes: [
+      { speaker: 'Narrator', text: 'It is not a proposal. You have never needed the formality of one, not after everything else that already proved it. It is smaller than that, and somehow larger.' },
+      { speaker: 'Joel', text: '"If I had to do all of it again," Joel says, watching you across the fire, "the Breaking, all of it, every single hard year that got us here \u2014 I would still choose this. Choose you. I want you to actually know that, not just assume it."' },
+      { speaker: 'San', text: '"I would too," you tell him, and mean it entirely, no hesitation left anywhere in it. "Every part of it. Even the parts that hurt."' },
+      { speaker: 'Joel', text: '"Even the parts that hurt," Joel repeats, soft, like it means something particular to hear you say that specific phrase. "Good. Me too."' }
+    ] },
+  { stage: 6, title: 'The Rain and the Kitten, Still', icon: '🌧️',
+    scenes: [
+      { speaker: 'Narrator', text: 'You find yourselves talking about it again, unprompted \u2014 the box, the rain, the small grey kitten neither of you had any real plan for. The very beginning, however far away it has since become.' },
+      { speaker: 'San', text: '"I think about that box sometimes," you admit. "How none of this \u2014 any of it \u2014 was supposed to start there. It just did."' },
+      { speaker: 'Joel', text: '"I think about it too," Joel says. "More than I probably should. It is strange, being able to point to one exact afternoon and say, that. That is where it actually started, even though neither of us knew it yet."' },
+      { speaker: 'San', text: '"Soel knew," you say, glancing at the cat currently asleep against Joel\u2019s leg, entirely unbothered by being discussed. "I think he has always known."' },
+      { speaker: 'Joel', text: '"He usually does," Joel agrees, and pulls you in, the fire and the rain-that-was and the whole long road between them somehow all present in the same quiet moment.' }
+    ] }
+];
+
+// === FAMILY TIES (Aisyah, Mezstorm, Eliz, Senedra, Zaki, Soel) ===
+// 4 stages each, same trigger mechanism as Lovetalk but entirely separate state and
+// pool per character — found/blood family rather than romance, deliberately distinct
+// register. Soel's stays lighter/sweeter throughout, given he already has his own
+// full arc (Where the Cats Never Left) — these are small additions, not a new arc.
+const FAMILY_TIES_STAGES = {
+  Aisyah: [
+    { stage: 1, title: 'The Ledger She Keeps Privately', icon: '🗡️', scenes: [
+      { speaker: 'Narrator', text: 'Aisyah finds you between fights, characteristically unceremonious about it.' },
+      { speaker: 'Aisyah', text: '"I keep a list," she admits, offhand, like it costs her something to say even that plainly. "Not written. Just \u2014 kept. Every time you actually needed me and I showed up anyway. It is longer than I expected it to get."' },
+      { speaker: 'San', text: '"Why keep it at all?"' },
+      { speaker: 'Aisyah', text: '"Because I am not good at saying it the soft way," Aisyah says. "This is the version I have instead."' }
+    ] },
+    { stage: 2, title: 'Family Business, Reconsidered', icon: '📜', scenes: [
+      { speaker: 'Aisyah', text: '"Senedra wants to run the trade routes properly someday," Aisyah says, watching her daughter from across camp. "I keep telling her family business should stay in the family. I am starting to understand that means something different now than it used to."' },
+      { speaker: 'San', text: '"Different how?"' },
+      { speaker: 'Aisyah', text: '"Used to mean blood only," Aisyah says. "Does not mean that anymore. Has not for a while, honestly. I just took longer than most of us to actually say so."' }
+    ] },
+    { stage: 3, title: 'What She Does Not Dwell On', icon: '🌤️', scenes: [
+      { speaker: 'San', text: '"You never dwell on the hard parts," you say. "I used to think that meant you had not really felt them."' },
+      { speaker: 'Aisyah', text: '"I felt them," Aisyah says, plain, no defensiveness in it. "I just decided a long time ago that dwelling never actually fixed anything for me. Moving forward did. Different people process differently. Neither way is more honest than the other."' },
+      { speaker: 'San', text: '"I know that now," you tell her. "I did not always."' }
+    ] },
+    { stage: 4, title: 'The Sister She Actually Is', icon: '🌙', scenes: [
+      { speaker: 'Narrator', text: 'This one arrives without much preamble, the way the truest things with Aisyah usually do.' },
+      { speaker: 'Aisyah', text: '"I do not say this enough," she says, uncharacteristically direct. "You are the reason I still believe families can be chosen properly, not just survived. That is not a small thing. I do not hand that out for free."' },
+      { speaker: 'San', text: '"I know exactly how rare that is, coming from you," you say, and mean every word of it.' },
+      { speaker: 'Aisyah', text: '"Good," Aisyah says, already moving on before either of you can get too sentimental about it. "Do not make me say it twice."' }
+    ] }
+  ],
+  Mezstorm: [
+    { stage: 1, title: 'The Storm That Answers Now', icon: '⛈️', scenes: [
+      { speaker: 'Mezstorm', text: '"The lightning used to just happen to me," Mezstorm says, watching his own hands spark faintly, unbothered. "Now it answers when I actually call it. I do not think I have said out loud how much that difference matters."' },
+      { speaker: 'San', text: '"What changed?"' },
+      { speaker: 'Mezstorm', text: '"I stopped being afraid of what I could become," he says, "and started being curious about it instead."' }
+    ] },
+    { stage: 2, title: "Eliz's Mum", icon: '💙', scenes: [
+      { speaker: 'Mezstorm', text: '"She still calls me Mum," Mezstorm says, quiet, watching Eliz from across the fire. "Even like this. Especially like this. I do not think I will ever stop being surprised by that, honestly."' },
+      { speaker: 'San', text: '"Why would you be surprised? You have earned it."' },
+      { speaker: 'Mezstorm', text: '"Because I did not earn my first two," he says, and lets that sit, honest without needing to explain further.' }
+    ] },
+    { stage: 3, title: 'What He Sends Now', icon: '💌', scenes: [
+      { speaker: 'Mezstorm', text: '"I used to think sending money was the same as being there," Mezstorm says. "It is not. I know that now. But I still send what I can, when I can \u2014 not instead of being present. Alongside it."' },
+      { speaker: 'San', text: '"That is different from before. Genuinely."' },
+      { speaker: 'Mezstorm', text: '"It is the same gesture," he agrees, "but it means something different when it is not the only thing you are offering."' }
+    ] },
+    { stage: 4, title: 'Thawed, On Purpose', icon: '❄️', scenes: [
+      { speaker: 'Narrator', text: 'He finds you specifically for this one, which is rare enough on its own to notice.' },
+      { speaker: 'Mezstorm', text: '"You did not give up on me," Mezstorm says, plain. "When I was still frozen. When it would have been easier not to bother. I do not think I say thank you for that nearly often enough."' },
+      { speaker: 'San', text: '"You do not have to keep thanking me," you tell him, gentle. "You just have to keep thawing. That is thanks enough."' },
+      { speaker: 'Mezstorm', text: '"Then I will keep doing that," he says, "for as long as it takes."' }
+    ] }
+  ],
+  Eliz: [
+    { stage: 1, title: 'Textures and Colors', icon: '✨', scenes: [
+      { speaker: 'Eliz', text: '"Your magic feels like warm static," Eliz says, matter-of-fact, the way she describes most things. "Joel\u2019s feels like a held breath. I like knowing what everyone feels like. It helps me understand who is actually safe."' },
+      { speaker: 'San', text: '"What do I feel like when I am upset?"' },
+      { speaker: 'Eliz', text: '"Sharper," Eliz says, without hesitation. "But never pointed at me. I have always known that much."' }
+    ] },
+    { stage: 2, title: 'The Girl Who Endured', icon: '🌸', scenes: [
+      { speaker: 'San', text: '"You have always endured so much," you tell her, gentle. "I do not think I say that enough."' },
+      { speaker: 'Eliz', text: '"I do not think of it as enduring," Eliz says, considering it seriously, the way she considers most things. "I think of it as just \u2014 staying. Staying is not the same as suffering, even when other people assume it must be."' },
+      { speaker: 'San', text: '"That is a better way to think about it than I ever managed."' }
+    ] },
+    { stage: 3, title: 'Some Wounds Are Not of the Body', icon: '🕊️', scenes: [
+      { speaker: 'Eliz', text: '"I can mend bodies easily," Eliz says. "The other wounds take longer. I am still learning those. I do not think anyone ever finishes learning those, honestly."' },
+      { speaker: 'San', text: '"You have already helped with more of mine than you probably know."' },
+      { speaker: 'Eliz', text: '"I know more than you think," Eliz says, small smile. "I just do not always say so out loud."' }
+    ] },
+    { stage: 4, title: 'Guardian Spirit', icon: '🛡️', scenes: [
+      { speaker: 'Narrator', text: 'This one arrives quietly, Eliz\u2019s hands finding yours the way they do before something honest.' },
+      { speaker: 'Eliz', text: '"I cannot be reduced below one HP," Eliz says. "Not because I am special. Because someone, somewhere, decided I had already survived enough. I try to be that for other people too, when I can."' },
+      { speaker: 'San', text: '"You already are. For all of us."' },
+      { speaker: 'Eliz', text: '"Good," Eliz says, satisfied, and squeezes your hand once before letting go.' }
+    ] }
+  ],
+  Senedra: [
+    { stage: 1, title: 'Paths Others See as Walls', icon: '🏹', scenes: [
+      { speaker: 'Senedra', text: '"I learned this from Mum," Senedra says, tracing a route on a map only she seems able to read clearly. "Aisyah. Not just the tracking. The part where you keep looking even after everyone else has decided there is no path."' },
+      { speaker: 'San', text: '"She is good at that."' },
+      { speaker: 'Senedra', text: '"She is the best at that," Senedra says, certain, no hesitation in it at all.' }
+    ] },
+    { stage: 2, title: 'Dried Goods and Trade Routes', icon: '📦', scenes: [
+      { speaker: 'Senedra', text: '"The real money is in dried goods," Senedra says, entirely serious, offering you pemmican like it is a genuine business proposal. "They travel. They last. They sell. I have thought about this a great deal."' },
+      { speaker: 'San', text: '"You sound exactly like your mother."' },
+      { speaker: 'Senedra', text: '"I have been told," Senedra says, pleased rather than annoyed by the comparison.' }
+    ] },
+    { stage: 3, title: 'The Niece Who Grew Up Sharp', icon: '🎯', scenes: [
+      { speaker: 'San', text: '"You have grown up so much," you tell her, and mean it in the specific way you only get to mean it with someone you have actually watched grow.' },
+      { speaker: 'Senedra', text: '"I had good examples," Senedra says. "You. Mum. Eliz, even, in her own way. I do not think I could have turned out any other way, honestly, with all of you around."' },
+      { speaker: 'San', text: '"That might be the nicest thing you have ever said to me."' },
+      { speaker: 'Senedra', text: '"Do not let it go to your head," Senedra says, already smiling.' }
+    ] },
+    { stage: 4, title: 'Eagle-Eyed, On Purpose', icon: '🦅', scenes: [
+      { speaker: 'Narrator', text: 'She finds you at the edge of camp, watching something on the horizon only she can properly make out yet.' },
+      { speaker: 'Senedra', text: '"I see the path before anyone else does," Senedra says. "I used to think that made me useful. Now I think it just makes me yours \u2014 family, the kind that watches out ahead so nobody else has to worry about what is coming."' },
+      { speaker: 'San', text: '"You have always been more than useful to me."' },
+      { speaker: 'Senedra', text: '"I know," Senedra says, quiet certainty in it. "I just like hearing it said."' }
+    ] }
+  ],
+  Zaki: [
+    { stage: 1, title: 'The Pack, Checked Again', icon: '🎒', scenes: [
+      { speaker: 'Zaki', text: '"Seventeen items," Zaki says, going through his pack for what is very obviously not the first time today. "I have never once needed all seventeen. I have also never once dropped below seventeen. I do not examine that too closely."' },
+      { speaker: 'San', text: '"It keeps you steady. That is not nothing."' },
+      { speaker: 'Zaki', text: '"That is exactly what it does," Zaki agrees, relieved someone finally said it plainly instead of teasing him about it.' }
+    ] },
+    { stage: 2, title: 'The Cafe, Actually His', icon: '☕', scenes: [
+      { speaker: 'Zaki', text: '"I did not expect to be good at this," Zaki admits, wiping down his own counter with real, quiet pride. "The planning, the logistics, the small talk. It turns out checking a pack seventeen times and running a whole cafe use the same muscle."' },
+      { speaker: 'San', text: '"You built something real here."' },
+      { speaker: 'Zaki', text: '"I did," Zaki says, and for once does not deflect the compliment at all.' }
+    ] },
+    { stage: 3, title: 'What Kyle Never Had', icon: '⚖️', scenes: [
+      { speaker: 'Zaki', text: '"I heard what you said about Kyle," Zaki admits, a little sheepish about it. "I do not think I ever had to choose steady over impulsive. I just always was steady. I do not know if that makes it a virtue or just luck."' },
+      { speaker: 'San', text: '"Maybe it does not need to be one or the other."' },
+      { speaker: 'Zaki', text: '"Maybe not," Zaki agrees, considering it properly. "Either way, I am glad it is who I turned out to be."' }
+    ] },
+    { stage: 4, title: 'The Nephew Who Grew Into It', icon: '🗡️', scenes: [
+      { speaker: 'Narrator', text: 'He finds you between his own shifts, still faintly smelling of coffee and ink from the ledgers.' },
+      { speaker: 'Zaki', text: '"Mum says you\u2019re the bravest person she knows," Zaki says. "I think she is right. I also think you taught me most of what bravery is actually supposed to look like, even the boring parts. Especially the boring parts."' },
+      { speaker: 'San', text: '"You have more than earned your own place in this, Zaki. Not just as family. As yourself."' },
+      { speaker: 'Zaki', text: '"I know," Zaki says, quiet certainty under the usual easy grin. "I just like hearing it said too."' }
+    ] }
+  ],
+  Soel: [
+    { stage: 1, title: 'The Sunny Patch', icon: '☀️', scenes: [
+      { speaker: 'Narrator', text: 'Soel claims a patch of light on the floor with the unbothered certainty of a cat who has never once doubted his right to it.' },
+      { speaker: 'San', text: '"You always find the good spot," you tell him, and he simply blinks, slow, unimpressed by the observation.' },
+      { speaker: 'Narrator', text: 'It is, somehow, exactly the right amount of conversation for both of you.' }
+    ] },
+    { stage: 2, title: 'A Leaf, Charred at the Edges', icon: '🍂', scenes: [
+      { speaker: 'Narrator', text: 'Soel brings you something again \u2014 a small, ordinary token, offered without ceremony, the way he always does.' },
+      { speaker: 'San', text: '"Thank you," you tell him, taking it seriously, the way you have learned to take everything he offers seriously.' },
+      { speaker: 'Narrator', text: 'He does not need the thanks. He gives it anyway, every time, unasked.' }
+    ] },
+    { stage: 3, title: 'Unkillable, Chosen Anyway', icon: '🐾', scenes: [
+      { speaker: 'San', text: '"You did not have to choose me," you tell him, quiet, scratching behind his ears the way he tolerates from exactly one person. "You could have chosen anyone."' },
+      { speaker: 'Narrator', text: 'Soel leans into your hand, unhurried, the specific weight of an answer that was never going to need more words than this.' }
+    ] },
+    { stage: 4, title: 'The Space Between', icon: '💫', scenes: [
+      { speaker: 'Narrator', text: 'He sits between you and Joel tonight, deliberate about it, the way he has since a rainy porch in a life that does not exist anymore.' },
+      { speaker: 'San', text: '"You are the space between us," you say, soft, understanding it freshly even after everything. "You always have been."' },
+      { speaker: 'Narrator', text: 'Soel does not confirm it. He never does. He just stays exactly where he is, warm and certain, and lets that be the whole answer.' }
+    ] }
+  ]
+};
+
 const BONDING_SCENES = [
   {
     id: 'joel_san_date', companion: 'Joel', minAffinity: 150, icon: '💜',
