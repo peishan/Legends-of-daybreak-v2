@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (ch146-147: San\u2019s parents, Ch.48 memory reveal, Mama gifts, how they fight)';
+const APP_VERSION = '2026-08-17 (ch148: The Lunch Before She Left + Zaki\u2019s Guild Cafe: drinks, rumors, banter)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -4977,6 +4977,31 @@ storyJournal: {
           { speaker: 'Narrator', text: 'Soel shifts against your leg, unbothered, entirely certain of his spot the way he is entirely certain of most things. Neither of you says anything else for a while. Nothing else needs saying.' },
           { speaker: 'San', text: '"We disagree," you say, finally, soft. "We always will, probably. But we always come back to the same place after. We support each other. That has never once actually been in question, whatever else was."' },
           { speaker: 'Joel', text: '"Always," Joel agrees, and pulls you in, and the ordinary stars keep doing the plain, unglamorous work of simply being stars, the same way this whole quiet stretch of the journey has been doing the plain work of simply, finally, letting the two of you rest in it.' },
+        ]
+      }
+,{
+        id: 'journal_148',
+        title: 'The Lunch Before She Left',
+        chapter: 148,
+        unlockType: 'level',
+        unlockAt: 580,
+        icon: '🍽️',
+        summary: 'San tells Joel about a real lunch in Brunei, 2026 — her father asking Zaki about a great-grandson, and the quiet comparison she never said out loud at the time between her own nephew and Joel\'s youngest brother.',
+        scenes: [
+          { speaker: 'San', text: '"There was a lunch," you say, watching the fire instead of Joel, the way you do when a memory is real enough that looking at him directly while telling it feels like too much at once. "2026. Before all of this. Zaki\u2019s girlfriend was flying back to the UK for her studies, and everyone wanted one more meal together before she left."' },
+          { speaker: 'Joel', text: '"I did not know he had a girlfriend," Joel says, surprised, turning the sentence over like it does not quite fit next to the Zaki he knows \u2014 packs checked seventeen times, logistics mapped before anyone asks.' },
+          { speaker: 'San', text: '"Serious one, too. A business partner as well, if you can believe that \u2014 the two of them building something together, not just dating. My family noticed her properly at his university graduation. It was never really a secret. It just never came up, here, until now."' },
+          { speaker: 'San', text: '"It was me, Aisyah, our father, Senedra, Zaki, and her. My father, being exactly who he is, asked outright whether a great-grandson might be on the way soon. Not delicately. Just asked, the way people in families like mine always eventually ask."' },
+          { speaker: 'Joel', text: '"How did that land?"' },
+          { speaker: 'San', text: '"Zaki laughed it off, mostly. But I remember sitting there thinking \u2014 he has this. Whatever \'this\' actually is. Steady. Building something real, with someone real, before rushing into anything bigger. He and your brother are almost exactly the same age. Both graduated in 2025."' },
+          { speaker: 'Joel', text: 'Something crosses his face, quiet, half a wince. "Kyle," he says.' },
+          { speaker: 'San', text: '"I never said it to you before," you admit. "It felt unkind to say out loud, comparing them like that. But watching Zaki that day \u2014 patient, deliberate, actually planning before leaping \u2014 I could not help thinking about Kyle having a child before he had so much as a steady job to bring one into. I am not trying to be cruel about your brother. I just noticed the difference, and it stayed with me."' },
+          { speaker: 'Joel', text: '"You are not being cruel," Joel says, quiet. "I have thought the exact same thing myself, more than once. I love Kyle. I also think he did it backwards, and some days I do not know which of those two things I am supposed to lead with."' },
+          { speaker: 'San', text: '"Maybe you do not have to pick just one," you say, gentle. "You are allowed to love him and still wish he had done it differently. Both things can be true at the same time."' },
+          { speaker: 'Narrator', text: 'There is a sound at the edge of the firelight \u2014 a familiar, deliberately unhurried footstep, the specific rhythm of someone who has just heard his own name from several feet away and decided he is absolutely not going to pretend otherwise.' },
+          { speaker: 'Zaki', text: '"Did anyone mention my name?" Zaki asks, poking his head in, entirely unbothered, already reaching for a spot by the fire like it was always going to be his. "I have excellent hearing. Comes from checking the same pack seventeen times. You start noticing everything eventually."' },
+          { speaker: 'San', text: '"We were saying good things," you tell him, fond, making room. "Mostly."' },
+          { speaker: 'Zaki', text: '"Mostly is a good ratio," Zaki says, settling in like he has no intention of leaving anytime soon. "I will take mostly."' },
         ]
       }
     ]
@@ -18372,7 +18397,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.74';
+const BUILD_ID = '2026-08-17.75';
 // =========================
 
 
@@ -19973,6 +19998,7 @@ function render(){
   else if(G.state=='raid_room')h+=rRaidRoom();
   else if(G.state=='guild')h+=rGuild();
   else if(G.state=='guild_hub')h+=rGuildHub();
+  else if(G.state=='guild_cafe')h+=rGuildCafe();
   else if(G.state=='guild_bounty_missions')h+=rGuildBountyMissions();
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='guild_boss')h+=rGuildBoss();
@@ -20031,6 +20057,7 @@ function attachEvents() {
     else if(a=='journal')setS('journal');
     else if(a=='guild')setS('guild');
     else if(a=='guild_hub')setS('guild_hub');
+    else if(a=='guild_cafe')setS('guild_cafe');
     else if(a=='guild_bounty_missions')setS('guild_bounty_missions');
     else if(a=='stronghold')setS('stronghold');
     else if(a=='guild_boss')setS('guild_boss');
@@ -22862,6 +22889,175 @@ const GUILD_NOTICE_BOARD = [
   "Someone carved a small, crooked star into the doorframe near the entrance. Nobody's admitted to it. Nobody's removed it either."
 ];
 
+// === GUILD CAFE (Zaki's) ===
+// A gap the narrative had left open — Zaki mentioned in the webcomic but never given
+// an actual function here. Two mechanics, BG2-tavern-style: drinks that surface rumors
+// (rival guilds, the worlds the party's actually walked through), and sitting down with
+// specific companions for banter, logged the same way the Vision Machine's window text
+// logs — pure flavor, no combat, no rewards beyond the rumor/banter itself.
+const GUILD_CAFE_DRINKS = [
+  { id: 'zus', name: 'Zus', price: 15, rumorTier: 1, desc: 'The one from Dre\u2019s old mornings. Cold, sweet, gone in four sips.' },
+  { id: 'roasted_sip', name: 'Roasted Sip', price: 30, rumorTier: 2, desc: 'Actual coffee, actually roasted properly. Zaki is quietly proud of this one.' },
+  { id: 'matcha_latte', name: 'Matcha Latte', price: 50, rumorTier: 3, desc: 'The specialty. Zaki will not explain why he learned to make this specifically. Nobody has pushed hard enough to find out.' }
+];
+
+// Tier 1 = common/lighthearted, Tier 2 = rival-guild specific, Tier 3 = the worlds
+// themselves. Rumor pulled at random from the drink's own tier every time.
+const GUILD_CAFE_RUMORS = {
+  1: [
+    "Someone overheard Lewis trying to sell 'guaranteed' luck charms again. Nobody's bought one twice.",
+    "Wahyu's been muttering about a stitch pattern that 'shouldn't be possible.' Won't elaborate.",
+    "Dr. AA apparently diagnosed a cold correctly from across the room. Nobody's sure how.",
+    "Someone left an entire jar of Zus concentrate on Zaki's counter overnight. He still hasn't found who.",
+    "Jorvin insists a wrench went missing on its own. Nobody believes him. Nobody\u2019s found the wrench either."
+  ],
+  2: [
+    "Word is the Emberwatch Vanguard lost their first muster ever last week \u2014 to a guild nobody local has even named yet.",
+    "The Ledger Reclaimers keep records on every muster they've ever run. Apparently ours is 'thicker than expected.'",
+    "The Static Chorus salvaged something that reportedly still hums, days after they brought it in. Nobody local wants to ask what it does.",
+    "The Root Wardens have been leaving territory markers near the Grove \u2014 not as a warning anymore. More like they're used to the company.",
+    "Corran, from the Kindling Rivals, has apparently started asking after specific people by name before a muster even starts.",
+    "Fen's been overheard calling this guild 'a colleague' instead of 'the opposition.' First time anyone's heard that shift out loud.",
+    "The Last Ledger reportedly hasn't lost a single muster past turn six. Ever. Not once, as far as anyone can find record of."
+  ],
+  3: [
+    "Travelers passing through the Threshold District say the Order there finally stood down \u2014 for good, this time, no more emergency protocol left running.",
+    "Someone swears they saw a door in the Steadfast Roads open clean, no cost taken on the way through. Most people still don't believe that's possible.",
+    "The Uncatalogued keeps growing, apparently \u2014 more people finding pages of that Index every season, most of them still getting it badly wrong.",
+    "A merchant mentioned a library, whole, somewhere past everything mapped, kept by someone who apparently never ages. Nobody local has actually found it themselves.",
+    "There's a place, or so the story goes, that cats have kept standing for longer than anyone official ever assigned the job. Take that as you will.",
+    "Someone asked if the Architect ever finished what it was drawing. Nobody's actually answered that one yet. Maybe nobody can."
+  ]
+};
+
+function getGuildCafeRumor(tier) {
+  const pool = GUILD_CAFE_RUMORS[tier] || GUILD_CAFE_RUMORS[1];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function buyGuildCafeDrink(drinkId) {
+  const drink = GUILD_CAFE_DRINKS.find(d => d.id === drinkId);
+  if (!drink) return;
+  if (G.p.gold < drink.price) { lg('\u2615 Not enough gold for that.'); return; }
+  G.p.gold -= drink.price;
+  const rumor = getGuildCafeRumor(drink.rumorTier);
+  lg('\u2615 Zaki slides over a ' + drink.name + '. "On the house next time, maybe." Word around the cafe: ' + rumor);
+  render();
+}
+
+// Flavor-only collectibles, no stat effect \u2014 same spirit as keepsake items elsewhere.
+const GUILD_CAFE_MERCH = [
+  { id: 'zaki_notebook', n: "Zaki's Planning Notebook", price: 200, desc: 'Grid-ruled. He is very particular about the grid.' },
+  { id: 'zaki_calculator', n: "A Field Calculator", price: 350, desc: 'Zaki insists this has saved more musters than any weapon has.' },
+  { id: 'zaki_checklist', n: "The Pack Checklist, Laminated", price: 150, desc: 'Seventeen items. He has never once needed all seventeen. He has never once dropped below seventeen either.' }
+];
+
+function buyGuildCafeMerch(itemId) {
+  const item = GUILD_CAFE_MERCH.find(i => i.id === itemId);
+  if (!item) return;
+  if (G.p.gold < item.price) { lg('\u2615 Not enough gold for that.'); return; }
+  G.p.gold -= item.price;
+  addI({ n: item.n, t: 'keepsake', q: 1, r: 'rare' });
+  lg('\u2615 Picked up ' + item.n + ' from Zaki\u2019s counter.');
+  render();
+}
+
+// Companion drink-with banter, logged like Vision Machine window text \u2014 pure flavor,
+// no combat, no rewards. Solo pairings need that member recruited; the two family
+// pairings (Zaki, Liang) always have both San and Joel present rather than San alone.
+const GUILD_CAFE_BANTER = {
+  solo_mimi: [
+    'Mimi: "I read your cup before you even finished it. You are going to have an ordinary day. I checked twice. Still ordinary."',
+    'Mimi: "Sister Wren thinks my readings are nonsense. I have not told her three of them came true this month."',
+    'Mimi: "Zaki makes the matcha too strong on purpose. I have decided I like that about him."'
+  ],
+  solo_aisy: [
+    'Aisy: "I could have taken that whole tray without anyone noticing. I did not. You are welcome for my restraint."',
+    'Aisy: "Shadow Walker does not mean I cannot enjoy a good drink in the light occasionally. Do not tell anyone I said that."',
+    'Aisy: "Zaki charges me half price. He thinks I do not know he does that. I have let him keep thinking that."'
+  ],
+  solo_iris: [
+    'Iris: "Ash does not like matcha. Ash likes the little cakes Zaki keeps under the counter for regulars. I am apparently a regular now."',
+    'Iris: "I used to drink alone, most days, before all this. It is strange, still, having somewhere to sit that is not just a lookout post."',
+    'Iris: "Zaki asked if Ash wanted his own cup. Ash does not drink from cups. Zaki poured one anyway. Ash approves of the gesture, if not the execution."'
+  ],
+  double_date_mimi_brada: [
+    'Brada: "She reads my future in the foam every single time. It is always the same future. I have started to suspect she just likes doing it."',
+    'Mimi: "His future is fine, for the record. Mostly. I would tell him if it were not."',
+    'Brada: "We split a Roasted Sip. She takes the bigger half. I have never once minded."'
+  ],
+  family_zaki: [
+    'Zaki: "I have the whole week\u2019s logistics mapped out already. You did not even have to ask this time."',
+    'Zaki: "Mum says you\u2019re the bravest person she knows, San. I think she is right, for what that is worth from someone who checks his own pack seventeen times."',
+    'Joel: "You have gotten good at this," Joel tells him, nodding at the counter, the drinks, the whole quiet operation. Zaki, for once, does not deflect the compliment.'
+  ],
+  family_liang: [
+    'KW Liang: "Snowball likes it here. Warm counter. Nobody minds the fur in the pastries. Mostly nobody minds."',
+    'KW Liang: "I still check the room before I sit. Old habit. Zaki does not comment on it. I appreciate that more than I have said out loud."',
+    'San: "You are allowed to just sit, you know," you tell him, gentle. Liang almost believes you. Almost.'
+  ]
+};
+
+function isGuildCafeBanterAvailable(key) {
+  const requirements = {
+    solo_mimi: ['mimi'], solo_aisy: ['aisy'], solo_iris: ['iris'],
+    double_date_mimi_brada: ['mimi', 'brada'], family_zaki: [], family_liang: ['kw_liang']
+  };
+  const req = requirements[key];
+  if (!req) return false;
+  return req.every(id => isGuildMemberRecruited(id));
+}
+
+function drinkWithCompanions(key) {
+  if (!isGuildCafeBanterAvailable(key)) return;
+  const pool = GUILD_CAFE_BANTER[key];
+  if (!pool) return;
+  const line = pool[Math.floor(Math.random() * pool.length)];
+  lg('\u2615 ' + line);
+  render();
+}
+
+function rGuildCafe() {
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
+  h += '<div class="st" style="text-align:center;">\u2615 Zaki\u2019s Guild Cafe</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Drinks come with rumors. Zaki insists that is not why he started serving them, but nobody quite believes that anymore.</div>';
+
+  h += '<div class="panel-title" style="margin-bottom:8px;">Menu</div>';
+  for (let drink of GUILD_CAFE_DRINKS) {
+    h += '<div class="panel" style="margin-bottom:8px;">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    h += '<div><div style="font-weight:700;">' + drink.name + '</div><div class="btn-hint">' + drink.desc + '</div></div>';
+    h += '<button onclick="buyGuildCafeDrink(\'' + drink.id + '\')" class="abtn" style="margin:0;white-space:nowrap;">' + drink.price + 'G</button>';
+    h += '</div></div>';
+  }
+
+  h += '<div class="panel-title" style="margin:14px 0 8px;">Sit With Someone</div>';
+  const pairings = [
+    { key: 'solo_mimi', label: '\u2615 Mimi' },
+    { key: 'solo_aisy', label: '\u2615 Aisy' },
+    { key: 'solo_iris', label: '\u2615 Iris' },
+    { key: 'double_date_mimi_brada', label: '\u2615\u2615 Mimi & Brada (double date)' },
+    { key: 'family_zaki', label: '\u2615\u2615\u2615 San, Joel & Zaki' },
+    { key: 'family_liang', label: '\u2615\u2615\u2615 San, Joel & Liang' }
+  ];
+  for (let p of pairings) {
+    const available = isGuildCafeBanterAvailable(p.key);
+    h += '<button onclick="' + (available ? 'drinkWithCompanions(\'' + p.key + '\')' : '') + '" class="' + (available ? 'btn-outline-ghost' : 'btn-outline-ghost') + '" style="width:100%;margin-bottom:6px;' + (available ? '' : 'opacity:0.4;') + '">' + p.label + (available ? '' : ' \uD83D\uDD12') + '</button>';
+  }
+
+  h += '<div class="panel-title" style="margin:14px 0 8px;">Zaki\u2019s Counter</div>';
+  for (let item of GUILD_CAFE_MERCH) {
+    h += '<div class="panel" style="margin-bottom:8px;">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    h += '<div><div style="font-weight:700;">' + item.n + '</div><div class="btn-hint">' + item.desc + '</div></div>';
+    h += '<button onclick="buyGuildCafeMerch(\'' + item.id + '\')" class="abtn" style="margin:0;white-space:nowrap;">' + item.price + 'G</button>';
+    h += '</div></div>';
+  }
+
+  h += '</div>';
+  return h;
+}
 
 function rGuildHub() {
   let h = '<div class="content">';
@@ -22994,6 +23190,13 @@ function rGuildHub() {
     }
     h += '</div>';
   }
+
+  // Guild Cafe summary card
+  h += '<div class="panel" style="margin-top:12px;text-align:center;">';
+  h += '<div class="panel-title">\u2615 Zaki\u2019s Guild Cafe</div>';
+  h += '<div class="btn-hint" style="margin:6px 0;">Drinks, rumors, and a counter Zaki runs himself.</div>';
+  h += '<button onclick="setS(\'guild_cafe\')" class="btn-outline-ghost" style="width:100%;">Visit the Cafe</button>';
+  h += '</div>';
 
   // Guild Bounty Missions summary card
   resetGuildBountyMissionDailyIfNeeded();
