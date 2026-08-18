@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (23 new achievements catching up Lv100-580+: worlds, Guild, Temple, Library, story)';
+const APP_VERSION = '2026-08-17 (Fixed: companion gear now scales with player level, same as San\u2019s own gear)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5977,11 +5977,16 @@ function generateCompanionItem(memberName, slot, zoneLevel, forceRarity) {
   const rarityData = ITEM_RARITY[rarity];
 
   const slotLabel = (role.slotLabelOverrides && role.slotLabelOverrides[slot]) || (slot === 'weapon' ? role.weaponLabel : slot === 'armor' ? role.armorLabel : '');
-  const item = { n: base.n, slot: slot, forCompanion: memberName, r: rarity, ilvl: base.ilvl, d: (slotLabel ? slotLabel + ' for ' : 'For ') + memberName + '.' };
-  if (base.atk) item.atk = Math.floor(base.atk * rarityData.mult);
-  if (base.def) item.def = Math.floor(base.def * rarityData.mult);
-  if (base.spd) item.spd = Math.max(1, Math.floor(base.spd * rarityData.mult));
-  if (base.hp) item.hp = Math.floor(base.hp * rarityData.mult);
+  const item = { n: base.n, slot: slot, forCompanion: memberName, r: rarity, ilvl: Math.max(base.ilvl, zoneLevel), d: (slotLabel ? slotLabel + ' for ' : 'For ') + memberName + '.' };
+  // Scale stats to the actual zone level, same fix generateItem() already uses for
+  // general player loot — without this, every companion gear drop from a level 40+
+  // zone would silently reuse this table's frozen-low stats forever, exactly the
+  // problem that was quietly leaving every companion behind San's own scaling gear.
+  const levelScale = Math.max(1, zoneLevel / Math.max(1, base.ilvl));
+  if (base.atk) item.atk = Math.floor(base.atk * rarityData.mult * levelScale);
+  if (base.def) item.def = Math.floor(base.def * rarityData.mult * levelScale);
+  if (base.spd) item.spd = Math.max(1, Math.floor(base.spd * rarityData.mult * levelScale));
+  if (base.hp) item.hp = Math.floor(base.hp * rarityData.mult * levelScale);
   return item;
 }
 
@@ -5994,10 +5999,17 @@ function recalcPartyMember(member) {
   for (let slot in member.eq) {
     const it = member.eq[slot];
     if (!it) continue;
-    if (it.atk) bonus.atk += it.atk;
-    if (it.def) bonus.def += it.def;
-    if (it.spd) bonus.spd += it.spd;
-    if (it.hp) bonus.hp += it.hp;
+    // Same scaling fix generateItem()/generateCompanionItem() already use — without
+    // this, every companion's starting kit, shop gear, and crafted gear (frozen at
+    // ilvl ~6-35 across the board) would keep contributing less and less relative to
+    // San's own gear as the player's level climbed, even though nothing here ever
+    // explicitly weakened it. Missing ilvl falls back to G.p.lvl (a no-op scale of 1)
+    // rather than 1, so a data gap can't accidentally produce a runaway multiplier.
+    const levelScale = Math.max(1, G.p.lvl / Math.max(1, it.ilvl || G.p.lvl));
+    if (it.atk) bonus.atk += Math.round(it.atk * levelScale);
+    if (it.def) bonus.def += Math.round(it.def * levelScale);
+    if (it.spd) bonus.spd += Math.round(it.spd * levelScale);
+    if (it.hp) bonus.hp += Math.round(it.hp * levelScale);
   }
   member.atk = member.base.atk + bonus.atk;
   member.def = member.base.def + bonus.def;
@@ -18572,7 +18584,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.78';
+const BUILD_ID = '2026-08-17.79';
 // =========================
 
 
