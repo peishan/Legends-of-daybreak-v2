@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Temple expanded: Rank 6-10, Brother Corin\u2019s Trials Lv200+, Wren banter fix)';
+const APP_VERSION = '2026-08-17 (23 new achievements catching up Lv100-580+: worlds, Guild, Temple, Library, story)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -920,6 +920,38 @@ const G = {
     { id: 'devourer_slayer', n: 'Devourer of Worlds', d: 'Defeat The Astral Devourer', icon: '🌑', t: 'boss_specific', target: 'The Astral Devourer', need: 1, rw: { xp: 1200, g: 800 }, done: false, secret: false },
     { id: 'tyrant_slayer', n: 'Tyrant Breaker', d: 'Defeat The Infernal Tyrant', icon: '⚔️', t: 'boss_specific', target: 'The Infernal Tyrant', need: 1, rw: { xp: 1400, g: 900 }, done: false, secret: false },
     { id: 'beyond_veil', n: 'Beyond the Veil', d: 'Complete the Beyond the Veil quest chain', icon: '🌀', t: 'quests', need: 3, rw: { xp: 1500, g: 1000 }, done: false, secret: false },
+    // === CATCHING UP (Lv100-580+, everything built after the original list stopped) ===
+    // World climax bosses
+    { id: 'world1_slayer', n: 'What the Order Left Behind', d: 'Defeat The Order That Never Stood Down, closing out Liang\'s world', icon: '🏛️', t: 'boss_specific', target: 'The Order That Never Stood Down', need: 1, rw: { xp: 15000, g: 10000 }, done: false, secret: false },
+    { id: 'world2_slayer', n: 'What It Was Becoming', d: 'Defeat An Unwritten Thing', icon: '📜', t: 'boss_specific', target: 'An Unwritten Thing', need: 1, rw: { xp: 20000, g: 13000 }, done: false, secret: false },
+    { id: 'world3_slayer', n: 'The Draft, Finished', d: 'Defeat The Draft That Kept Drawing, closing out the Architect\'s world', icon: '📐', t: 'boss_specific', target: 'The Draft That Kept Drawing', need: 1, rw: { xp: 26000, g: 17000 }, done: false, secret: false },
+    { id: 'world4_slayer', n: 'Proof It Can Be Done Gently', d: 'Defeat The Last Roadwarden, closing out The Steadfast Roads', icon: '🛡️', t: 'boss_specific', target: 'The Last Roadwarden', need: 1, rw: { xp: 32000, g: 21000 }, done: false, secret: false },
+    // Level milestones matching each world's rough start
+    { id: 'century', n: 'A Century In', d: 'Reach Level 100', icon: '💯', t: 'level', need: 100, rw: { xp: 3000, g: 2000 }, done: false, secret: false },
+    { id: 'lv200', n: 'The Uncatalogued', d: 'Reach Level 200', icon: '📖', t: 'level', need: 200, rw: { xp: 8000, g: 5000 }, done: false, secret: false },
+    { id: 'lv300', n: 'The Steadfast Roads', d: 'Reach Level 300', icon: '🛤️', t: 'level', need: 300, rw: { xp: 15000, g: 9000 }, done: false, secret: false },
+    { id: 'lv400', n: 'What They Learned Not to Rush', d: 'Reach Level 400', icon: '⏳', t: 'level', need: 400, rw: { xp: 24000, g: 14000 }, done: false, secret: false },
+    { id: 'lv500', n: 'The Door the Roadwardens Kept', d: 'Reach Level 500', icon: '🚪', t: 'level', need: 500, rw: { xp: 35000, g: 20000 }, done: false, secret: false },
+    // Guild milestones
+    { id: 'guild_eternal', n: 'Temple Eternal', d: 'Reach the highest Guild Rank', icon: '🏰', t: 'guild_rank', need: 10, rw: { xp: 12000, g: 8000 }, done: false, secret: false },
+    { id: 'guild_boss_first', n: 'What the Initiates Face Together', d: 'Defeat the first Guild Boss tier', icon: '💀', t: 'guild_boss_tier', need: 1, rw: { xp: 5000, g: 3500 }, done: false, secret: false },
+    { id: 'guild_war_streak', n: 'A Streak Worth Keeping', d: 'Reach a Guild War streak of 5', icon: '⚔️', t: 'guild_war_streak', need: 5, rw: { xp: 4000, g: 2800 }, done: false, secret: false },
+    { id: 'bounty_first', n: 'Squad Returns', d: 'Complete a Guild Bounty Mission', icon: '🎖️', t: 'bounty_mission_count', need: 1, rw: { xp: 2000, g: 1500 }, done: false, secret: false },
+    { id: 'full_roster', n: 'Everyone Who Answered', d: 'Recruit the entire Guild War roster', icon: '👥', t: 'guild_roster_full', need: 16, rw: { xp: 18000, g: 12000 }, done: false, secret: false },
+    // Temple milestones
+    { id: 'temple_eternal', n: 'The Highest Standing', d: 'Reach the highest Temple Rank', icon: '🙏', t: 'temple_rank', need: 10, rw: { xp: 12000, g: 8000 }, done: false, secret: false },
+    { id: 'trial_first', n: 'What the Vigil First Demands', d: 'Defeat the first Temple Trial tier', icon: '🕯️', t: 'temple_trial_tier', need: 2, rw: { xp: 5000, g: 3500 }, done: false, secret: false },
+    // Stronghold milestones
+    { id: 'all_strongholds', n: 'Every Ground Kept', d: 'Claim all 6 strongholds', icon: '🗼', t: 'stronghold_count', need: 6, rw: { xp: 16000, g: 11000 }, done: false, secret: false },
+    { id: 'guild_hall_max', n: 'The Sanctum, Finished', d: 'Max out any single stronghold\'s Guild Hall', icon: '🏛️', t: 'guild_hall_level', need: 5, rw: { xp: 10000, g: 7000 }, done: false, secret: false },
+    // Library Research milestones
+    { id: 'first_breakthrough', n: 'The Search, Begun', d: 'Earn your first Library Research breakthrough', icon: '🔮', t: 'library_breakthroughs', need: 1, rw: { xp: 3000, g: 2000 }, done: false, secret: false },
+    { id: 'breakthrough_25', n: 'Twenty-Five, Confirmed', d: 'Reach 25 total Library Research breakthroughs', icon: '📚', t: 'library_breakthroughs', need: 25, rw: { xp: 14000, g: 9000 }, done: false, secret: false },
+    // Story milestones
+    { id: 'season_two', n: 'Not Recovering. Beginning.', d: 'Reach the Season Two chapter', icon: '🌅', t: 'chapter_read', target: 'journal_092', need: 1, rw: { xp: 6000, g: 4000 }, done: false, secret: false },
+    { id: 'season_three', n: 'The Honest Timescale', d: 'Reach the Season Three chapter', icon: '⏳', t: 'chapter_read', target: 'journal_140', need: 1, rw: { xp: 20000, g: 13000 }, done: false, secret: false },
+    // Small / fun
+    { id: 'cafe_regular', n: 'A Regular Now', d: 'Sit with every pairing at Zaki\'s Guild Cafe at least once', icon: '\u2615', t: 'cafe_pairings_tried', need: 6, rw: { xp: 4000, g: 3000 }, done: false, secret: false },
   ],
 
   storyline: [
@@ -5165,7 +5197,8 @@ storyJournal: {
   // faster with a stronger/more diverse squad); what actually gates repeat use is a
   // 2-3 hour cooldown *after* collecting, before the next dispatch is allowed. 5
   // dispatches per real day, one active at a time.
-  guildBountyMission: { dispatchedToday: 0, lastResetDay: -1, cooldownUntil: 0, active: null, selectedMembers: [] },
+  guildBountyMission: { dispatchedToday: 0, lastResetDay: -1, cooldownUntil: 0, active: null, selectedMembers: [], lifetimeCompleted: 0 },
+  guildCafePairingsTried: [], // tracks which drink-with pairings have been tried at least once
   visionMachine: { lastUseDay: -1, joelLetterCount: 0 }, // Varel Farseer's window — once per real day, 1M gold
   kindlingCommissions: { linesToday: 0, checksToday: 0, refreshDay: 0 }, // bounded daily ritual — 3 lines, 2 checks, resets once per game day
   guildBoss: { tierIndex: 0, currentHp: 0, lastAttemptDay: 0 }, // persistent HP across days — the whole recruited roster chips away at it together
@@ -6787,6 +6820,47 @@ function checkAchievements() {
         break;
       case 'focus':
         if (G.p.fstreak >= ach.need) earned = true;
+        break;
+      // New types added alongside the Lv200+ content catch-up — everything below
+      // reads state that already exists elsewhere in the file (Guild Rank, Temple
+      // Rank, Stronghold claims, Library Research, story chapters), except the two
+      // small counters (lifetimeCompleted, cafePairingsTried) added specifically to
+      // back these checks, since nothing previously needed a lifetime tally for either.
+      case 'guild_rank':
+        if (getGuildRank() >= ach.need) earned = true;
+        break;
+      case 'temple_rank':
+        if (getTempleRank() >= ach.need) earned = true;
+        break;
+      case 'stronghold_count':
+        if (Object.keys(G.strongholds).filter(id => G.strongholds[id]).length >= ach.need) earned = true;
+        break;
+      case 'guild_hall_level':
+        if (Object.keys(STRONGHOLDS).some(id => G.strongholds[id] && getGuildHallLevel(id) >= ach.need)) earned = true;
+        break;
+      case 'library_breakthroughs':
+        if (G.libraryResearch && G.libraryResearch.totalBreakthroughs >= ach.need) earned = true;
+        break;
+      case 'chapter_read':
+        if ((G.storyJournal.read || []).includes(ach.target)) earned = true;
+        break;
+      case 'guild_war_streak':
+        if ((G.guildWar.bestStreak || 0) >= ach.need) earned = true;
+        break;
+      case 'guild_boss_tier':
+        if (G.guildBoss.tierIndex >= ach.need) earned = true;
+        break;
+      case 'temple_trial_tier':
+        if (G.templeTrial.tier >= ach.need) earned = true;
+        break;
+      case 'bounty_mission_count':
+        if ((G.guildBountyMission.lifetimeCompleted || 0) >= ach.need) earned = true;
+        break;
+      case 'guild_roster_full':
+        if (G.guildRoster.recruited.length >= ach.need) earned = true;
+        break;
+      case 'cafe_pairings_tried':
+        if ((G.guildCafePairingsTried || []).length >= ach.need) earned = true;
         break;
     }
 
@@ -11805,6 +11879,8 @@ function collectGuildBountyMission() {
   lg('🎖️ Squad returns! +' + mission.gold.toLocaleString() + 'G, +' + mission.xp.toLocaleString() + ' XP' + (G.guildJoined ? ', +30 Guild Rep' : '') + '.');
   G.guildBountyMission.cooldownUntil = Date.now() + mission.cooldownMin * 60000;
   G.guildBountyMission.active = null;
+  G.guildBountyMission.lifetimeCompleted = (G.guildBountyMission.lifetimeCompleted || 0) + 1;
+  checkAchievements();
   lvlup();
   render();
 }
@@ -18496,7 +18572,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.77';
+const BUILD_ID = '2026-08-17.78';
 // =========================
 
 
@@ -18613,6 +18689,7 @@ function saveGame() {
     guildRosterRecruited: G.guildRoster.recruited || [],
     guildGatherLastCollectedDay: G.guildGather.lastCollectedDay,
     guildBountyMission: G.guildBountyMission,
+    guildCafePairingsTried: G.guildCafePairingsTried,
     guildWeeklyRewardLastClaimedWeek: G.guildWeeklyReward.lastClaimedWeek,
     visionMachineLastUseDay: G.visionMachine.lastUseDay,
     visionMachineJoelLetterCount: G.visionMachine.joelLetterCount || 0,
@@ -18921,6 +18998,7 @@ function loadGame() {
     G.guildRoster.recruited = data.guildRosterRecruited || [];
     G.guildGather.lastCollectedDay = data.guildGatherLastCollectedDay !== undefined ? data.guildGatherLastCollectedDay : -1;
     if (data.guildBountyMission) G.guildBountyMission = data.guildBountyMission;
+    G.guildCafePairingsTried = data.guildCafePairingsTried || [];
     G.guildWeeklyReward.lastClaimedWeek = data.guildWeeklyRewardLastClaimedWeek !== undefined ? data.guildWeeklyRewardLastClaimedWeek : -1;
     G.visionMachine.lastUseDay = data.visionMachineLastUseDay !== undefined ? data.visionMachineLastUseDay : -1;
     G.visionMachine.joelLetterCount = data.visionMachineJoelLetterCount || 0;
@@ -23116,6 +23194,11 @@ function drinkWithCompanions(key) {
   if (!pool) return;
   const line = pool[Math.floor(Math.random() * pool.length)];
   lg('\u2615 ' + line);
+  if (!G.guildCafePairingsTried) G.guildCafePairingsTried = [];
+  if (!G.guildCafePairingsTried.includes(key)) {
+    G.guildCafePairingsTried.push(key);
+    checkAchievements();
+  }
   render();
 }
 
