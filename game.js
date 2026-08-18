@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Story So Far rebuilt (was lost) + new Cellphone: selfies + 11 message threads)';
+const APP_VERSION = '2026-08-17 (ch149-153: Codex glimpse + Jovie; Vision Machine Past Memories, 19 vignettes)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5100,6 +5100,111 @@ storyJournal: {
           { speaker: 'Zaki', text: '"Mostly is a good ratio," Zaki says, settling in like he has no intention of leaving anytime soon. "I will take mostly."' },
         ]
       }
+,{
+        id: 'journal_149',
+        title: 'A Glimpse of the Codex',
+        chapter: 149,
+        unlockType: 'level',
+        unlockAt: 590,
+        icon: '👥',
+        summary: 'A glitch in reality shows the party a version of San and Joel they do not recognize \u2014 the same two people, somewhere else, somewhere the story went differently.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It happens without warning, the way glitches always do \u2014 a flicker at the edge of the Hall, reality catching on itself for half a second like fabric snagging on a nail. Everyone stops. Nobody quite knows why yet.' },
+          { speaker: 'Mimi', text: '"That was not a spell," Mimi says, already alert, already tracking something none of the rest of you can see yet. "That was a seam."' },
+          { speaker: 'Narrator', text: 'The air folds, briefly, the way water folds around a stone \u2014 and for just a few seconds, impossibly, there is a window where there should be a wall. Through it: a cottage. A version of Joel, leaner, warier, standing at a door that has clearly not been opened for visitors in a long while. A version of San beside him, and something in the set of her shoulders that does not look like the San anyone in this room has ever actually seen.' },
+          { speaker: 'Joel', text: '"That is \u2014" Joel starts, and does not finish, because there is nothing that sentence is actually supposed to end with.' },
+          { speaker: 'Narrator', text: 'It is early, whatever this is \u2014 early enough that the cottage-Joel and cottage-San have the careful, unfinished quality of two people still learning whether the world around them is actually safe yet. No party. No Hall. No sixteen names on a roster. Just the two of them, and a door neither has fully decided to open.' },
+          { speaker: 'San', text: '"They look tired," you say, quiet, unable to look away. "Not hurt. Just \u2014 tired, in a way that goes all the way down."' },
+          { speaker: 'Narrator', text: 'The seam closes as suddenly as it opened, reality snapping back into its ordinary shape, the Hall exactly as it was a moment ago \u2014 except that everyone in it is now very quiet, and San\u2019s hand has not let go of Joel\u2019s.' },
+          { speaker: 'Joel', text: '"I do not know what that was," Joel says, carefully. "I do not think I want to guess badly at it either."' },
+          { speaker: 'San', text: '"I think we ask someone who might actually know," you say. "I think we ask Varel."' },
+        ]
+      }
+,{
+        id: 'journal_150',
+        title: 'What Farseer Could Not Answer',
+        chapter: 150,
+        unlockType: 'level',
+        unlockAt: 595,
+        icon: '🔮',
+        summary: 'Varel Farseer cannot explain what the party saw \u2014 only that the Echoes already hinted at it. San decides, plainly, not to pry further. She would not trade what she has now.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Varel listens to the whole account without interrupting once, which is somehow more unsettling than if he had reacted immediately.' },
+          { speaker: 'Varel', text: '"I cannot tell you what you saw," he says, finally, honest in the specific way that costs him something to be. "Not because I am withholding it. Because I genuinely do not know. There are more worlds than the ones we have walked through together. I have always known that. I did not know one of them looked quite so much like this one."' },
+          { speaker: 'Joel', text: '"A version of us," Joel says. "Somewhere else. Living a version of this that went differently."' },
+          { speaker: 'Varel', text: '"The Echoes we encountered, early on \u2014 you remember them," Varel says. "I always read those as warnings about what could have happened here, if things had gone worse. I think, now, some of them may have been something closer to a window. Not a warning. A glimpse sideways, into a place where it actually did."' },
+          { speaker: 'San', text: '"Is there a way to know more?" you ask, and surprise yourself a little with how steady the question comes out.' },
+          { speaker: 'Varel', text: '"Not that I currently have," Varel admits. "If an answer exists, I suspect it is the kind of answer a place like the Library would eventually hold, not the kind I can hand you today."' },
+          { speaker: 'Narrator', text: 'You sit with that for a long moment, turning it over. Part of you wants to pull the thread immediately, follow it as far as it goes. A larger part of you, quieter, does not.' },
+          { speaker: 'San', text: '"Then I will let it wait," you say, and mean it. "Whatever that place is, whoever they are \u2014 I have this. Right here. I am not interested in trading it for a question, even an interesting one."' },
+          { speaker: 'Joel', text: '"Good," Joel says, quiet, pulling you against him. "Because I was not going to let you, even if you had wanted to."' },
+        ]
+      }
+,{
+        id: 'journal_151',
+        title: 'The Vision Machine, Upgraded',
+        chapter: 151,
+        unlockType: 'level',
+        unlockAt: 600,
+        icon: '📼',
+        summary: 'Farseer calls with news: the Vision Machine can now show more than the present. It can show the past \u2014 whatever memories still remain to be found.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The call comes a few days later, Varel\u2019s voice carrying the specific energy of someone who has genuinely surprised himself.' },
+          { speaker: 'Varel', text: '"I was not looking for this," he says, without preamble. "I was still turning over what you told me about the glitch \u2014 and in trying to understand it, I found something I was not expecting to find in the Vision Machine\u2019s own architecture. It was never only built to show the present."' },
+          { speaker: 'San', text: '"What else can it show?"' },
+          { speaker: 'Varel', text: '"The past," Varel says, simple. "Memory, properly \u2014 not the fragments that come back to you on their own, unpredictably. Something closer to a real window, backward instead of across. It will take real resources to actually open that window properly. I will not pretend otherwise."' },
+          { speaker: 'Joel', text: '"How much?"' },
+          { speaker: 'Varel', text: '"Half a million gold," Varel says, and there is no apology in it, just honesty. "I do not enjoy naming a number that large. I also will not insult you by pretending this is small work."' },
+          { speaker: 'San', text: '"If it works," you say, slow, feeling the shape of what he is actually offering, "I could see things I have already lost pieces of. Properly. Not just the flashes."' },
+          { speaker: 'Varel', text: '"That is exactly what I am offering," Varel confirms. "Whenever you are ready. It will still be here."' },
+          { speaker: 'Narrator', text: 'You do not answer him immediately. But you already know, somewhere underneath the hesitation, that you are going to say yes.' },
+        ]
+      }
+,{
+        id: 'journal_152',
+        title: 'Jovie',
+        chapter: 152,
+        unlockType: 'level',
+        unlockAt: 610,
+        icon: '💉',
+        summary: 'An old friend from the SK* days walks into the Guild Hall \u2014 someone San and Joel had no idea had crossed over at all, until she was simply standing there.',
+        scenes: [
+          { speaker: 'Narrator', text: 'You almost do not recognize her at first \u2014 the years, the world, the sheer distance between where you last spoke and here doing exactly what distance does. And then she smiles, and it is unmistakably, impossibly her.' },
+          { speaker: 'San', text: '"Jovie?" The name comes out smaller than you meant it to, disbelief doing most of the work. "Jovie \u2014 you\u2019re here? You\u2019re actually here?"' },
+          { speaker: 'Jovie', text: '"In the flesh," Jovie says, a little wry about it, like she has had time to get used to how strange that sentence actually is. "Or whatever counts as flesh, these days."' },
+          { speaker: 'Joel', text: '"How long," Joel asks, still visibly recalibrating. "How long have you been here?"' },
+          { speaker: 'Jovie', text: '"I genuinely do not know," Jovie admits. "Long enough. I have stopped trying to convert it into anything that makes sense."' },
+          { speaker: 'Narrator', text: 'The last real memory either of you has of her is years old now \u2014 SK*, the same province back home as Joel, the two of them colleagues before either of you ever properly met. San knew her a different way: a cashier at the supermarket branch near Robin\u2019s office, close enough that a passing hello turned, slowly, into an actual friendship.' },
+          { speaker: 'San', text: '"You just disappeared," you say, gentle, not an accusation, just a fact that has sat unresolved for a very long time. "One week you were there, and then you weren\u2019t. I lost my own job with Robin not long after. I never got the full story."' },
+          { speaker: 'Jovie', text: '"An incident," Jovie says, careful about the word. "With a customer. I will not relive the specifics. What I will say is that the company\u2019s response told me everything I needed to know about how replaceable they considered me. I resigned before they could make it official for me."' },
+          { speaker: 'Joel', text: '"I asked around, after," Joel says, quiet. "Weeks later. Nobody would say much. It confirmed what I already suspected about how SK* actually treated people, underneath the version they wanted us all to believe."' },
+          { speaker: 'Jovie', text: '"I went home," Jovie continues. "The Philippines. Applied everywhere. Ended up at a medical center, eventually \u2014 front desk, mostly, but you learn things, being around it every day. San, Joel, you both tried reaching me. I remember seeing the messages, sometimes days late. The connection back home was never reliable. I always meant to reply properly. I do not think I ever actually managed it."' },
+          { speaker: 'San', text: '"We wondered," you admit. "We never stopped wondering, honestly. And now here you are."' },
+          { speaker: 'Jovie', text: '"Here I am," Jovie agrees, and something in her face shifts, the smile going a little more solemn. "It was not a clean arrival, if it matters. I do not think any of ours were."' },
+        ]
+      }
+,{
+        id: 'journal_153',
+        title: 'The Clinic, and Then Nothing Familiar',
+        chapter: 153,
+        unlockType: 'level',
+        unlockAt: 615,
+        icon: '🩹',
+        summary: 'Jovie tells them how it actually happened \u2014 a long shift at the clinic, and then a world with no clinic in it at all. What she built alone, before she ever found anyone.',
+        scenes: [
+          { speaker: 'Jovie', text: '"I just woke up," Jovie says, finally, once she has decided to actually tell it properly. "I found myself here. That is the whole beginning of it, as unsatisfying as that is. I had just finished a long shift at the clinic \u2014 the kind where you do not remember the drive home, you just arrive. And then I was not home. I was not anywhere I recognized at all."' },
+          { speaker: 'Narrator', text: 'She tells it plainly, the way people tell things they have had a long time alone to make peace with.' },
+          { speaker: 'Jovie', text: '"There was a box beside me," Jovie says. "A medical box \u2014 mine, somehow, though I never packed one. Gauze, basic supplies, a few things I did not recognize until I needed them. I did not question it very hard. I was too busy trying to figure out whether I was going to survive the first night."' },
+          { speaker: 'San', text: '"You were alone," you say, quiet, understanding the shape of it before she finishes.' },
+          { speaker: 'Jovie', text: '"Completely," Jovie confirms. "No party. No guild. No one to explain any of it to me. I leveled up because the alternative was not leveling up, and the alternative did not seem survivable. I learned herbalism because the box ran out eventually, and the world did not stop needing tending just because I was out of supplies."' },
+          { speaker: 'Joel', text: '"That sounds like exactly the kind of thing you would actually do," Joel says, and it is not really a joke, even though it almost sounds like one. "Figure it out. Quietly. Tell no one how hard it actually was."' },
+          { speaker: 'Jovie', text: '"Someone had to," Jovie says, simple. "It might as well have been the person with the medical box."' },
+          { speaker: 'San', text: '"Dr. AA arrived with something similar," you tell her, thinking it through as you say it. "A kit of his own. I think that might be exactly where his own abilities in this world actually come from \u2014 not something Aethon gave him. Something he already had, that Aethon just... let matter, the way it never quite got to back home."' },
+          { speaker: 'Jovie', text: '"Then maybe I should meet him," Jovie says, something steadier in her voice now, like she has just found the shape of a reason to be here. "I spent years at a front desk making sure the right supplies reached the right hands at the right time. If that is worth something here too, I would rather it go toward keeping people upright than sit unused."' },
+          { speaker: 'San', text: '"Maybe Dr. AA could use some help," you say, and it is less a suggestion than a decision you have already half-made.' },
+          { speaker: 'Narrator', text: 'And so Jovie stays \u2014 not as another blade in the party, not as another name on the roster who marches out to fight, but as exactly what she has always quietly been: the person who makes sure the kit is actually stocked when someone needs it most.' },
+        ]
+      }
     ]
   },
 
@@ -5311,7 +5416,7 @@ storyJournal: {
   // max on rest, same "restock between engagements, not mid-fight" logic a real field
   // kit actually has, rather than being an unlimited resource like Senedra's use of
   // the player's own potion inventory.
-  drAAKit: { charges: 3, maxCharges: 3 },
+  drAAKit: { charges: 3 }, // maxCharges is computed via getDrAAKitMaxCharges(), not stored — Jovie's bonus charge needs to apply immediately once recruited, not wait for a manual sync
   grindAfkMode: false, // minimal-render grind view for battery savings while multitasking
   afkAdventure: { active: false, zoneIndices: [], startTime: 0, startLevel: 1, legendaryItemsGained: [], totalXp: 0, totalGold: 0, totalKills: 0, bossKills: {}, activeMs: 0, lastResumeTime: 0, backgroundedAt: null, eliteMode: false, visible: false, playerBrowsing: false },
   afkAdventurePicker: [], // temporary selection state while choosing zones, before starting
@@ -7094,6 +7199,119 @@ function checkZakiCourage() {
   }
   return true;
 }
+
+// === VISION MACHINE: PAST MEMORIES (Ch. 151+) ===
+// Unlocked once via a 500,000 gold spend, then a repeatable pool — pick a memory, see
+// it, no cost per viewing after the initial unlock. Deliberately short vignettes, not
+// full chapters — this is meant to feel like flipping through recovered fragments, not
+// reading another story arc. Covers: San's overprotective childhood, her sisters
+// leaving/marrying/divorcing, Joel's poor village childhood, their early relationship,
+// work dilemmas, a day that was just theirs, Joel with his daughter, Mama, San's parents.
+const VISION_MACHINE_MEMORY_UNLOCK_COST = 500000;
+
+const VISION_MACHINE_MEMORIES = [
+  { id: 'mem_locked_gate', title: 'The Locked Gate', icon: '🚪', scenes: [
+    { speaker: 'Narrator', text: 'You are sixteen, and the gate is locked again, and your mother is already at the window before you have even knocked.' },
+    { speaker: 'Mama', text: '"Where were you? You said six."' },
+    { speaker: 'San', text: '"It is six-fifteen, Mama."' },
+    { speaker: 'Narrator', text: 'She lets you in without another word, but the porch light stays on an hour longer than it needs to, every single night after.' }
+  ] },
+  { id: 'mem_every_call', title: 'Every Call Answered', icon: '📞', scenes: [
+    { speaker: 'Narrator', text: 'The phone rings twice before you even reach the bus stop, every single morning, the same number, the same three questions.' },
+    { speaker: 'Dad', text: '"Did you eat? Do you have money? Text when you arrive."' },
+    { speaker: 'San', text: '"Yes, yes, I will, Papa."' },
+    { speaker: 'Narrator', text: 'You did not understand it then, how much of that was love wearing the only shape fear ever taught them to give it.' }
+  ] },
+  { id: 'mem_aisyah_wedding', title: 'Aisyah\u2019s Wedding Day', icon: '💍', scenes: [
+    { speaker: 'Narrator', text: 'She cries in the car beforehand, just once, quick, like she is embarrassed to be caught at it.' },
+    { speaker: 'Aisyah', text: '"I am not sad," she says, before you can ask. "I just did not think I would actually get here."' },
+    { speaker: 'San', text: '"You got here," you tell her, fixing her veil. "Whatever happens after, you got here."' }
+  ] },
+  { id: 'mem_mez_marriage', title: 'Mezstorm\u2019s Marriage, Once', icon: '💐', scenes: [
+    { speaker: 'Narrator', text: 'She looked happy, once. You have to remind yourself of that sometimes, now, looking back through everything that came after.' },
+    { speaker: 'Mez', text: '"I think this is actually going to work," she says, young, certain, holding a bouquet she picked herself.' },
+    { speaker: 'Narrator', text: 'It is not a lie, exactly, the way it ends later. It is just not the whole story either. Nothing ever is, at the beginning.' }
+  ] },
+  { id: 'mem_mez_left', title: 'The Day Mez Left', icon: '🌧️', scenes: [
+    { speaker: 'Narrator', text: 'There are no boxes, not really. There is just Mez, at the door, two sons already gone ahead with their father, and a silence that does not know how to end itself.' },
+    { speaker: 'Mez', text: '"Take care of yourself," she says, and it sounds like an apology for something much larger than the sentence itself.' },
+    { speaker: 'San', text: '"You too," you say, and do not know, yet, how long it will actually take her to mean it.' }
+  ] },
+  { id: 'mem_village_well', title: 'The Village Well', icon: '🪣', scenes: [
+    { speaker: 'Narrator', text: 'Joel is eight, carrying water twice his own weight, and nobody around him thinks that is unusual, because it isn\u2019t.' },
+    { speaker: 'Young Joel', text: '"Almost home," he tells himself, out loud, the way children do when the walk is long and the arms are tired.' },
+    { speaker: 'Narrator', text: 'He will do this walk hundreds more times before he is grown. He will never once complain about it where his mother can hear.' }
+  ] },
+  { id: 'mem_shared_shoes', title: 'Shared Shoes', icon: '👞', scenes: [
+    { speaker: 'Narrator', text: 'There is one good pair between the three brothers, and a schedule nobody wrote down but everyone somehow knew.' },
+    { speaker: 'Young Joel', text: '"Your turn tomorrow," he tells his brother, already used to it, already unbothered in the specific way poverty teaches a child to be unbothered.' },
+    { speaker: 'Narrator', text: 'He does not remember resenting it. He remembers being fast, and careful, and grateful there was a pair at all.' }
+  ] },
+  { id: 'mem_movie_hated', title: 'The Movie They Both Hated', icon: '🎬', scenes: [
+    { speaker: 'Joel', text: '"This is the worst thing I have ever watched," Joel whispers, forty minutes in, entirely serious.' },
+    { speaker: 'San', text: '"Then why did you pick it?"' },
+    { speaker: 'Joel', text: '"I did not know! The poster looked good!"' },
+    { speaker: 'Narrator', text: 'You do not remember a single plot point, years later. You remember laughing the whole way home about how bad it was.' }
+  ] },
+  { id: 'mem_cant_afford_dinner', title: 'A Dinner Neither Could Afford', icon: '🍽️', scenes: [
+    { speaker: 'Narrator', text: 'You split one dessert between you, technically two spoons, mostly just an excuse to sit somewhere nice a little longer.' },
+    { speaker: 'San', text: '"We really should not have ordered this."' },
+    { speaker: 'Joel', text: '"Worth it," Joel says, already reaching for a second bite before you can. "Absolutely worth it."' }
+  ] },
+  { id: 'mem_birthday_surprise', title: 'Her Birthday, His Surprise', icon: '🎂', scenes: [
+    { speaker: 'Narrator', text: 'He is a terrible liar about it for a week beforehand, and you let him think he pulled it off anyway.' },
+    { speaker: 'Joel', text: '"Surprise," Joel says, entirely unnecessary, since you have known for days.' },
+    { speaker: 'San', text: '"I had no idea," you tell him, and mean the kindness of it, if not the literal truth.' }
+  ] },
+  { id: 'mem_new_year', title: 'New Year, Just the Two of Them', icon: '🎆', scenes: [
+    { speaker: 'Narrator', text: 'No party, no crowd — just the two of you on a rooftop somewhere, watching a sky neither of you paid to see.' },
+    { speaker: 'Joel', text: '"Any resolutions?" Joel asks, half-joking.' },
+    { speaker: 'San', text: '"Just this," you say. "More of exactly this."' }
+  ] },
+  { id: 'mem_first_fight', title: 'Their First Real Fight', icon: '💢', scenes: [
+    { speaker: 'Narrator', text: 'It is about something small, the way first fights usually are — a missed message, an assumption neither of you checked.' },
+    { speaker: 'Joel', text: '"I just wish you had told me," Joel says, frustrated but not unkind about it.' },
+    { speaker: 'San', text: '"I should have," you admit. "I am sorry."' },
+    { speaker: 'Narrator', text: 'It does not last the night. Neither of you is built for a cold war, even this early on.' }
+  ] },
+  { id: 'mem_deadline', title: 'The Deadline That Never Ends', icon: '💻', scenes: [
+    { speaker: 'Narrator', text: 'Midnight, again, the office mostly empty, the same report open for the third revision.' },
+    { speaker: 'San', text: '"I am starting to think this deadline is a metaphor," you mutter, to no one, at your desk.' },
+    { speaker: 'Narrator', text: 'It is not a metaphor. It is just Tuesday.' }
+  ] },
+  { id: 'mem_robin_bad_day', title: 'Robin\u2019s Office, A Bad Day', icon: '📋', scenes: [
+    { speaker: 'Narrator', text: 'Robin is short with everyone that afternoon, snapping over nothing, and nobody in the office says a word about why.' },
+    { speaker: 'San', text: '"Rough day," you say to a coworker, quiet, in the hallway after.' },
+    { speaker: 'Narrator', text: 'You do not know yet what is actually happening at his house. Nobody does. Not for a long while.' }
+  ] },
+  { id: 'mem_hotel_day', title: 'Just the Two of Them, A Whole Day', icon: '🏨', scenes: [
+    { speaker: 'Narrator', text: 'No plans, no schedule — just a hotel room, breakfast in bed, and an entire day neither of you had to share with anyone else.' },
+    { speaker: 'Joel', text: '"We should do this more," Joel says, unhurried, meaning it.' },
+    { speaker: 'San', text: '"We should," you agree, already knowing how rarely life actually allows it.' }
+  ] },
+  { id: 'mem_joel_daughter_hair', title: 'Learning, Badly, To Braid', icon: '🎀', scenes: [
+    { speaker: 'Narrator', text: 'Joel\u2019s hands are too big for this, and he knows it, and his daughter waits anyway, patient in the way small children are patient with people they trust.' },
+    { speaker: 'Young Joel', text: '"Almost got it," he says, for the fourth time, clearly not close.' },
+    { speaker: 'Narrator', text: 'She laughs at the lopsided result in the mirror. He laughs too. Neither of them minds that it is crooked.' }
+  ] },
+  { id: 'mem_daughter_phone_call', title: 'A Phone Call, Her Voice', icon: '📱', scenes: [
+    { speaker: 'Narrator', text: 'The call is short, the connection worse than usual, but her voice comes through clear enough for what matters.' },
+    { speaker: 'Young Joel', text: '"Papa, guess what happened at school today," she says, already talking before he can even say hello properly.' },
+    { speaker: 'Narrator', text: 'He listens to every word of it, twice as long as the story actually takes to tell.' }
+  ] },
+  { id: 'mem_mama_table', title: 'Mama\u2019s Table, Full', icon: '🍚', scenes: [
+    { speaker: 'Narrator', text: 'Too much food, as always, Mama insisting everyone take seconds before anyone has finished firsts.' },
+    { speaker: 'Mama', text: '"Eat more. You are both too thin."' },
+    { speaker: 'Joel', text: '"We are not thin, Mama."' },
+    { speaker: 'Mama', text: '"Eat more anyway."' }
+  ] },
+  { id: 'mem_parents_dinner', title: 'Dinner, Just the Three of Them', icon: '🍲', scenes: [
+    { speaker: 'Narrator', text: 'An ordinary weeknight, nothing special about the meal, everything special about who is at the table.' },
+    { speaker: 'Dad', text: '"How was your week?"' },
+    { speaker: 'San', text: '"Busy. Good, though."' },
+    { speaker: 'Narrator', text: 'Nobody says anything more meaningful than that. It does not need to be more meaningful than that.' }
+  ] }
+];
 
 function getAffinityUnlockBonus(type) {
   let bonus = 0;
@@ -9178,7 +9396,19 @@ function tickWrenHealerAbilities() {
 // deterministically once someone's genuinely hurt, not on a random roll, matching
 // "steady hands" — he doesn't wait around, he just doesn't have infinite supply.
 const DR_AA_HEAL_THRESHOLD = 0.40;
-const DR_AA_HEAL_PCT = 0.25;
+const DR_AA_BASE_HEAL_PCT = 0.25;
+const DR_AA_BASE_MAX_CHARGES = 3;
+
+// Jovie boosts both sides of Dr. AA's kit once recruited — an extra charge (her own
+// medical box, restocking his) and slightly stronger patch-ups (years at a front desk
+// making sure the right supplies reached the right hands). "A bit of both," per design —
+// not a separate mechanic competing with his, an upgrade to the one he already has.
+function getDrAAKitMaxCharges() {
+  return DR_AA_BASE_MAX_CHARGES + (isGuildMemberRecruited('jovie') ? 1 : 0);
+}
+function getDrAAHealPct() {
+  return DR_AA_BASE_HEAL_PCT + (isGuildMemberRecruited('jovie') ? 0.05 : 0);
+}
 
 function isDrAAActive() {
   return G.party.some(p => p.n === 'Dr. AA' && p.on && p.hp > 0);
@@ -9196,15 +9426,17 @@ function tickDrAAMedicalKit() {
   }
   if (lowest.pctHp >= DR_AA_HEAL_THRESHOLD) return;
 
+  const healPct = getDrAAHealPct();
+  const maxCharges = getDrAAKitMaxCharges();
   G.drAAKit.charges--;
   if (lowest.isPlayer) {
-    const healAmt = Math.floor(G.p.mhp * DR_AA_HEAL_PCT);
+    const healAmt = Math.floor(G.p.mhp * healPct);
     G.p.hp = Math.min(G.p.mhp, G.p.hp + healAmt);
-    lg('🩺 Dr. AA reaches for the kit \u2014 patches you up for ' + healAmt + ' HP. (' + G.drAAKit.charges + '/' + G.drAAKit.maxCharges + ' charges left)');
+    lg('🩺 Dr. AA reaches for the kit \u2014 patches you up for ' + healAmt + ' HP. (' + G.drAAKit.charges + '/' + maxCharges + ' charges left)');
   } else {
-    const healAmt = Math.floor(lowest.ref.mhp * DR_AA_HEAL_PCT);
+    const healAmt = Math.floor(lowest.ref.mhp * healPct);
     lowest.ref.hp = Math.min(lowest.ref.mhp, lowest.ref.hp + healAmt);
-    lg('🩺 Dr. AA reaches for the kit \u2014 patches up ' + lowest.name + ' for ' + healAmt + ' HP. (' + G.drAAKit.charges + '/' + G.drAAKit.maxCharges + ' charges left)');
+    lg('🩺 Dr. AA reaches for the kit \u2014 patches up ' + lowest.name + ' for ' + healAmt + ' HP. (' + G.drAAKit.charges + '/' + maxCharges + ' charges left)');
   }
 }
 
@@ -10238,6 +10470,34 @@ function useVisionMachine() {
     lg('   ' + reply);
   }
 
+  render();
+}
+
+// Vision Machine — Past Memories (Ch. 151+). One-time unlock, then a repeatable pool
+// with no per-viewing cost — the whole point is being able to actually revisit these
+// once the machine can hold them at all, not gate every single look.
+function isVisionMachineMemoriesUnlockable() {
+  return (G.storyJournal.read || []).includes('journal_151');
+}
+function isVisionMachineMemoriesUnlocked() {
+  return G.visionMachine.memoriesUnlocked === true;
+}
+function unlockVisionMachineMemories() {
+  if (!isVisionMachineMemoriesUnlockable()) { lg('🔮 Varel has not mentioned this upgrade yet.'); return; }
+  if (isVisionMachineMemoriesUnlocked()) return;
+  if (G.p.gold < VISION_MACHINE_MEMORY_UNLOCK_COST) { lg('🔮 Not enough gold to open the window backward yet. Needs ' + VISION_MACHINE_MEMORY_UNLOCK_COST.toLocaleString() + 'G.'); return; }
+  G.p.gold -= VISION_MACHINE_MEMORY_UNLOCK_COST;
+  G.visionMachine.memoriesUnlocked = true;
+  lg('🔮 The window opens backward, for the first time. Whatever still remains to be found is yours to look for now.');
+  render();
+}
+function viewRandomVisionMemory() {
+  if (!isVisionMachineMemoriesUnlocked()) return;
+  const memory = VISION_MACHINE_MEMORIES[Math.floor(Math.random() * VISION_MACHINE_MEMORIES.length)];
+  lg('🔮 Memory: ' + memory.icon + ' ' + memory.title);
+  for (let scene of memory.scenes) {
+    lg((scene.speaker !== 'Narrator' ? scene.speaker + ': ' : '') + scene.text);
+  }
   render();
 }
 
@@ -12018,6 +12278,26 @@ const GUILD_MEMBERS = [
       'Renn Evergreen: "Two hundred years of reading and somehow this is still the part I never get tired of."',
       'Renn Evergreen: "I have seen this exact mistake made before. Centuries ago. Still works the same way."',
       'Renn Evergreen: "Patience is easy when you genuinely have unlimited time. I try not to let that make me smug about it."'
+    ] },
+  { id: 'jovie', npcName: 'Jovie', role: 'Clinic Support', icon: '💉',
+    bountyArchetype: 'Support',
+    hallSpot: 'a supply corner she reorganized within her first week, uninvited and unstoppable',
+    recruitReq: { type: 'journal', journalId: 'journal_153' },
+    fieldBuff: { healPct: 0.06 },
+    gatherMats: ['Herb Bundle', 'Gem Dust'],
+    // Not a party member — she stays Guild-side on purpose, same shape as Jorvin/Wahyu/
+    // Dudin, but her actual function is upgrading Dr. AA's kit directly rather than
+    // trading. See getDrAAKitMaxCharges()/getDrAAHealPct() for the mechanical side.
+    hubBanter: [
+      'Jovie: "I spent years making sure the right supplies reached the right hands at the right time. Turns out that skill translates further than I expected."',
+      'Jovie: "Dr. AA keeps trying to reorganize my supply corner. I keep putting it back. We have an understanding."',
+      'Jovie: "I still do not fully know how long I was out there alone before I found any of you. I have stopped needing the number."'
+    ],
+    recruitLine: "Jovie sets the medical box down like she has already decided where it belongs. \"Put me wherever the kit is. I have spent enough of my life keeping one stocked \u2014 might as well keep doing it somewhere that matters this much.\"",
+    barks: [
+      'Jovie: "Kit\u2019s stocked. It stays stocked. That is the whole job, and I take it seriously."',
+      'Jovie: "I learned herbalism the hard way, alone, with no one to ask. I would rather nobody else here ever has to learn it that way."',
+      'Jovie: "Dr. AA and I disagree about inventory placement constantly. We have never once disagreed about whether the kit gets refilled."'
     ] }
 ];
 
@@ -16123,9 +16403,11 @@ function completeRest() {
   for (let p of G.party) { if (p.on) updateAffinity(p.n, 2); }
   checkLovetalkAndFamilyTies();
   // Dr. AA's kit restocks between engagements, not mid-fight — same logic a real
-  // field kit actually has.
-  if (G.drAAKit.charges < G.drAAKit.maxCharges) {
-    G.drAAKit.charges = G.drAAKit.maxCharges;
+  // field kit actually has. Uses getDrAAKitMaxCharges() rather than a stored field,
+  // so Jovie's bonus charge applies immediately once she's recruited, no separate sync needed.
+  const drAAMaxCharges = getDrAAKitMaxCharges();
+  if (G.drAAKit.charges < drAAMaxCharges) {
+    G.drAAKit.charges = drAAMaxCharges;
     if (isDrAAActive()) lg('🩺 Dr. AA restocks the kit. Ready again.');
   }
   // Track rest_with quest progress
@@ -19090,7 +19372,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.90';
+const BUILD_ID = '2026-08-17.91';
 // =========================
 
 
@@ -19214,6 +19496,7 @@ function saveGame() {
     guildWeeklyRewardLastClaimedWeek: G.guildWeeklyReward.lastClaimedWeek,
     visionMachineLastUseDay: G.visionMachine.lastUseDay,
     visionMachineJoelLetterCount: G.visionMachine.joelLetterCount || 0,
+    visionMachineMemoriesUnlocked: G.visionMachine.memoriesUnlocked || false,
     chainQuests: G.chainQuests || {},
     strongholdCosmetics: G.strongholdCosmetics,
     bondingSeenScenes: G.bonding.seenScenes,
@@ -19529,6 +19812,7 @@ function loadGame() {
     G.guildWeeklyReward.lastClaimedWeek = data.guildWeeklyRewardLastClaimedWeek !== undefined ? data.guildWeeklyRewardLastClaimedWeek : -1;
     G.visionMachine.lastUseDay = data.visionMachineLastUseDay !== undefined ? data.visionMachineLastUseDay : -1;
     G.visionMachine.joelLetterCount = data.visionMachineJoelLetterCount || 0;
+    G.visionMachine.memoriesUnlocked = data.visionMachineMemoriesUnlocked || false;
     G.chainQuests = data.chainQuests || {};
     // Any chain that was mid-fight when the save happened resumes from its saved floor,
     // not stuck mid-combat — active gets cleared, stageIndex (the real progress) doesn't.
@@ -23752,6 +24036,19 @@ function rStrongholds() {
         h += '<div class="btn-hint">🔮 Costs ' + VISION_MACHINE_COST.toLocaleString() + 'G to open. You have ' + Math.floor(G.p.gold).toLocaleString() + 'G.</div>';
       } else {
         h += '<button onclick="useVisionMachine()" class="abtn" style="width:100%;">🔮 Open the Window (' + VISION_MACHINE_COST.toLocaleString() + 'G)</button>';
+      }
+      // Past Memories — separate section, appears once Varel has actually mentioned
+      // the upgrade (Ch.151), not before.
+      if (isVisionMachineMemoriesUnlockable()) {
+        h += '<div style="border-top:1px solid var(--border);margin:10px 0;padding-top:10px;">';
+        h += '<div style="font-size:12px;font-weight:600;margin-bottom:6px;">Past Memories</div>';
+        if (isVisionMachineMemoriesUnlocked()) {
+          h += '<button onclick="viewRandomVisionMemory()" class="abtn" style="width:100%;">🔮 View a Memory</button>';
+        } else {
+          h += '<div class="btn-hint" style="margin-bottom:6px;">A one-time upgrade to open the window backward, not just across.</div>';
+          h += '<button onclick="unlockVisionMachineMemories()" class="' + (G.p.gold >= VISION_MACHINE_MEMORY_UNLOCK_COST ? 'abtn' : 'btn-outline-ghost') + '" style="width:100%;">🔮 Unlock (' + VISION_MACHINE_MEMORY_UNLOCK_COST.toLocaleString() + 'G)</button>';
+        }
+        h += '</div>';
       }
       h += '</div>';
       h += '</div>';
