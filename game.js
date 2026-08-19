@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Hall Tour: a walk through the Guild Hall connecting every room built this session)';
+const APP_VERSION = '2026-08-17 (Fixed: siege defense enemies + bonus reward now scale with player level, was frozen at claim-time zoneLv)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -10584,9 +10584,15 @@ function startSiegeWave() {
   G.currentBoss = null;
   G.cbt.autoCombat = isAutoCombatPreferred();
   const waveSize = 2 + Math.floor(G.siegeDefense.wave / 2); // waves 0-1: 2 enemies, wave 2: 3 enemies
+  // Enemies previously scaled to the stronghold's fixed zoneLv forever — meaning
+  // sieges at an early-claimed stronghold (Mended Grove, zoneLv 11) stayed trivially
+  // easy and trivially rewarding no matter how high the player's actual level climbed.
+  // Floored at the original zoneLv so an unclaimed-but-nearby siege never gets
+  // artificially harder than intended, but scales up past that with the player.
+  const siegeEnemyLv = Math.max(def.zoneLv, G.p.lvl);
   for (let i = 0; i < waveSize; i++) {
     const name = def.siegeEnemies[Math.floor(Math.random() * def.siegeEnemies.length)];
-    const e = generateRaidEliteEnemy(name, def.zoneLv);
+    const e = generateRaidEliteEnemy(name, siegeEnemyLv);
     e.id = i;
     G.cbt.en.push(e);
   }
@@ -10611,15 +10617,22 @@ function handleSiegeVictory() {
   G.cbt.on = false;
 
   if (G.siegeDefense.wave >= G.siegeDefense.maxWaves) {
-    // Siege fully repelled — bonus reward, and the siege is over
+    // Siege fully repelled — bonus reward, and the siege is over. Same staleness fix
+    // as the wave enemies above: the flat siegeReward numbers were never touched once
+    // a stronghold was claimed, so defending Mended Grove at level 500 paid exactly
+    // what it paid at level 15. Guild Rep stays flat on purpose — it's read elsewhere
+    // in this codebase as an achievement-style currency, not a power-scaling one.
     const reward = def.siegeReward || { xp: 0, gold: 0, guildRep: 0 };
-    G.p.xp += reward.xp;
-    G.p.gold += reward.gold;
+    const rewardScale = Math.max(1, G.p.lvl / def.zoneLv);
+    const scaledXp = Math.round(reward.xp * rewardScale);
+    const scaledGold = Math.round(reward.gold * rewardScale);
+    G.p.xp += scaledXp;
+    G.p.gold += scaledGold;
     if (reward.guildRep && G.guildJoined) {
       addGuildRep(reward.guildRep);
       checkGuildRankUp();
     }
-    lg('🏰 SIEGE REPELLED! ' + def.name + ' is safe. Bonus: +' + reward.xp + ' XP, +' + reward.gold + 'G' + (reward.guildRep && G.guildJoined ? ', +' + reward.guildRep + ' Guild Rep' : '') + '.');
+    lg('🏰 SIEGE REPELLED! ' + def.name + ' is safe. Bonus: +' + scaledXp.toLocaleString() + ' XP, +' + scaledGold.toLocaleString() + 'G' + (reward.guildRep && G.guildJoined ? ', +' + reward.guildRep + ' Guild Rep' : '') + '.');
     G.strongholdSiege[G.siegeDefense.strongholdId].active = false;
     G.siegeDefense.active = false;
     G.siegeDefense.strongholdId = null;
@@ -20109,7 +20122,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.113';
+const BUILD_ID = '2026-08-17.114';
 // =========================
 
 
