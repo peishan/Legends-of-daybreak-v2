@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Chapter art wired up through chapter 62)';
+const APP_VERSION = '2026-08-17 (9 new achievements: Garden/Infirmary, Lovetalk, Family Ties, Blitz, Vision Memories)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -193,7 +193,7 @@ const G = {
     { n: 'Dr. AA', t: 'Steady Hands', r: 'Healer', hp: 70, mhp: 70, atk: 5, def: 6, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Calm under pressure in the specific way only someone who has already seen the worst of it can be. Keeps a ghost story ready for the ride there, and a steady hand ready for whatever happens once you arrive.', b: '+20% Healing potency', col: '#0284c7', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 5, def: 6, spd: 5 }, eq: { weapon: { n: 'Old-World Medical Kit', slot: 'weapon', forCompanion: 'Dr. AA', r: 'rare', ilvl: 28, atk: 14, def: 10, d: "Field kit for Dr. AA. +14 ATK, +10 DEF" }, armor: { n: "Physician's Coat", slot: 'armor', forCompanion: 'Dr. AA', r: 'rare', ilvl: 28, def: 18, atk: 4, d: "Coat for Dr. AA. +18 DEF, +4 ATK" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Sister Wren', t: 'True Devotion', r: 'Healer', hp: 68, mhp: 68, atk: 4, def: 8, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Spent a long time devoted to something that was never real. Knows real when she finally gets to stand next to it \u2014 and stands between the party and whatever comes next, calling on the Temple\u2019s grace when it is needed.', b: '+10% Defense (party) \u00b7 Intercession (DEF buff) \u00b7 Temple\u2019s Grace (cure chance)', col: '#f0abfc', affinityBonuses: [], gear: null, base: { mhp: 68, atk: 4, def: 8, spd: 5 }, eq: { weapon: { n: 'Temple-Blessed Censer', slot: 'weapon', forCompanion: 'Sister Wren', r: 'rare', ilvl: 28, atk: 12, def: 12, d: "Censer for Sister Wren. +12 ATK, +12 DEF" }, armor: { n: 'Vestments of Intercession', slot: 'armor', forCompanion: 'Sister Wren', r: 'rare', ilvl: 28, def: 20, d: "Sacred vestments for Sister Wren. +20 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Ser Aldric', t: 'The Other Kind of Found', r: 'Knight', hp: 110, mhp: 110, atk: 7, def: 9, spd: 3, on: false, ul: 999, recruitGated: true, d: 'Spent a long time being found by things. Guild work feels like the other version of that \u2014 chosen instead of caught. Holds a line like it is a personal promise, because to him, it is.', b: '+15% Defense', col: '#57534e', affinityBonuses: [], gear: null, base: { mhp: 110, atk: 7, def: 9, spd: 3 }, eq: { weapon: { n: "The Other Kind of Found's Blade", slot: 'weapon', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, atk: 20, def: 14, d: "Sword for Ser Aldric. +20 ATK, +14 DEF" }, armor: { n: "Knight's Unbroken Plate", slot: 'armor', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, def: 26, d: "Heavy plate for Ser Aldric. +26 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'Renn Evergreen', t: 'Alchemist-Archivist', r: 'Support', hp: 90, mhp: 90, mp: 60, mmp: 60, atk: 5, def: 6, spd: 4, on: false, ul: 999, recruitGated: true, d: 'Centuries old, permanently stuck looking barely past twenty — an alchemical formula that worked exactly as intended and not at all as he expected. Keeps the Library\u2019s shelves standing mostly out of habit, and because, unlike almost anyone else who might take the job, he genuinely has the time to spare.', b: '+5% XP gain (party)', col: '#a16207', affinityBonuses: [], gear: null, base: { mhp: 90, atk: 5, def: 6, spd: 4, mmp: 60 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Renn Evergreen', t: 'Alchemist-Archivist', r: 'Support', hp: 90, mhp: 90, mp: 60, mmp: 60, atk: 5, def: 6, spd: 4, on: false, ul: 999, recruitGated: true, d: 'Centuries old, permanently stuck looking barely past twenty — an alchemical formula that worked exactly as intended and not at all as he expected. Keeps the Library\u2019s shelves standing mostly out of habit, and because, unlike almost anyone else who might take the job, he genuinely has the time to spare.', b: '+5% XP gain (party)', col: '#a16207', affinityBonuses: [], gear: null, base: { mhp: 90, atk: 5, def: 6, spd: 4, mmp: 60 }, eq: { weapon: { n: "The Formula That Worked", slot: 'weapon', forCompanion: 'Renn Evergreen', r: 'rare', ilvl: 28, atk: 14, spd: 6, d: "Staff for Renn Evergreen. +14 ATK, +6 SPD" }, armor: { n: "Four Centuries of Reading", slot: 'armor', forCompanion: 'Renn Evergreen', r: 'rare', ilvl: 28, def: 18, atk: 4, d: "Robes for Renn Evergreen. +18 DEF, +4 ATK" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Iris', t: 'Held Her Own', r: 'Scout', hp: 68, mhp: 68, atk: 9, def: 4, spd: 10, on: false, ul: 999, recruitGated: true, d: 'Held a line alone for years before the Guild gave her something better than solitude. Ash has never once left her side, and Ash is usually right.', b: '+15% Crit chance \u00b7 Ash (20% chance a missed attack lands anyway)', col: '#c2703d', affinityBonuses: [], gear: null, base: { mhp: 68, atk: 9, def: 4, spd: 10 }, eq: { weapon: { n: "Iris's Long Knives", slot: 'weapon', forCompanion: 'Iris', r: 'rare', ilvl: 28, atk: 25, spd: 9, d: "Twin knives for Iris. +25 ATK, +9 SPD" }, armor: { n: "Ash's Watch", slot: 'armor', forCompanion: 'Iris', r: 'rare', ilvl: 28, def: 15, spd: 7, d: "Light armor for Iris. +15 DEF, +7 SPD" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } }
   ],
 
@@ -1003,7 +1003,20 @@ const G = {
     { id: 'season_two', n: 'Not Recovering. Beginning.', d: 'Reach the Season Two chapter', icon: '🌅', t: 'chapter_read', target: 'journal_092', need: 1, rw: { xp: 6000, g: 4000 }, done: false, secret: false },
     { id: 'season_three', n: 'The Honest Timescale', d: 'Reach the Season Three chapter', icon: '⏳', t: 'chapter_read', target: 'journal_140', need: 1, rw: { xp: 20000, g: 13000 }, done: false, secret: false },
     // Small / fun
-    { id: 'cafe_regular', n: 'A Regular Now', d: 'Sit with every pairing at Zaki\'s Guild Cafe at least once', icon: '\u2615', t: 'cafe_pairings_tried', need: 6, rw: { xp: 4000, g: 3000 }, done: false, secret: false },
+    { id: 'cafe_regular', n: 'A Regular Now', d: 'Sit with every pairing at Zaki\'s Guild Cafe at least once', icon: '\u2615', t: 'cafe_pairings_tried', need: 10, rw: { xp: 4000, g: 3000 }, done: false, secret: false },
+    // === Achievement coverage for the newest systems this session — Garden &
+    // Infirmary, Lovetalk, Family Ties, Blitz Mode, Vision Machine Past Memories.
+    // Same catch-up spirit as the earlier Guild/Temple/Library pass, applied
+    // immediately this time rather than after the gap had years to grow.
+    { id: 'first_brew', n: 'The First Batch', d: 'Collect your first brew from the Infirmary', icon: '🧪', t: 'infirmary_potions', need: 1, rw: { xp: 2500, g: 1800 }, done: false, secret: false },
+    { id: 'jovie_master', n: 'Master of the Infirmary', d: 'Reach Jovie\'s highest tier', icon: '💉', t: 'jovie_tier', need: 5, rw: { xp: 15000, g: 10000 }, done: false, secret: false },
+    { id: 'rare_herb_hand', n: 'A Good Eye for Rare Ground', d: 'Gather Rare Herb with Jovie 10 times', icon: '🌿', t: 'rare_herbs_gathered', need: 10, rw: { xp: 6000, g: 4000 }, done: false, secret: false },
+    { id: 'lovetalk_complete', n: 'Choosing You Again', d: 'Reach the final Lovetalk stage with Joel', icon: '💜', t: 'lovetalk_stage', need: 6, rw: { xp: 12000, g: 8000 }, done: false, secret: false },
+    { id: 'family_ties_maxed', n: 'Every Bond, Tended', d: 'Reach the final stage of Family Ties with all six', icon: '🌙', t: 'family_ties_maxed', need: 1, rw: { xp: 18000, g: 12000 }, done: false, secret: false },
+    { id: 'mercenary_blitz_first', n: 'Instant Contract', d: 'Use Mercenary Blitz for the first time', icon: '⚡', t: 'mercenary_blitz_used', need: 1, rw: { xp: 2000, g: 1500 }, done: false, secret: false },
+    { id: 'dragon_blitz_first', n: 'Instant Hoard', d: 'Use Dragon Hunt Blitz for the first time', icon: '⚡', t: 'dragon_blitz_used', need: 1, rw: { xp: 3000, g: 2200 }, done: false, secret: false },
+    { id: 'window_backward', n: 'The Window, Backward', d: 'Unlock the Vision Machine\'s Past Memories', icon: '🔮', t: 'vision_memories_unlocked', need: 1, rw: { xp: 8000, g: 5000 }, done: false, secret: false },
+    { id: 'memories_recovered', n: 'Ten Memories, Recovered', d: 'View 10 Past Memories through the Vision Machine', icon: '📼', t: 'vision_memories_viewed', need: 10, rw: { xp: 9000, g: 6000 }, done: false, secret: false },
   ],
 
   storyline: [
@@ -6116,7 +6129,20 @@ const COMPANION_GEAR_ROLES = {
   // He gets 4 slots total instead of 8, all uniquely flavored: Charm, Ward, Collar, Blessing.
   Soel: { weaponType: 'charm', weaponLabel: 'Charm', armorType: 'fur', armorLabel: 'Warded Fur',
     hiddenSlots: ['head', 'hands', 'feet', 'ring2'],
-    slotLabelOverrides: { amulet: 'Collar', ring1: 'Blessing' } }
+    slotLabelOverrides: { amulet: 'Collar', ring1: 'Blessing' } },
+  // The 8 swappable Guild War members were missing from this table entirely — meaning
+  // none of them could ever receive a gear drop from combat loot, only whatever
+  // hardcoded starting kit they shipped with (and Renn's was empty, hence no gear at
+  // all). Reusing the existing shared weapon/armor tables rather than inventing new
+  // ones, matched to each member's established flavor.
+  'Ser Aldric': { weaponType: 'sword', weaponLabel: 'Blade', armorType: 'heavy', armorLabel: 'Plate' },
+  Mimi: { weaponType: 'staff', weaponLabel: 'Staff', armorType: 'robe', armorLabel: 'Robes' },
+  'Brada Shah': { weaponType: 'bow', weaponLabel: 'Bow', armorType: 'light', armorLabel: 'Light Armor' },
+  'Dr. AA': { weaponType: 'mace', weaponLabel: 'Mace', armorType: 'robe', armorLabel: 'Robes' },
+  'Sister Wren': { weaponType: 'mace', weaponLabel: 'Mace', armorType: 'robe', armorLabel: 'Robes' },
+  'KW Liang': { weaponType: 'dagger', weaponLabel: 'Dagger', armorType: 'light', armorLabel: 'Light Armor' },
+  Iris: { weaponType: 'bow', weaponLabel: 'Bow', armorType: 'light', armorLabel: 'Light Armor' },
+  'Renn Evergreen': { weaponType: 'staff', weaponLabel: 'Staff', armorType: 'robe', armorLabel: 'Robes' }
 };
 
 const COMPANION_WEAPON_TABLES = {
@@ -7091,6 +7117,36 @@ function checkAchievements() {
       case 'cafe_pairings_tried':
         if ((G.guildCafePairingsTried || []).length >= ach.need) earned = true;
         break;
+      // New types added alongside the newest systems this session — same pattern as
+      // the earlier catch-up pass (Guild/Temple/Library), so achievements don't fall
+      // behind again the moment something new ships.
+      case 'infirmary_potions':
+        if ((G.infirmary.lifetimePotionsMade || 0) >= ach.need) earned = true;
+        break;
+      case 'jovie_tier':
+        if (getJovieTier() >= ach.need) earned = true;
+        break;
+      case 'rare_herbs_gathered':
+        if ((G.infirmary.rareHerbGatherCount || 0) >= ach.need) earned = true;
+        break;
+      case 'lovetalk_stage':
+        if (G.lovetalk.stage >= ach.need) earned = true;
+        break;
+      case 'family_ties_maxed':
+        if (Object.values(G.familyTies).every(ft => ft.stage >= 4)) earned = true;
+        break;
+      case 'mercenary_blitz_used':
+        if ((G.mercenaryBlitz.lifetimeUses || 0) >= ach.need) earned = true;
+        break;
+      case 'dragon_blitz_used':
+        if ((G.dragonHuntBlitzLifetimeUses || 0) >= ach.need) earned = true;
+        break;
+      case 'vision_memories_unlocked':
+        if (isVisionMachineMemoriesUnlocked()) earned = true;
+        break;
+      case 'vision_memories_viewed':
+        if ((G.visionMachine.memoriesViewedCount || 0) >= ach.need) earned = true;
+        break;
     }
 
     if (earned) {
@@ -7469,9 +7525,11 @@ function gatherRareHerbsWithJovie() {
   let msg = '🌿 Jovie: "Good ground today." +' + xp.toLocaleString() + ' XP';
   if (found) {
     addI({ n: 'Rare Herb', t: 'mat', q: 1, r: 'rare' });
+    G.infirmary.rareHerbGatherCount = (G.infirmary.rareHerbGatherCount || 0) + 1;
     msg += ', +1 Rare Herb';
   }
   lg(msg + '.');
+  checkAchievements();
   lvlup();
   render();
 }
@@ -10662,6 +10720,8 @@ function viewRandomVisionMemory() {
   for (let scene of memory.scenes) {
     lg((scene.speaker !== 'Narrator' ? scene.speaker + ': ' : '') + scene.text);
   }
+  G.visionMachine.memoriesViewedCount = (G.visionMachine.memoriesViewedCount || 0) + 1;
+  checkAchievements();
   render();
 }
 
@@ -10924,6 +10984,7 @@ function blitzDragon(dragonId) {
   if (epicItem) { addI(epicItem); lg('✨ HOARD: ' + epicItem.n + ' (Epic)'); }
 
   G.dragonHuntBlitz[dragonId].blitzesUsedToday = (G.dragonHuntBlitz[dragonId].blitzesUsedToday || 0) + 1;
+  G.dragonHuntBlitzLifetimeUses = (G.dragonHuntBlitzLifetimeUses || 0) + 1;
   lvlup();
   render();
 }
@@ -12462,6 +12523,26 @@ const GUILD_MEMBERS = [
       'Jovie: "Kit\u2019s stocked. It stays stocked. That is the whole job, and I take it seriously."',
       'Jovie: "I learned herbalism the hard way, alone, with no one to ask. I would rather nobody else here ever has to learn it that way."',
       'Jovie: "Dr. AA and I disagree about inventory placement constantly. We have never once disagreed about whether the kit gets refilled."'
+    ] },
+  { id: 'zul', npcName: 'Zul', role: 'Courier', icon: '🚗',
+    bountyArchetype: 'Utility',
+    hallSpot: 'the doorway, half in and half out, keys already in hand',
+    recruitReq: { type: 'trader_visits', visits: 10 },
+    fieldBuff: { xpPct: 0.04 },
+    gatherMats: ['Iron Ore', 'Gem Dust'],
+    // Formal Guild recruitment on top of his existing driver/teleport service — the
+    // same instinct that got documents to Finance on time now gets Bounty Missions
+    // there faster too. See getZulBountyCooldownMult() for the mechanical side.
+    hubBanter: [
+      'Zul: "Kewangan," Zul says, to nobody in particular, the way he always has. Some habits do not need a reason anymore.',
+      'Zul: "Roads are worse here. Job is the same."',
+      'Zul: "I do not ask what is in the package. Never did. Not going to start now."'
+    ],
+    recruitLine: "Zul does not say much when San asks him to make it official. He just nods, once, the way he nods at everything. \"Same job,\" he says. \"Just further now.\"",
+    barks: [
+      'Zul: "Kewangan?" \u2014 still the only real question he ever asks, and it still means exactly what it always meant.',
+      'Zul: "Fastest road is rarely the safest one. I know both anyway."',
+      'Zul: "Nobody thanks the driver. I have made my peace with that."'
     ] }
 ];
 
@@ -12587,7 +12668,11 @@ function computeBountyMissionPreview(memberIds) {
   const diversityMult = 1 + (diversityCount > 1 ? (diversityCount - 1) * 0.05 : 0); // +5% per distinct archetype beyond the first, up to +15% for all 4
 
   const durationMin = Math.max(5, Math.round(GUILD_BOUNTY_BASE_DURATION_MIN - totalBuff * 20));
-  const cooldownMin = Math.max(120, Math.round(GUILD_BOUNTY_BASE_COOLDOWN_MIN - totalBuff * 100));
+  let cooldownMin = Math.max(120, Math.round(GUILD_BOUNTY_BASE_COOLDOWN_MIN - totalBuff * 100));
+  // Zul's courier speed shaves cooldown further once recruited — same instinct that
+  // got documents to Finance on time now applies to Bounty Mission turnaround,
+  // independent of whether he's actually one of the dispatched members himself.
+  if (isGuildMemberRecruited('zul')) cooldownMin = Math.max(90, Math.round(cooldownMin * 0.85));
 
   const rank = getGuildRank();
   const baseGold = 800 * rank * memberIds.length;
@@ -17599,6 +17684,7 @@ function blitzMercenary() {
   // of today should also start from that tier, not climb back up from near zero.
   G.mercenary.completed = Math.max(G.mercenary.completed || 0, reward.tier * MERCENARY_CONTRACTS_PER_TIER);
   G.mercenaryBlitz.lastBlitzDay = G.gameDay;
+  G.mercenaryBlitz.lifetimeUses = (G.mercenaryBlitz.lifetimeUses || 0) + 1;
   checkAchievements();
   lg('⚡ Mercenary Blitz: instant contract cleared at Tier ' + (reward.tier + 1) + '. +' + reward.txp.toLocaleString() + ' XP, +' + reward.tg2.toLocaleString() + 'G. Standing restored to Tier ' + (reward.tier + 1) + '.');
   lvlup();
@@ -19539,7 +19625,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.97';
+const BUILD_ID = '2026-08-17.99';
 // =========================
 
 
@@ -24421,13 +24507,35 @@ const GUILD_CAFE_BANTER = {
     'KW Liang: "Snowball likes it here. Warm counter. Nobody minds the fur in the pastries. Mostly nobody minds."',
     'KW Liang: "I still check the room before I sit. Old habit. Zaki does not comment on it. I appreciate that more than I have said out loud."',
     'San: "You are allowed to just sit, you know," you tell him, gentle. Liang almost believes you. Almost.'
+  ],
+  family_dr_aa: [
+    'Dr. AA: "Sister Wren and I still have not settled whether faith or medicine actually keeps this Hall standing. I say medicine. She is wrong. Lovingly wrong."',
+    'Dr. AA: "Jovie reorganized my kit again. It is more efficient now. I resent how much more efficient it is."',
+    'Joel: "How is the kit holding up?" Joel asks, and Dr. AA launches into an answer neither of you fully understands but both nod along to anyway.'
+  ],
+  family_renn: [
+    'Renn Evergreen: "Centuries of tea, and Zaki still makes the best matcha I have had. I do not say that lightly."',
+    'Renn Evergreen: "People keep offering me advice for someone my age. I have stopped correcting them here too. It is funnier this way."',
+    'Joel: "Does it get old?" Joel asks, genuinely curious. "Watching everyone else keep aging?" Renn considers the question longer than the joke deserved.'
+  ],
+  family_jovie: [
+    'Jovie: "I keep meaning to just sit and not think about supply counts for one hour. I am up to about forty minutes now. Progress."',
+    'Jovie: "Dr. AA and I argue about kit placement here too. Apparently the argument follows me wherever there is a counter."',
+    'San: "You are allowed to actually rest, you know," you tell her, and Jovie makes a face like she has heard that one already, from someone else, recently.'
+  ],
+  double_date_aldric_wren: [
+    'Ser Aldric: "She would tell you I am too careful. I would tell you she is too certain. We have found this makes us, apparently, a good match."',
+    'Sister Wren: "He still checks a room before he sits in it. I still light a candle before I trust anything fully. Neither of us has really stopped being who we were before this."',
+    'Ser Aldric: "I did not expect to find this," he says, simply, watching her across the table. "I am glad I was wrong about that."'
   ]
 };
 
 function isGuildCafeBanterAvailable(key) {
   const requirements = {
     solo_mimi: ['mimi'], solo_aisy: ['aisy'], solo_iris: ['iris'],
-    double_date_mimi_brada: ['mimi', 'brada'], family_zaki: [], family_liang: ['kw_liang']
+    double_date_mimi_brada: ['mimi', 'brada'], family_zaki: [], family_liang: ['kw_liang'],
+    family_dr_aa: ['dr_aa'], family_renn: ['renn'], family_jovie: ['jovie'],
+    double_date_aldric_wren: ['ser_aldric', 'sister_wren']
   };
   const req = requirements[key];
   if (!req) return false;
@@ -24548,8 +24656,12 @@ function rGuildCafe() {
     { key: 'solo_aisy', label: '\u2615 Aisy' },
     { key: 'solo_iris', label: '\u2615 Iris' },
     { key: 'double_date_mimi_brada', label: '\u2615\u2615 Mimi & Brada (double date)' },
+    { key: 'double_date_aldric_wren', label: '\u2615\u2615 Ser Aldric & Sister Wren (double date)' },
     { key: 'family_zaki', label: '\u2615\u2615\u2615 San, Joel & Zaki' },
-    { key: 'family_liang', label: '\u2615\u2615\u2615 San, Joel & Liang' }
+    { key: 'family_liang', label: '\u2615\u2615\u2615 San, Joel & Liang' },
+    { key: 'family_dr_aa', label: '\u2615\u2615\u2615 San, Joel & Dr. AA' },
+    { key: 'family_renn', label: '\u2615\u2615\u2615 San, Joel & Renn' },
+    { key: 'family_jovie', label: '\u2615\u2615\u2615 San, Joel & Jovie' }
   ];
   for (let p of pairings) {
     const available = isGuildCafeBanterAvailable(p.key);
