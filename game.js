@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Garden now Joel\u2019s own hobby, stronghold-gated not Jovie-gated; Cellphone text corrected)';
+const APP_VERSION = '2026-08-17 (Mercenary Blitz restores yesterday\u2019s peak tier + fixed stretched Stop button)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -17594,10 +17594,13 @@ function blitzMercenary() {
   const reward = getMercenaryBlitzReward();
   G.p.xp += reward.txp;
   G.p.gold += reward.tg2;
-  G.mercenary.completed = (G.mercenary.completed || 0) + 1;
+  // Restores standing to exactly yesterday's peak tier threshold, not just +1 — Blitz
+  // is meant to pick up where you left off, so any regular contracts played the rest
+  // of today should also start from that tier, not climb back up from near zero.
+  G.mercenary.completed = Math.max(G.mercenary.completed || 0, reward.tier * MERCENARY_CONTRACTS_PER_TIER);
   G.mercenaryBlitz.lastBlitzDay = G.gameDay;
   checkAchievements();
-  lg('⚡ Mercenary Blitz: instant contract cleared at Tier ' + (reward.tier + 1) + '. +' + reward.txp.toLocaleString() + ' XP, +' + reward.tg2.toLocaleString() + 'G.');
+  lg('⚡ Mercenary Blitz: instant contract cleared at Tier ' + (reward.tier + 1) + '. +' + reward.txp.toLocaleString() + ' XP, +' + reward.tg2.toLocaleString() + 'G. Standing restored to Tier ' + (reward.tier + 1) + '.');
   lvlup();
   render();
 }
@@ -19184,7 +19187,7 @@ function renderLogPanel() {
     const bd = G.busyDayAutopilot;
     h += '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(139,92,246,0.15);border:1px solid var(--accent);border-radius:10px;padding:6px 10px;margin-bottom:6px;">';
     h += '<span onclick="setS(\'combat\')" style="font-size:12px;font-weight:700;color:var(--accent-light);cursor:pointer;flex:1;">🚀 Busy Day \u2014 ' + (bd.queueIndex + 1) + '/' + bd.queue.length + ' (' + bd.completedCount + ' done)</span>';
-    h += '<button onclick="event.stopPropagation();stopBusyDayAutopilot();" class="btn-outline-ghost" style="margin:0;padding:3px 10px;font-size:10px;">Stop</button>';
+    h += '<button onclick="event.stopPropagation();stopBusyDayAutopilot();" style="flex-shrink:0;width:auto;margin:0;padding:4px 12px;font-size:10px;font-weight:700;border-radius:8px;border:1px solid var(--accent-light);background:transparent;color:var(--accent-light);cursor:pointer;">Stop</button>';
     h += '</div>';
   }
   h += '<div class="log-highlight ' + getLogElementClass(highlight) + '"><div class="lh-text">' + boldNumbers(highlight) + '</div></div>';
@@ -19536,7 +19539,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.95';
+const BUILD_ID = '2026-08-17.96';
 // =========================
 
 
