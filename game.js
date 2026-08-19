@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fixed: Rune screen browser hang (unbounded array rendering all as DOM) + skill tree cutoff)';
+const APP_VERSION = '2026-08-17 (Fixed: Dr. AA banter line referenced Jovie before her Season 2/3 recruitment)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -20149,7 +20149,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.116';
+const BUILD_ID = '2026-08-17.118';
 // =========================
 
 
@@ -24203,10 +24203,17 @@ function rGuildWar() {
   for (let def of GUILD_MEMBERS) {
     const recruited = isGuildMemberRecruited(def.id);
     const fielded = G.guildWar.fielded.includes(def.id);
+    const onDuty = isGuildMemberOnDuty(def.id);
     h += '<div class="panel' + (fielded ? ' panel-gold' : '') + '" style="text-align:left;' + (recruited ? '' : 'opacity:0.5;') + '">';
     h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
     h += '<div><span style="font-size:16px;">' + def.icon + '</span> <span style="font-weight:700;' + (fielded ? 'color:var(--gold);' : '') + '">' + def.npcName + '</span> <span style="font-size:11px;color:var(--text-dim);">' + def.role + '</span></div>';
-    if (recruited) {
+    if (recruited && onDuty && !fielded) {
+      // Visibly reflects the on-duty block instead of relying on the toggle function's
+      // lg() line, which was easy to miss — clicking still routes through
+      // toggleGuildWarField() for the same message, but the button itself now shows
+      // why it's not a normal "Field" action before anyone taps it.
+      h += '<button onclick="toggleGuildWarField(\'' + def.id + '\')" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;opacity:0.6;" disabled>📋 On Duty</button>';
+    } else if (recruited) {
       h += '<button onclick="toggleGuildWarField(\'' + def.id + '\')" class="' + (fielded ? 'abtn' : 'btn-outline-ghost') + '" style="margin:0;padding:4px 10px;font-size:11px;">' + (fielded ? 'Fielded' : 'Field') + '</button>';
     } else {
       h += '<span style="font-size:11px;color:var(--text-dim);">🔒 Not yet recruited</span>';
@@ -25178,7 +25185,7 @@ const GUILD_CAFE_BANTER = {
   ],
   family_dr_aa: [
     'Dr. AA: "Sister Wren and I still have not settled whether faith or medicine actually keeps this Hall standing. I say medicine. She is wrong. Lovingly wrong."',
-    'Dr. AA: "Jovie reorganized my kit again. It is more efficient now. I resent how much more efficient it is."',
+    'Dr. AA: "I have three ghost stories rated \u2018clinically inadvisable to tell before bed.\u2019 Sister Wren asks for all three, every time. I have stopped pretending I mind."',
     'Joel: "How is the kit holding up?" Joel asks, and Dr. AA launches into an answer neither of you fully understands but both nod along to anyway.'
   ],
   family_renn: [
