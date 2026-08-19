@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fixed: siege defense enemies + bonus reward now scale with player level, was frozen at claim-time zoneLv)';
+const APP_VERSION = '2026-08-17 (Fixed: Rune screen browser hang (unbounded array rendering all as DOM) + skill tree cutoff)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -670,6 +670,26 @@ const G = {
     { n: 'An Ordinary Afternoon of Fixing Things', lv: 530, elem: 'none', d: "Nobody asks the party to be heroes here. The well needs clearing. The roof needs finishing, properly this time. San re-shelves a small pile of books nobody's opened in years, out of habit more than need. It is, entire, the most unremarkable afternoon anyone in this party has had in longer than they can actually count. Nobody complains about that even once.", en: ['A Cat Supervising Closely', 'Something Unbothered by the Work', 'A Barn Cat, Mildly Helpful'], loot: ['A Properly Finished Roof', 'A Well, Actually Clear', 'An Afternoon With Nothing Urgent In It'], xp: 5750, g: 3450, dg: 'low' },
     { n: 'What Joel and San Never Get, Usually', lv: 540, elem: 'none', d: "No crisis waiting. No grief to process. No door to open carefully or badly. Just an evening, a porch, two cups of something warm, and the specific, uncomplicated quiet of two people who have earned an ordinary night together and, for once, actually get to have one.", en: ['A Cat, Entirely Uninterested', 'Something Purring Nearby', 'A Sleepy Guardian'], loot: ['A Warm, Uneventful Evening', 'Two Cups, Both Empty Now', 'Nothing Urgent At All'], xp: 5800, g: 3480, dg: 'low' },
     { n: 'Wherever Soel Actually Came From', lv: 550, elem: 'none', d: "Not a dramatic origin. Not a hidden destiny. Just the plain, gentle truth, offered without ceremony: this was always going to be a place cats kept, with or without a Guardian Spirit to call their own — and Soel, San understands now, did not choose her because anything about her was special. He chose her the way any cat chooses anyone. Because he decided to. Because that was, quietly, always enough.", en: ['An Old Cat, Watching', 'Something Content, Finally', 'The Last Kitten of the Litter'], loot: ['A Small, Unremarkable Truth', 'Proof Some Choices Need No Reason', 'Soel\u2019s Own Quiet Answer'], xp: 5900, g: 3540, dg: 'low' },
+    // === WORLD 6: THE WORLD THAT DROWNED IN WANTING (Lv 560-650) ===
+    // Held in reserve since Soel's World closed at 550, waiting for the right idea
+    // instead of getting padded out for its own sake. Core theme: what happens when
+    // you don't stop taking. Not a random flood — a world that went under because
+    // something took more than it could ever metabolize, and the water was the
+    // consequence, not the cause. Merfolk are descendants who adapted to survive it
+    // rather than perish; orcs are a displaced land people sharing an uneasy, evolving
+    // border with them; the Taotie-coded guardians are the actual threat — not
+    // monsters in the generic sense, but living consequences, activating wherever
+    // greed or overreach happens again.
+    { n: 'The Water That Remembers Why', lv: 560, elem: 'none', d: "Not a natural coastline — a border, drawn by drowning, still holding the shape of streets and rooflines beneath water that never fully settled. Nothing here happened by accident. The flooding remembers exactly why it came.", en: ['A Tide-Worn Sentinel', 'Something Still Keeping the Old Border', 'A Drowned Watcher'], loot: ['A Waterlogged Boundary Marker', 'Proof This Was Once Dry Ground', 'Silt That Never Fully Settled'], xp: 6100, g: 3660, dg: 'impossible' },
+    { n: 'Where the Merfolk Chose to Stay', lv: 570, elem: 'water', d: "Not refugees, exactly — descendants, generations deep, of people who looked at a drowning world and adapted rather than fled it. They test strangers carefully. They have very good reason to.", en: ['A Reef Guardian', 'Something Testing Strangers', 'A Tidecaller\u2019s Ward'], loot: ['A Reef-Worked Ornament', 'Proof Adaptation Was Chosen, Not Given', 'A Tidecaller\u2019s Marker'], xp: 6200, g: 3720, dg: 'impossible' },
+    { n: 'What They Adapted Rather Than Lost', lv: 580, elem: 'water', d: "The merfolk elders still remember breathing air, or their grandparents did — the stories are specific about that, deliberately, the way people keep true things specific so they don\u2019t quietly become myth.", en: ['A Current-Shaped Sentinel', 'Something That Remembers Breathing Air', 'A Merfolk Elder\u2019s Guard'], loot: ['An Elder\u2019s Kept Memory', 'Proof the Stories Stayed Specific', 'A Current-Worn Keepsake'], xp: 6300, g: 3780, dg: 'impossible' },
+    { n: 'The Ground the Orcs Still Miss', lv: 590, elem: 'none', d: "What little dry ground survived belongs to the orc clans now, fiercely, the way people hold onto the last of something after losing the rest of it. They do not call themselves refugees either. They call themselves what\u2019s left.", en: ['A Displaced Orc Sentry', 'Something Guarding the Last Dry Ground', 'A Warcamp Watcher'], loot: ['A Warcamp Marker', 'Proof This Ground Is Still Defended', 'Soil From Higher Ground'], xp: 6400, g: 3840, dg: 'impossible' },
+    { n: 'Two Peoples, One Half-Drowned Border', lv: 600, elem: 'none', d: "Not war, not quite — a truce old enough to have its own rules, tested constantly by people on both sides who\u2019d rather it break than keep costing them. San recognizes the shape of it immediately. She has watched Corran and Fen do the same dance.", en: ['A Border Enforcer', 'Something Testing the Truce', 'A Contested Ground Guardian'], loot: ['A Truce Marker, Still Standing', 'Proof the Border Has Rules', 'Something Neither Side Claims'], xp: 6600, g: 3960, dg: 'impossible' },
+    { n: 'Where the First Warning Still Stands', lv: 610, elem: 'none', d: "A relic, bronze-worked, ancient past even the merfolk\u2019s oldest stories — a face with no body, all mouth, cast deliberately to be looked at and understood immediately. Whoever made it wanted the warning to survive them. It did.", en: ['A Taotie-Marked Relic Guard', 'Something That Judges Excess', 'A Warning Given Bronze Teeth'], loot: ['A Bronze Warning, Intact', 'Proof This Was Made to Last', 'A Face With No Body, Cast on Purpose'], xp: 6800, g: 4080, dg: 'impossible' },
+    { n: 'What Actually Pulled This World Under', lv: 620, elem: 'none', d: "Not a flood. A debt, finally called in — someone, something, some whole system here took more than the world could ever give back, and the water is what came to collect it. The merfolk elders knew this. They just never said it plainly before now.", en: ['A Consumption Wraith', 'Something That Took Too Much, Once', 'A Debt Given Shape'], loot: ['A Ledger Nobody Wanted Kept', 'Proof the Water Was Never Random', 'What the Debt Actually Cost'], xp: 7000, g: 4200, dg: 'impossible' },
+    { n: 'The Relic Nobody Should Reach For', lv: 630, elem: 'none', d: "It would be so easy to take. That is, San understands slowly, exactly the point of it being here at all — a temptation left deliberately in reach, watched closely by something that has judged exactly this choice before and is fully prepared to judge it again.", en: ['A Hoard-Ward', 'Something Testing Whoever Reaches', 'A Taotie Sentinel, Watching Closely'], loot: ['A Relic, Deliberately Left Reachable', 'Proof the Test Was Real', 'Something That Chose Not to Take It'], xp: 7300, g: 4380, dg: 'impossible' },
+    { n: 'When the Old Guardians Wake in Force', lv: 640, elem: 'none', d: "Not provoked — timed. Whatever kept these guardians dormant has finally run its course, and the whole drowned border wakes at once, bronze eyes opening in water that has waited a very long time to be taken seriously again.", en: ['A Taotie Broodguard', 'Something Fully Awake Now', 'A Reckoning, Approaching'], loot: ['A Broodguard\u2019s Cast-Off Plate', 'Proof the Waiting Is Over', 'Bronze Still Warm From Waking'], xp: 7600, g: 4560, dg: 'impossible' },
+    { n: 'The Debt Finally Come Due', lv: 650, elem: 'none', d: "The last stretch before the reckoning itself \u2014 merfolk and orcs both, for once, standing the same line instead of opposite ones, because whatever is about to surface does not particularly care which side of the old border anyone was standing on.", en: ['The Reckoning\u2019s Own Vanguard', 'Something That Remembers Every Debt', 'A Guardian Given One Last Purpose'], loot: ['Proof Both Sides Finally Stood Together', 'A Debt About to Be Called', 'The Last Warning Before the Reckoning'], xp: 7900, g: 4740, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -993,6 +1013,7 @@ const G = {
     { id: 'world2_slayer', n: 'What It Was Becoming', d: 'Defeat An Unwritten Thing', icon: '📜', t: 'boss_specific', target: 'An Unwritten Thing', need: 1, rw: { xp: 20000, g: 13000 }, done: false, secret: false },
     { id: 'world3_slayer', n: 'The Draft, Finished', d: 'Defeat The Draft That Kept Drawing, closing out the Architect\'s world', icon: '📐', t: 'boss_specific', target: 'The Draft That Kept Drawing', need: 1, rw: { xp: 26000, g: 17000 }, done: false, secret: false },
     { id: 'world4_slayer', n: 'Proof It Can Be Done Gently', d: 'Defeat The Last Roadwarden, closing out The Steadfast Roads', icon: '🛡️', t: 'boss_specific', target: 'The Last Roadwarden', need: 1, rw: { xp: 32000, g: 21000 }, done: false, secret: false },
+    { id: 'world6_slayer', n: 'The Debt, Finally Paid', d: 'Defeat The Taotie, Still Hungry, closing out the drowned world', icon: '🌊', t: 'boss_specific', target: 'The Taotie, Still Hungry', need: 1, rw: { xp: 48000, g: 32000 }, done: false, secret: false },
     // Level milestones matching each world's rough start
     { id: 'century', n: 'A Century In', d: 'Reach Level 100', icon: '💯', t: 'level', need: 100, rw: { xp: 3000, g: 2000 }, done: false, secret: false },
     { id: 'lv200', n: 'The Uncatalogued', d: 'Reach Level 200', icon: '📖', t: 'level', need: 200, rw: { xp: 8000, g: 5000 }, done: false, secret: false },
@@ -1663,6 +1684,12 @@ const G = {
     { n: 'The Last Roadwarden', zone: 'Proof It Can Be Done Gently', hp: 2114488, mhp: 2114488, atk: 5159, def: 3087, xp: 1025526, g: 733727,
       mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 528622,
       desc: "Not guarding the door out of suspicion \u2014 guarding it out of standards. Every Roadwarden who ever stood this post asked the same unspoken question of everyone who reached it: have you actually earned this, or do you just want it badly enough to skip the parts that matter. It has been a very long time since anyone answered that question the right way. It is willing to find out if that changes today." },
+    // World 6's own climax boss — the Taotie itself, not a guardian of it. Every phase
+    // break is framed as another course it refuses to stop at, matching the "what
+    // happens when you don't stop taking" theme the whole world was built around.
+    { n: 'The Taotie, Still Hungry', zone: 'The Debt Finally Come Due', hp: 3850000, mhp: 3850000, atk: 7100, def: 4250, xp: 1520000, g: 1085000,
+      mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 962500,
+      desc: "All mouth, the old warning said, and it was not exaggerating. It does not attack out of hatred and it does not defend out of fear \u2014 it simply keeps consuming, the way it always has, the way whatever this world used to be apparently never taught it to stop. Merfolk and orc lines both stand this line today, for once on the same side of an old border, because there is nothing about this particular hunger that discriminates." },
     // The Endless Thinning's own boss — every zone boss above it is a fixed stat
     // block, calibrated once and left to eventually fall behind the same way regular
     // monsters used to. This one carries no hp/atk/def/xp/g of its own at all:
@@ -20122,7 +20149,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.114';
+const BUILD_ID = '2026-08-17.116';
 // =========================
 
 
@@ -22125,7 +22152,7 @@ function rSecret(){
 }
 
 function rSkillTree(){
-  let h = '<div style="padding:16px;">';
+  let h = '<div class="content">';
   h += '<h2 class="st">🌳 Skill Trees</h2>';
   if (!G.playerSpec.path) {
     h += '<div style="font-size:13px;color:var(--text-dim);margin-bottom:20px;text-align:center;">Choose your specialization at Level 3.</div>';
@@ -22577,14 +22604,28 @@ function rRunes(){
     h+='</button>';
   }
 
-  // Rune inventory with better visual cards
+  // Rune inventory with better visual cards. Capped display — this array has no
+  // upper bound (runes drop from every Lv10+ kill with nothing ever pruning it), so a
+  // long playthrough can accumulate hundreds or thousands of them. Rendering all of
+  // them as individual DOM cards with inline mouseover/mouseout handlers on every
+  // single render() call is exactly what was hanging the browser on this screen.
+  // Combine actions above operate on the full G.runes array regardless of this cap,
+  // so nothing about actually using the runes is affected — only how many get drawn.
+  const RUNE_DISPLAY_CAP = 60;
   h+='<div style="font-size:12px;font-weight:600;color:var(--accent-light);margin-bottom:10px;">Rune Inventory ('+G.runes.length+')</div>';
   if(G.runes.length===0){
     h+='<div style="font-size:12px;color:var(--text-dim);padding:12px;background:var(--bg-card);border-radius:12px;margin-bottom:16px;">No runes yet. Defeat enemies in Lv 10+ zones to find them.</div>';
   }else{
+    if (G.runes.length > RUNE_DISPLAY_CAP) {
+      h += '<div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;">Showing the ' + RUNE_DISPLAY_CAP + ' highest-rarity runes. Use Combine above to consolidate the rest \u2014 they\u2019re all still there.</div>';
+    }
+    const rarityOrder = { legendary: 4, epic: 3, rare: 2, uncommon: 1, common: 0 };
+    const displayRunes = [...G.runes]
+      .map((r, i) => ({ r, i }))
+      .sort((a, b) => (rarityOrder[b.r.r] || 0) - (rarityOrder[a.r.r] || 0))
+      .slice(0, RUNE_DISPLAY_CAP);
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">';
-    for(let i=0;i<G.runes.length;i++){
-      const r=G.runes[i];
+    for(let { r, i } of displayRunes){
       const rarityGlow = r.r==='rare'?'0 0 8px '+r.color+'40':r.r==='epic'?'0 0 12px '+r.color+'60':'';
       h+='<div class="rune-item" data-ri="'+i+'" style="background:var(--bg-card);border:2px solid '+r.color+';border-radius:12px;padding:10px 8px;text-align:center;cursor:pointer;user-select:none;box-shadow:'+rarityGlow+';transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.transform=\'none\'">';
       h+='<div style="font-size:24px;margin-bottom:4px;">'+r.icon+'</div>';
@@ -25318,7 +25359,8 @@ const TROPHY_WORLD_BOSSES = [
   { name: 'The Order That Never Stood Down', world: "Liang's World", icon: '🏛️' },
   { name: 'An Unwritten Thing', world: 'The Undecided World', icon: '📜' },
   { name: 'The Draft That Kept Drawing', world: "The Architect's World", icon: '📐' },
-  { name: 'The Last Roadwarden', world: 'The Steadfast Roads', icon: '🛡️' }
+  { name: 'The Last Roadwarden', world: 'The Steadfast Roads', icon: '🛡️' },
+  { name: 'The Taotie, Still Hungry', world: 'The World That Drowned in Wanting', icon: '🌊' }
 ];
 
 function rGuildChest() {
