@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (9 new achievements: Garden/Infirmary, Lovetalk, Family Ties, Blitz, Vision Memories)';
+const APP_VERSION = '2026-08-17 (Lovetalk Tier 2: 5 new stages, Season 3+, gated behind ch151)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -1011,7 +1011,8 @@ const G = {
     { id: 'first_brew', n: 'The First Batch', d: 'Collect your first brew from the Infirmary', icon: '🧪', t: 'infirmary_potions', need: 1, rw: { xp: 2500, g: 1800 }, done: false, secret: false },
     { id: 'jovie_master', n: 'Master of the Infirmary', d: 'Reach Jovie\'s highest tier', icon: '💉', t: 'jovie_tier', need: 5, rw: { xp: 15000, g: 10000 }, done: false, secret: false },
     { id: 'rare_herb_hand', n: 'A Good Eye for Rare Ground', d: 'Gather Rare Herb with Jovie 10 times', icon: '🌿', t: 'rare_herbs_gathered', need: 10, rw: { xp: 6000, g: 4000 }, done: false, secret: false },
-    { id: 'lovetalk_complete', n: 'Choosing You Again', d: 'Reach the final Lovetalk stage with Joel', icon: '💜', t: 'lovetalk_stage', need: 6, rw: { xp: 12000, g: 8000 }, done: false, secret: false },
+    { id: 'lovetalk_complete', n: 'Choosing You Again', d: 'Reach the end of Lovetalk\'s first arc with Joel', icon: '💜', t: 'lovetalk_stage', need: 6, rw: { xp: 12000, g: 8000 }, done: false, secret: false },
+    { id: 'lovetalk_tier2_complete', n: 'Whatever Comes, Together', d: 'Reach the final Lovetalk stage with Joel (Season 3)', icon: '⭐', t: 'lovetalk_stage', need: 11, rw: { xp: 22000, g: 15000 }, done: false, secret: false },
     { id: 'family_ties_maxed', n: 'Every Bond, Tended', d: 'Reach the final stage of Family Ties with all six', icon: '🌙', t: 'family_ties_maxed', need: 1, rw: { xp: 18000, g: 12000 }, done: false, secret: false },
     { id: 'mercenary_blitz_first', n: 'Instant Contract', d: 'Use Mercenary Blitz for the first time', icon: '⚡', t: 'mercenary_blitz_used', need: 1, rw: { xp: 2000, g: 1500 }, done: false, secret: false },
     { id: 'dragon_blitz_first', n: 'Instant Hoard', d: 'Use Dragon Hunt Blitz for the first time', icon: '⚡', t: 'dragon_blitz_used', need: 1, rw: { xp: 3000, g: 2200 }, done: false, secret: false },
@@ -7627,9 +7628,13 @@ function checkLovetalkAndFamilyTies() {
   if (G.p.lvl < LOVETALK_FAMILY_TIES_MIN_LEVEL) return;
 
   // Lovetalk — requires Joel actually in the active party, same as any companion-scene
-  // gate elsewhere in this file.
+  // gate elsewhere in this file. Tier 2 (stages 7-11) stays locked until Season 3 has
+  // actually begun (journal_151, the Vision Machine upgrade chapter) — the original
+  // six were reaffirmation inside an already-settled relationship; these carry
+  // different weight and shouldn't be available before that weight exists in-story.
   const joelPresent = G.party.some(p => p.n === 'Joel' && p.on && p.hp > 0);
-  if (joelPresent && G.lovetalk.stage < LOVETALK_STAGES.length && G.lovetalk.lastRestDay !== G.gameDay) {
+  const lovetalkCap = (G.storyJournal.read || []).includes('journal_151') ? LOVETALK_STAGES.length : 6;
+  if (joelPresent && G.lovetalk.stage < lovetalkCap && G.lovetalk.lastRestDay !== G.gameDay) {
     if (Math.random() < LOVETALK_TRIGGER_CHANCE) {
       G.lovetalk.lastRestDay = G.gameDay;
       triggerLovetalkStage();
@@ -19625,7 +19630,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.99';
+const BUILD_ID = '2026-08-17.100';
 // =========================
 
 
@@ -23782,6 +23787,49 @@ const LOVETALK_STAGES = [
       { speaker: 'Joel', text: '"I think about it too," Joel says. "More than I probably should. It is strange, being able to point to one exact afternoon and say, that. That is where it actually started, even though neither of us knew it yet."' },
       { speaker: 'San', text: '"Soel knew," you say, glancing at the cat currently asleep against Joel\u2019s leg, entirely unbothered by being discussed. "I think he has always known."' },
       { speaker: 'Joel', text: '"He usually does," Joel agrees, and pulls you in, the fire and the rain-that-was and the whole long road between them somehow all present in the same quiet moment.' }
+    ] },
+  // === TIER 2 (Season 3+, unlocked after journal_151) ===
+  // The original six were reaffirmation inside an already-settled relationship.
+  // These five carry different weight — sustaining something over years rather than
+  // choosing it once, with the Codex glimpse and the Library's own long timeline both
+  // finally given room to actually be sat with together, not just mentioned in passing.
+  { stage: 7, title: 'The Question the Codex Left Behind', icon: '👥',
+    scenes: [
+      { speaker: 'Narrator', text: 'It resurfaces on its own, the way things like this do \u2014 not forced, just finally ready to be held properly instead of set aside.' },
+      { speaker: 'San', text: '"I still think about them sometimes," you admit. "The cottage. How tired they looked. I do not know why it stayed with me the way it did."' },
+      { speaker: 'Joel', text: '"I think about it too," Joel says, honest. "Not because I want to know more. Because some part of me is grateful, every time, that whatever happened to them did not happen to us."' },
+      { speaker: 'San', text: '"We do not know that it did not," you say, gentle, not trying to unsettle him, just being accurate. "We just know ours went differently."' },
+      { speaker: 'Joel', text: '"Differently is enough for me," Joel says. "I do not need the whole answer. I just need this version to keep being true."' }
+    ] },
+  { stage: 8, title: 'What the Library Actually Costs', icon: '📖',
+    scenes: [
+      { speaker: 'Narrator', text: 'The weight of it lands properly some nights, well after the decision itself was already made.' },
+      { speaker: 'Joel', text: '"Years," Joel says, quiet, watching the fire. "Maybe decades. I said yes to that so easily, at the time. I do not think I let myself actually feel the size of it until just now."' },
+      { speaker: 'San', text: '"I know," you tell him. "I felt it too, late, the same way. It is a strange thing, choosing a timeline that outlasts how urgent it feels in the moment."' },
+      { speaker: 'Joel', text: '"Do you regret it? Saying yes that fast?"' },
+      { speaker: 'San', text: '"No," you say, certain. "I just needed to actually feel the weight of it before I could carry it properly. I think that is different from regret."' }
+    ] },
+  { stage: 9, title: 'Carrying It Together', icon: '🤝',
+    scenes: [
+      { speaker: 'Narrator', text: 'This one is less a conversation than an agreement, arrived at slowly, over several quieter evenings before this one.' },
+      { speaker: 'Joel', text: '"I do not want to just survive this timeline," Joel says. "The years. I want to actually live through them with you, not just endure them side by side."' },
+      { speaker: 'San', text: '"Then let us make sure we do that on purpose," you say. "Not just Library work and waiting. Evenings like this too. On purpose, not by accident."' },
+      { speaker: 'Joel', text: '"On purpose," Joel agrees, like it is a promise worth naming plainly rather than just assuming. "I can do on purpose."' }
+    ] },
+  { stage: 10, title: 'The Door He Never Closed', icon: '🚪',
+    scenes: [
+      { speaker: 'Narrator', text: 'Neither of you brings it up often. Tonight, quietly, San does.' },
+      { speaker: 'San', text: '"You said once you were not closing the door," you say, careful. "On having a child of our own, someday. I think about that more than I say out loud."' },
+      { speaker: 'Joel', text: '"I meant it," Joel says, simple. "I still mean it. Not now \u2014 not with the Tower, the strongholds, everything we are already carrying. But not never, either."' },
+      { speaker: 'San', text: '"Not never," you repeat, and something in the phrase settles rather than unsettles you. "I can live inside that. I do not need it resolved tonight."' },
+      { speaker: 'Joel', text: '"Then we will leave it exactly where it is," Joel says, gentle. "Open. Ours. Whenever it is actually time."' }
+    ] },
+  { stage: 11, title: 'Whatever Comes, Together', icon: '⭐',
+    scenes: [
+      { speaker: 'Narrator', text: 'The fire has burned low, and neither of you has moved to build it back up, content to let the evening end exactly as quietly as it started.' },
+      { speaker: 'Joel', text: '"Years from now," Joel says, "however this Library work actually ends \u2014 I do not need to know the ending yet. I just need to know I am still doing it with you when it comes."' },
+      { speaker: 'San', text: '"You will be," you tell him, certain in a way that does not need proving anymore, only saying. "Whatever it turns out to be. Together is the only version I am actually planning for."' },
+      { speaker: 'Joel', text: '"Together," Joel says, and it lands like it always has, since a rainy porch in a life that does not exist anymore \u2014 simple, true, and entirely enough.' }
     ] }
 ];
 
