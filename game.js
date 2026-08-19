@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Lovetalk Tier 2: 5 new stages, Season 3+, gated behind ch151)';
+const APP_VERSION = '2026-08-17 (Fixed: all 24 traders\u2019 stock now scales with player level, was frozen at zoneLv \u226456)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -7825,6 +7825,21 @@ function buyFromNPC(npcName, itemIdx) {
   // ilvl-based socket migration. Must clone, not reference, so multiple purchases of
   // the same stock item don't end up sharing one sockets array.
   if (item.sockets !== undefined) boughtItem.sockets = new Array(item.sockets.length).fill(null);
+  // Scale purchased gear to the player's current level — same fix already applied to
+  // generateItem()/generateCompanionItem(). Every trader's stock is hand-authored at a
+  // fixed ilvl (the highest trader zoneLv in the whole game is 56), so without this,
+  // every shop becomes permanently useless the moment a player levels much past it —
+  // exactly the bug that was quietly making companion gear worthless before that fix.
+  const itemAnchorLv = item.ilvl || npc.zoneLv || 1;
+  const levelScale = Math.max(1, G.p.lvl / Math.max(1, itemAnchorLv));
+  if (levelScale > 1) {
+    for (let key of FORGE_STAT_KEYS) {
+      if (boughtItem[key] !== undefined && key !== 'critChance' && key !== 'lifeSteal' && key !== 'mpRegen' && key !== 'hpRegen' && key !== 'goldFind') {
+        boughtItem[key] = Math.max(1, Math.round(boughtItem[key] * levelScale));
+      }
+    }
+    boughtItem.ilvl = G.p.lvl;
+  }
   addI(boughtItem);
   npc.visitCount++;
   lg('🧳 Bought ' + item.n + ' from ' + npc.n + ' for ' + finalPrice + 'G!' + (aisyah ? ' (Aisyah haggled 10% off!)' : ''));
@@ -19630,7 +19645,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.100';
+const BUILD_ID = '2026-08-17.101';
 // =========================
 
 
