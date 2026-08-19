@@ -823,6 +823,12 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .party-avatar-circle { width: 52px; height: 52px; border-radius: 50%; border: 2px solid; overflow: hidden; position: relative; font-size: 20px; font-weight: 700; color: var(--text); }
 .party-avatar-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .party-avatar-fallback { width: 100%; height: 100%; align-items: center; justify-content: center; }
+/* Combat/roster circles are small (52px), so a face composed further back in the
+   source portrait reads as distant even with object-fit:cover already filling the
+   frame — cover crops to fit the frame's shape, it doesn't know to zoom toward a
+   face specifically. A CSS-only scale fixes this without needing new cropped image
+   files: the circle's own overflow:hidden clips it cleanly, same as a real crop. */
+.party-avatar-circle .party-avatar-img { transform: scale(1.35); transform-origin: center 30%; }
 .party-avatar-hp { width: 52px; height: 6px; background: var(--timer-bg); border-radius: 3px; overflow: hidden; margin-top: 2px; }
 .party-avatar-hp-fill { height: 100%; transition: width 0.3s ease-out; }
 .party-avatar-stat-text { font-size: 9px; font-weight: 600; color: var(--text-dim); line-height: 1.2; white-space: nowrap; max-width: 52px; overflow: hidden; text-overflow: ellipsis; }

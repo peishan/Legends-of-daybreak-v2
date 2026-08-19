@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fixed: cover-series art reference updated from .jpg to .png)';
+const APP_VERSION = '2026-08-17 (Founding Anniversary: guild gets its own calendar, scaling rewards every 100 game days)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -77,6 +77,21 @@ if ('serviceWorker' in navigator) {
     console.log('SW registration failed:', err);
   });
 }
+
+// Shared by both the Temple bundle and Dudin's bundle — one of each Elixir of Swift
+// Growth tier, unpacked into inventory as 6 separate items rather than sitting as a
+// single bundle item themselves. Declared here, before G, specifically because Dudin's
+// trader stock is nested inside the initial G object literal below — referencing this
+// from a later declaration would throw a temporal-dead-zone ReferenceError the moment
+// the game tried to load, since object literal properties evaluate eagerly in order.
+const ELIXIR_BUNDLE_ITEMS = [
+  { n: 'Elixir of Swift Growth', t: 'pot', eff: 'xp_boost', v: 30, boostPct: 0.5, r: 'rare', d: '+50% XP for 30 real minutes. Only one growth elixir can be active at a time.' },
+  { n: 'Elixir of Swift Growth (2 Hour)', t: 'pot', eff: 'xp_boost', v: 120, boostPct: 0.5, r: 'rare', d: '+50% XP for 2 real hours. Only one growth elixir can be active at a time.' },
+  { n: 'Elixir of Swift Growth (4 Hour)', t: 'pot', eff: 'xp_boost', v: 240, boostPct: 0.5, r: 'epic', d: '+50% XP for 4 real hours. Only one growth elixir can be active at a time.' },
+  { n: 'Elixir of Swift Growth (8 Hour)', t: 'pot', eff: 'xp_boost', v: 480, boostPct: 0.5, r: 'epic', d: '+50% XP for 8 real hours. Only one growth elixir can be active at a time.' },
+  { n: 'Elixir of Swift Growth (10 Hour)', t: 'pot', eff: 'xp_boost', v: 600, boostPct: 0.5, r: 'epic', d: '+50% XP for 10 real hours. Only one growth elixir can be active at a time.' },
+  { n: 'Elixir of Swift Growth (12 Hour)', t: 'pot', eff: 'xp_boost', v: 720, boostPct: 0.5, r: 'legendary', d: '+50% XP for a full 12 real hours. Only one growth elixir can be active at a time.' }
+];
 
 const G = {
 
@@ -1177,7 +1192,8 @@ const G = {
         { n: 'Field Ration Pack', t: 'food', eff: 'heal', v: 60, q: 1, r: 'uncommon', price: 30, d: 'Dense, plain, and built to actually keep you standing. Restores 60 HP.' },
         { n: 'Combat Med-Kit', t: 'food', eff: 'heal', v: 85, q: 1, r: 'rare', price: 48, d: "Dudin doesn't hand these out to just anyone. Restores 85 HP." },
         { n: 'Standard-Issue Canteen', t: 'drink', eff: 'mana', v: 45, q: 1, r: 'uncommon', price: 26, d: 'Tastes like nothing. Works like everything. Restores 45 MP.' },
-        { n: "Reserve Officer's Flask", t: 'drink', eff: 'mana', v: 65, q: 1, r: 'rare', price: 42, d: 'Saved for the people who actually needed it. Restores 65 MP.' }
+        { n: "Reserve Officer's Flask", t: 'drink', eff: 'mana', v: 65, q: 1, r: 'rare', price: 42, d: 'Saved for the people who actually needed it. Restores 65 MP.' },
+        { n: 'Elixir of Swift Growth: Full Set', t: 'bundle', bundleContents: ELIXIR_BUNDLE_ITEMS, q: 1, r: 'legendary', price: 10500, d: "Not his usual line of work, but he got his hands on a full case and figures somebody should get use out of it. One of each bottle, no Temple standing required." }
       ],
       unlocked: false, zone: 'The Static Fields', zoneLv: 41, visitCount: 0 },
     { n: 'Wahyu', t: 'trader', title: 'The Printmaker', icon: '👕', col: '#0e7490', zone: 'The Static Fields', zoneLv: 41,
@@ -5381,6 +5397,17 @@ storyJournal: {
   // Boss, Guild War, Frontier, or Boss Rush — those stay manual on purpose.
   busyDayAutopilot: { active: false, queue: [], queueIndex: 0, startTime: 0, completedCount: 0, skippedTargets: [], playerBrowsing: false, pendingAfterMercenary: false },
   guildWarRivalEncounters: {}, // per-rival muster count, keyed by rival name — drives Corran/Fen's evolving banter
+  guildWarAccords: [], // rival names with a formalized Trade Accord — see proposeGuildWarAccord()
+  guildWarAccordLastPayoutDay: -1,
+  guildMemberRequests: {}, // keyed by member id — see checkGuildMemberRequests()
+  guildMemberRequestLastDay: -1,
+  guildMemberRequestQueue: null, // id of the request currently awaiting a response, if any
+  guildDuties: {}, // keyed by member id -> duty type ('scout'/'defense'/'training'/'trade')
+  guildDutyLastPayoutDay: -1,
+  guildFoundedDay: -1, // set once, the real day the guild was actually joined — see checkGuildUnlock()
+  guildAnniversariesCelebrated: 0,
+  guildChest: { lastOpenedWeek: -1 },
+  guildChestUpgrades: {}, // keyed by member id -> { [fieldBuffStat]: bonus }, capped per member
   // Guild Bounty Missions — dispatch a squad (up to 4, from recruited members not
   // otherwise occupied) on a job. The job itself resolves fast (5-15 real minutes,
   // faster with a stronger/more diverse squad); what actually gates repeat use is a
@@ -7813,6 +7840,17 @@ function buyFromNPC(npcName, itemIdx) {
   
   G.p.gold -= finalPrice;
 
+  // Bundles unpack into their contents rather than being added as a single item —
+  // same handling as buyTempleConsumable(), checked before the normal scaling logic
+  // below since a bundle has no stats of its own to scale.
+  if (item.t === 'bundle') {
+    for (let bundled of item.bundleContents) addI({ ...bundled, q: 1 });
+    npc.visitCount++;
+    lg('🧳 Bought ' + item.n + ' from ' + npc.n + ' for ' + finalPrice + 'G' + (aisyah ? ' (Aisyah haggled 10% off!)' : '') + ' \u2014 ' + item.bundleContents.length + ' elixirs added.');
+    render();
+    return;
+  }
+
   // Start from a full copy of the stock item so ANY field it defines survives the
   // purchase (price/idx aside) — a hardcoded whitelist here previously dropped custom
   // fields like stat/boostVal/mins the moment a new effect type introduced them,
@@ -8929,7 +8967,8 @@ const TEMPLE_CONSUMABLES = [
   { n: 'Elixir of Swift Growth (4 Hour)', t: 'pot', eff: 'xp_boost', v: 240, boostPct: 0.5, minRank: 3, cost: 1600, r: 'epic', d: '+50% XP for 4 real hours. The Temple only trusts this size bottle to Chosen who have actually stuck around a while. Only one growth elixir can be active at a time.' },
   { n: 'Elixir of Swift Growth (8 Hour)', t: 'pot', eff: 'xp_boost', v: 480, boostPct: 0.5, minRank: 4, cost: 2800, r: 'epic', d: '+50% XP for 8 real hours \u2014 long enough to just leave it running in the background of a whole session. Only one growth elixir can be active at a time.' },
   { n: 'Elixir of Swift Growth (10 Hour)', t: 'pot', eff: 'xp_boost', v: 600, boostPct: 0.5, minRank: 4, cost: 3300, r: 'epic', d: '+50% XP for 10 real hours. Only one growth elixir can be active at a time.' },
-  { n: 'Elixir of Swift Growth (12 Hour)', t: 'pot', eff: 'xp_boost', v: 720, boostPct: 0.5, minRank: 5, cost: 3800, r: 'legendary', d: '+50% XP for a full 12 real hours. Temple Chosen only \u2014 the biggest bottle they keep behind the counter. Only one growth elixir can be active at a time.' }
+  { n: 'Elixir of Swift Growth (12 Hour)', t: 'pot', eff: 'xp_boost', v: 720, boostPct: 0.5, minRank: 5, cost: 3800, r: 'legendary', d: '+50% XP for a full 12 real hours. Temple Chosen only \u2014 the biggest bottle they keep behind the counter. Only one growth elixir can be active at a time.' },
+  { n: 'Elixir of Swift Growth: Full Set', t: 'bundle', bundleContents: ELIXIR_BUNDLE_ITEMS, minRank: 5, cost: 10500, r: 'legendary', d: 'One of each bottle the Temple keeps \u2014 30 minutes through the full 12 hours \u2014 for less than buying all six separately. Temple Chosen only.' }
 ];
 
 // === TEACH A DISCIPLE — core logic ===
@@ -9461,6 +9500,7 @@ function getGuildBonus(statKey) {
 function checkGuildUnlock() {
   if (!G.guildJoined && G.p.lvl >= 5) {
     G.guildJoined = true;
+    G.guildFoundedDay = G.gameDay;
     lg('🛡️ You\'ve joined the Adventurers\' Guild! The Contract Board is open — check it for bigger jobs than the usual bounties.');
     refreshGuildContracts();
   }
@@ -9581,9 +9621,14 @@ function buyTempleConsumable(index) {
   const cost = getTempleCost(item.cost);
   if (G.p.gold < cost) { lg('❌ Need ' + cost + 'G (have ' + G.p.gold + ').'); return; }
   G.p.gold -= cost;
-  const { minRank, cost: _c, ...itemData } = item;
-  addI({ ...itemData, q: 1 });
-  lg('⛪ Temple Shop: acquired ' + item.n + ' for ' + cost + 'G.');
+  if (item.t === 'bundle') {
+    for (let bundled of item.bundleContents) addI({ ...bundled, q: 1 });
+    lg('⛪ Temple Shop: acquired ' + item.n + ' for ' + cost + 'G \u2014 ' + item.bundleContents.length + ' elixirs added.');
+  } else {
+    const { minRank, cost: _c, ...itemData } = item;
+    addI({ ...itemData, q: 1 });
+    lg('⛪ Temple Shop: acquired ' + item.n + ' for ' + cost + 'G.');
+  }
   render();
 }
 
@@ -12610,6 +12655,16 @@ const GUILD_MEMBERS = [
 function getGuildMemberDef(id) { return GUILD_MEMBERS.find(m => m.id === id); }
 function isGuildMemberRecruited(id) { return G.guildRoster.recruited.includes(id); }
 
+// GUILD_MEMBERS is a shared constant, not per-save state — Guild Chest upgrades can't
+// mutate def.fieldBuff directly without bleeding across saves/sessions. This reads the
+// definition's base value plus whatever's been separately banked in G.guildChestUpgrades.
+function getGuildMemberFieldBuffValue(id, stat) {
+  const def = getGuildMemberDef(id);
+  const base = (def && def.fieldBuff[stat]) || 0;
+  const bonus = (G.guildChestUpgrades[id] && G.guildChestUpgrades[id][stat]) || 0;
+  return base + bonus;
+}
+
 // === GUILD CHRONICLE ===
 // Auto-generated record of the guild's own history, read as short narrative entries
 // rather than raw stat deltas — kept by Renn in-universe (matching his archivist
@@ -12619,6 +12674,125 @@ const GUILD_CHRONICLE_MAX_ENTRIES = 60;
 function addChronicleEntry(icon, text) {
   G.guildChronicle.push({ day: G.gameDay, icon, text });
   if (G.guildChronicle.length > GUILD_CHRONICLE_MAX_ENTRIES) G.guildChronicle.shift();
+}
+
+// === TRADE ACCORDS ===
+// A mechanical payoff for Corran/Fen's evolving banter, which previously only ever
+// changed the flavor text, never the actual relationship. Once a rival's encounter
+// count reaches the "warm" tier (10+), the player can formalize it — that rival
+// permanently stops appearing in Guild War musters, replaced by a smaller but
+// guaranteed daily gold/rep trickle. Only rivals with a named leader are eligible;
+// the other four in GUILD_WAR_RIVALS never got this arc built for them.
+const GUILD_WAR_ACCORD_THRESHOLD = 10;
+const GUILD_WAR_ACCORD_DAILY_GOLD = 400;
+const GUILD_WAR_ACCORD_DAILY_REP = 15;
+
+function canProposeGuildWarAccord(rivalName) {
+  if (!GUILD_WAR_RIVAL_LEADERS[rivalName]) return false;
+  if (G.guildWarAccords.includes(rivalName)) return false;
+  return (G.guildWarRivalEncounters[rivalName] || 0) >= GUILD_WAR_ACCORD_THRESHOLD;
+}
+
+function proposeGuildWarAccord(rivalName) {
+  if (!canProposeGuildWarAccord(rivalName)) return;
+  const leader = GUILD_WAR_RIVAL_LEADERS[rivalName];
+  G.guildWarAccords.push(rivalName);
+  lg('🤝 A Trade Accord is struck with ' + rivalName + '. ' + leader.name + ' will not be mustering against you again \u2014 not as an enemy, anyway.');
+  addChronicleEntry('🤝', 'A Trade Accord was struck with ' + rivalName + ', formalizing what ' + leader.name + ' had already stopped calling a rivalry.');
+  checkAchievements();
+  render();
+}
+
+// === GUILD MEMBER REQUESTS ===
+// Members reaching back to San rather than the other way around — gated on Guild
+// recruitment specifically, not party presence, since most of the roster (Zul, Jovie,
+// Jorvin, Wahyu, Dudin) never enters the actual adventuring party at all. A request is
+// a message reaching the Hall, not a scene requiring someone standing next to her.
+// One request per member, ever — this is about giving the wider roster a moment of
+// actually being someone, not a repeatable system like Lovetalk/Family Ties.
+const GUILD_MEMBER_REQUEST_TRIGGER_CHANCE = 0.20;
+
+const GUILD_MEMBER_REQUESTS = {
+  ser_aldric: { prompt: 'Ser Aldric has noticed a pattern near the Hall \u2014 nothing urgent yet, but the kind of thing he\u2019d rather investigate now than wait for it to become a real problem. He is asking permission to go himself.',
+    options: [
+      { label: 'Go with him', outcome: 'You go together. It turns out to be nothing, this time \u2014 but Ser Aldric walks back lighter than he arrived, like being trusted enough to be asked along mattered more than what you actually found.', gold: 800, xp: 400 },
+      { label: 'Trust him to handle it alone', outcome: 'He goes alone, and comes back satisfied, quietly proud to have been trusted with it. "The other kind of found," he says once, almost to himself, "means also being trusted to go looking on your own."', gold: 1200, xp: 0 }
+    ] },
+  sister_wren: { prompt: 'Sister Wren wants to expand the shrine corner into something bigger \u2014 real space, not just a corner. She is asking, carefully, whether the Treasury might cover it.',
+    options: [
+      { label: 'Fund it from the Treasury', outcome: 'The Treasury covers it. Sister Wren does not say much, just lights the first candle in the new space herself, slow, like she is making sure it counts.', treasuryCost: 5000 },
+      { label: 'Fund it yourself', outcome: 'You cover it personally. "You did not have to," she says, and then, quieter, "but I am glad you did." The shrine gets its space either way.', gold: -5000 }
+    ] },
+  dr_aa: { prompt: 'Dr. AA wants a proper infirmary expansion \u2014 more shelf space, a second table, room to actually work instead of making do. He has already drawn up what he needs. He is asking you to approve it.',
+    options: [
+      { label: 'Approve the full expansion', outcome: 'He gets everything on the list. "Efficient," he says, already rearranging things before the paint is even dry, visibly pleased in the specific way he never quite says out loud.', treasuryCost: 6000 },
+      { label: 'Approve a smaller version', outcome: 'You approve the essentials, not the whole list. He accepts it without complaint \u2014 "Enough is enough," he says \u2014 though Jovie mentions later he kept the full drawing anyway, just in case.', gold: -2000 }
+    ] },
+  renn: { prompt: 'Renn wants a real research budget \u2014 not much, by his standards, but more than he\u2019s been quietly funding out of his own centuries-old reserves. He is asking, almost sheepishly, whether the Guild might actually cover it now.',
+    options: [
+      { label: 'Fund his research properly', outcome: '"I have been doing this on my own for longer than I can comfortably admit," Renn says, and for once does not turn it into a joke about his age. "Thank you for not making me keep doing it alone."', treasuryCost: 8000, xp: 500 },
+      { label: 'Offer a modest stipend instead', outcome: 'He accepts the smaller amount graciously \u2014 "I have had centuries of practice being patient about funding too," he says, and means it as a joke, mostly.', gold: -1500 }
+    ] },
+  jovie: { prompt: 'Jovie wants a specific reagent \u2014 not for the kit, for herself, a recipe she has been wanting to try since long before any of this. She asks like it costs her something to ask for anything just for her.',
+    options: [
+      { label: 'Get her exactly what she asked for', outcome: 'You track it down. She goes quiet for a second when you hand it over \u2014 "I did not actually expect you to say yes," she admits \u2014 before setting straight to work on it, pleased in a way she does not often let show.', gold: -800 },
+      { label: 'Tell her to take the time, no strings', outcome: '"Take the afternoon," you tell her. "Kit\u2019s not going anywhere." She looks at you like she is not sure what to do with being told to just rest. She takes the afternoon anyway.', xp: 300 }
+    ] },
+  zul: { prompt: 'Zul does not usually ask for anything. Today he mentions, offhand, that the roads have gotten easier lately \u2014 fewer washouts, less to dodge. It takes you a moment to realize he is actually telling you something, in his own way.',
+    options: [
+      { label: '"That sounds like relief, Zul."', outcome: 'He does not confirm it outright. He just nods, once, the way he nods at everything \u2014 but the silence after is a slightly different shape than usual. "Kewangan," he says, eventually, and it sounds almost fond this time.', xp: 400 },
+      { label: 'Just nod back, let it be what it is', outcome: 'You do not push. He seems to appreciate that more than a response would have landed \u2014 some things are better left exactly as understated as he offered them.', gold: 600 }
+    ] },
+  kw_liang: { prompt: 'KW Liang asks, careful about it, whether he might take a few days to visit Reyes and the Warren. Not a mission. Just a visit \u2014 the kind he still is not fully used to being allowed to want.',
+    options: [
+      { label: '"Go. Take as long as you need."', outcome: 'He goes. He comes back different \u2014 not lighter exactly, but steadier, like checking a room before he sits in it has started to feel like habit again instead of necessity. "Snowball says hello," he adds, and almost smiles.', xp: 500 },
+      { label: 'Offer to send Snowball\u2019s favorite treats along', outcome: 'You send him off with a small parcel for the cat too. Liang looks at it a long moment before pocketing it carefully. "That is unnecessary," he says. He does not put it down.', gold: -400 }
+    ] },
+  iris: { prompt: 'Iris asks, a little sideways about it, whether there might be some kind of actual recognition for Ash \u2014 not a title, nothing formal, just something that says he is genuinely part of this and not just along for the ride.',
+    options: [
+      { label: 'Have something made for Ash', outcome: 'A small collar tag gets made, nothing elaborate, just a mark that says he belongs here. Iris fastens it herself, quiet, and Ash sits very still for it, like he understands exactly what it means.', gold: -600 },
+      { label: '"He already is, Iris. He always has been."', outcome: 'She does not say anything for a moment. "I know," she says, finally, "I think I just needed someone else to say it out loud." Ash leans into her leg, unbothered, entirely certain of himself either way.', xp: 400 }
+    ] }
+};
+
+function checkGuildMemberRequests() {
+  if (G.guildMemberRequestLastDay === G.gameDay) return;
+  const eligible = Object.keys(GUILD_MEMBER_REQUESTS).filter(id =>
+    isGuildMemberRecruited(id) && !(G.guildMemberRequests[id] && G.guildMemberRequests[id].triggered)
+  );
+  if (eligible.length === 0) return;
+  if (Math.random() >= GUILD_MEMBER_REQUEST_TRIGGER_CHANCE) return;
+  G.guildMemberRequestLastDay = G.gameDay;
+  const id = eligible[Math.floor(Math.random() * eligible.length)];
+  G.guildMemberRequestQueue = id;
+  const def = getGuildMemberDef(id);
+  const req = GUILD_MEMBER_REQUESTS[id];
+  lg('📨 A request from ' + def.npcName + ': ' + req.prompt);
+  render();
+}
+
+function respondToGuildMemberRequest(optionIndex) {
+  const id = G.guildMemberRequestQueue;
+  if (!id) return;
+  const req = GUILD_MEMBER_REQUESTS[id];
+  const option = req.options[optionIndex];
+  if (!option) return;
+  const def = getGuildMemberDef(id);
+
+  if (option.treasuryCost) {
+    if (G.guildTreasury.gold < option.treasuryCost) { lg('💰 Not enough in the Treasury for that yet.'); return; }
+    G.guildTreasury.gold -= option.treasuryCost;
+  }
+  if (option.gold) G.p.gold = Math.max(0, G.p.gold + option.gold);
+  if (option.xp) G.p.xp += option.xp;
+
+  lg('📨 ' + def.npcName + ': ' + option.outcome);
+  addChronicleEntry('📨', def.npcName + '\u2019s request was resolved: ' + option.label + '.');
+  G.guildMemberRequests[id] = { triggered: true, choiceIndex: optionIndex };
+  G.guildMemberRequestQueue = null;
+  checkAchievements();
+  lvlup();
+  render();
 }
 
 function recruitGuildMember(id) {
@@ -12662,12 +12836,205 @@ function isGuildMemberOnBountyDispatch(id) {
   return G.guildBountyMission.active && G.guildBountyMission.active.memberIds.includes(id);
 }
 
+// === DUTY ASSIGNMENTS ===
+// A standing assignment, not a one-time dispatch — the actual "staffed roster" feel,
+// distinct from Idle Gathering (materials) and Guild War fielding (combat, per-muster).
+// Assigning someone to a Duty occupies the same slot Idle Gathering/Guild War/Bounty
+// Dispatch already share, so it's a genuine tradeoff: a member on Scout Duty can't
+// also gather materials or be fielded that day, same as being on a dispatch.
+const GUILD_DUTY_TYPES = {
+  scout: { name: 'Scout Duty', icon: '🔭', desc: 'Daily chance at a bonus material.' },
+  defense: { name: 'Defense Duty', icon: '🛡️', desc: 'Small daily Guild Rep.' },
+  training: { name: 'Training Duty', icon: '📚', desc: 'Small daily XP.' },
+  trade: { name: 'Trade Duty', icon: '💰', desc: 'Small daily gold, banked straight to the Treasury.' }
+};
+
+function isGuildMemberOnDuty(id) {
+  return !!G.guildDuties[id];
+}
+
+function canAssignGuildDuty(id) {
+  return isGuildMemberRecruited(id) && !G.guildWar.fielded.includes(id) && !isGuildMemberOnBountyDispatch(id) && !isGuildMemberOnDuty(id);
+}
+
+function assignGuildDuty(id, dutyType) {
+  if (!GUILD_DUTY_TYPES[dutyType]) return;
+  if (!canAssignGuildDuty(id)) { lg('📋 That member isn\u2019t free to take on a Duty right now.'); return; }
+  G.guildDuties[id] = dutyType;
+  const def = getGuildMemberDef(id);
+  lg('📋 ' + def.npcName + ' assigned to ' + GUILD_DUTY_TYPES[dutyType].name + '.');
+  render();
+}
+
+function unassignGuildDuty(id) {
+  if (!G.guildDuties[id]) return;
+  const def = getGuildMemberDef(id);
+  delete G.guildDuties[id];
+  lg('📋 ' + def.npcName + ' relieved of duty.');
+  render();
+}
+
+// === GUILD CHEST ===
+// A weekly communal draw — deliberately not equipment-only, since not every recruited
+// member can hold gear. Weighted pool: equipment for gear-eligible members, permanent
+// (small, capped) fieldBuff upgrades for anyone recruited, and guild-wide rewards as a
+// fallback when no member-specific option applies. Same weekly cadence as Guild
+// Contracts (Math.floor(G.gameDay / 7)), not daily like everything else built so far.
+const GUILD_CHEST_UPGRADE_PER_DRAW = 0.01;
+const GUILD_CHEST_UPGRADE_CAP = 0.05; // max total bonus any one member can bank this way
+const GUILD_CHEST_REWARD_POOL = [
+  { type: 'equipment', weight: 20 },
+  { type: 'upgrade', weight: 30 },
+  { type: 'treasury', weight: 20 },
+  { type: 'materials', weight: 15 },
+  { type: 'rep', weight: 15 }
+];
+
+function canOpenGuildChest() {
+  if (!G.guildJoined) return false;
+  return Math.floor(G.gameDay / 7) !== G.guildChest.lastOpenedWeek;
+}
+
+function rollGuildChestRewardType() {
+  const totalWeight = GUILD_CHEST_REWARD_POOL.reduce((s, r) => s + r.weight, 0);
+  let roll = Math.random() * totalWeight;
+  for (let r of GUILD_CHEST_REWARD_POOL) {
+    if (roll < r.weight) return r.type;
+    roll -= r.weight;
+  }
+  return 'treasury';
+}
+
+function openGuildChest() {
+  if (!canOpenGuildChest()) { lg('🗝️ The Guild Chest is already drawn for this week.'); return; }
+  G.guildChest.lastOpenedWeek = Math.floor(G.gameDay / 7);
+
+  const recruitedIds = GUILD_MEMBERS.map(m => m.id).filter(id => isGuildMemberRecruited(id));
+  let type = rollGuildChestRewardType();
+  // Fall back gracefully if the rolled type has no valid target this week, rather than
+  // wasting the draw or crashing on an empty pool.
+  const gearEligible = recruitedIds.filter(id => SWAPPABLE_PARTY_POOL.includes(getGuildMemberDef(id).npcName));
+  if (type === 'equipment' && gearEligible.length === 0) type = 'upgrade';
+  if (type === 'upgrade' && recruitedIds.length === 0) type = 'treasury';
+
+  if (type === 'equipment') {
+    const id = gearEligible[Math.floor(Math.random() * gearEligible.length)];
+    const def = getGuildMemberDef(id);
+    const slots = ['weapon', 'armor', 'head', 'hands', 'feet', 'ring', 'amulet'];
+    const slot = slots[Math.floor(Math.random() * slots.length)];
+    const item = generateCompanionItem(def.npcName, slot, G.p.lvl, Math.random() < 0.3 ? 'epic' : 'rare');
+    if (item) {
+      addI(item);
+      lg('🗝️ Guild Chest: ' + item.n + ' for ' + def.npcName + ' (' + item.r + ').');
+      addChronicleEntry('🗝️', 'The Guild Chest yielded ' + item.n + ' for ' + def.npcName + '.');
+    } else {
+      G.guildTreasury.gold += 2000;
+      lg('🗝️ Guild Chest: +2,000G to the Treasury.');
+    }
+  } else if (type === 'upgrade') {
+    const id = recruitedIds[Math.floor(Math.random() * recruitedIds.length)];
+    const def = getGuildMemberDef(id);
+    const stat = Object.keys(def.fieldBuff)[0];
+    if (!G.guildChestUpgrades[id]) G.guildChestUpgrades[id] = {};
+    const current = G.guildChestUpgrades[id][stat] || 0;
+    if (current >= GUILD_CHEST_UPGRADE_CAP) {
+      G.guildTreasury.gold += 1500;
+      lg('🗝️ Guild Chest: ' + def.npcName + ' is already fully upgraded \u2014 +1,500G to the Treasury instead.');
+    } else {
+      const applied = Math.min(GUILD_CHEST_UPGRADE_PER_DRAW, GUILD_CHEST_UPGRADE_CAP - current);
+      G.guildChestUpgrades[id][stat] = current + applied;
+      lg('🗝️ Guild Chest: ' + def.npcName + '\u2019s Guild War contribution grows a little sharper. (+' + Math.round(applied * 100) + '%)');
+      addChronicleEntry('🗝️', def.npcName + ' grew a little sharper, courtesy of the Guild Chest.');
+    }
+  } else if (type === 'treasury') {
+    const amt = 3000 + Math.floor(Math.random() * 3000);
+    G.guildTreasury.gold += amt;
+    lg('🗝️ Guild Chest: +' + amt.toLocaleString() + 'G to the Treasury.');
+  } else if (type === 'materials') {
+    const mats = ['Herb Bundle', 'Gem Dust', 'Iron Ore', 'Fire Essence', 'Ice Crystal', 'Obsidian', 'Silver Thread'];
+    const mat = mats[Math.floor(Math.random() * mats.length)];
+    const qty = 3 + Math.floor(Math.random() * 5);
+    addI({ n: mat, t: 'mat', q: qty, r: 'common' });
+    lg('🗝️ Guild Chest: +' + qty + ' ' + mat + '.');
+  } else if (type === 'rep') {
+    const amt = 40 + Math.floor(Math.random() * 40);
+    addGuildRep(amt);
+    lg('🗝️ Guild Chest: +' + amt + ' Guild Rep.');
+  }
+  checkAchievements();
+  render();
+}
+
+// === FOUNDING ANNIVERSARY ===
+// The guild gets its own calendar, not just player-driven systems — checked on rest
+// alongside everything else. A "Guild Year" is a round 100 game days, not tied to the
+// Aethon 12:1 time-ratio lore (that's narrative flavor, not a mechanical constant
+// anywhere else in the codebase); this just needs a clean, predictable interval.
+const GUILD_YEAR_LENGTH_DAYS = 100;
+
+function checkGuildAnniversary() {
+  if (!G.guildJoined || G.guildFoundedDay < 0) return;
+  const daysSinceFounding = G.gameDay - G.guildFoundedDay;
+  const dueAnniversary = G.guildAnniversariesCelebrated + 1;
+  if (daysSinceFounding < dueAnniversary * GUILD_YEAR_LENGTH_DAYS) return;
+
+  G.guildAnniversariesCelebrated = dueAnniversary;
+  const xp = 3000 * dueAnniversary;
+  const gold = 2500 * dueAnniversary;
+  G.p.xp += xp;
+  G.p.gold += gold;
+  addGuildRep(50 * dueAnniversary);
+  const ordinal = dueAnniversary === 1 ? '1st' : dueAnniversary === 2 ? '2nd' : dueAnniversary === 3 ? '3rd' : dueAnniversary + 'th';
+  lg('🎉 The Guild\u2019s ' + ordinal + ' Founding Anniversary! Everyone gathers for it, even the ones who\u2019d rather be working. +' + xp.toLocaleString() + ' XP, +' + gold.toLocaleString() + 'G, +' + (50 * dueAnniversary) + ' Guild Rep.');
+  addChronicleEntry('🎉', 'The Guild celebrated its ' + ordinal + ' Founding Anniversary.');
+  checkAchievements();
+  lvlup();
+}
+
+// Checked once per real day on rest, same cadence as Trade Accords and the Stronghold
+// stipend — every currently-assigned member pays out according to their duty type.
+function grantDailyDutyPayouts() {
+  if (G.guildDutyLastPayoutDay === G.gameDay) return;
+  const assignedIds = Object.keys(G.guildDuties).filter(id => isGuildMemberRecruited(id));
+  if (assignedIds.length === 0) return;
+  G.guildDutyLastPayoutDay = G.gameDay;
+
+  let scoutHits = 0, defenseRep = 0, trainingXp = 0, tradeGold = 0;
+  const scoutMats = ['Herb Bundle', 'Gem Dust', 'Iron Ore', 'Fire Essence', 'Ice Crystal', 'Obsidian'];
+  for (let id of assignedIds) {
+    const duty = G.guildDuties[id];
+    if (duty === 'scout' && Math.random() < 0.5) {
+      const mat = scoutMats[Math.floor(Math.random() * scoutMats.length)];
+      addI({ n: mat, t: 'mat', q: 1, r: 'common' });
+      scoutHits++;
+    } else if (duty === 'defense') {
+      defenseRep += 10;
+    } else if (duty === 'training') {
+      trainingXp += 150;
+    } else if (duty === 'trade') {
+      tradeGold += 300;
+    }
+  }
+  if (defenseRep > 0 && G.guildJoined) addGuildRep(defenseRep);
+  if (trainingXp > 0) G.p.xp += trainingXp;
+  if (tradeGold > 0) G.guildTreasury.gold += tradeGold;
+
+  let parts = [];
+  if (scoutHits > 0) parts.push(scoutHits + ' material' + (scoutHits > 1 ? 's' : '') + ' found');
+  if (defenseRep > 0) parts.push('+' + defenseRep + ' Guild Rep');
+  if (trainingXp > 0) parts.push('+' + trainingXp.toLocaleString() + ' XP');
+  if (tradeGold > 0) parts.push('+' + tradeGold.toLocaleString() + 'G to Treasury');
+  if (parts.length > 0) lg('📋 Duty report: ' + parts.join(', ') + '.');
+  lvlup();
+}
+
 function getIdleGatheringGuildMembers() {
   return GUILD_MEMBERS.filter(def =>
     def.recruitReq.type !== 'always' &&
     isGuildMemberRecruited(def.id) &&
     !G.guildWar.fielded.includes(def.id) &&
     !isGuildMemberOnBountyDispatch(def.id) &&
+    !isGuildMemberOnDuty(def.id) &&
     def.gatherMats
   );
 }
@@ -12732,9 +13099,10 @@ function computeBountyMissionPreview(memberIds) {
     if (!def) continue;
     if (def.bountyArchetype) archetypesPresent.add(def.bountyArchetype);
     for (let stat in def.fieldBuff) {
-      totalBuff += def.fieldBuff[stat];
-      if (stat === 'goldPct') goldPct += def.fieldBuff[stat];
-      if (stat === 'xpPct') xpPct += def.fieldBuff[stat];
+      const val = getGuildMemberFieldBuffValue(id, stat);
+      totalBuff += val;
+      if (stat === 'goldPct') goldPct += val;
+      if (stat === 'xpPct') xpPct += val;
     }
   }
   const diversityCount = archetypesPresent.size;
@@ -13094,6 +13462,7 @@ function toggleGuildWarField(id) {
     G.guildWar.fielded.splice(idx, 1);
   } else {
     if (isGuildMemberOnBountyDispatch(id)) { lg('🎖️ That member is out on a Guild Bounty Mission right now.'); return; }
+    if (isGuildMemberOnDuty(id)) { lg('📋 That member is on Duty right now \u2014 relieve them first.'); return; }
     if (G.guildWar.fielded.length >= getGuildWarMaxFielded()) { lg('🛡️ Only ' + getGuildWarMaxFielded() + ' guild members can be fielded per muster.'); return; }
     G.guildWar.fielded.push(id);
   }
@@ -13107,7 +13476,7 @@ function getGuildWarFieldBonus(statKey) {
   let total = 0;
   for (let id of G.guildWar.fielded) {
     const def = getGuildMemberDef(id);
-    if (def && def.fieldBuff[statKey]) total += def.fieldBuff[statKey];
+    if (def && def.fieldBuff[statKey]) total += getGuildMemberFieldBuffValue(id, statKey);
   }
   return total;
 }
@@ -13264,7 +13633,13 @@ function startGuildWar() {
 }
 
 function spawnGuildWarEncounter() {
-  const identity = GUILD_WAR_RIVALS[Math.floor(Math.random() * GUILD_WAR_RIVALS.length)];
+  // Rivals with an active Trade Accord (see proposeGuildWarAccord()) drop out of the
+  // muster pool entirely — the whole point of formalizing peace with one is that they
+  // stop showing up to fight you. Falls back to the full pool if somehow every rival
+  // ended up accorded, so Guild War never runs out of opponents entirely.
+  const activePool = GUILD_WAR_RIVALS.filter(r => !G.guildWarAccords.includes(r.n));
+  const pool = activePool.length > 0 ? activePool : GUILD_WAR_RIVALS;
+  const identity = pool[Math.floor(Math.random() * pool.length)];
   const streak = G.guildWar.streak;
   const stats = getGuildWarScaledStats(G.p.lvl);
   const streakMult = 1 + streak * 0.06;
@@ -16721,9 +17096,23 @@ function completeRest() {
   // Stronghold daily stipend — once per day, resting at a claimed stronghold site
   if (G.rest.selectedSite) grantStrongholdStipend(G.rest.selectedSite);
   checkDailyQuests('rest', 1);
+  // Trade Accord payout — once per real day, regardless of which site is rested at.
+  // Same "the guild profits alongside you" spirit as the Treasury's income cut, just
+  // sourced from formalized peace instead of active income.
+  if (G.guildWarAccords.length > 0 && G.guildWarAccordLastPayoutDay !== G.gameDay) {
+    G.guildWarAccordLastPayoutDay = G.gameDay;
+    const totalGold = GUILD_WAR_ACCORD_DAILY_GOLD * G.guildWarAccords.length;
+    const totalRep = GUILD_WAR_ACCORD_DAILY_REP * G.guildWarAccords.length;
+    G.p.gold += totalGold;
+    if (G.guildJoined) addGuildRep(totalRep);
+    lg('🤝 Trade Accord payout: +' + totalGold.toLocaleString() + 'G' + (G.guildJoined ? ', +' + totalRep + ' Guild Rep' : '') + ' from ' + G.guildWarAccords.length + ' accord' + (G.guildWarAccords.length > 1 ? 's' : '') + '.');
+  }
   // Affinity gain for resting together
   for (let p of G.party) { if (p.on) updateAffinity(p.n, 2); }
   checkLovetalkAndFamilyTies();
+  checkGuildMemberRequests();
+  grantDailyDutyPayouts();
+  checkGuildAnniversary();
   // Dr. AA's kit restocks between engagements, not mid-fight — same logic a real
   // field kit actually has. Uses getDrAAKitMaxCharges() rather than a stored field,
   // so Jovie's bonus charge applies immediately once she's recruited, no separate sync needed.
@@ -19697,7 +20086,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.105';
+const BUILD_ID = '2026-08-17.111';
 // =========================
 
 
@@ -19813,6 +20202,17 @@ function saveGame() {
     guildWarBestStreak: G.guildWar.bestStreak || 0,
     guildRosterRecruited: G.guildRoster.recruited || [],
     guildTreasury: G.guildTreasury,
+    guildWarAccords: G.guildWarAccords,
+    guildWarAccordLastPayoutDay: G.guildWarAccordLastPayoutDay,
+    guildMemberRequests: G.guildMemberRequests,
+    guildMemberRequestLastDay: G.guildMemberRequestLastDay,
+    guildMemberRequestQueue: G.guildMemberRequestQueue,
+    guildDuties: G.guildDuties,
+    guildDutyLastPayoutDay: G.guildDutyLastPayoutDay,
+    guildFoundedDay: G.guildFoundedDay,
+    guildAnniversariesCelebrated: G.guildAnniversariesCelebrated,
+    guildChest: G.guildChest,
+    guildChestUpgrades: G.guildChestUpgrades,
     guildChronicle: G.guildChronicle || [],
     guildGatherLastCollectedDay: G.guildGather.lastCollectedDay,
     guildBountyMission: G.guildBountyMission,
@@ -20133,6 +20533,22 @@ function loadGame() {
     G.guildWar.bestStreak = data.guildWarBestStreak || 0;
     G.guildRoster.recruited = data.guildRosterRecruited || [];
     if (data.guildTreasury) G.guildTreasury = data.guildTreasury;
+    if (data.guildWarAccords) G.guildWarAccords = data.guildWarAccords;
+    if (data.guildWarAccordLastPayoutDay !== undefined) G.guildWarAccordLastPayoutDay = data.guildWarAccordLastPayoutDay;
+    if (data.guildMemberRequests) G.guildMemberRequests = data.guildMemberRequests;
+    if (data.guildMemberRequestLastDay !== undefined) G.guildMemberRequestLastDay = data.guildMemberRequestLastDay;
+    if (data.guildMemberRequestQueue !== undefined) G.guildMemberRequestQueue = data.guildMemberRequestQueue;
+    if (data.guildDuties) G.guildDuties = data.guildDuties;
+    if (data.guildDutyLastPayoutDay !== undefined) G.guildDutyLastPayoutDay = data.guildDutyLastPayoutDay;
+    if (data.guildFoundedDay !== undefined) G.guildFoundedDay = data.guildFoundedDay;
+    if (data.guildAnniversariesCelebrated !== undefined) G.guildAnniversariesCelebrated = data.guildAnniversariesCelebrated;
+    // Migration: a save from before this feature shipped could already have
+    // guildJoined=true with no founding day ever recorded. Backfilling to "now"
+    // rather than guessing a past date, so it doesn't immediately fire off several
+    // anniversaries at once on the next rest.
+    if (G.guildJoined && G.guildFoundedDay < 0) G.guildFoundedDay = G.gameDay;
+    if (data.guildChest) G.guildChest = data.guildChest;
+    if (data.guildChestUpgrades) G.guildChestUpgrades = data.guildChestUpgrades;
     G.guildChronicle = data.guildChronicle || [];
     G.guildGather.lastCollectedDay = data.guildGatherLastCollectedDay !== undefined ? data.guildGatherLastCollectedDay : -1;
     if (data.guildBountyMission) G.guildBountyMission = data.guildBountyMission;
@@ -21338,6 +21754,8 @@ function render(){
   else if(G.state=='guild_chronicle')h+=rGuildChronicle();
   else if(G.state=='guild_trophy_room')h+=rTrophyRoom();
   else if(G.state=='guild_treasury')h+=rGuildTreasury();
+  else if(G.state=='guild_duties')h+=rGuildDuties();
+  else if(G.state=='guild_chest')h+=rGuildChest();
   else if(G.state=='guild_bounty_missions')h+=rGuildBountyMissions();
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='guild_boss')h+=rGuildBoss();
@@ -21403,6 +21821,8 @@ function attachEvents() {
     else if(a=='guild_chronicle')setS('guild_chronicle');
     else if(a=='guild_trophy_room')setS('guild_trophy_room');
     else if(a=='guild_treasury')setS('guild_treasury');
+    else if(a=='guild_duties')setS('guild_duties');
+    else if(a=='guild_chest')setS('guild_chest');
     else if(a=='guild_bounty_missions')setS('guild_bounty_missions');
     else if(a=='stronghold')setS('stronghold');
     else if(a=='guild_boss')setS('guild_boss');
@@ -22747,6 +23167,23 @@ function rToday() {
   h += '<div class="st" style="text-align:center;">📅 Today</div>';
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Everything worth a quick look, in one place \u2014 for whenever you\'ve got three minutes and nothing else to point them at.</div>';
 
+  // Guild Member Request — a pending request needs actual response buttons, not just
+  // a log line, same reasoning as the Missed-Day Catch-Up panel above.
+  if (G.guildMemberRequestQueue) {
+    const reqId = G.guildMemberRequestQueue;
+    const req = GUILD_MEMBER_REQUESTS[reqId];
+    const def = getGuildMemberDef(reqId);
+    if (req && def) {
+      h += '<div class="panel panel-gold" style="text-align:center;">';
+      h += '<div class="panel-title" style="color:var(--gold);">📨 A Request from ' + def.npcName + '</div>';
+      h += '<div class="btn-hint" style="margin:6px 0;">' + req.prompt + '</div>';
+      for (let i = 0; i < req.options.length; i++) {
+        h += '<button onclick="respondToGuildMemberRequest(' + i + ')" class="abtn" style="width:100%;margin-bottom:6px;text-align:left;">' + req.options[i].label + '</button>';
+      }
+      h += '</div>';
+    }
+  }
+
   // Missed-Day Catch-Up — only shows when yesterday's dailies/bounties/gathering
   // were actually left unfinished, not just because a real day passed. Averaged
   // rewards, not maximum; Disciples/Guild War/Guild Boss/Temple Trials never included.
@@ -23695,11 +24132,12 @@ function rGuildWar() {
     }
     h += '</div>';
     const buffKey = Object.keys(def.fieldBuff)[0];
-    const buffLabel = buffKey === 'atkPct' ? '+' + Math.floor(def.fieldBuff[buffKey]*100) + '% ATK when fielded'
-      : buffKey === 'critPct' ? '+' + Math.floor(def.fieldBuff[buffKey]*100) + '% Crit when fielded'
-      : buffKey === 'xpPct' ? '+' + Math.floor(def.fieldBuff[buffKey]*100) + '% XP when fielded'
-      : '+' + Math.floor(def.fieldBuff[buffKey]*100) + '% Gold when fielded';
-    h += '<div style="font-size:10.5px;color:var(--text-dim);margin-top:4px;">' + buffLabel + '</div>';
+    const buffVal = getGuildMemberFieldBuffValue(def.id, buffKey);
+    const buffLabel = buffKey === 'atkPct' ? '+' + Math.floor(buffVal*100) + '% ATK when fielded'
+      : buffKey === 'critPct' ? '+' + Math.floor(buffVal*100) + '% Crit when fielded'
+      : buffKey === 'xpPct' ? '+' + Math.floor(buffVal*100) + '% XP when fielded'
+      : '+' + Math.floor(buffVal*100) + '% Gold when fielded';
+    h += '<div style="font-size:10.5px;color:var(--text-dim);margin-top:4px;">' + buffLabel + (G.guildChestUpgrades[def.id] ? ' \u2728' : '') + '</div>';
     h += '</div>';
   }
 
@@ -23707,6 +24145,27 @@ function rGuildWar() {
     h += '<button onclick="startGuildWar()" class="abtn" style="width:100%;margin-top:12px;">⚔️ Muster the Guild</button>';
   } else {
     h += '<div class="btn-hint" style="text-align:center;margin-top:12px;">Field at least one Guild member to start a muster.</div>';
+  }
+
+  // Trade Accords — only the two rivals with an actual named-leader relationship
+  // (Corran/Fen) are eligible at all, and only once their banter's reached the "warm"
+  // tier (10+ musters).
+  h += '<div class="panel-title" style="margin:14px 0 8px;">🤝 Trade Accords</div>';
+  for (let rivalName in GUILD_WAR_RIVAL_LEADERS) {
+    const leader = GUILD_WAR_RIVAL_LEADERS[rivalName];
+    const count = G.guildWarRivalEncounters[rivalName] || 0;
+    const accorded = G.guildWarAccords.includes(rivalName);
+    h += '<div class="panel' + (accorded ? ' panel-gold' : '') + '" style="margin-bottom:8px;text-align:left;">';
+    h += '<div style="font-weight:700;' + (accorded ? 'color:var(--gold);' : '') + '">' + leader.name + ' \u2014 ' + rivalName + '</div>';
+    if (accorded) {
+      h += '<div class="btn-hint">Accord active \u2014 +' + GUILD_WAR_ACCORD_DAILY_GOLD.toLocaleString() + 'G, +' + GUILD_WAR_ACCORD_DAILY_REP + ' Guild Rep daily. No longer musters against you.</div>';
+    } else if (canProposeGuildWarAccord(rivalName)) {
+      h += '<div class="btn-hint" style="margin-bottom:6px;">' + count + ' musters so far \u2014 ready to formalize.</div>';
+      h += '<button onclick="proposeGuildWarAccord(\'' + rivalName + '\')" class="abtn" style="width:100%;">Propose a Trade Accord</button>';
+    } else {
+      h += '<div class="btn-hint">' + count + '/' + GUILD_WAR_ACCORD_THRESHOLD + ' musters \u2014 not ready yet.</div>';
+    }
+    h += '</div>';
   }
 
   h += '</div>';
@@ -24821,6 +25280,82 @@ const TROPHY_WORLD_BOSSES = [
   { name: 'The Last Roadwarden', world: 'The Steadfast Roads', icon: '🛡️' }
 ];
 
+function rGuildChest() {
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
+  h += '<div class="st" style="text-align:center;">🗝️ The Guild Chest</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">One draw a week. Equipment when someone can use it, a permanent edge when they can\u2019t, guild-wide otherwise.</div>';
+
+  const canOpen = canOpenGuildChest();
+  h += '<div class="panel' + (canOpen ? ' panel-gold' : '') + '" style="text-align:center;margin-bottom:16px;">';
+  if (canOpen) {
+    h += '<div class="panel-title" style="color:var(--gold);">Ready to Draw</div>';
+    h += '<button onclick="openGuildChest()" class="abtn" style="width:100%;margin-top:8px;">Open the Chest</button>';
+  } else {
+    h += '<div class="btn-hint">Already drawn this week \u2014 check back next week.</div>';
+  }
+  h += '</div>';
+
+  h += '<div class="panel-title" style="margin-bottom:8px;">What\u2019s In It</div>';
+  h += '<div class="panel" style="margin-bottom:8px;"><div style="font-weight:700;font-size:13px;">⚔️ Equipment</div><div class="btn-hint">A real gear piece for a random gear-eligible member.</div></div>';
+  h += '<div class="panel" style="margin-bottom:8px;"><div style="font-weight:700;font-size:13px;">✨ Member Upgrade</div><div class="btn-hint">A small, permanent boost to a random recruited member\u2019s Guild War contribution. Capped per member.</div></div>';
+  h += '<div class="panel" style="margin-bottom:8px;"><div style="font-weight:700;font-size:13px;">💰 Treasury Boost \u00b7 🌿 Materials \u00b7 🛡️ Guild Rep</div><div class="btn-hint">Guild-wide, whenever a member-specific draw doesn\u2019t apply.</div></div>';
+
+  const upgraded = Object.keys(G.guildChestUpgrades).filter(id => isGuildMemberRecruited(id));
+  if (upgraded.length > 0) {
+    h += '<div class="panel-title" style="margin:14px 0 8px;">Sharpened by the Chest</div>';
+    for (let id of upgraded) {
+      const def = getGuildMemberDef(id);
+      const stat = Object.keys(G.guildChestUpgrades[id])[0];
+      const val = G.guildChestUpgrades[id][stat];
+      h += '<div class="panel" style="margin-bottom:6px;"><div style="font-weight:700;font-size:12px;">' + def.npcName + '</div><div class="btn-hint">+' + Math.round(val * 100) + '% ' + stat.replace('Pct', '') + (val >= GUILD_CHEST_UPGRADE_CAP ? ' (maxed)' : '') + '</div></div>';
+    }
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function rGuildDuties() {
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
+  h += '<div class="st" style="text-align:center;">📋 Duty Assignments</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Standing assignments, not one-time dispatches. Assigning someone here means they are not gathering, not fielded, not out on a mission \u2014 just working the Duty, every day, until relieved.</div>';
+
+  const recruited = GUILD_MEMBERS.filter(def => def.recruitReq.type !== 'always' && isGuildMemberRecruited(def.id));
+  if (recruited.length === 0) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">No recruited Guild Members yet to assign.</div></div>';
+    h += '</div>';
+    return h;
+  }
+
+  for (let def of recruited) {
+    const duty = G.guildDuties[def.id];
+    const fielded = G.guildWar.fielded.includes(def.id);
+    const onDispatch = isGuildMemberOnBountyDispatch(def.id);
+    h += '<div class="panel' + (duty ? ' panel-gold' : '') + '" style="margin-bottom:8px;text-align:left;">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
+    h += '<div><span style="font-size:16px;">' + def.icon + '</span> <span style="font-weight:700;' + (duty ? 'color:var(--gold);' : '') + '">' + def.npcName + '</span></div>';
+    if (duty) h += '<button onclick="unassignGuildDuty(\'' + def.id + '\')" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;">Relieve</button>';
+    h += '</div>';
+    if (duty) {
+      h += '<div class="btn-hint">' + GUILD_DUTY_TYPES[duty].icon + ' ' + GUILD_DUTY_TYPES[duty].name + ' \u2014 ' + GUILD_DUTY_TYPES[duty].desc + '</div>';
+    } else if (fielded || onDispatch) {
+      h += '<div class="btn-hint">' + (fielded ? 'Currently fielded for Guild War.' : 'Currently out on a Bounty Mission.') + '</div>';
+    } else {
+      h += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+      for (let key in GUILD_DUTY_TYPES) {
+        h += '<button onclick="assignGuildDuty(\'' + def.id + '\',\'' + key + '\')" class="btn-outline-ghost" style="margin:0;padding:4px 8px;font-size:10.5px;">' + GUILD_DUTY_TYPES[key].icon + ' ' + GUILD_DUTY_TYPES[key].name + '</button>';
+      }
+      h += '</div>';
+    }
+    h += '</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
 function rGuildTreasury() {
   let h = '<div class="content">';
   h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
@@ -25105,6 +25640,21 @@ function rGuildHub() {
   h += '<div class="panel-title">💰 The Guild Treasury</div>';
   h += '<div class="btn-hint" style="margin:6px 0;">' + G.guildTreasury.gold.toLocaleString() + 'G banked' + (getGuildTreasuryRepBonus() > 0 ? ' \u2014 +' + Math.round(getGuildTreasuryRepBonus() * 100) + '% Guild Rep' : '') + '</div>';
   h += '<button onclick="setS(\'guild_treasury\')" class="btn-outline-ghost" style="width:100%;">Visit</button>';
+  h += '</div>';
+
+  // Duty Assignments summary card
+  const dutyCount = Object.keys(G.guildDuties).length;
+  h += '<div class="panel" style="margin-top:12px;text-align:center;">';
+  h += '<div class="panel-title">📋 Duty Assignments</div>';
+  h += '<div class="btn-hint" style="margin:6px 0;">' + dutyCount + ' member' + (dutyCount === 1 ? '' : 's') + ' on standing Duty.</div>';
+  h += '<button onclick="setS(\'guild_duties\')" class="btn-outline-ghost" style="width:100%;">Visit</button>';
+  h += '</div>';
+
+  // Guild Chest summary card
+  h += '<div class="panel' + (canOpenGuildChest() ? ' panel-gold' : '') + '" style="margin-top:12px;text-align:center;">';
+  h += '<div class="panel-title" style="' + (canOpenGuildChest() ? 'color:var(--gold);' : '') + '">🗝️ The Guild Chest</div>';
+  h += '<div class="btn-hint" style="margin:6px 0;">' + (canOpenGuildChest() ? 'Ready to draw this week.' : 'Already drawn this week.') + '</div>';
+  h += '<button onclick="setS(\'guild_chest\')" class="btn-outline-ghost" style="width:100%;">Visit</button>';
   h += '</div>';
 
   // Stronghold summary card — Guild Hall progression lives inside Strongholds, and
