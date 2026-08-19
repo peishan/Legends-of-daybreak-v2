@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Garden & Infirmary: Joel/Jovie brewing loop, 100%/200% elixirs, daily-capped)';
+const APP_VERSION = '2026-08-17 (Fixed: Busy Day badge now has a real Stop button; Garden added to main menu)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -19174,9 +19174,9 @@ function renderLogPanel() {
   }
   if (G.busyDayAutopilot.active && G.state !== 'combat') {
     const bd = G.busyDayAutopilot;
-    h += '<div onclick="setS(\'combat\')" style="display:flex;justify-content:space-between;align-items:center;background:rgba(139,92,246,0.15);border:1px solid var(--accent);border-radius:10px;padding:6px 10px;margin-bottom:6px;cursor:pointer;">';
-    h += '<span style="font-size:12px;font-weight:700;color:var(--accent-light);">🚀 Busy Day \u2014 ' + (bd.queueIndex + 1) + '/' + bd.queue.length + ' (' + bd.completedCount + ' done)</span>';
-    h += '<span style="font-size:10px;color:var(--text-dim);">Running \u2014 tap to view</span>';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(139,92,246,0.15);border:1px solid var(--accent);border-radius:10px;padding:6px 10px;margin-bottom:6px;">';
+    h += '<span onclick="setS(\'combat\')" style="font-size:12px;font-weight:700;color:var(--accent-light);cursor:pointer;flex:1;">🚀 Busy Day \u2014 ' + (bd.queueIndex + 1) + '/' + bd.queue.length + ' (' + bd.completedCount + ' done)</span>';
+    h += '<button onclick="event.stopPropagation();stopBusyDayAutopilot();" class="btn-outline-ghost" style="margin:0;padding:3px 10px;font-size:10px;">Stop</button>';
     h += '</div>';
   }
   h += '<div class="log-highlight ' + getLogElementClass(highlight) + '"><div class="lh-text">' + boldNumbers(highlight) + '</div></div>';
@@ -19528,7 +19528,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.92';
+const BUILD_ID = '2026-08-17.94';
 // =========================
 
 
@@ -24888,6 +24888,7 @@ function rMenu(){
       {i:'🏰',l:'Guild Hub',a:'guild_hub'},
       {i:'📚',l:'Teach a Disciple',a:'disciples'},
       {i:'📖',l:'The Library',a:'library_research'},
+      {i:'🌿',l:'Garden & Infirmary',a:'garden_infirmary'},
       {i:'👥',l:'Active Party',a:'party_selection'},
       {i:'🗼',l:'Stronghold',a:'stronghold'},
     ]},
@@ -25524,10 +25525,22 @@ function rCellphone() {
 
   if (tab === 'photos') {
     h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
-    for (let src of SELFIE_PHOTOS) {
-      h += '<img src="' + src + '" loading="lazy" style="width:100%;border-radius:10px;aspect-ratio:1;object-fit:cover;" onerror="this.style.display=\'none\';" alt="">';
+    for (let i = 0; i < SELFIE_PHOTOS.length; i++) {
+      h += '<img src="' + SELFIE_PHOTOS[i] + '" loading="lazy" style="width:100%;border-radius:10px;aspect-ratio:1;object-fit:cover;cursor:pointer;" onerror="this.style.display=\'none\';" onclick="G.cellphoneLightbox=' + i + ';render();" alt="">';
     }
     h += '</div>';
+    if (G.cellphoneLightbox !== null && G.cellphoneLightbox !== undefined) {
+      const idx = G.cellphoneLightbox;
+      h += '<div onclick="G.cellphoneLightbox=null;render();" style="position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:20px;">';
+      h += '<img src="' + SELFIE_PHOTOS[idx] + '" style="max-width:100%;max-height:80vh;border-radius:10px;object-fit:contain;" onclick="event.stopPropagation();" alt="">';
+      h += '<div style="display:flex;gap:16px;margin-top:16px;align-items:center;">';
+      if (idx > 0) h += '<button onclick="event.stopPropagation();G.cellphoneLightbox=' + (idx - 1) + ';render();" class="btn-outline-ghost">\u2190</button>';
+      h += '<div style="color:#fff;font-size:13px;">' + (idx + 1) + ' / ' + SELFIE_PHOTOS.length + '</div>';
+      if (idx < SELFIE_PHOTOS.length - 1) h += '<button onclick="event.stopPropagation();G.cellphoneLightbox=' + (idx + 1) + ';render();" class="btn-outline-ghost">\u2192</button>';
+      h += '</div>';
+      h += '<button onclick="G.cellphoneLightbox=null;render();" class="btn-outline-ghost" style="margin-top:12px;">Close</button>';
+      h += '</div>';
+    }
   } else {
     if (G.cellphoneOpenThread) {
       const thread = CELLPHONE_THREADS.find(t => t.id === G.cellphoneOpenThread);
