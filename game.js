@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fixed: Busy Day badge now has a real Stop button; Garden added to main menu)';
+const APP_VERSION = '2026-08-17 (Garden now Joel\u2019s own hobby, stronghold-gated not Jovie-gated; Cellphone text corrected)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -7365,12 +7365,20 @@ const JOVIE_RECIPES = [
   { id: 'volatile_30', n: "Jovie's Volatile Growth Elixir", tierReq: 5, herbCost: 20, rareHerbCost: 3, brewMinutes: 90, eff: 'xp_boost', v: 30, boostPct: 2.0, r: 'legendary', highTier: true }
 ];
 
-function isGardenUnlocked() {
+// Garden and Infirmary are gated separately on purpose — gardening has always been
+// Joel's own hobby, independent of Jovie ever arriving at all, so it unlocks off
+// owning any stronghold (matching "the stronghold has a garden" directly) rather than
+// her recruitment. Herbs harvested before she joins simply sit in inventory — banked
+// guild stock — until there's someone to actually brew with them.
+function isGardenAccessible() {
+  return Object.keys(G.strongholds).some(id => G.strongholds[id]);
+}
+function isInfirmaryAccessible() {
   return isGuildMemberRecruited('jovie');
 }
 
 function canTendGarden() {
-  return isGardenUnlocked() && G.garden.lastTendDay !== G.gameDay && G.garden.harvestReadyAt === 0;
+  return isGardenAccessible() && G.garden.lastTendDay !== G.gameDay && G.garden.harvestReadyAt === 0;
 }
 function tendGarden() {
   if (!canTendGarden()) return;
@@ -19528,7 +19536,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.94';
+const BUILD_ID = '2026-08-17.95';
 // =========================
 
 
@@ -24442,12 +24450,12 @@ function rGardenInfirmary() {
   h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
   h += '<div class="st" style="text-align:center;">🌿 Garden & Infirmary</div>';
 
-  if (!isGardenUnlocked()) {
-    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🔒 Recruit Jovie to unlock the garden and her brewing.</div></div></div>';
+  if (!isGardenAccessible()) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🔒 Claim a stronghold to unlock the garden \u2014 it has always been Joel\u2019s hobby, on the ground he actually gets to keep.</div></div></div>';
     return h;
   }
 
-  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Joel tends what grows. Jovie turns it into something useful.</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Joel tends what grows. Whoever\u2019s around to use it, eventually will.</div>';
 
   // Garden
   h += '<div class="panel-title" style="margin-bottom:8px;">🌿 The Garden</div>';
@@ -24464,10 +24472,18 @@ function rGardenInfirmary() {
   } else {
     h += '<div class="btn-hint">Already tended today \u2014 back tomorrow.</div>';
   }
-  h += '<div class="btn-hint" style="margin-top:8px;">Herb Bundle in bag: ' + getHerbBundleCount() + ' \u00b7 Rare Herb: ' + getRareHerbCount() + '</div>';
+  h += '<div class="btn-hint" style="margin-top:8px;">Herb Bundle banked: ' + getHerbBundleCount() + ' \u00b7 Rare Herb: ' + getRareHerbCount() + '</div>';
   h += '</div>';
 
-  // Infirmary
+  // Infirmary — separately gated behind Jovie's actual recruitment, since her brewing
+  // is her own arc, distinct from Joel's garden always having been his own thing.
+  if (!isInfirmaryAccessible()) {
+    h += '<div class="panel-title" style="margin-bottom:8px;">🧪 The Infirmary</div>';
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🔒 Nobody\u2019s brewing yet. The herbs keep banking either way \u2014 recruit Jovie and all of it becomes usable at once.</div></div>';
+    h += '</div>';
+    return h;
+  }
+
   const tier = getJovieTier();
   const tierDef = JOVIE_TIERS.find(t => t.tier === tier);
   h += '<div class="panel-title" style="margin-bottom:8px;">🧪 The Infirmary \u2014 Jovie (' + tierDef.name + ', Tier ' + tier + ')</div>';
@@ -24689,9 +24705,11 @@ function rGuildHub() {
   h += '<button onclick="setS(\'guild_cafe\')" class="btn-outline-ghost" style="width:100%;">Visit the Cafe</button>';
   h += '</div>';
 
-  // Garden & Infirmary summary card — only shows once Jovie's actually recruited
-  if (isGardenUnlocked()) {
-    const gardenReady = canHarvestGarden() || canCollectInfirmaryBrew();
+  // Garden & Infirmary summary card — garden shows once any stronghold's claimed
+  // (Joel's own hobby, no Jovie required); collect-ready check only applies once the
+  // Infirmary side is actually reachable too.
+  if (isGardenAccessible()) {
+    const gardenReady = canHarvestGarden() || (isInfirmaryAccessible() && canCollectInfirmaryBrew());
     h += '<div class="panel' + (gardenReady ? ' panel-gold' : '') + '" style="margin-top:12px;text-align:center;">';
     h += '<div class="panel-title" style="' + (gardenReady ? 'color:var(--gold);' : '') + '">🌿 Garden & Infirmary</div>';
     h += '<div class="btn-hint" style="margin:6px 0;">Joel\u2019s garden, Jovie\u2019s brewing.</div>';
@@ -25417,11 +25435,12 @@ function rStorySoFar() {
 }
 
 // === THE CELLPHONE ===
-// A recovered phone, mostly intact — selfies from before, and text threads that came
-// back in fragments rather than whole. Short messages throughout is deliberate, not a
-// content-scope shortcut: some of what didn't survive the crossing is simply gone,
-// same spirit as the memory-lag idea established elsewhere (San and Joel's own
-// half-remembered conversations). A few threads carry a [message lost] gap on purpose.
+// A repaired phone. The selfies are new — taken after the repair, not recovered —
+// while the text threads are the genuinely recovered half, coming back in fragments
+// rather than whole. Short messages throughout is deliberate, not a content-scope
+// shortcut: some of what didn't survive the crossing is simply gone, same spirit as
+// the memory-lag idea established elsewhere (San and Joel's own half-remembered
+// conversations). A few threads carry a [message lost] gap on purpose.
 const SELFIE_PHOTOS = [];
 for (let i = 1; i <= 17; i++) SELFIE_PHOTOS.push('selfies/selfie' + String(i).padStart(2, '0') + '.jpg');
 
@@ -25516,7 +25535,11 @@ function rCellphone() {
   const tab = G.cellphoneTab || 'photos';
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">📱 The Cellphone</div>';
-  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Recovered, mostly intact. Some of it didn\u2019t make the crossing whole.</div>';
+  if (tab === 'photos') {
+    h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Taken after the phone was actually repaired \u2014 not recovered, just new.</div>';
+  } else {
+    h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Recovered, mostly intact. Some of it didn\u2019t make the crossing whole.</div>';
+  }
 
   h += '<div style="display:flex;gap:8px;margin-bottom:16px;">';
   h += '<button onclick="G.cellphoneTab=\'photos\';render();" class="' + (tab === 'photos' ? 'abtn' : 'btn-outline-ghost') + '" style="flex:1;">📷 Photos</button>';
