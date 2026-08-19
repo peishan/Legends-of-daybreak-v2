@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Mercenary Blitz restores yesterday\u2019s peak tier + fixed stretched Stop button)';
+const APP_VERSION = '2026-08-17 (Chapter art wired up through chapter 62)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -19539,7 +19539,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.96';
+const BUILD_ID = '2026-08-17.97';
 // =========================
 
 
@@ -25380,7 +25380,27 @@ const CHAPTER_ART = {
   'A Debt With No Owner': 'chapter51-debt-with-no-owner.jpg',
   'journal_051': 'chapter51-debt-with-no-owner.jpg',
   'What Was Owed, Surfacing': 'chapter52-what-was-owed-surfacing.jpg',
-  'journal_052': 'chapter52-what-was-owed-surfacing.jpg'
+  'journal_052': 'chapter52-what-was-owed-surfacing.jpg',
+  'Proof the Road Continues': 'chapter53-proof-the-road-continues.jpg',
+  'journal_053': 'chapter53-proof-the-road-continues.jpg',
+  'What the Hollow Prophet Believed': 'chapter54-what-the-hollow-prophet-believed.jpg',
+  'journal_054': 'chapter54-what-the-hollow-prophet-believed.jpg',
+  'The Knight Who Came Back Different': 'chapter55-knight-who-came-back-different.jpg',
+  'journal_055': 'chapter55-knight-who-came-back-different.jpg',
+  'What Faith Does Without Anyone to Follow': 'chapter56-what-faith-does-without-anyone-to-follow.jpg',
+  'journal_056': 'chapter56-what-faith-does-without-anyone-to-follow.jpg',
+  'The Last of the Believing': 'chapter57-last-of-the-believing.jpg',
+  'journal_057': 'chapter57-last-of-the-believing.jpg',
+  'What Soel Actually Is': 'chapter58-what-soel-actually-is.jpg',
+  'journal_058': 'chapter58-what-soel-actually-is.jpg',
+  'The One He Chose Before': 'chapter59-one-he-chose-before.jpg',
+  'journal_059': 'chapter59-one-he-chose-before.jpg',
+  'The Cellphone': 'chapter60-cellphone.jpg',
+  'journal_060': 'chapter60-cellphone.jpg',
+  'The Mechanic': 'chapter61-mechanic.jpg',
+  'journal_061': 'chapter61-mechanic.jpg',
+  'Proof of Where You Were Standing': 'chapter62-proof-of-where-you-were-standing.jpg',
+  'journal_062': 'chapter62-proof-of-where-you-were-standing.jpg'
 };
 function getChapterArt(key) {
   const file = CHAPTER_ART[key];
