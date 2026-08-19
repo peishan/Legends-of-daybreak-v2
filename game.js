@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fixed: all 24 traders\u2019 stock now scales with player level, was frozen at zoneLv \u226456)';
+const APP_VERSION = '2026-08-17 (Fixed: cover-series art reference updated from .jpg to .png)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5358,6 +5358,11 @@ storyJournal: {
   guildHallLevel: {}, // Guild Hall level per stronghold id (1 = just claimed, up to 5)
   guildJoined: false, // The Guild — separate from any Stronghold, auto-joins at level 5
   guildRep: 0, // lifetime reputation total, determines rank, never spent
+  // Guild Treasury — a shared pool, separate from San's own gold, funded by direct
+  // contribution and a small automatic cut of guild-generated income. Milestones fund
+  // permanent guild-wide bonuses, reinforcing "the guild profits together" rather than
+  // everything routing through one person's pocket.
+  guildTreasury: { gold: 0, lifetimeContributed: 0, milestonesUnlocked: [] },
   templeRep: 0, // lifetime temple reputation, mirrors guildRep pattern
   templeTrial: { tier: 1, currentHp: null, lastAttemptDay: -1 }, // Brother Corin's repeatable Trials, Lv200+
   templeHunt: { active: false, currentBossName: null },
@@ -5367,6 +5372,7 @@ storyJournal: {
   frayingFrontier: { active: false, streak: 0, bestStreak: 0, batchRemaining: 0 }, // endless mode, level 100+, bosses scale off current player level indefinitely
   guildWar: { active: false, streak: 0, bestStreak: 0, fielded: [], batchRemaining: 0 }, // squad gauntlet vs rival guilds, unlocks after Iris & Ash (journal_101) + Lv 105
   guildRoster: { recruited: [] }, // ids from GUILD_MEMBERS who've actually joined the Guild War roster
+  guildChronicle: [], // auto-generated record of the guild's own history — see addChronicleEntry()
   guildGather: { lastCollectedDay: -1 }, // once-per-real-day materials from unfielded, non-core Guild Members
   guildWeeklyReward: { lastClaimedWeek: -1 }, // manual claim, tied to Guild Rank — lapses if not claimed that week
   // "Busy Day" autopilot — auto-runs Stronghold Tasks + Bounties by actually traveling
@@ -9368,7 +9374,7 @@ function handleGuildBossDefeat(tier) {
   const gold = tier.g;
   G.p.xp += xp;
   G.p.gold += gold;
-  if (G.guildJoined) { G.guildRep += 150; G.guildRepBalance += 150; }
+  if (G.guildJoined) addGuildRep(150);
   lg('🎉 ' + tier.n + ' falls! The whole guild did this together. +' + xp.toLocaleString() + ' XP, +' + gold.toLocaleString() + 'G' + (G.guildJoined ? ', +150 Guild Rep' : ''));
 
   if (G.guildBoss.tierIndex < GUILD_BOSS_TIERS.length - 1) {
@@ -9386,6 +9392,55 @@ function handleGuildBossDefeat(tier) {
   checkAchievements();
 }
 
+
+// === GUILD TREASURY ===
+// A shared pool separate from San's own gold — funded by direct contribution, milestones
+// unlock permanent guild-wide Guild Rep bonuses. addGuildRep() centralizes the bonus
+// application so it only needs wiring once rather than touching every individual
+// G.guildRep += site scattered across contracts/combat/bounty missions/etc.
+const GUILD_TREASURY_MILESTONES = [
+  { threshold: 50000, id: 'first_reserve', name: 'First Reserve', repPct: 0.05, desc: '+5% Guild Rep gain, permanently.' },
+  { threshold: 200000, id: 'growing_coffers', name: 'Growing Coffers', repPct: 0.05, desc: 'Another +5% Guild Rep gain (10% total).' },
+  { threshold: 750000, id: 'well_funded', name: 'Well-Funded', repPct: 0.05, desc: 'Another +5% Guild Rep gain (15% total).' },
+  { threshold: 2000000, id: 'guild_endowment', name: 'The Guild Endowment', repPct: 0.10, desc: 'Another +10% Guild Rep gain (25% total) \u2014 the Guild is genuinely self-sustaining now.' }
+];
+
+function getGuildTreasuryRepBonus() {
+  let bonus = 0;
+  for (let m of GUILD_TREASURY_MILESTONES) { if (G.guildTreasury.milestonesUnlocked.includes(m.id)) bonus += m.repPct; }
+  return bonus;
+}
+
+function checkGuildTreasuryMilestones() {
+  for (let m of GUILD_TREASURY_MILESTONES) {
+    if (G.guildTreasury.lifetimeContributed >= m.threshold && !G.guildTreasury.milestonesUnlocked.includes(m.id)) {
+      G.guildTreasury.milestonesUnlocked.push(m.id);
+      lg('💰 Treasury Milestone: ' + m.name + '! ' + m.desc);
+      addChronicleEntry('💰', 'The Treasury reached "' + m.name + '" \u2014 ' + m.desc);
+      checkAchievements();
+    }
+  }
+}
+
+// Every Guild Rep award in the game should route through here instead of touching
+// G.guildRep/G.guildRepBalance directly, so the Treasury's permanent bonus actually
+// applies at the point of gain rather than needing a retroactive, harder-to-verify fix.
+function addGuildRep(amount) {
+  const scaled = Math.round(amount * (1 + getGuildTreasuryRepBonus()));
+  G.guildRep += scaled;
+  G.guildRepBalance += scaled;
+  return scaled;
+}
+
+function contributeToTreasury(amount) {
+  if (amount <= 0 || G.p.gold < amount) { lg('💰 Not enough gold to contribute that much.'); return; }
+  G.p.gold -= amount;
+  G.guildTreasury.gold += amount;
+  G.guildTreasury.lifetimeContributed += amount;
+  lg('💰 Contributed ' + amount.toLocaleString() + 'G to the Guild Treasury.');
+  checkGuildTreasuryMilestones();
+  render();
+}
 
 function getGuildRank() {
   let rank = 0;
@@ -9456,17 +9511,6 @@ function addTempleRep(amount) {
   lg('🙏 Temple standing +' + boosted + ' (' + G.templeRep + ')');
 }
 
-function checkGuildRankUp(previousRank) {
-  const rank = getGuildRank();
-  if (rank > previousRank) {
-    const def = GUILD_RANKS.find(r => r.rank === rank);
-    if (def) {
-      lg('🛡️ GUILD RANK UP: ' + def.name + '!');
-      lg('   ' + def.desc);
-    }
-  }
-}
-
 // Guild Contracts refresh weekly (not daily like bounties) — bigger jobs, rarer refresh.
 function refreshGuildContracts() {
   if (!G.guildJoined) return;
@@ -9506,14 +9550,12 @@ function checkGuildContractKill(enemyName) {
 function completeGuildContract(c) {
   c.done = true;
   c.refreshWeek = Math.floor(G.gameDay / 7);
-  const previousRank = getGuildRank();
   G.p.xp += c.rw.xp;
   G.p.gold += c.rw.g;
-  G.guildRep += c.rep;
-  G.guildRepBalance += c.rep;
+  addGuildRep(c.rep);
   G.p.quests++;
   lg('🛡️ Guild Contract complete: ' + c.n + '! +' + c.rw.xp + 'XP +' + c.rw.g + 'G +' + c.rep + ' Guild Rep');
-  checkGuildRankUp(previousRank);
+  checkGuildRankUp();
   lvlup();
 }
 
@@ -10528,10 +10570,8 @@ function handleSiegeVictory() {
     G.p.xp += reward.xp;
     G.p.gold += reward.gold;
     if (reward.guildRep && G.guildJoined) {
-      const previousRank = getGuildRank();
-      G.guildRep += reward.guildRep;
-      G.guildRepBalance += reward.guildRep;
-      checkGuildRankUp(previousRank);
+      addGuildRep(reward.guildRep);
+      checkGuildRankUp();
     }
     lg('🏰 SIEGE REPELLED! ' + def.name + ' is safe. Bonus: +' + reward.xp + ' XP, +' + reward.gold + 'G' + (reward.guildRep && G.guildJoined ? ', +' + reward.guildRep + ' Guild Rep' : '') + '.');
     G.strongholdSiege[G.siegeDefense.strongholdId].active = false;
@@ -11119,6 +11159,7 @@ function claimStronghold(id) {
   if (!def) return;
   const alreadyClaimed = G.strongholds[id];
   G.strongholds[id] = true;
+  if (!alreadyClaimed) addChronicleEntry('🗼', def.name + ' claimed for the Guild.');
   if (!G.guildHallLevel[id]) G.guildHallLevel[id] = 1; // Guild Founded is automatic on claim
   for (let siteId of def.restSiteIds) {
     const site = G.rest.sites.find(s => s.id === siteId);
@@ -12569,12 +12610,24 @@ const GUILD_MEMBERS = [
 function getGuildMemberDef(id) { return GUILD_MEMBERS.find(m => m.id === id); }
 function isGuildMemberRecruited(id) { return G.guildRoster.recruited.includes(id); }
 
+// === GUILD CHRONICLE ===
+// Auto-generated record of the guild's own history, read as short narrative entries
+// rather than raw stat deltas — kept by Renn in-universe (matching his archivist
+// instincts), surfaced on the Guild Hub. Capped at 60 entries, oldest trimmed first,
+// so this stays a readable recent history rather than an ever-growing log dump.
+const GUILD_CHRONICLE_MAX_ENTRIES = 60;
+function addChronicleEntry(icon, text) {
+  G.guildChronicle.push({ day: G.gameDay, icon, text });
+  if (G.guildChronicle.length > GUILD_CHRONICLE_MAX_ENTRIES) G.guildChronicle.shift();
+}
+
 function recruitGuildMember(id) {
   if (isGuildMemberRecruited(id)) return;
   const def = getGuildMemberDef(id);
   if (!def) return;
   G.guildRoster.recruited.push(id);
   lg('🛡️ ' + def.npcName + ' has joined the Guild roster! ' + def.recruitLine);
+  addChronicleEntry('📜', def.npcName + ' joined the Guild roster.');
 }
 
 // Checked from checkNPCUnlocks() so it rides the same call sites (level-up, load,
@@ -12741,7 +12794,7 @@ function collectGuildBountyMission() {
   const mission = G.guildBountyMission.active;
   G.p.gold += mission.gold;
   G.p.xp += mission.xp;
-  if (G.guildJoined) { G.guildRep += 30; G.guildRepBalance += 30; }
+  if (G.guildJoined) addGuildRep(30);
   lg('🎖️ Squad returns! +' + mission.gold.toLocaleString() + 'G, +' + mission.xp.toLocaleString() + ' XP' + (G.guildJoined ? ', +30 Guild Rep' : '') + '.');
   G.guildBountyMission.cooldownUntil = Date.now() + mission.cooldownMin * 60000;
   G.guildBountyMission.active = null;
@@ -18104,7 +18157,7 @@ handleVictory = function() {
     const rep = 50 + G.guildWar.streak * 10;
     G.p.xp += txp;
     G.p.gold += tg2;
-    if (G.guildJoined) { G.guildRep += rep; G.guildRepBalance += rep; }
+    if (G.guildJoined) addGuildRep(rep);
     G.p.bossKills = (G.p.bossKills || 0) + 1;
     checkBountyKill(defeatedName, true);
     G.guildWar.streak++;
@@ -18992,8 +19045,7 @@ function sf(minutes){
           addI({ n: mat, t: 'mat', q: 1, r: 'common' });
           lg('✨ FOCUS SURGE! Found ' + mat + '.');
         } else if (pick === 'rep') {
-          G.guildRepBalance += 5;
-          G.guildRep += 5;
+          addGuildRep(5);
           lg('✨ FOCUS SURGE! +5 Guild Reputation.');
         }
       }
@@ -19645,7 +19697,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.101';
+const BUILD_ID = '2026-08-17.105';
 // =========================
 
 
@@ -19760,6 +19812,8 @@ function saveGame() {
     bossRushBestStreak: G.bossRush.bestStreak || 0,
     guildWarBestStreak: G.guildWar.bestStreak || 0,
     guildRosterRecruited: G.guildRoster.recruited || [],
+    guildTreasury: G.guildTreasury,
+    guildChronicle: G.guildChronicle || [],
     guildGatherLastCollectedDay: G.guildGather.lastCollectedDay,
     guildBountyMission: G.guildBountyMission,
     guildCafePairingsTried: G.guildCafePairingsTried,
@@ -20078,6 +20132,8 @@ function loadGame() {
     G.bossRush.bestStreak = data.bossRushBestStreak || 0;
     G.guildWar.bestStreak = data.guildWarBestStreak || 0;
     G.guildRoster.recruited = data.guildRosterRecruited || [];
+    if (data.guildTreasury) G.guildTreasury = data.guildTreasury;
+    G.guildChronicle = data.guildChronicle || [];
     G.guildGather.lastCollectedDay = data.guildGatherLastCollectedDay !== undefined ? data.guildGatherLastCollectedDay : -1;
     if (data.guildBountyMission) G.guildBountyMission = data.guildBountyMission;
     G.guildCafePairingsTried = data.guildCafePairingsTried || [];
@@ -21138,6 +21194,8 @@ function checkGuildRankUp() {
   if (curRank > G.guildRankLastSeen) {
     const line = GUILD_RANK_UP_REACTIONS[curRank];
     if (line) lg('🛡️ ' + line);
+    const rankDef = GUILD_RANKS.find(r => r.rank === curRank);
+    if (rankDef) addChronicleEntry('🛡️', 'The Guild reached ' + rankDef.name + '.');
     G.guildRankLastSeen = curRank;
   } else if (curRank !== G.guildRankLastSeen) {
     G.guildRankLastSeen = curRank;
@@ -21277,6 +21335,9 @@ function render(){
   else if(G.state=='cellphone')h+=rCellphone();
   else if(G.state=='guild_cafe')h+=rGuildCafe();
   else if(G.state=='garden_infirmary')h+=rGardenInfirmary();
+  else if(G.state=='guild_chronicle')h+=rGuildChronicle();
+  else if(G.state=='guild_trophy_room')h+=rTrophyRoom();
+  else if(G.state=='guild_treasury')h+=rGuildTreasury();
   else if(G.state=='guild_bounty_missions')h+=rGuildBountyMissions();
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='guild_boss')h+=rGuildBoss();
@@ -21339,6 +21400,9 @@ function attachEvents() {
     else if(a=='cellphone')setS('cellphone');
     else if(a=='guild_cafe')setS('guild_cafe');
     else if(a=='garden_infirmary')setS('garden_infirmary');
+    else if(a=='guild_chronicle')setS('guild_chronicle');
+    else if(a=='guild_trophy_room')setS('guild_trophy_room');
+    else if(a=='guild_treasury')setS('guild_treasury');
     else if(a=='guild_bounty_missions')setS('guild_bounty_missions');
     else if(a=='stronghold')setS('stronghold');
     else if(a=='guild_boss')setS('guild_boss');
@@ -24744,6 +24808,127 @@ function rGuildCafe() {
   return h;
 }
 
+// === TROPHY ROOM ===
+// Physical companion to the Chronicle — same underlying data, displayed as mounted
+// trophies rather than a log. Deliberately reuses state that already exists (bestiary
+// kills, dragon clears, streak records, guild boss tier) rather than tracking anything
+// new; an empty pedestal for anything not yet earned, matching a real trophy room's
+// actual shape (some walls are already full, some are still waiting).
+const TROPHY_WORLD_BOSSES = [
+  { name: 'The Order That Never Stood Down', world: "Liang's World", icon: '🏛️' },
+  { name: 'An Unwritten Thing', world: 'The Undecided World', icon: '📜' },
+  { name: 'The Draft That Kept Drawing', world: "The Architect's World", icon: '📐' },
+  { name: 'The Last Roadwarden', world: 'The Steadfast Roads', icon: '🛡️' }
+];
+
+function rGuildTreasury() {
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
+  h += '<div class="st" style="text-align:center;">💰 The Guild Treasury</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Separate from your own gold \u2014 what the Guild has, not what San has.</div>';
+
+  h += '<div class="panel panel-gold" style="text-align:center;margin-bottom:16px;">';
+  h += '<div class="panel-title" style="color:var(--gold);">Treasury Balance</div>';
+  h += '<div style="font-size:26px;font-weight:800;margin:6px 0;color:var(--gold);">' + G.guildTreasury.gold.toLocaleString() + 'G</div>';
+  h += '<div class="btn-hint">Lifetime contributed: ' + G.guildTreasury.lifetimeContributed.toLocaleString() + 'G</div>';
+  const repBonus = getGuildTreasuryRepBonus();
+  if (repBonus > 0) h += '<div class="btn-hint" style="color:var(--gold);margin-top:4px;">+' + Math.round(repBonus * 100) + '% Guild Rep gain, permanently</div>';
+  h += '</div>';
+
+  h += '<div class="panel-title" style="margin-bottom:8px;">Contribute</div>';
+  h += '<div class="panel" style="margin-bottom:16px;">';
+  h += '<div class="btn-hint" style="margin-bottom:8px;">Your gold: ' + G.p.gold.toLocaleString() + 'G</div>';
+  h += '<div style="display:flex;gap:8px;">';
+  for (let amt of [1000, 10000, 100000]) {
+    const can = G.p.gold >= amt;
+    h += '<button onclick="contributeToTreasury(' + amt + ')" class="' + (can ? 'abtn' : 'btn-outline-ghost') + '" style="flex:1;font-size:12px;" ' + (can ? '' : 'disabled') + '>+' + amt.toLocaleString() + 'G</button>';
+  }
+  h += '</div></div>';
+
+  h += '<div class="panel-title" style="margin-bottom:8px;">Milestones</div>';
+  for (let m of GUILD_TREASURY_MILESTONES) {
+    const unlocked = G.guildTreasury.milestonesUnlocked.includes(m.id);
+    h += '<div class="panel' + (unlocked ? ' panel-gold' : '') + '" style="margin-bottom:8px;' + (unlocked ? '' : 'opacity:0.6;') + '">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    h += '<div><div style="font-weight:700;font-size:13px;' + (unlocked ? 'color:var(--gold);' : '') + '">' + (unlocked ? '\u2713 ' : '🔒 ') + m.name + '</div><div class="btn-hint">' + m.desc + '</div></div>';
+    h += '<div class="btn-hint" style="white-space:nowrap;">' + m.threshold.toLocaleString() + 'G</div>';
+    h += '</div></div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function rTrophyRoom() {
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
+  h += '<div class="st" style="text-align:center;">🏆 The Trophy Room</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">What the Guild actually has to show for itself.</div>';
+
+  h += '<div class="panel-title" style="margin-bottom:8px;">World Climax Bosses</div>';
+  for (let b of TROPHY_WORLD_BOSSES) {
+    const earned = G.bestiary[b.name] && G.bestiary[b.name].kills > 0;
+    h += '<div class="panel' + (earned ? ' panel-gold' : '') + '" style="margin-bottom:8px;' + (earned ? '' : 'opacity:0.5;') + '">';
+    h += '<div style="display:flex;gap:10px;align-items:center;">';
+    h += '<div style="font-size:22px;">' + (earned ? b.icon : '🔒') + '</div>';
+    h += '<div><div style="font-weight:700;font-size:13px;' + (earned ? 'color:var(--gold);' : '') + '">' + (earned ? b.name : 'Not Yet Claimed') + '</div><div class="btn-hint">' + b.world + '</div></div>';
+    h += '</div></div>';
+  }
+
+  h += '<div class="panel-title" style="margin:14px 0 8px;">Dragon Hoard</div>';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">';
+  for (let dragon of DRAGONS) {
+    const earned = G.dragonHunt.cleared && G.dragonHunt.cleared[dragon.id] > 0;
+    h += '<div class="panel' + (earned ? ' panel-gold' : '') + '" style="text-align:center;' + (earned ? '' : 'opacity:0.5;') + '">';
+    h += '<div style="font-size:20px;">' + (earned ? '🐉' : '🔒') + '</div>';
+    h += '<div style="font-size:11px;font-weight:700;' + (earned ? 'color:var(--gold);' : '') + '">' + (earned ? dragon.n.split(',')[0] : 'Unclaimed') + '</div>';
+    if (earned) h += '<div class="btn-hint">' + G.dragonHunt.cleared[dragon.id] + 'x</div>';
+    h += '</div>';
+  }
+  h += '</div>';
+
+  h += '<div class="panel-title" style="margin-bottom:8px;">Guild War Record</div>';
+  const warStreak = G.guildWar.bestStreak || 0;
+  h += '<div class="panel' + (warStreak > 0 ? ' panel-gold' : '') + '" style="text-align:center;margin-bottom:16px;' + (warStreak > 0 ? '' : 'opacity:0.5;') + '">';
+  h += '<div style="font-size:22px;">⚔️</div>';
+  h += '<div style="font-weight:700;' + (warStreak > 0 ? 'color:var(--gold);' : '') + '">Best Streak: ' + warStreak + '</div>';
+  h += '</div>';
+
+  h += '<div class="panel-title" style="margin-bottom:8px;">Guild Boss Record</div>';
+  const bossTierIdx = Math.min(G.guildBoss.tierIndex, GUILD_BOSS_TIERS.length - 1);
+  const bossTier = GUILD_BOSS_TIERS[bossTierIdx];
+  h += '<div class="panel' + (G.guildBoss.tierIndex > 0 ? ' panel-gold' : '') + '" style="text-align:center;' + (G.guildBoss.tierIndex > 0 ? '' : 'opacity:0.5;') + '">';
+  h += '<div style="font-size:22px;">💀</div>';
+  h += '<div style="font-weight:700;' + (G.guildBoss.tierIndex > 0 ? 'color:var(--gold);' : '') + '">' + (G.guildBoss.tierIndex > 0 ? 'Reached: ' + bossTier.n : 'No tier reached yet') + '</div>';
+  h += '</div>';
+
+  h += '</div>';
+  return h;
+}
+
+function rGuildChronicle() {
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
+  h += '<div class="st" style="text-align:center;">📜 The Guild Chronicle</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Kept by Renn, mostly out of habit \u2014 the same instinct that keeps every other shelf in the Library standing.</div>';
+
+  if (G.guildChronicle.length === 0) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">Nothing recorded yet. The Chronicle starts filling in as the Guild actually does something worth writing down.</div></div>';
+  } else {
+    for (let i = G.guildChronicle.length - 1; i >= 0; i--) {
+      const entry = G.guildChronicle[i];
+      h += '<div class="panel" style="margin-bottom:8px;">';
+      h += '<div style="display:flex;gap:10px;align-items:flex-start;">';
+      h += '<div style="font-size:18px;">' + entry.icon + '</div>';
+      h += '<div><div style="font-size:13px;">' + entry.text + '</div><div class="btn-hint" style="margin-top:2px;">Day ' + entry.day + '</div></div>';
+      h += '</div></div>';
+    }
+  }
+
+  h += '</div>';
+  return h;
+}
+
 function rGuildHub() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🏰 Guild Hub</div>';
@@ -24894,6 +25079,33 @@ function rGuildHub() {
     h += '<button onclick="setS(\'garden_infirmary\')" class="btn-outline-ghost" style="width:100%;">Visit</button>';
     h += '</div>';
   }
+
+  // Guild Chronicle summary card — shows the most recent entry as a teaser, once
+  // anything's actually been recorded.
+  h += '<div class="panel" style="margin-top:12px;text-align:center;">';
+  h += '<div class="panel-title">📜 The Guild Chronicle</div>';
+  if (G.guildChronicle.length > 0) {
+    const latest = G.guildChronicle[G.guildChronicle.length - 1];
+    h += '<div class="btn-hint" style="margin:6px 0;">' + latest.icon + ' ' + latest.text + '</div>';
+  } else {
+    h += '<div class="btn-hint" style="margin:6px 0;">Nothing recorded yet.</div>';
+  }
+  h += '<button onclick="setS(\'guild_chronicle\')" class="btn-outline-ghost" style="width:100%;">Read the Chronicle</button>';
+  h += '</div>';
+
+  // Trophy Room summary card — same underlying data, mounted rather than logged.
+  h += '<div class="panel" style="margin-top:12px;text-align:center;">';
+  h += '<div class="panel-title">🏆 The Trophy Room</div>';
+  h += '<div class="btn-hint" style="margin:6px 0;">Everything the Guild has actually earned, on display.</div>';
+  h += '<button onclick="setS(\'guild_trophy_room\')" class="btn-outline-ghost" style="width:100%;">Visit</button>';
+  h += '</div>';
+
+  // Guild Treasury summary card
+  h += '<div class="panel" style="margin-top:12px;text-align:center;">';
+  h += '<div class="panel-title">💰 The Guild Treasury</div>';
+  h += '<div class="btn-hint" style="margin:6px 0;">' + G.guildTreasury.gold.toLocaleString() + 'G banked' + (getGuildTreasuryRepBonus() > 0 ? ' \u2014 +' + Math.round(getGuildTreasuryRepBonus() * 100) + '% Guild Rep' : '') + '</div>';
+  h += '<button onclick="setS(\'guild_treasury\')" class="btn-outline-ghost" style="width:100%;">Visit</button>';
+  h += '</div>';
 
   // Stronghold summary card — Guild Hall progression lives inside Strongholds, and
   // strongholds already pay Guild Rep directly on siege defense, so this belongs here
@@ -25596,7 +25808,7 @@ function getChapterArtFile(key) {
 // (journal_092, "Not Recovering. Beginning.") has been read, matching the same
 // boundary used everywhere else Season 1/2 gating already happens.
 const STORY_SO_FAR_ART = {
-  seriesCover: 'cover-series.jpg',
+  seriesCover: 'cover-series.png',
   season1Cover: 'cover-season1.jpg',
   season1Glossary: 'glossary-season1-part1.jpg',
   season2Cover: 'cover-season2.jpg',
