@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Founding Anniversary: guild gets its own calendar, scaling rewards every 100 game days)';
+const APP_VERSION = '2026-08-17 (Hall Tour: a walk through the Guild Hall connecting every room built this session)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5406,6 +5406,7 @@ storyJournal: {
   guildDutyLastPayoutDay: -1,
   guildFoundedDay: -1, // set once, the real day the guild was actually joined — see checkGuildUnlock()
   guildAnniversariesCelebrated: 0,
+  guildProbation: {}, // keyed by member id -> true while on probation, see checkGuildProbationGraduations()
   guildChest: { lastOpenedWeek: -1 },
   guildChestUpgrades: {}, // keyed by member id -> { [fieldBuffStat]: bonus }, capped per member
   // Guild Bounty Missions — dispatch a squad (up to 4, from recruited members not
@@ -12657,12 +12658,15 @@ function isGuildMemberRecruited(id) { return G.guildRoster.recruited.includes(id
 
 // GUILD_MEMBERS is a shared constant, not per-save state — Guild Chest upgrades can't
 // mutate def.fieldBuff directly without bleeding across saves/sessions. This reads the
-// definition's base value plus whatever's been separately banked in G.guildChestUpgrades.
+// definition's base value plus whatever's been separately banked in G.guildChestUpgrades,
+// then halves the total while the member's still on probation (see recruitGuildMember()/
+// checkGuildProbationGraduations()) — they contribute, just not at full strength yet.
 function getGuildMemberFieldBuffValue(id, stat) {
   const def = getGuildMemberDef(id);
   const base = (def && def.fieldBuff[stat]) || 0;
   const bonus = (G.guildChestUpgrades[id] && G.guildChestUpgrades[id][stat]) || 0;
-  return base + bonus;
+  const total = base + bonus;
+  return G.guildProbation[id] ? total * 0.5 : total;
 }
 
 // === GUILD CHRONICLE ===
@@ -12800,8 +12804,10 @@ function recruitGuildMember(id) {
   const def = getGuildMemberDef(id);
   if (!def) return;
   G.guildRoster.recruited.push(id);
+  G.guildProbation[id] = true;
   lg('🛡️ ' + def.npcName + ' has joined the Guild roster! ' + def.recruitLine);
-  addChronicleEntry('📜', def.npcName + ' joined the Guild roster.');
+  lg('   On probation for now \u2014 a first Guild War win while fielded will make it official.');
+  addChronicleEntry('📜', def.npcName + ' joined the Guild roster, on probation.');
 }
 
 // Checked from checkNPCUnlocks() so it rides the same call sites (level-up, load,
@@ -12963,6 +12969,22 @@ function openGuildChest() {
   }
   checkAchievements();
   render();
+}
+
+// === NEW-RECRUIT PROBATION ===
+// Every new recruit starts on probation — contributing at half fieldBuff strength
+// (see getGuildMemberFieldBuffValue()) until they've actually proven themselves in a
+// real Guild War win while fielded. Checked right inside the Guild War victory
+// handler, not on a timer — this is about doing the work, not waiting it out.
+function checkGuildProbationGraduations() {
+  for (let id of G.guildWar.fielded) {
+    if (!G.guildProbation[id]) continue;
+    delete G.guildProbation[id];
+    const def = getGuildMemberDef(id);
+    if (!def) continue;
+    lg('🎖️ ' + def.npcName + ' is off probation \u2014 full standing in the Guild now, earned rather than given.');
+    addChronicleEntry('🎖️', def.npcName + ' graduated from probation after a Guild War win.');
+  }
 }
 
 // === FOUNDING ANNIVERSARY ===
@@ -18551,6 +18573,7 @@ handleVictory = function() {
     checkBountyKill(defeatedName, true);
     G.guildWar.streak++;
     if (G.guildWar.streak > (G.guildWar.bestStreak || 0)) G.guildWar.bestStreak = G.guildWar.streak;
+    checkGuildProbationGraduations();
     checkAchievements();
     lg('🎉 ' + defeatedName + ' stands down! +' + txp + ' XP, +' + tg2 + 'G' + (G.guildJoined ? ', +' + rep + ' Guild Rep' : ''));
     guildWarBark();
@@ -20086,7 +20109,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.111';
+const BUILD_ID = '2026-08-17.113';
 // =========================
 
 
@@ -20211,6 +20234,7 @@ function saveGame() {
     guildDutyLastPayoutDay: G.guildDutyLastPayoutDay,
     guildFoundedDay: G.guildFoundedDay,
     guildAnniversariesCelebrated: G.guildAnniversariesCelebrated,
+    guildProbation: G.guildProbation,
     guildChest: G.guildChest,
     guildChestUpgrades: G.guildChestUpgrades,
     guildChronicle: G.guildChronicle || [],
@@ -20542,6 +20566,7 @@ function loadGame() {
     if (data.guildDutyLastPayoutDay !== undefined) G.guildDutyLastPayoutDay = data.guildDutyLastPayoutDay;
     if (data.guildFoundedDay !== undefined) G.guildFoundedDay = data.guildFoundedDay;
     if (data.guildAnniversariesCelebrated !== undefined) G.guildAnniversariesCelebrated = data.guildAnniversariesCelebrated;
+    if (data.guildProbation) G.guildProbation = data.guildProbation;
     // Migration: a save from before this feature shipped could already have
     // guildJoined=true with no founding day ever recorded. Backfilling to "now"
     // rather than guessing a past date, so it doesn't immediately fire off several
@@ -21756,6 +21781,7 @@ function render(){
   else if(G.state=='guild_treasury')h+=rGuildTreasury();
   else if(G.state=='guild_duties')h+=rGuildDuties();
   else if(G.state=='guild_chest')h+=rGuildChest();
+  else if(G.state=='guild_hall_tour')h+=rGuildHallTour();
   else if(G.state=='guild_bounty_missions')h+=rGuildBountyMissions();
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='guild_boss')h+=rGuildBoss();
@@ -21823,6 +21849,7 @@ function attachEvents() {
     else if(a=='guild_treasury')setS('guild_treasury');
     else if(a=='guild_duties')setS('guild_duties');
     else if(a=='guild_chest')setS('guild_chest');
+    else if(a=='guild_hall_tour')setS('guild_hall_tour');
     else if(a=='guild_bounty_missions')setS('guild_bounty_missions');
     else if(a=='stronghold')setS('stronghold');
     else if(a=='guild_boss')setS('guild_boss');
@@ -24131,13 +24158,14 @@ function rGuildWar() {
       h += '<span style="font-size:11px;color:var(--text-dim);">🔒 Not yet recruited</span>';
     }
     h += '</div>';
+    const onProbation = G.guildProbation[def.id];
     const buffKey = Object.keys(def.fieldBuff)[0];
     const buffVal = getGuildMemberFieldBuffValue(def.id, buffKey);
     const buffLabel = buffKey === 'atkPct' ? '+' + Math.floor(buffVal*100) + '% ATK when fielded'
       : buffKey === 'critPct' ? '+' + Math.floor(buffVal*100) + '% Crit when fielded'
       : buffKey === 'xpPct' ? '+' + Math.floor(buffVal*100) + '% XP when fielded'
       : '+' + Math.floor(buffVal*100) + '% Gold when fielded';
-    h += '<div style="font-size:10.5px;color:var(--text-dim);margin-top:4px;">' + buffLabel + (G.guildChestUpgrades[def.id] ? ' \u2728' : '') + '</div>';
+    h += '<div style="font-size:10.5px;color:var(--text-dim);margin-top:4px;">' + buffLabel + (G.guildChestUpgrades[def.id] ? ' \u2728' : '') + (onProbation ? ' \u2014 <span style="color:var(--accent-light);">on probation, half strength</span>' : '') + '</div>';
     h += '</div>';
   }
 
@@ -25464,6 +25492,39 @@ function rGuildChronicle() {
   return h;
 }
 
+function rGuildHallTour() {
+  let h = '<div class="content">';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
+  h += '<div class="st" style="text-align:center;">🏰 A Walk Through the Hall</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">It stopped being just a building a while ago.</div>';
+
+  const stops = [
+    { icon: '\u2615', title: 'Just past the front doors', body: 'Zaki\u2019s counter, first thing anyone sees walking in \u2014 warm light, the smell of something roasting, a few people who never seem to actually leave.', action: 'guild_cafe', label: "Zaki's Guild Cafe" },
+    { icon: '📋', title: 'The corridor past the counter', body: 'A board, mostly, and whoever\u2019s currently standing in front of it deciding where they\u2019re actually needed today.', action: 'guild_duties', label: 'Duty Assignments' },
+    { icon: '🌿', title: 'Through the side door, into the light', body: 'Joel\u2019s garden, if you can call a stronghold courtyard a garden. Jovie\u2019s supply corner sits just past it, reorganized within her first week and never quite put back.', action: 'garden_infirmary', label: 'Garden & Infirmary' },
+    { icon: '💰', title: 'Down a step, behind a door that actually locks', body: 'The Treasury \u2014 not much to look at, honestly, just a room that takes what\u2019s put into it seriously.', action: 'guild_treasury', label: 'The Guild Treasury' },
+    { icon: '🗝️', title: 'Further back, a heavier door still', body: 'The Chest room. Nobody opens it more than once a week. Nobody\u2019s ever explained why it needs its own room instead of just living in the Treasury.', action: 'guild_chest', label: 'The Guild Chest' },
+    { icon: '🏆', title: 'The long hall on the way to the back', body: 'Everything the Guild has actually earned, mounted rather than filed away. Easy to walk past quickly. Nobody ever quite manages to.', action: 'guild_trophy_room', label: 'The Trophy Room' },
+    { icon: '📜', title: 'A desk near the trophies, always a little cluttered', body: 'Renn\u2019s, unofficially. The Chronicle lives here, mostly out of habit \u2014 the same habit that keeps every other shelf he\u2019s responsible for standing.', action: 'guild_chronicle', label: 'The Guild Chronicle' },
+    { icon: '⚔️', title: 'The back room, maps on every wall', body: 'Where musters actually get planned. Loud on a good week, quieter than it should be on a bad one.', action: 'guild_war', label: 'Guild War' }
+  ];
+
+  for (let stop of stops) {
+    h += '<div class="panel" style="margin-bottom:10px;">';
+    h += '<div style="display:flex;gap:10px;align-items:flex-start;">';
+    h += '<div style="font-size:20px;">' + stop.icon + '</div>';
+    h += '<div style="flex:1;">';
+    h += '<div style="font-weight:700;font-size:12.5px;">' + stop.title + '</div>';
+    h += '<div class="btn-hint" style="margin:4px 0 8px;">' + stop.body + '</div>';
+    h += '<button onclick="setS(\'' + stop.action + '\')" class="btn-outline-ghost" style="width:100%;">Visit ' + stop.label + '</button>';
+    h += '</div></div></div>';
+  }
+
+  h += '<div class="btn-hint" style="text-align:center;margin-top:8px;">Strongholds sit outside all this \u2014 outposts of their own, not rooms in this building.</div>';
+  h += '</div>';
+  return h;
+}
+
 function rGuildHub() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🏰 Guild Hub</div>';
@@ -25477,6 +25538,12 @@ function rGuildHub() {
   }
 
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:10px;">The Mended Grove\'s hall isn\'t grand \u2014 a hearth, a workbench nobody\'s ever seen fully cleared, a shrine corner, a door someone\'s always standing near. Whoever\'s idle today is probably somewhere in it right now.</div>';
+
+  h += '<div class="panel panel-gold" style="text-align:center;margin-bottom:12px;">';
+  h += '<div class="panel-title" style="color:var(--gold);">🏰 A Walk Through the Hall</div>';
+  h += '<div class="btn-hint" style="margin:6px 0;">See where everything actually is, room to room.</div>';
+  h += '<button onclick="setS(\'guild_hall_tour\')" class="abtn" style="width:100%;">Take the Tour</button>';
+  h += '</div>';
 
   const noticeLine = GUILD_NOTICE_BOARD[Math.floor(Math.random() * GUILD_NOTICE_BOARD.length)];
   h += '<div class="btn-hint" style="text-align:center;font-size:11px;color:var(--text-dim);margin-bottom:10px;padding:6px 8px;border:1px dashed var(--border);border-radius:8px;">📌 ' + noticeLine + '</div>';
