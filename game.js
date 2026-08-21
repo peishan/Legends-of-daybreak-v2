@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Ch.154-155: Tamsin introduced; Soel care (Feed/Play/Pet, Renn/Wren/Tamsin real-date upkeep); fixed Mendstone dead-end)';
+const APP_VERSION = '2026-08-17 (URGENT FIX: save-quota error \u2014 rune array was never capped, now capped + retroactively pruned on load)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -14358,6 +14358,38 @@ function getSocketCount(ilvl) {
   return 0;
 }
 
+// G.runes previously had no cap anywhere except how many got *displayed* — the
+// underlying array itself grew forever from every Lv10+ kill, with nothing ever
+// pruning it, and the full array gets serialized into the save every time regardless
+// of what's shown on screen. Over a long save this is very likely what actually blew
+// past the localStorage quota. Centralizing every push through here so new growth
+// stays bounded, and pruneRunesToCap() also runs once on load to retroactively shrink
+// an already-oversized save so the next write actually succeeds.
+const RUNES_HARD_CAP = 200;
+const RUNE_PRUNE_ORDER = { common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4 };
+function pruneRunesToCap() {
+  if (G.runes.length <= RUNES_HARD_CAP) return 0;
+  G.runes.sort((a, b) => (RUNE_PRUNE_ORDER[a.r] || 0) - (RUNE_PRUNE_ORDER[b.r] || 0));
+  const removed = G.runes.length - RUNES_HARD_CAP;
+  G.runes.splice(0, removed); // lowest-rarity entries sort first, removed first
+  return removed;
+}
+function addRune(rune) {
+  G.runes.push(rune);
+  pruneRunesToCap();
+}
+
+// Shared by wellnessChecklist and mealLog — both keyed by 'YYYY-MM-DD' with nothing
+// ever removing old days otherwise. Keeps only the most recent N days' keys.
+function pruneDailyLog(logObj, keepDays) {
+  const keys = Object.keys(logObj);
+  if (keys.length <= keepDays) return 0;
+  keys.sort(); // 'YYYY-MM-DD' strings sort chronologically as plain strings
+  const toRemove = keys.slice(0, keys.length - keepDays);
+  for (let k of toRemove) delete logObj[k];
+  return toRemove.length;
+}
+
 function generateRune(zoneLevel) {
   const keys = Object.keys(RUNE_TYPES);
   // Higher zones = better rune chances
@@ -14376,7 +14408,7 @@ function addRuneLoot(zoneName) {
   if (!zone || zone.lv < 10) return; // Runes only from Lv 10+ zones
   if (Math.random() < 0.3) { // 30% drop chance
     const rune = generateRune(zone.lv);
-    G.runes.push(rune);
+    addRune(rune);
     lg('💎 Rune dropped: ' + rune.icon + ' ' + rune.name + '!');
   }
 }
@@ -14652,7 +14684,7 @@ function unsocketRune(sourceDescriptor, slot) {
   const item = resolveSocketableItem(sourceDescriptor);
   if (!item || !item.sockets || !item.sockets[slot]) return;
   const rune = item.sockets[slot];
-  G.runes.push(rune);
+  addRune(rune);
   item.sockets[slot] = null;
 
   // Recalculate socket stats
@@ -20468,7 +20500,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.121';
+const BUILD_ID = '2026-08-17.122';
 // =========================
 
 
@@ -20830,6 +20862,12 @@ function loadGame() {
     // here silently wiped runes, talents, and rift progress on every reload.
     G.talents = data.talents || [];
     G.runes = data.runes || [];
+    // Retroactive fix — this shrinks an already-oversized save down to the cap
+    // immediately on load, rather than only preventing further growth going forward.
+    // Without this, a save that's already past quota would keep failing to write no
+    // matter what gets capped from here on, since the existing bloat never gets touched.
+    const runesPruned = pruneRunesToCap();
+    if (runesPruned > 0) lg('💎 Rune inventory was over its storage limit \u2014 trimmed ' + runesPruned + ' of the lowest-rarity runes to keep saves working. Higher-rarity runes were kept.');
     G.riftCounter = data.riftCounter || 0;
     G.currentRift = data.currentRift || null;
     G.riftFightsRemaining = data.riftFightsRemaining || 0;
@@ -20932,6 +20970,12 @@ function loadGame() {
     if (data.sicknessTracking) G.sicknessTracking = data.sicknessTracking;
     if (data.wellnessChecklist) G.wellnessChecklist = data.wellnessChecklist;
     if (data.mealLog) G.mealLog = data.mealLog;
+    // Same unbounded-growth pattern as the runes fix above — both are keyed by
+    // 'YYYY-MM-DD' with nothing ever removing old days, so they'd otherwise grow
+    // forever. 30 days of history is more than enough for anything either screen
+    // actually displays; older days get dropped on load rather than kept forever.
+    pruneDailyLog(G.wellnessChecklist, 30);
+    pruneDailyLog(G.mealLog, 30);
     if (data.bills) G.bills = data.bills;
     if (data.soelCare) G.soelCare = data.soelCare;
     if (data.guildDutyLastPayoutDay !== undefined) G.guildDutyLastPayoutDay = data.guildDutyLastPayoutDay;
