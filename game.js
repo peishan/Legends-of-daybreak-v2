@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (URGENT FIX: save-quota error \u2014 rune array was never capped, now capped + retroactively pruned on load)';
+const APP_VERSION = '2026-08-17 (Runes now auto-combine automatically every rest \u2014 never need to open the Rune screen at all)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -14447,7 +14447,7 @@ function openCombineModal() {
 // typeFilter is optional — omit it (or pass null) to combine every type at once,
 // matching the original behavior. Pass a specific rune type key to only touch that
 // type, leaving everything else in the inventory untouched.
-function autoCombineRunes(typeFilter) {
+function autoCombineRunes(typeFilter, quiet) {
   const batchSize = G.runeCombineModal.batchSize || 3;
   let totalCombines = 0;
   const producedCounts = {}; // name -> count, for the summary message
@@ -14517,8 +14517,10 @@ function autoCombineRunes(typeFilter) {
   }
 
   if (totalCombines === 0) {
-    lg('🔮 No matching batches of ' + batchSize + ' found to combine' + (typeFilter && RUNE_TYPES[typeFilter] ? ' for ' + RUNE_TYPES[typeFilter].name : '') + '.');
-    render();
+    if (!quiet) {
+      lg('🔮 No matching batches of ' + batchSize + ' found to combine' + (typeFilter && RUNE_TYPES[typeFilter] ? ' for ' + RUNE_TYPES[typeFilter].name : '') + '.');
+      render();
+    }
     return;
   }
 
@@ -14532,8 +14534,13 @@ function autoCombineRunes(typeFilter) {
   for (const r of excludedByFilter) G.runes.push(r);
 
   const summary = Object.entries(producedCounts).map(([name, count]) => count + '× ' + name).join(', ');
-  lg('✨ Auto-combined ' + totalCombines + ' batch' + (totalCombines === 1 ? '' : 'es') + ': ' + summary + '!');
-  render();
+  lg((quiet ? '✨ Runes combined while resting: ' : '✨ Auto-combined ') + totalCombines + ' batch' + (totalCombines === 1 ? '' : 'es') + ': ' + summary + '!');
+  if (!quiet) render();
+}
+
+// Called automatically every rest — never requires opening the Rune screen at all.
+function autoCombineRunesQuiet() {
+  autoCombineRunes(null, true);
 }
 
 function closeCombineModal() {
@@ -17526,6 +17533,10 @@ function completeRest() {
   checkGuildMemberRequests();
   grantDailyDutyPayouts();
   checkGuildAnniversary();
+  // Runs automatically every rest, no need to ever open the (previously laggy) Rune
+  // screen at all — combines everything it can, cascading through multiple rarity
+  // tiers in one pass since autoCombineRunes() already handles that internally.
+  autoCombineRunesQuiet();
   // Dr. AA's kit restocks between engagements, not mid-fight — same logic a real
   // field kit actually has. Uses getDrAAKitMaxCharges() rather than a stored field,
   // so Jovie's bonus charge applies immediately once she's recruited, no separate sync needed.
@@ -20500,7 +20511,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.122';
+const BUILD_ID = '2026-08-17.123';
 // =========================
 
 
