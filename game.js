@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Household Bills folded into Guild Treasury: paying a bill contributes directly to it)';
+const APP_VERSION = '2026-08-17 (Ch.154-155: Tamsin introduced; Soel care (Feed/Play/Pet, Renn/Wren/Tamsin real-date upkeep); fixed Mendstone dead-end)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5262,6 +5262,49 @@ storyJournal: {
           { speaker: 'Narrator', text: 'And so Jovie stays \u2014 not as another blade in the party, not as another name on the roster who marches out to fight, but as exactly what she has always quietly been: the person who makes sure the kit is actually stocked when someone needs it most.' },
         ]
       }
+,{
+        id: 'journal_154',
+        title: 'A Reason to Go Back',
+        chapter: 154,
+        unlockType: 'level',
+        unlockAt: 620,
+        icon: '🐾',
+        summary: 'Soel gets restless, in a way that is easy to miss until you actually notice it. San and Joel realize what he is asking for, without him ever having to ask.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It is small, at first \u2014 Soel sitting a little longer at the window than usual, facing a direction that does not correspond to anything in this stronghold at all.' },
+          { speaker: 'San', text: '"He has been doing that for days," you say, watching him from the doorway. "Just... looking."' },
+          { speaker: 'Joel', text: '"Looking where, though?" Joel comes to stand beside you, following the angle of it. "There is nothing out that window but the training yard."' },
+          { speaker: 'San', text: '"I do not think it is the window he is looking at," you say, slow, working it out as you say it. "I think it is further than that."' },
+          { speaker: 'Narrator', text: 'Soel does not turn when you say his name. He flicks one ear, acknowledging you exist, and goes back to looking at whatever it is he is looking at.' },
+          { speaker: 'Joel', text: '"His world," Joel says, quiet, like the realization arrives a half-second behind San\u2019s. "He has not been back since he first led us there."' },
+          { speaker: 'San', text: '"We do not have to make it a whole expedition," you say. "We could just... go. Let him have it. No mission, no reason beyond him wanting to."' },
+          { speaker: 'Joel', text: '"That is reason enough," Joel says, already reaching for his boots. "It always has been, with him."' },
+          { speaker: 'Narrator', text: 'Soel is at the door before either of you finish getting ready, sitting there with the specific patience of someone who has been waiting considerably longer than he is willing to admit.' },
+        ]
+      }
+,{
+        id: 'journal_155',
+        title: 'Tamsin, Keeper of Strays',
+        chapter: 155,
+        unlockType: 'level',
+        unlockAt: 625,
+        icon: '🌙',
+        summary: 'Back in Soel\u2019s world, they meet the woman who has apparently been tending it \u2014 and him, from a distance \u2014 the entire time.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The world greets them exactly as it did the first time: quiet, warm, cats everywhere and none of them bothered by three strangers walking through. Soel moves ahead of the group like he has never once needed a map here.' },
+          { speaker: 'Narrator', text: 'The woman is sitting on a low stone wall when they find her, a cat draped over each shoulder and a third asleep entirely in her lap, like she has simply been furniture for as long as any of them can remember.' },
+          { speaker: 'Tamsin', text: '"You brought him back," she says, not a question, already smiling before introductions have happened at all. "I wondered when you would. He has been ready for a while."' },
+          { speaker: 'San', text: '"You know him?" you ask, surprised, though something about the way Soel has already trotted straight to her makes the surprise feel a little foolish in hindsight.' },
+          { speaker: 'Tamsin', text: '"Everyone who stays here long enough gets known," Tamsin says, scratching behind Soel\u2019s ears with the easy familiarity of someone who has done it a hundred times before. "My name is Tamsin. I look after the ones who wander through \u2014 and the ones who wander out, when they\u2019re ready to."' },
+          { speaker: 'Joel', text: '"Is that what he did?" Joel asks. "Wandered out?"' },
+          { speaker: 'Tamsin', text: '"In his own time, on his own terms," Tamsin says. "I do not stop any of them. I just make sure they are actually ready before they go." She looks at Soel a long moment, considering something. "He has grown, since. More than most do."' },
+          { speaker: 'San', text: '"Grown how?" you ask, genuinely curious now.' },
+          { speaker: 'Tamsin', text: '"Spirit cats carry more than fur and claws," Tamsin says. "What he has built with the two of you \u2014 that changes what he is capable of, if someone actually helps it along. I can do that. Not often. Not casually. But when it is time, I can help him become a little more of what he is already becoming."' },
+          { speaker: 'Joel', text: '"And in return?" Joel asks, not suspicious exactly, just careful the way he always is about anything offered freely.' },
+          { speaker: 'Tamsin', text: '"Bring him back," Tamsin says, simple. "That is the whole cost. He does not belong to you. He also does not belong here anymore, not fully. He belongs to whatever the two of you are building together. I just like watching it happen."' },
+          { speaker: 'Narrator', text: 'Soel, for his part, has already curled up against her side like no time has passed at all \u2014 and like he fully intends to be the one who decides when it is time to leave.' },
+        ]
+      }
     ]
   },
 
@@ -5455,6 +5498,19 @@ storyJournal: {
   bills: {
     electricity: { dueDay: 15, paidThisMonth: false, monthKey: null, streak: 0 },
     phone: { dueDay: 20, paidThisMonth: false, monthKey: null, streak: 0 }
+  },
+  // Soel care — manual daily actions (Feed/Play/Pet), living in the Garden rather than
+  // the Infirmary since a spirit cat doesn't need medical reminders. Spirit Elixir
+  // replaces the "vaccination" idea entirely, supplied by Renn (Alchemist-Archivist —
+  // magical/scholarly expertise, not clinical), on a monthly rather than daily cadence.
+  soelCare: {
+    lastFedDay: -1, lastPlayedDay: -1, lastPettedDay: -1,
+    // Real-date tracking, not simple month-rollover — these need genuine "is it
+    // actually due yet" math, not just a reset on the 1st regardless of when last given.
+    lastElixirDate: '2026-06-08', intervalMonths: 2, // Renn — deworming replacement
+    lastWardingDate: '2026-07-04', wardingIntervalMonths: 3, // Sister Wren — flea/tick replacement
+    lastTamsinDate: '2026-06-06', // Tamsin — vaccination replacement, yearly
+    tamsinUpgrades: { hp: 0, atk: 0, def: 0, spd: 0 } // capped, see TAMSIN_UPGRADE_CAP
   },
   guildChest: { lastOpenedWeek: -1 },
   guildChestUpgrades: {}, // keyed by member id -> { [fieldBuffStat]: bonus }, capped per member
@@ -7666,6 +7722,89 @@ function markBillPaid(billId) {
   render();
 }
 
+// === SOEL CARE ===
+// Feed/Play/Pet are simple daily manual actions. Elixir/Warding/Upgrade are real-world
+// vet-care replacements — deworming, flea/tick prevention, and vaccination respectively
+// — each tracked against an actual last-given date and a real interval, not a simple
+// month-rollover, so "due" reflects when it's actually needed rather than resetting
+// arbitrarily on the 1st. Renn supplies the Elixir (alchemical, matches his role),
+// Sister Wren the Warding (protective magic, matches hers — Soel's own gear slot is
+// already literally named "Warded Fur"), and Tamsin the Upgrade — gated behind
+// defeating The Elder Wyrm at least once, since her offer in Ch.155 was conditional on
+// Soel actually having grown, not just time passing.
+const TAMSIN_UPGRADE_CAP = 10; // max total per stat, all-time
+
+function addMonthsToDate(dateStr, months) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setMonth(d.getMonth() + months);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function isDateDue(dueDateStr) {
+  return todayKey() >= dueDateStr;
+}
+
+function feedSoel() {
+  if (G.soelCare.lastFedDay === G.gameDay) return;
+  G.soelCare.lastFedDay = G.gameDay;
+  updateAffinity('Soel', 2);
+  lg('🍇 Spirit berries, set down without ceremony. Soel eats them like he\u2019s doing you a favor.');
+  render();
+}
+function playWithSoel() {
+  if (G.soelCare.lastPlayedDay === G.gameDay) return;
+  G.soelCare.lastPlayedDay = G.gameDay;
+  updateAffinity('Soel', 2);
+  lg('🧶 A few minutes of actual play. Soel pretends it was his idea the entire time.');
+  render();
+}
+function petSoel() {
+  if (G.soelCare.lastPettedDay === G.gameDay) return;
+  G.soelCare.lastPettedDay = G.gameDay;
+  updateAffinity('Soel', 2);
+  lg('🐾 Soel leans into it, unbothered, entirely certain this was owed to him.');
+  render();
+}
+
+function getElixirDueDate() { return addMonthsToDate(G.soelCare.lastElixirDate, G.soelCare.intervalMonths); }
+function canGiveSoelElixir() { return isInfirmaryAccessible() && isGuildMemberRecruited('renn') && isDateDue(getElixirDueDate()); }
+function giveSoelElixir() {
+  if (!canGiveSoelElixir()) return;
+  G.soelCare.lastElixirDate = todayKey();
+  lg('\u2697\ufe0f Renn\u2019s Spirit Elixir, given. "Keeps what shouldn\u2019t be there from ever settling in," he says. "Same idea, whatever world you\u2019re in."');
+  render();
+}
+
+function getWardingDueDate() { return addMonthsToDate(G.soelCare.lastWardingDate, G.soelCare.wardingIntervalMonths); }
+function canGiveSoelWarding() { return isGuildMemberRecruited('sister_wren') && isDateDue(getWardingDueDate()); }
+function giveSoelWarding() {
+  if (!canGiveSoelWarding()) return;
+  G.soelCare.lastWardingDate = todayKey();
+  lg('\ud83d\udee1\ufe0f Sister Wren renews the ward on Soel\u2019s fur. "Small things," she says, "are still things worth warding against."');
+  render();
+}
+
+function isTamsinUpgradeUnlocked() {
+  return G.bestiary['The Elder Wyrm'] && G.bestiary['The Elder Wyrm'].kills > 0;
+}
+function getTamsinDueDate() { return addMonthsToDate(G.soelCare.lastTamsinDate, 12); }
+function canVisitTamsin() {
+  return isTamsinUpgradeUnlocked() && isDateDue(getTamsinDueDate()) &&
+    Object.values(G.soelCare.tamsinUpgrades).some(v => v < TAMSIN_UPGRADE_CAP);
+}
+function visitTamsin() {
+  if (!canVisitTamsin()) return;
+  G.soelCare.lastTamsinDate = todayKey();
+  const stats = ['hp', 'atk', 'def', 'spd'].filter(s => G.soelCare.tamsinUpgrades[s] < TAMSIN_UPGRADE_CAP);
+  const stat = stats[Math.floor(Math.random() * stats.length)];
+  G.soelCare.tamsinUpgrades[stat] += 2;
+  const soel = G.party.find(p => p.n === 'Soel');
+  if (soel && soel.base) soel.base[stat === 'hp' ? 'mhp' : stat] = (soel.base[stat === 'hp' ? 'mhp' : stat] || 0) + 2;
+  const statLabel = { hp: 'HP', atk: 'ATK', def: 'DEF', spd: 'SPD' }[stat];
+  lg('\ud83c\udf19 Tamsin spends a while with Soel, unhurried. "A little more of what he\u2019s already becoming," she says \u2014 +2 ' + statLabel + ', permanently.');
+  checkAchievements();
+  render();
+}
+
 function canTendGarden() {
   return isGardenAccessible() && G.garden.lastTendDay !== G.gameDay && G.garden.harvestReadyAt === 0;
 }
@@ -9624,6 +9763,15 @@ function handleGuildBossDefeat(tier) {
     // Already at the final tier (Guild Eternal) — it doesn't escalate further, it
     // just gets fought again. Matches the rank's own description: "nothing left to
     // prove" — they keep showing up anyway, not because they have to.
+    // A small Mendstone drop chance lives here specifically — the Mended Sanctum
+    // quest was previously the material's ONLY source in the entire game, meaning
+    // using it once (e.g. on Forge tier 6) left no way to ever get another. This is
+    // the toughest fight in the game that's also genuinely repeatable, so it's the
+    // right home for a rare-but-real second source without making the material common.
+    if (Math.random() < 0.08) {
+      addI({ n: 'Mendstone', t: 'mat', q: 1, r: 'legendary', d: 'Formed from the region\u2019s own healing, not mined from anything that was ever broken. Rare even here \u2014 the Eternal Vigil does not give this up easily.' });
+      lg('✨ The Eternal Vigil leaves something behind: a Mendstone.');
+    }
     G.guildBoss.currentHp = tier.hp;
     lg('🕯️ The Eternal Vigil returns. Not because it has to be faced again \u2014 because the guild chooses to, every time.');
   }
@@ -20320,7 +20468,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.120';
+const BUILD_ID = '2026-08-17.121';
 // =========================
 
 
@@ -20447,6 +20595,7 @@ function saveGame() {
     wellnessChecklist: G.wellnessChecklist,
     mealLog: G.mealLog,
     bills: G.bills,
+    soelCare: G.soelCare,
     guildDutyLastPayoutDay: G.guildDutyLastPayoutDay,
     guildFoundedDay: G.guildFoundedDay,
     guildAnniversariesCelebrated: G.guildAnniversariesCelebrated,
@@ -20784,6 +20933,7 @@ function loadGame() {
     if (data.wellnessChecklist) G.wellnessChecklist = data.wellnessChecklist;
     if (data.mealLog) G.mealLog = data.mealLog;
     if (data.bills) G.bills = data.bills;
+    if (data.soelCare) G.soelCare = data.soelCare;
     if (data.guildDutyLastPayoutDay !== undefined) G.guildDutyLastPayoutDay = data.guildDutyLastPayoutDay;
     if (data.guildFoundedDay !== undefined) G.guildFoundedDay = data.guildFoundedDay;
     if (data.guildAnniversariesCelebrated !== undefined) G.guildAnniversariesCelebrated = data.guildAnniversariesCelebrated;
@@ -25569,6 +25719,41 @@ function rGardenInfirmary() {
     : '<button onclick="startSickness()" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;">Mark Sick</button>';
   h += '</div>';
   if (activeSickness) h += '<div class="btn-hint" style="margin-top:4px;">Since ' + activeSickness.start + ' \u2014 sick-day meds are showing above.</div>';
+  h += '</div>';
+
+  // === SOEL CARE ===
+  h += '<div class="panel-title" style="margin-top:14px;margin-bottom:8px;">🐾 Soel</div>';
+  h += '<div style="display:flex;gap:8px;margin-bottom:10px;">';
+  h += '<button onclick="feedSoel()" class="' + (G.soelCare.lastFedDay === G.gameDay ? 'btn-outline-ghost' : 'abtn') + '" style="flex:1;font-size:11px;padding:8px 4px;" ' + (G.soelCare.lastFedDay === G.gameDay ? 'disabled' : '') + '>🍇 Feed</button>';
+  h += '<button onclick="playWithSoel()" class="' + (G.soelCare.lastPlayedDay === G.gameDay ? 'btn-outline-ghost' : 'abtn') + '" style="flex:1;font-size:11px;padding:8px 4px;" ' + (G.soelCare.lastPlayedDay === G.gameDay ? 'disabled' : '') + '>🧶 Play</button>';
+  h += '<button onclick="petSoel()" class="' + (G.soelCare.lastPettedDay === G.gameDay ? 'btn-outline-ghost' : 'abtn') + '" style="flex:1;font-size:11px;padding:8px 4px;" ' + (G.soelCare.lastPettedDay === G.gameDay ? 'disabled' : '') + '>🐾 Pet</button>';
+  h += '</div>';
+
+  if (isGuildMemberRecruited('renn')) {
+    const elixirDue = canGiveSoelElixir();
+    h += '<div class="panel' + (elixirDue ? ' panel-gold' : '') + '" style="margin-bottom:8px;">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    h += '<div><div style="font-weight:700;font-size:12.5px;">\u2697\ufe0f Renn\u2019s Spirit Elixir</div><div class="btn-hint">' + (elixirDue ? 'Due now.' : 'Next due ' + getElixirDueDate() + '.') + '</div></div>';
+    h += elixirDue ? '<button onclick="giveSoelElixir()" class="abtn" style="margin:0;padding:4px 10px;font-size:11px;">Give</button>' : '';
+    h += '</div></div>';
+  }
+  if (isGuildMemberRecruited('sister_wren')) {
+    const wardingDue = canGiveSoelWarding();
+    h += '<div class="panel' + (wardingDue ? ' panel-gold' : '') + '" style="margin-bottom:8px;">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    h += '<div><div style="font-weight:700;font-size:12.5px;">\ud83d\udee1\ufe0f Sister Wren\u2019s Warding</div><div class="btn-hint">' + (wardingDue ? 'Due now.' : 'Next due ' + getWardingDueDate() + '.') + '</div></div>';
+    h += wardingDue ? '<button onclick="giveSoelWarding()" class="abtn" style="margin:0;padding:4px 10px;font-size:11px;">Renew</button>' : '';
+    h += '</div></div>';
+  }
+  h += '<div class="panel' + (canVisitTamsin() ? ' panel-gold' : '') + '" style="margin-bottom:8px;">';
+  if (!isTamsinUpgradeUnlocked()) {
+    h += '<div style="font-weight:700;font-size:12.5px;">\ud83c\udf19 Tamsin\u2019s Upgrade</div><div class="btn-hint">\ud83d\udd12 Defeat The Elder Wyrm to unlock \u2014 she offered, back in Soel\u2019s world, but only once he\u2019s actually grown enough to matter.</div>';
+  } else {
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    h += '<div><div style="font-weight:700;font-size:12.5px;">\ud83c\udf19 Tamsin\u2019s Upgrade</div><div class="btn-hint">' + (canVisitTamsin() ? 'Due now.' : Object.values(G.soelCare.tamsinUpgrades).every(v => v >= TAMSIN_UPGRADE_CAP) ? 'Fully grown \u2014 nothing left to give.' : 'Next due ' + getTamsinDueDate() + '.') + '</div></div>';
+    h += canVisitTamsin() ? '<button onclick="visitTamsin()" class="abtn" style="margin:0;padding:4px 10px;font-size:11px;">Visit</button>' : '';
+    h += '</div>';
+  }
   h += '</div>';
 
   h += '</div>';
