@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fixed: Dr. AA banter line referenced Jovie before her Season 2/3 recruitment)';
+const APP_VERSION = '2026-08-17 (Household Bills folded into Guild Treasury: paying a bill contributes directly to it)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5434,6 +5434,28 @@ storyJournal: {
   guildFoundedDay: -1, // set once, the real day the guild was actually joined — see checkGuildUnlock()
   guildAnniversariesCelebrated: 0,
   guildProbation: {}, // keyed by member id -> true while on probation, see checkGuildProbationGraduations()
+  // === WELLNESS TRACKING (Infirmary) ===
+  // Ported from the Daybreak Quest tracker's REMINDER_LABELS system — same conditional
+  // gating logic (day-of-week, period-only, sick-only, specific date), same actual
+  // regimen, now living in Dr. AA's Infirmary instead of a standalone checklist app.
+  // Pure positive tracking — no penalty anywhere for a missed day, on purpose.
+  cycleTracking: { periods: [] }, // [{ start: 'YYYY-MM-DD', end: 'YYYY-MM-DD'|null }]
+  sicknessTracking: { episodes: [] }, // [{ start: 'YYYY-MM-DD', end: 'YYYY-MM-DD'|null }]
+  wellnessChecklist: {}, // keyed by 'YYYY-MM-DD' -> array of completed reminder keys for that day
+  // === GUILD CAFE MEALS ===
+  // Zaki (hobby chef) offers a small daily menu; Joel occasionally cooks a Filipino
+  // dish specifically. Logged, not scored — same "no penalty for missing" spirit.
+  mealLog: {}, // keyed by 'YYYY-MM-DD' -> array of { slot: 'breakfast'|'lunch'|'dinner', dish, cook, time }
+  // === HOUSEHOLD BILLS (Guild Treasury) ===
+  // Ported from the Daybreak Quest tracker's bill structure — folded into the Guild
+  // Treasury per request, rather than a standalone tracker. Paying a bill contributes
+  // directly to the Treasury (not just thematically tied to it), so keeping your own
+  // household running actually feeds the same pool the Guild draws its milestone
+  // bonuses from. monthKey ('YYYY-MM') drives the paidThisMonth reset and streak logic.
+  bills: {
+    electricity: { dueDay: 15, paidThisMonth: false, monthKey: null, streak: 0 },
+    phone: { dueDay: 20, paidThisMonth: false, monthKey: null, streak: 0 }
+  },
   guildChest: { lastOpenedWeek: -1 },
   guildChestUpgrades: {}, // keyed by member id -> { [fieldBuffStat]: bonus }, capped per member
   // Guild Bounty Missions — dispatch a squad (up to 4, from recruited members not
@@ -7493,6 +7515,155 @@ function isGardenAccessible() {
 }
 function isInfirmaryAccessible() {
   return isGuildMemberRecruited('jovie');
+}
+
+// === WELLNESS TRACKING ===
+// Ported from the Daybreak Quest tracker's cycle/sickness/reminder system — same
+// underlying logic, same actual regimen, now surfaced through Dr. AA's Infirmary.
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function cycleActivePeriod() {
+  const periods = G.cycleTracking.periods;
+  if (periods.length === 0) return null;
+  const last = periods[periods.length - 1];
+  return last.end === null ? last : null;
+}
+function startPeriod() {
+  if (cycleActivePeriod()) return;
+  G.cycleTracking.periods.push({ start: todayKey(), end: null });
+  lg('🩸 Period logged as started today.');
+  render();
+}
+function endPeriod() {
+  const active = cycleActivePeriod();
+  if (!active) return;
+  active.end = todayKey();
+  lg('🩸 Period logged as ended today.');
+  render();
+}
+function isDateInPeriod(dateKey) {
+  return G.cycleTracking.periods.some(p => dateKey >= p.start && dateKey <= (p.end || todayKey()));
+}
+function getCycleStats() {
+  const periods = G.cycleTracking.periods;
+  if (periods.length === 0) return null;
+  const starts = periods.map(p => new Date(p.start).getTime()).sort((a, b) => a - b);
+  const cycleLengths = [];
+  for (let i = 1; i < starts.length; i++) cycleLengths.push(Math.round((starts[i] - starts[i - 1]) / 86400000));
+  const avgCycle = cycleLengths.length ? Math.round(cycleLengths.reduce((a, b) => a + b, 0) / cycleLengths.length) : null;
+  const periodLengths = periods.filter(p => p.end).map(p => Math.round((new Date(p.end) - new Date(p.start)) / 86400000) + 1);
+  const avgPeriod = periodLengths.length ? Math.round(periodLengths.reduce((a, b) => a + b, 0) / periodLengths.length) : null;
+  const lastStart = new Date(starts[starts.length - 1]);
+  const predictedNext = avgCycle ? new Date(lastStart.getTime() + avgCycle * 86400000) : null;
+  return { avgCycle, avgPeriod, predictedNext, totalLogged: periods.length };
+}
+
+function sicknessActiveEpisode() {
+  const eps = G.sicknessTracking.episodes;
+  if (eps.length === 0) return null;
+  const last = eps[eps.length - 1];
+  return last.end === null ? last : null;
+}
+function startSickness() {
+  if (sicknessActiveEpisode()) return;
+  G.sicknessTracking.episodes.push({ start: todayKey(), end: null });
+  lg('🤒 Marked as sick, starting today.');
+  render();
+}
+function endSickness() {
+  const active = sicknessActiveEpisode();
+  if (!active) return;
+  active.end = todayKey();
+  lg('🤒 Marked as recovered.');
+  render();
+}
+function isDateSick(dateKey) {
+  return G.sicknessTracking.episodes.some(e => dateKey >= e.start && dateKey <= (e.end || todayKey()));
+}
+
+// Same shape as the source app's REMINDER_LABELS — days (0=Sun..6=Sat), periodOnly,
+// sickOnly, onlyDate ('MM-DD') all gate whether an item shows up today at all.
+const INFIRMARY_REMINDERS = {
+  amitriptyline: { icon: '🌛', label: 'Amitriptyline', desc: '~10:00 PM, before sleep.' },
+  magnesium: { icon: '🌌', label: 'Magnesium Glycinate', desc: '~9:30 PM, before amitriptyline.' },
+  supplements: { icon: '💊', label: 'Afternoon Supplements', desc: 'Methylene blue, Mega B, Collagen/glutathione, Cran Max \u2014 Mon\u2013Sat.', days: [1, 2, 3, 4, 5, 6] },
+  acv: { icon: '🍏', label: 'Apple Cider Vinegar', desc: 'With water, at night.' },
+  periodMeds: { icon: '🩸', label: 'Tranexamic + Mefenamic Acid', desc: 'Period days only.', periodOnly: true },
+  coughLinctusMorning: { icon: '🍯', label: 'Cough Linctus \u2014 Morning', desc: 'While sick, 3x daily.', sickOnly: true },
+  coughLinctusAfternoon: { icon: '🍯', label: 'Cough Linctus \u2014 Afternoon', desc: 'While sick, 3x daily.', sickOnly: true },
+  coughLinctusNight: { icon: '🍯', label: 'Cough Linctus \u2014 Night', desc: 'While sick, 3x daily.', sickOnly: true },
+  mucolyticMorning: { icon: '💊', label: 'Carboxymethylcysteine \u2014 Morning', desc: 'While sick, 3x daily.', sickOnly: true },
+  mucolyticAfternoon: { icon: '💊', label: 'Carboxymethylcysteine \u2014 Afternoon', desc: 'While sick, 3x daily.', sickOnly: true },
+  mucolyticNight: { icon: '💊', label: 'Carboxymethylcysteine \u2014 Night', desc: 'While sick, 3x daily.', sickOnly: true },
+  morningWater: { icon: '💧', label: 'Morning Water', desc: 'A mouthful, right when you wake up.' },
+  sleptEarly: { icon: '🌙', label: 'Sleep Early', desc: 'Lights out before midnight.' },
+  healthCheckup: { icon: '🩺', label: 'Yearly Health Checkup', desc: 'August 31st.', onlyDate: '08-31' }
+};
+
+function reminderAppliesToday(key) {
+  const info = INFIRMARY_REMINDERS[key];
+  if (!info) return false;
+  const dk = todayKey();
+  if (info.days && !info.days.includes(new Date().getDay())) return false;
+  if (info.periodOnly && !isDateInPeriod(dk)) return false;
+  if (info.sickOnly && !isDateSick(dk)) return false;
+  if (info.onlyDate && dk.slice(5) !== info.onlyDate) return false;
+  return true;
+}
+function getTodaysReminders() {
+  return Object.keys(INFIRMARY_REMINDERS).filter(reminderAppliesToday);
+}
+function isReminderDoneToday(key) {
+  const dk = todayKey();
+  return (G.wellnessChecklist[dk] || []).includes(key);
+}
+function toggleWellnessReminder(key) {
+  const dk = todayKey();
+  if (!G.wellnessChecklist[dk]) G.wellnessChecklist[dk] = [];
+  const idx = G.wellnessChecklist[dk].indexOf(key);
+  if (idx >= 0) G.wellnessChecklist[dk].splice(idx, 1);
+  else G.wellnessChecklist[dk].push(key);
+  render();
+}
+
+// === HOUSEHOLD BILLS (Guild Treasury) ===
+const BILL_LABELS = {
+  electricity: { icon: '\u26a1', label: 'Electricity' },
+  phone: { icon: '\ud83d\udcf1', label: 'Phone' }
+};
+const BILL_TREASURY_CONTRIBUTION = 500; // gold banked to the Guild Treasury per bill paid
+
+function currentMonthKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+// Checked on render — a new month rolling over resets paidThisMonth for every bill,
+// and breaks the streak for anything that was left unpaid when the month changed.
+function checkBillMonthRollover() {
+  const mk = currentMonthKey();
+  for (let id in G.bills) {
+    const bill = G.bills[id];
+    if (bill.monthKey === mk) continue; // already current, nothing to do
+    if (bill.monthKey !== null && !bill.paidThisMonth) bill.streak = 0; // missed last month
+    bill.paidThisMonth = false;
+    bill.monthKey = mk;
+  }
+}
+function markBillPaid(billId) {
+  const bill = G.bills[billId];
+  if (!bill || bill.paidThisMonth) return;
+  checkBillMonthRollover();
+  bill.paidThisMonth = true;
+  bill.streak = (bill.streak || 0) + 1;
+  G.guildTreasury.gold += BILL_TREASURY_CONTRIBUTION;
+  G.guildTreasury.lifetimeContributed += BILL_TREASURY_CONTRIBUTION;
+  const def = BILL_LABELS[billId];
+  lg(def.icon + ' ' + def.label + ' paid \u2014 +' + BILL_TREASURY_CONTRIBUTION + 'G to the Guild Treasury. Streak: ' + bill.streak + '.');
+  checkGuildTreasuryMilestones();
+  render();
 }
 
 function canTendGarden() {
@@ -20149,7 +20320,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.118';
+const BUILD_ID = '2026-08-17.120';
 // =========================
 
 
@@ -20271,6 +20442,11 @@ function saveGame() {
     guildMemberRequestLastDay: G.guildMemberRequestLastDay,
     guildMemberRequestQueue: G.guildMemberRequestQueue,
     guildDuties: G.guildDuties,
+    cycleTracking: G.cycleTracking,
+    sicknessTracking: G.sicknessTracking,
+    wellnessChecklist: G.wellnessChecklist,
+    mealLog: G.mealLog,
+    bills: G.bills,
     guildDutyLastPayoutDay: G.guildDutyLastPayoutDay,
     guildFoundedDay: G.guildFoundedDay,
     guildAnniversariesCelebrated: G.guildAnniversariesCelebrated,
@@ -20603,6 +20779,11 @@ function loadGame() {
     if (data.guildMemberRequestLastDay !== undefined) G.guildMemberRequestLastDay = data.guildMemberRequestLastDay;
     if (data.guildMemberRequestQueue !== undefined) G.guildMemberRequestQueue = data.guildMemberRequestQueue;
     if (data.guildDuties) G.guildDuties = data.guildDuties;
+    if (data.cycleTracking) G.cycleTracking = data.cycleTracking;
+    if (data.sicknessTracking) G.sicknessTracking = data.sicknessTracking;
+    if (data.wellnessChecklist) G.wellnessChecklist = data.wellnessChecklist;
+    if (data.mealLog) G.mealLog = data.mealLog;
+    if (data.bills) G.bills = data.bills;
     if (data.guildDutyLastPayoutDay !== undefined) G.guildDutyLastPayoutDay = data.guildDutyLastPayoutDay;
     if (data.guildFoundedDay !== undefined) G.guildFoundedDay = data.guildFoundedDay;
     if (data.guildAnniversariesCelebrated !== undefined) G.guildAnniversariesCelebrated = data.guildAnniversariesCelebrated;
@@ -25132,6 +25313,43 @@ function buyGuildCafeDrink(drinkId) {
   render();
 }
 
+// === MEALS ===
+// Zaki's own hobby-chef menu, general fare. Joel's kitchen is kept as its own
+// separate list — Filipino dishes specifically, his own thing, not folded into
+// Zaki's counter. Ordering picks a random dish rather than requiring a manual
+// choice each time, matching the low-friction spirit of everything else logged here.
+const ZAKI_MEAL_MENU = [
+  { dish: 'Fried Rice Sampler', line: 'Zaki slides it over without being asked twice. "Figured you\u2019d want this today."' },
+  { dish: 'Grilled Skewers', line: 'Still smoking a little when it reaches the table. Zaki watches for your reaction like it matters.' },
+  { dish: "Zaki's Own Noodle Soup", line: '"Recipe\u2019s still not finished," he says, "but it\u2019s close enough to serve."' },
+  { dish: 'Pan-Seared Vegetables', line: 'Simple, and better than it has any right to be. Zaki shrugs like it\u2019s nothing.' },
+  { dish: 'Whatever Was Fresh Today', line: 'He doesn\u2019t even tell you what\u2019s in it. "Just eat it," he says. "You\u2019ll like it."' }
+];
+const JOEL_MEAL_MENU = [
+  { dish: 'Adobo', line: 'The kitchen smells like it for an hour before it\u2019s even ready. Joel won\u2019t rush it, not for anyone.' },
+  { dish: 'Sinigang', line: '"Needs to be sour enough," Joel mutters, tasting it a third time before deciding it\u2019s finally right.' },
+  { dish: 'Pancit', line: 'A birthday dish, technically, but Joel makes it whenever he feels like it anyway.' },
+  { dish: 'Lumpia', line: 'He rolls them with the same care every single time, like the shape actually matters.' },
+  { dish: 'Tinola', line: 'Simple, warm, exactly what it needs to be. Joel doesn\u2019t say much while he makes this one.' }
+];
+
+function orderMealFromZaki() {
+  const pick = ZAKI_MEAL_MENU[Math.floor(Math.random() * ZAKI_MEAL_MENU.length)];
+  logMeal(pick.dish, 'Zaki', pick.line);
+}
+function orderMealFromJoel() {
+  const pick = JOEL_MEAL_MENU[Math.floor(Math.random() * JOEL_MEAL_MENU.length)];
+  logMeal(pick.dish, 'Joel', pick.line);
+}
+function logMeal(dish, cook, line) {
+  const dk = todayKey();
+  if (!G.mealLog[dk]) G.mealLog[dk] = [];
+  const timeLabel = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  G.mealLog[dk].push({ dish, cook, time: timeLabel });
+  lg('\ud83c\udf7d\ufe0f ' + dish + ' logged. ' + line);
+  render();
+}
+
 // Flavor-only collectibles, no stat effect \u2014 same spirit as keepsake items elsewhere.
 const GUILD_CAFE_MERCH = [
   { id: 'zaki_notebook', n: "Zaki's Planning Notebook", price: 200, desc: 'Grid-ruled. He is very particular about the grid.' },
@@ -25306,6 +25524,53 @@ function rGardenInfirmary() {
     h += '</div>';
   }
 
+  // === WELLNESS (Infirmary Reminders) ===
+  // Today's applicable items only, matching the ported reminderAppliesToday() logic
+  // exactly — period meds only show during a logged period, sick-day items only show
+  // during a logged sickness episode, supplements only Mon-Sat, etc. Pure check-off,
+  // no penalty anywhere for leaving something unchecked.
+  h += '<div class="panel-title" style="margin-top:14px;margin-bottom:8px;">💊 Today, With Dr. AA</div>';
+  const todaysReminders = getTodaysReminders();
+  if (todaysReminders.length === 0) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">Nothing scheduled for today.</div></div>';
+  } else {
+    for (let key of todaysReminders) {
+      const item = INFIRMARY_REMINDERS[key];
+      const done = isReminderDoneToday(key);
+      h += '<div class="panel' + (done ? ' panel-gold' : '') + '" style="margin-bottom:6px;cursor:pointer;" onclick="toggleWellnessReminder(\'' + key + '\')">';
+      h += '<div style="display:flex;align-items:center;gap:10px;">';
+      h += '<div style="font-size:18px;">' + (done ? '\u2705' : item.icon) + '</div>';
+      h += '<div><div style="font-weight:700;font-size:13px;' + (done ? 'color:var(--gold);text-decoration:line-through;' : '') + '">' + item.label + '</div><div class="btn-hint">' + item.desc + '</div></div>';
+      h += '</div></div>';
+    }
+  }
+
+  // Period + sickness episode controls — the actual gates the reminders above read from
+  const activePeriod = cycleActivePeriod();
+  const activeSickness = sicknessActiveEpisode();
+  const cycleStats = getCycleStats();
+  h += '<div class="panel" style="margin-top:10px;">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
+  h += '<div style="font-weight:700;font-size:12.5px;">🩸 Cycle Tracking</div>';
+  h += activePeriod
+    ? '<button onclick="endPeriod()" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;">End Period</button>'
+    : '<button onclick="startPeriod()" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;">Start Period</button>';
+  h += '</div>';
+  if (activePeriod) h += '<div class="btn-hint">Active since ' + activePeriod.start + '.</div>';
+  else if (cycleStats) h += '<div class="btn-hint">Avg cycle: ' + (cycleStats.avgCycle || '\u2014') + 'd \u00b7 Avg period: ' + (cycleStats.avgPeriod || '\u2014') + 'd \u00b7 ' + cycleStats.totalLogged + ' logged.</div>';
+  else h += '<div class="btn-hint">Nothing logged yet.</div>';
+  h += '</div>';
+
+  h += '<div class="panel" style="margin-top:8px;">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+  h += '<div style="font-weight:700;font-size:12.5px;">🤒 Sickness</div>';
+  h += activeSickness
+    ? '<button onclick="endSickness()" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;">Mark Recovered</button>'
+    : '<button onclick="startSickness()" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;">Mark Sick</button>';
+  h += '</div>';
+  if (activeSickness) h += '<div class="btn-hint" style="margin-top:4px;">Since ' + activeSickness.start + ' \u2014 sick-day meds are showing above.</div>';
+  h += '</div>';
+
   h += '</div>';
   return h;
 }
@@ -25324,6 +25589,25 @@ function rGuildCafe() {
     h += '<button onclick="buyGuildCafeDrink(\'' + drink.id + '\')" class="abtn" style="margin:0;white-space:nowrap;">' + drink.price + 'G</button>';
     h += '</div></div>';
   }
+
+  // === MEALS ===
+  // Logging, not nutrition tracking — no calories, no targets, just "did you eat and
+  // what was it." Zaki (hobby chef) covers general fare; Joel specifically cooks
+  // Filipino dishes, kept as its own distinct source rather than folded into Zaki's
+  // menu, since that's specifically his own thing.
+  h += '<div class="panel-title" style="margin:14px 0 8px;">Meals Today</div>';
+  const todaysMeals = G.mealLog[todayKey()] || [];
+  if (todaysMeals.length > 0) {
+    for (let meal of todaysMeals) {
+      h += '<div class="panel" style="margin-bottom:6px;"><div style="display:flex;justify-content:space-between;"><div style="font-size:12.5px;"><b>' + meal.dish + '</b> \u2014 ' + meal.cook + '</div><div class="btn-hint">' + meal.time + '</div></div></div>';
+    }
+  } else {
+    h += '<div class="btn-hint" style="margin-bottom:8px;">Nothing logged yet today.</div>';
+  }
+  h += '<div style="display:flex;gap:8px;margin-bottom:16px;">';
+  h += '<button onclick="orderMealFromZaki()" class="abtn" style="flex:1;">Order from Zaki</button>';
+  h += '<button onclick="orderMealFromJoel()" class="abtn" style="flex:1;">Ask Joel to Cook</button>';
+  h += '</div>';
 
   h += '<div class="panel-title" style="margin:14px 0 8px;">Sit With Someone</div>';
   const pairings = [
@@ -25469,6 +25753,24 @@ function rGuildTreasury() {
     h += '<button onclick="contributeToTreasury(' + amt + ')" class="' + (can ? 'abtn' : 'btn-outline-ghost') + '" style="flex:1;font-size:12px;" ' + (can ? '' : 'disabled') + '>+' + amt.toLocaleString() + 'G</button>';
   }
   h += '</div></div>';
+
+  // === HOUSEHOLD BILLS ===
+  // Paying a bill contributes directly to the Treasury (not just thematically tied to
+  // it) — keeping your own household running actually feeds the same pool the Guild
+  // draws its milestone bonuses from.
+  checkBillMonthRollover();
+  h += '<div class="panel-title" style="margin-bottom:8px;">Household Bills</div>';
+  for (let id in G.bills) {
+    const bill = G.bills[id];
+    const def = BILL_LABELS[id];
+    h += '<div class="panel' + (bill.paidThisMonth ? ' panel-gold' : '') + '" style="margin-bottom:8px;">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    h += '<div><div style="font-weight:700;font-size:13px;">' + def.icon + ' ' + def.label + '</div><div class="btn-hint">Due day ' + bill.dueDay + ' \u00b7 Streak: ' + bill.streak + '</div></div>';
+    h += bill.paidThisMonth
+      ? '<span style="font-size:11px;color:var(--gold);font-weight:700;">\u2713 Paid</span>'
+      : '<button onclick="markBillPaid(\'' + id + '\')" class="abtn" style="margin:0;padding:4px 10px;font-size:11px;">Mark Paid</button>';
+    h += '</div></div>';
+  }
 
   h += '<div class="panel-title" style="margin-bottom:8px;">Milestones</div>';
   for (let m of GUILD_TREASURY_MILESTONES) {
