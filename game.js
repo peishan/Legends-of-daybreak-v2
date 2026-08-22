@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fixed: Busy Day Mercenary now opt-in (was forced); stronghold task matching in multi-enemy zones)';
+const APP_VERSION = '2026-08-17 (Fixed: Guild Contracts were never included in Busy Day Autopilot at all \u2014 now wired in alongside strongholds/bounties)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -13725,6 +13725,21 @@ function buildBusyDayQueue() {
     else skipped.push(b.target);
   }
 
+  // Guild Contracts were never actually included here at all — a whole separate task
+  // type (weekly refresh, not daily) that Busy Day simply never touched, distinct from
+  // both Stronghold Tasks and Bounties despite the similar name/shape. Same structure
+  // as bounties (kill_specific/boss_specific, minLv/maxLv), so the same pattern applies.
+  if (G.guildJoined) {
+    for (let c of G.guildContracts) {
+      if (c.done || !BUSY_DAY_AUTOMATABLE_TYPES.includes(c.t) || !c.target) continue;
+      const minLv = c.minLv || 1, maxLv = c.maxLv || 999;
+      if (G.p.lvl < minLv || G.p.lvl > maxLv) continue;
+      const zi = findZoneIndexForTarget(c.target);
+      if (zi >= 0) queue.push({ kind: 'contract', id: c.id, target: c.target, zoneIndex: zi });
+      else skipped.push(c.target);
+    }
+  }
+
   return { queue, skipped: [...new Set(skipped)] };
 }
 
@@ -13732,6 +13747,10 @@ function isBusyDayQueueItemDone(item) {
   if (item.kind === 'stronghold') {
     const task = G.strongholdTasks.find(t => t.id === item.id);
     return !task || task.done;
+  }
+  if (item.kind === 'contract') {
+    const c = G.guildContracts.find(x => x.id === item.id);
+    return !c || c.done;
   }
   const b = G.bounties.find(x => x.id === item.id);
   return !b || b.done;
@@ -13750,7 +13769,7 @@ function startBusyDayAutopilot() {
   // explicitly told otherwise.
   const mercPending = G.busyDayAutopilot.includeMercenary && getMercenaryTier() >= 0 && !G.mercenary.active;
   if (queue.length === 0 && !mercPending) {
-    lg('🚀 Nothing left to auto-complete right now \u2014 stronghold tasks and bounties are all clear.');
+    lg('🚀 Nothing left to auto-complete right now \u2014 stronghold tasks, bounties, and guild contracts are all clear.');
     return;
   }
 
@@ -13758,7 +13777,7 @@ function startBusyDayAutopilot() {
   G.busyDayAutopilot.queueIndex = 0;
   G.busyDayAutopilot.playerBrowsing = false;
 
-  lg('🚀 Busy Day Autopilot started \u2014 ' + queue.length + ' stronghold/bounty target' + (queue.length === 1 ? '' : 's') + ' queued' + (skipped.length > 0 ? ', ' + skipped.length + ' skipped (no reachable zone: ' + skipped.join(', ') + ')' : '') + (mercPending ? '. Mercenary runs first.' : '.'));
+  lg('🚀 Busy Day Autopilot started \u2014 ' + queue.length + ' target' + (queue.length === 1 ? '' : 's') + ' queued (stronghold/bounty/contract)' + (skipped.length > 0 ? ', ' + skipped.length + ' skipped (no reachable zone: ' + skipped.join(', ') + ')' : '') + (mercPending ? '. Mercenary runs first.' : '.'));
 
   if (mercPending) {
     G.busyDayAutopilot.pendingAfterMercenary = true;
@@ -13813,7 +13832,7 @@ function advanceBusyDayQueue() {
 
 function finishBusyDayAutopilot() {
   const elapsedMin = Math.round((Date.now() - G.busyDayAutopilot.startTime) / 60000);
-  lg('🚀 Busy Day Autopilot finished \u2014 ' + G.busyDayAutopilot.completedCount + ' stronghold/bounty target' + (G.busyDayAutopilot.completedCount === 1 ? '' : 's') + ' cleared in ~' + elapsedMin + 'm.' + (G.busyDayAutopilot.skippedTargets.length > 0 ? ' Skipped (no reachable zone): ' + G.busyDayAutopilot.skippedTargets.join(', ') + '.' : ''));
+  lg('🚀 Busy Day Autopilot finished \u2014 ' + G.busyDayAutopilot.completedCount + ' target' + (G.busyDayAutopilot.completedCount === 1 ? '' : 's') + ' cleared in ~' + elapsedMin + 'm.' + (G.busyDayAutopilot.skippedTargets.length > 0 ? ' Skipped (no reachable zone): ' + G.busyDayAutopilot.skippedTargets.join(', ') + '.' : ''));
   G.busyDayAutopilot.active = false;
   G.busyDayAutopilot.queue = [];
   G.busyDayAutopilot.queueIndex = 0;
@@ -20524,7 +20543,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.124';
+const BUILD_ID = '2026-08-17.125';
 // =========================
 
 
@@ -23692,7 +23711,7 @@ function rToday() {
     h += '<div class="btn-hint" style="margin:6px 0;">' + (G.busyDayAutopilot.queueIndex + 1) + '/' + G.busyDayAutopilot.queue.length + ' targets \u2014 ' + G.busyDayAutopilot.completedCount + ' completed so far</div>';
     h += '<button onclick="stopBusyDayAutopilot()" class="btn-outline-ghost" style="width:100%;">Stop Autopilot</button>';
   } else {
-    h += '<div class="btn-hint" style="margin:6px 0;">Auto-completes Stronghold Tasks and Bounties by actually traveling and fighting \u2014 real combat, hands-off. Leaves AFK Adventure, Guild Boss, Guild War, Frontier, and Boss Rush for you.</div>';
+    h += '<div class="btn-hint" style="margin:6px 0;">Auto-completes Stronghold Tasks, Bounties, and Guild Contracts by actually traveling and fighting \u2014 real combat, hands-off. Leaves AFK Adventure, Guild Boss, Guild War, Frontier, and Boss Rush for you.</div>';
     h += '<label style="display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:8px;font-size:11.5px;color:var(--text-dim);"><input type="checkbox" ' + (G.busyDayAutopilot.includeMercenary ? 'checked' : '') + ' onchange="G.busyDayAutopilot.includeMercenary=this.checked;render();"> Also run a Mercenary batch</label>';
     h += '<button onclick="startBusyDayAutopilot()" class="abtn" style="width:100%;">Run Busy Day Autopilot</button>';
   }
