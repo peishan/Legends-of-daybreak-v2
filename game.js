@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (New: Relationships reread screen + filterable/exportable Session Log for long AFK sessions)';
+const APP_VERSION = '2026-08-17 (URGENT FIX: Session Log auto-export got stuck firing on every log line \u2014 was downloading hundreds of .md files; Guild Contracts level-range bug also fixed)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -99,6 +99,7 @@ const ELIXIR_BUNDLE_ITEMS = [
 // tab stays open; resets on reload. That's the actual point — it exists specifically
 // for the "I left this running all night, what did I miss" case.
 let sessionLog = [];
+let sessionLogSinceExport = 0; // separate counter, deliberately NOT sessionLog.length
 const SESSION_LOG_MAX = 5000; // generous but bounded, since this is memory not storage
 const SESSION_LOG_AUTOEXPORT_INTERVAL = 500; // triggers a real download roughly every 500 entries
 function logToSession(text, category) {
@@ -107,7 +108,17 @@ function logToSession(text, category) {
   // Auto-export checkpoint — the closest a browser sandbox can get to "auto save":
   // triggers a real download automatically rather than requiring you to remember to
   // click anything, without needing to poll on a timer.
-  if (sessionLog.length % SESSION_LOG_AUTOEXPORT_INTERVAL === 0) autoExportSessionLog();
+  // MUST use a separate counter, not sessionLog.length — once the array hits its
+  // SESSION_LOG_MAX cap, every further push is offset by a shift(), so length gets
+  // permanently stuck at exactly 5000 forever after. Since 5000 is itself a multiple
+  // of 500, checking length % 500 === 0 became permanently true the moment the cap
+  // was reached, firing a download on every single subsequent log line instead of
+  // every 500th — this is what caused the runaway hundreds of .md downloads.
+  sessionLogSinceExport++;
+  if (sessionLogSinceExport >= SESSION_LOG_AUTOEXPORT_INTERVAL) {
+    sessionLogSinceExport = 0;
+    autoExportSessionLog();
+  }
 }
 function detectLogCategory(msg) {
   if (msg.includes('💜 Lovetalk: ')) return 'lovetalk';
@@ -13788,13 +13799,16 @@ function buildBusyDayQueue() {
 
   // Guild Contracts were never actually included here at all — a whole separate task
   // type (weekly refresh, not daily) that Busy Day simply never touched, distinct from
-  // both Stronghold Tasks and Bounties despite the similar name/shape. Same structure
-  // as bounties (kill_specific/boss_specific, minLv/maxLv), so the same pattern applies.
+  // both Stronghold Tasks and Bounties despite the similar name/shape.
+  // Deliberately NO level-range check here, unlike Bounties — checkGuildContractKill()
+  // itself never enforces minLv/maxLv when crediting a kill, only whether the contract
+  // is done. Since only 3 contracts cycle into the active board at a time, a slower
+  // player can easily level past a contract's original maxLv while it's still sitting
+  // posted and fully completable — filtering on level here silently stranded those,
+  // reporting the autopilot run as "finished" while contracts sat untouched on the board.
   if (G.guildJoined) {
     for (let c of G.guildContracts) {
       if (c.done || !BUSY_DAY_AUTOMATABLE_TYPES.includes(c.t) || !c.target) continue;
-      const minLv = c.minLv || 1, maxLv = c.maxLv || 999;
-      if (G.p.lvl < minLv || G.p.lvl > maxLv) continue;
       const zi = findZoneIndexForTarget(c.target);
       if (zi >= 0) queue.push({ kind: 'contract', id: c.id, target: c.target, zoneIndex: zi });
       else skipped.push(c.target);
@@ -20605,7 +20619,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.126';
+const BUILD_ID = '2026-08-17.127';
 // =========================
 
 
