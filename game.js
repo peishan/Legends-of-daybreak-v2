@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fixed: Guild Contracts were never included in Busy Day Autopilot at all \u2014 now wired in alongside strongholds/bounties)';
+const APP_VERSION = '2026-08-17 (New: Relationships reread screen + filterable/exportable Session Log for long AFK sessions)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -92,6 +92,54 @@ const ELIXIR_BUNDLE_ITEMS = [
   { n: 'Elixir of Swift Growth (10 Hour)', t: 'pot', eff: 'xp_boost', v: 600, boostPct: 0.5, r: 'epic', d: '+50% XP for 10 real hours. Only one growth elixir can be active at a time.' },
   { n: 'Elixir of Swift Growth (12 Hour)', t: 'pot', eff: 'xp_boost', v: 720, boostPct: 0.5, r: 'legendary', d: '+50% XP for a full 12 real hours. Only one growth elixir can be active at a time.' }
 ];
+
+// Session log — deliberately declared OUTSIDE G and never touched by save/load, so it
+// can hold everything from a long-running session (8-10+ hour AFK stretches) without
+// ever risking the localStorage quota problem fixed earlier. Lives only as long as the
+// tab stays open; resets on reload. That's the actual point — it exists specifically
+// for the "I left this running all night, what did I miss" case.
+let sessionLog = [];
+const SESSION_LOG_MAX = 5000; // generous but bounded, since this is memory not storage
+const SESSION_LOG_AUTOEXPORT_INTERVAL = 500; // triggers a real download roughly every 500 entries
+function logToSession(text, category) {
+  sessionLog.push({ text, category: category || 'general', t: Date.now() });
+  if (sessionLog.length > SESSION_LOG_MAX) sessionLog.shift();
+  // Auto-export checkpoint — the closest a browser sandbox can get to "auto save":
+  // triggers a real download automatically rather than requiring you to remember to
+  // click anything, without needing to poll on a timer.
+  if (sessionLog.length % SESSION_LOG_AUTOEXPORT_INTERVAL === 0) autoExportSessionLog();
+}
+function detectLogCategory(msg) {
+  if (msg.includes('💜 Lovetalk: ')) return 'lovetalk';
+  if (msg.includes(' Family Ties (')) return 'familyties';
+  if (msg.includes('🔮 Memory: ')) return 'vision';
+  return 'general';
+}
+
+// Closest a browser sandbox allows to "auto save" — a real, honest file download,
+// just triggered by the app itself rather than requiring a manual click each time.
+function exportSessionLogToMd(category) {
+  const entries = category ? sessionLog.filter(e => e.category === category) : sessionLog;
+  if (entries.length === 0) { lg('📝 Nothing to export for that filter yet.'); return; }
+  const catLabel = { lovetalk: 'Lovetalk', familyties: 'Family Ties', vision: 'Vision Machine', general: 'General' };
+  const title = category ? catLabel[category] + ' Log' : 'Full Session Log';
+  let md = '# ' + title + '\n\n_Exported ' + new Date().toLocaleString() + ' \u2014 ' + entries.length + ' entries_\n\n';
+  for (let e of entries) {
+    md += '- **' + new Date(e.t).toLocaleTimeString() + '** [' + catLabel[e.category] + '] ' + e.text.replace(/\n/g, ' ') + '\n';
+  }
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'daybreak-log-' + (category || 'full') + '-' + Date.now() + '.md';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function autoExportSessionLog() {
+  exportSessionLogToMd(null);
+}
 
 const G = {
 
@@ -5556,6 +5604,7 @@ storyJournal: {
   // porch chapters already carry San/Joel's relationship to real depth by the 500s;
   // starting here gives Lovetalk room to build toward that rather than trailing it.
   lovetalk: { stage: 0, lastRestDay: -1 },
+  relationshipsScreen: { selected: null, viewingStage: null }, // UI navigation only, not persisted
   familyTies: {
     Aisyah: { stage: 0, lastRestDay: -1 },
     Mezstorm: { stage: 0, lastRestDay: -1 },
@@ -8047,8 +8096,15 @@ function triggerFamilyTiesStage(name) {
 
 function showLovetalkFamilyTiesScene() {
   if (!G.lovetalkSceneQueue) return;
+  // Scene dialogue lines don't carry a unique marker the way the header line does
+  // (detectLogCategory() would just fall through to 'general' for these), so tag them
+  // directly here based on which type actually triggered — same lg() call for the
+  // visible log/toast behavior, just with an explicit category override afterward.
+  const category = G.lovetalkSceneQueue.type === 'lovetalk' ? 'lovetalk' : 'familyties';
   for (let scene of G.lovetalkSceneQueue.data.scenes) {
-    lg((scene.speaker !== 'Narrator' ? scene.speaker + ': ' : '') + scene.text);
+    const line = (scene.speaker !== 'Narrator' ? scene.speaker + ': ' : '') + scene.text;
+    lg(line);
+    sessionLog[sessionLog.length - 1].category = category;
   }
   G.lovetalkSceneQueue = null;
   render();
@@ -11182,8 +11238,13 @@ function viewRandomVisionMemory() {
   if (!isVisionMachineMemoriesUnlocked()) return;
   const memory = VISION_MACHINE_MEMORIES[Math.floor(Math.random() * VISION_MACHINE_MEMORIES.length)];
   lg('🔮 Memory: ' + memory.icon + ' ' + memory.title);
+  // Scene lines below carry no unique marker of their own (same reasoning as
+  // showLovetalkFamilyTiesScene()) — tag them 'vision' explicitly rather than letting
+  // detectLogCategory() fall through to 'general' for the actual memory content.
   for (let scene of memory.scenes) {
-    lg((scene.speaker !== 'Narrator' ? scene.speaker + ': ' : '') + scene.text);
+    const line = (scene.speaker !== 'Narrator' ? scene.speaker + ': ' : '') + scene.text;
+    lg(line);
+    sessionLog[sessionLog.length - 1].category = 'vision';
   }
   G.visionMachine.memoriesViewedCount = (G.visionMachine.memoriesViewedCount || 0) + 1;
   checkAchievements();
@@ -20342,6 +20403,7 @@ function dismissSessionRecap() {
 
 function lg(msg){
   G.log.push(msg); if(G.log.length>200)G.log.shift();
+  logToSession(msg, detectLogCategory(msg));
   const highlightEl = document.querySelector('.log-highlight .lh-text');
   const highlightWrap = document.querySelector('.log-highlight');
   const tickerEl = document.getElementById('log');
@@ -20543,7 +20605,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.125';
+const BUILD_ID = '2026-08-17.126';
 // =========================
 
 
@@ -22240,6 +22302,8 @@ function render(){
   else if(G.state=='guild_duties')h+=rGuildDuties();
   else if(G.state=='guild_chest')h+=rGuildChest();
   else if(G.state=='guild_hall_tour')h+=rGuildHallTour();
+  else if(G.state=='relationships')h+=rRelationships();
+  else if(G.state=='session_log')h+=rSessionLog();
   else if(G.state=='guild_bounty_missions')h+=rGuildBountyMissions();
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='guild_boss')h+=rGuildBoss();
@@ -22308,6 +22372,8 @@ function attachEvents() {
     else if(a=='guild_duties')setS('guild_duties');
     else if(a=='guild_chest')setS('guild_chest');
     else if(a=='guild_hall_tour')setS('guild_hall_tour');
+    else if(a=='relationships')setS('relationships');
+    else if(a=='session_log')setS('session_log');
     else if(a=='guild_bounty_missions')setS('guild_bounty_missions');
     else if(a=='stronghold')setS('stronghold');
     else if(a=='guild_boss')setS('guild_boss');
@@ -26164,6 +26230,104 @@ function rGuildHallTour() {
   return h;
 }
 
+function rSessionLog() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">📝 Session Log</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Everything logged since this tab was last opened \u2014 not part of your save, so nothing here survives a reload, but nothing during a long session gets lost either.</div>';
+
+  const filter = G.sessionLogFilter || null;
+  const categories = [
+    { key: null, label: 'All' },
+    { key: 'lovetalk', label: '💜 Lovetalk' },
+    { key: 'familyties', label: '🌙 Family Ties' },
+    { key: 'vision', label: '🔮 Vision Machine' },
+    { key: 'general', label: 'General' }
+  ];
+  h += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">';
+  for (let c of categories) {
+    h += '<button onclick="G.sessionLogFilter=' + (c.key ? "'" + c.key + "'" : 'null') + ';render();" class="' + (filter === c.key ? 'abtn' : 'btn-outline-ghost') + '" style="margin:0;padding:5px 10px;font-size:11px;">' + c.label + '</button>';
+  }
+  h += '</div>';
+
+  const filtered = filter ? sessionLog.filter(e => e.category === filter) : sessionLog;
+  h += '<button onclick="exportSessionLogToMd(' + (filter ? "'" + filter + "'" : 'null') + ')" class="abtn" style="width:100%;margin-bottom:12px;">Export ' + (filter ? categories.find(c => c.key === filter).label : 'Full Log') + ' to .md (' + filtered.length + ')</button>';
+
+  if (filtered.length === 0) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">Nothing logged yet for this filter.</div></div>';
+  } else {
+    for (let e of filtered.slice(-100).reverse()) {
+      h += '<div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);">';
+      h += '<span class="btn-hint">' + new Date(e.t).toLocaleTimeString() + '</span> ' + e.text;
+      h += '</div>';
+    }
+    if (filtered.length > 100) h += '<div class="btn-hint" style="text-align:center;margin-top:8px;">Showing the most recent 100 of ' + filtered.length + ' \u2014 export to see all of them.</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function rRelationships() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">💜 Relationships</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Every stage reached so far, kept here to reread \u2014 nothing that already happened is ever lost, even if it happened while you weren\u2019t watching.</div>';
+
+  const viewing = G.relationshipsScreen.viewingStage;
+  const selected = G.relationshipsScreen.selected;
+
+  if (viewing !== null) {
+    // Reading a specific stage's actual scene content
+    const stages = selected === 'lovetalk' ? LOVETALK_STAGES : FAMILY_TIES_STAGES[selected];
+    const stageData = stages.find(s => s.stage === viewing);
+    h += '<button onclick="G.relationshipsScreen.viewingStage=null;render();" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 All Stages</button>';
+    if (stageData) {
+      h += '<div class="panel-title" style="margin-bottom:10px;">' + stageData.icon + ' ' + stageData.title + '</div>';
+      for (let scene of stageData.scenes) {
+        h += '<div style="margin-bottom:10px;font-size:13px;line-height:1.6;">';
+        if (scene.speaker !== 'Narrator') h += '<b>' + scene.speaker + ':</b> ';
+        h += scene.text + '</div>';
+      }
+    }
+  } else if (selected !== null) {
+    // List of stages reached so far for this relationship, tap to reread any of them
+    const stages = selected === 'lovetalk' ? LOVETALK_STAGES : FAMILY_TIES_STAGES[selected];
+    const currentStage = selected === 'lovetalk' ? G.lovetalk.stage : G.familyTies[selected].stage;
+    const label = selected === 'lovetalk' ? 'Joel' : selected;
+    h += '<button onclick="G.relationshipsScreen.selected=null;render();" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 All Relationships</button>';
+    h += '<div class="panel-title" style="margin-bottom:10px;">' + label + ' \u2014 Stage ' + currentStage + ' of ' + stages.length + '</div>';
+    if (currentStage === 0) {
+      h += '<div class="panel" style="text-align:center;"><div class="btn-hint">Nothing yet \u2014 keeps building on rest.</div></div>';
+    }
+    for (let s of stages) {
+      if (s.stage > currentStage) continue; // don't spoil stages not yet reached
+      h += '<div class="panel" style="margin-bottom:8px;cursor:pointer;" onclick="G.relationshipsScreen.viewingStage=' + s.stage + ';render();">';
+      h += '<div style="display:flex;align-items:center;gap:10px;">';
+      h += '<div style="font-size:18px;">' + s.icon + '</div>';
+      h += '<div><div style="font-weight:700;font-size:13px;">Stage ' + s.stage + ': ' + s.title + '</div></div>';
+      h += '</div></div>';
+    }
+  } else {
+    // Top-level list — every relationship with its current stage
+    h += '<div class="panel" style="margin-bottom:8px;cursor:pointer;" onclick="G.relationshipsScreen.selected=\'lovetalk\';render();">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    h += '<div><div style="font-weight:700;">💜 Joel</div><div class="btn-hint">Lovetalk</div></div>';
+    h += '<div class="btn-hint">Stage ' + G.lovetalk.stage + ' / ' + LOVETALK_STAGES.length + '</div>';
+    h += '</div></div>';
+    for (let name in G.familyTies) {
+      const stages = FAMILY_TIES_STAGES[name];
+      if (!stages) continue;
+      h += '<div class="panel" style="margin-bottom:8px;cursor:pointer;" onclick="G.relationshipsScreen.selected=\'' + name + '\';render();">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+      h += '<div><div style="font-weight:700;">🌙 ' + name + '</div><div class="btn-hint">Family Ties</div></div>';
+      h += '<div class="btn-hint">Stage ' + G.familyTies[name].stage + ' / ' + stages.length + '</div>';
+      h += '</div></div>';
+    }
+  }
+
+  h += '</div>';
+  return h;
+}
+
 function rGuildHub() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🏰 Guild Hub</div>';
@@ -26534,6 +26698,9 @@ function rMenu(){
     {i:'⛪',l:'Temple',d:'Blessings, cures, and revival',a:'temple'},
     {i:'📜',l:'The Story So Far',d:'Cover art and the cast, season by season',a:'story_so_far'},
     {i:'📱',l:'The Cellphone',d:'Recovered selfies and old message threads',a:'cellphone'},
+    {i:'💜',l:'Relationships',d:'Every Lovetalk and Family Ties stage, reread anytime',a:'relationships'},
+    {i:'📝',l:'Session Log',d:'Everything since this tab opened, filterable, exportable to .md',a:'session_log'},
+    {i:'📝',l:'Session Log',d:'Everything since this tab opened, filterable, exportable to .md',a:'session_log'},
   ];
   const sections=[
     { title: '🐉 Legendary Hunts', items: [
