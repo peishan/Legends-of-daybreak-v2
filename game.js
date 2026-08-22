@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Runes now auto-combine automatically every rest \u2014 never need to open the Rune screen at all)';
+const APP_VERSION = '2026-08-17 (Fixed: Busy Day Mercenary now opt-in (was forced); stronghold task matching in multi-enemy zones)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5465,7 +5465,7 @@ storyJournal: {
   // to the right zone and auto-fighting (same combat engine, same odds, just hands-off),
   // then chains into a Mercenary batch. Deliberately does NOT touch AFK Adventure, Guild
   // Boss, Guild War, Frontier, or Boss Rush — those stay manual on purpose.
-  busyDayAutopilot: { active: false, queue: [], queueIndex: 0, startTime: 0, completedCount: 0, skippedTargets: [], playerBrowsing: false, pendingAfterMercenary: false },
+  busyDayAutopilot: { active: false, queue: [], queueIndex: 0, startTime: 0, completedCount: 0, skippedTargets: [], playerBrowsing: false, pendingAfterMercenary: false, includeMercenary: false },
   guildWarRivalEncounters: {}, // per-rival muster count, keyed by rival name — drives Corran/Fen's evolving banter
   guildWarAccords: [], // rival names with a formalized Trade Accord — see proposeGuildWarAccord()
   guildWarAccordLastPayoutDay: -1,
@@ -13744,9 +13744,13 @@ function startBusyDayAutopilot() {
   G.busyDayAutopilot.completedCount = 0;
   G.busyDayAutopilot.startTime = Date.now();
 
-  const mercPending = getMercenaryTier() >= 0 && !G.mercenary.active; // mercenary is always repeatable, so just check it isn't already running
+  // Mercenary previously ran unconditionally whenever a contract was pending, whether
+  // or not that was wanted — now opt-in via G.busyDayAutopilot.includeMercenary,
+  // defaulting off, so "Start" only ever touches stronghold tasks and bounties unless
+  // explicitly told otherwise.
+  const mercPending = G.busyDayAutopilot.includeMercenary && getMercenaryTier() >= 0 && !G.mercenary.active;
   if (queue.length === 0 && !mercPending) {
-    lg('🚀 Nothing left to auto-complete right now \u2014 stronghold tasks, bounties, and mercenary are all clear.');
+    lg('🚀 Nothing left to auto-complete right now \u2014 stronghold tasks and bounties are all clear.');
     return;
   }
 
@@ -13754,7 +13758,7 @@ function startBusyDayAutopilot() {
   G.busyDayAutopilot.queueIndex = 0;
   G.busyDayAutopilot.playerBrowsing = false;
 
-  lg('🚀 Busy Day Autopilot started \u2014 ' + queue.length + ' stronghold/bounty target' + (queue.length === 1 ? '' : 's') + ' queued' + (skipped.length > 0 ? ', ' + skipped.length + ' skipped (no reachable zone: ' + skipped.join(', ') + ')' : '') + '. Mercenary runs first.');
+  lg('🚀 Busy Day Autopilot started \u2014 ' + queue.length + ' stronghold/bounty target' + (queue.length === 1 ? '' : 's') + ' queued' + (skipped.length > 0 ? ', ' + skipped.length + ' skipped (no reachable zone: ' + skipped.join(', ') + ')' : '') + (mercPending ? '. Mercenary runs first.' : '.'));
 
   if (mercPending) {
     G.busyDayAutopilot.pendingAfterMercenary = true;
@@ -19198,8 +19202,17 @@ function sc(zi, skipEvents) {
 
   if (!isBoss) {
     const ec=Math.floor(Math.random()*2)+1+Math.floor(z.lv/3);
+    // Busy Day Autopilot targeting a specific enemy in a zone with multiple competing
+    // types (e.g. 3 enemy types in one zone pool) previously relied on pure random
+    // chance to ever encounter the right one — meaning stronghold/bounty tasks tied to
+    // a specific target in a shared-pool zone could take many, many retries to
+    // complete, or feel like they never do. Biasing the first enemy slot toward the
+    // active autopilot target fixes this directly, without touching normal
+    // (non-autopilot) exploration, which still rolls fully random as before.
+    const autopilotTarget = G.busyDayAutopilot.active ? G.busyDayAutopilot.queue[G.busyDayAutopilot.queueIndex] : null;
+    const forcedTarget = (autopilotTarget && z.en.includes(autopilotTarget.target)) ? autopilotTarget.target : null;
     for(let i=0;i<ec;i++){
-      const t=z.en[Math.floor(Math.random()*z.en.length)];
+      const t = (i === 0 && forcedTarget) ? forcedTarget : z.en[Math.floor(Math.random()*z.en.length)];
     let e={n:t,hp:0,mhp:0,atk:0,def:0,xp:0,g:0};
     // The Endless Thinning reads the player's CURRENT level live, every single fight —
     // unlike every other zone (including the 96-100 stretch right before it), which
@@ -20511,7 +20524,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.123';
+const BUILD_ID = '2026-08-17.124';
 // =========================
 
 
@@ -23669,7 +23682,9 @@ function rToday() {
     h += '</div>';
   }
 
-  // Busy Day Autopilot — auto-runs Stronghold Tasks, Bounties, and Mercenary. Deliberately
+  // Busy Day Autopilot — auto-runs Stronghold Tasks and Bounties always; Mercenary is
+  // opt-in via includeMercenary (defaults off — it previously ran unconditionally
+  // whenever a contract was pending, which wasn't actually wanted). Deliberately
   // leaves AFK Adventure, Guild Boss, Guild War, Frontier, and Boss Rush alone.
   h += '<div class="panel' + (G.busyDayAutopilot.active ? ' panel-gold' : '') + '" style="text-align:center;">';
   h += '<div class="panel-title" style="' + (G.busyDayAutopilot.active ? 'color:var(--gold);' : '') + '">🚀 Busy Day Autopilot</div>';
@@ -23677,7 +23692,8 @@ function rToday() {
     h += '<div class="btn-hint" style="margin:6px 0;">' + (G.busyDayAutopilot.queueIndex + 1) + '/' + G.busyDayAutopilot.queue.length + ' targets \u2014 ' + G.busyDayAutopilot.completedCount + ' completed so far</div>';
     h += '<button onclick="stopBusyDayAutopilot()" class="btn-outline-ghost" style="width:100%;">Stop Autopilot</button>';
   } else {
-    h += '<div class="btn-hint" style="margin:6px 0;">Auto-completes Stronghold Tasks, Bounties, and a Mercenary batch by actually traveling and fighting \u2014 real combat, hands-off. Leaves AFK Adventure, Guild Boss, Guild War, Frontier, and Boss Rush for you.</div>';
+    h += '<div class="btn-hint" style="margin:6px 0;">Auto-completes Stronghold Tasks and Bounties by actually traveling and fighting \u2014 real combat, hands-off. Leaves AFK Adventure, Guild Boss, Guild War, Frontier, and Boss Rush for you.</div>';
+    h += '<label style="display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:8px;font-size:11.5px;color:var(--text-dim);"><input type="checkbox" ' + (G.busyDayAutopilot.includeMercenary ? 'checked' : '') + ' onchange="G.busyDayAutopilot.includeMercenary=this.checked;render();"> Also run a Mercenary batch</label>';
     h += '<button onclick="startBusyDayAutopilot()" class="abtn" style="width:100%;">Run Busy Day Autopilot</button>';
   }
   h += '</div>';
