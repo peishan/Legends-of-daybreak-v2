@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fixed: duplicate Session Log nav entry; auto-export removed entirely, back to manual-only)';
+const APP_VERSION = '2026-08-17 (Fixed: Busy Day bounties silently skipped when refreshDay was stale \u2014 same root cause as the Contracts bug)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -13773,9 +13773,15 @@ function buildBusyDayQueue() {
     else skipped.push(task.target);
   }
 
-  const today = G.gameDay;
+  // refreshDay !== today previously excluded any bounty that was left incomplete from
+  // a prior day — refreshBounties() only ever re-cycles bounties that were already
+  // done, so an incomplete one just sits with an old refreshDay forever, still fully
+  // valid and visible in the UI, but silently skipped here. Same root cause as the
+  // Guild Contracts bug: checkBountyKill() itself only checks b.done when crediting a
+  // kill, never refreshDay, so that check was never actually meaningful for whether a
+  // bounty could be worked on — only b.done and the level range genuinely matter.
   for (let b of G.bounties) {
-    if (b.done || b.refreshDay !== today || !BUSY_DAY_AUTOMATABLE_TYPES.includes(b.t) || !b.target) continue;
+    if (b.done || !BUSY_DAY_AUTOMATABLE_TYPES.includes(b.t) || !b.target) continue;
     const minLv = b.minLv || 1, maxLv = b.maxLv || 999;
     if (G.p.lvl < minLv || G.p.lvl > maxLv) continue;
     const zi = findZoneIndexForTarget(b.target);
@@ -20605,7 +20611,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.129';
+const BUILD_ID = '2026-08-17.130';
 // =========================
 
 
