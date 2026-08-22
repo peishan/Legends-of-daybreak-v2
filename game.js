@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fixed: Season 2 cover-art reference updated from .jpg to .png)';
+const APP_VERSION = '2026-08-17 (Fixed: duplicate Session Log nav entry; auto-export removed entirely, back to manual-only)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -98,27 +98,16 @@ const ELIXIR_BUNDLE_ITEMS = [
 // ever risking the localStorage quota problem fixed earlier. Lives only as long as the
 // tab stays open; resets on reload. That's the actual point — it exists specifically
 // for the "I left this running all night, what did I miss" case.
+// Manual export only — auto-export previously triggered here got stuck firing on every
+// single log line once the buffer hit its cap, flooding hundreds of unwanted .md
+// downloads. Rather than just patching that bug, auto-export is removed entirely per
+// request; the Export button on the Session Log screen still works exactly the same,
+// it just never fires on its own anymore.
 let sessionLog = [];
-let sessionLogSinceExport = 0; // separate counter, deliberately NOT sessionLog.length
 const SESSION_LOG_MAX = 5000; // generous but bounded, since this is memory not storage
-const SESSION_LOG_AUTOEXPORT_INTERVAL = 500; // triggers a real download roughly every 500 entries
 function logToSession(text, category) {
   sessionLog.push({ text, category: category || 'general', t: Date.now() });
   if (sessionLog.length > SESSION_LOG_MAX) sessionLog.shift();
-  // Auto-export checkpoint — the closest a browser sandbox can get to "auto save":
-  // triggers a real download automatically rather than requiring you to remember to
-  // click anything, without needing to poll on a timer.
-  // MUST use a separate counter, not sessionLog.length — once the array hits its
-  // SESSION_LOG_MAX cap, every further push is offset by a shift(), so length gets
-  // permanently stuck at exactly 5000 forever after. Since 5000 is itself a multiple
-  // of 500, checking length % 500 === 0 became permanently true the moment the cap
-  // was reached, firing a download on every single subsequent log line instead of
-  // every 500th — this is what caused the runaway hundreds of .md downloads.
-  sessionLogSinceExport++;
-  if (sessionLogSinceExport >= SESSION_LOG_AUTOEXPORT_INTERVAL) {
-    sessionLogSinceExport = 0;
-    autoExportSessionLog();
-  }
 }
 function detectLogCategory(msg) {
   if (msg.includes('💜 Lovetalk: ')) return 'lovetalk';
@@ -147,9 +136,6 @@ function exportSessionLogToMd(category) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-}
-function autoExportSessionLog() {
-  exportSessionLogToMd(null);
 }
 
 const G = {
@@ -20619,7 +20605,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.128';
+const BUILD_ID = '2026-08-17.129';
 // =========================
 
 
@@ -26713,7 +26699,6 @@ function rMenu(){
     {i:'📜',l:'The Story So Far',d:'Cover art and the cast, season by season',a:'story_so_far'},
     {i:'📱',l:'The Cellphone',d:'Recovered selfies and old message threads',a:'cellphone'},
     {i:'💜',l:'Relationships',d:'Every Lovetalk and Family Ties stage, reread anytime',a:'relationships'},
-    {i:'📝',l:'Session Log',d:'Everything since this tab opened, filterable, exportable to .md',a:'session_log'},
     {i:'📝',l:'Session Log',d:'Everything since this tab opened, filterable, exportable to .md',a:'session_log'},
   ];
   const sections=[
