@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (URGENT FIX: Session Log auto-export got stuck firing on every log line \u2014 was downloading hundreds of .md files; Guild Contracts level-range bug also fixed)';
+const APP_VERSION = '2026-08-17 (Fixed: Season 2 cover-art reference updated from .jpg to .png)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -20619,7 +20619,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.127';
+const BUILD_ID = '2026-08-17.128';
 // =========================
 
 
@@ -27248,7 +27248,7 @@ const STORY_SO_FAR_ART = {
   seriesCover: 'cover-series.png',
   season1Cover: 'cover-season1.jpg',
   season1Glossary: 'glossary-season1-part1.jpg',
-  season2Cover: 'cover-season2.jpg',
+  season2Cover: 'cover-season2.png',
   season2Glossary: 'glossary-season2-allies.jpg'
 };
 
