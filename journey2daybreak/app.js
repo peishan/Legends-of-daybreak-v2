@@ -11,18 +11,20 @@ const chapterCover = 'assets/hero/hero-ch1.jpg';
 
 // ---------------------------------------------------------------------------
 // PARTY — full roster with the chapter each member joins on. San is always
-// active. Mezstorm/Senedra/Zaki don't have final portrait art yet, so they
-// use a placeholder card (initial + "PORTRAIT PENDING") — swap the files in
-// assets/portraits/ whenever art is ready, nothing else needs to change.
+// active. Ser Aldric and Sister Wren are Season Two allies — join chapters
+// are placeholders (999 = "not yet in Season One's range") until you tell me
+// which chapter unlocks them.
 // ---------------------------------------------------------------------------
 const ALL_PARTY = [
-  {id:'san',      name:'SAN',      role:'Sorcerer',            hp:82, joinChapter:0,  portrait:'assets/portraits/san.jpg'},
-  {id:'joel',     name:'JOEL',     role:'Paladin',              hp:95, joinChapter:3,  portrait:'assets/portraits/joel.jpg'},
-  {id:'aisyah',   name:'AISYAH',   role:'Rogue / Merchant',     hp:74, joinChapter:4,  portrait:'assets/portraits/aisyah.jpg'},
-  {id:'eliz',     name:'ELIZ',     role:'Healer',               hp:68, joinChapter:6,  portrait:'assets/portraits/eliz.jpg'},
-  {id:'mezstorm', name:'MEZSTORM', role:'Stormsinger',          hp:80, joinChapter:7,  portrait:'assets/portraits/mezstorm.jpg'},
-  {id:'senedra',  name:'SENEDRA',  role:'Companion',            hp:70, joinChapter:11, portrait:'assets/portraits/senedra.jpg'},
-  {id:'zaki',     name:'ZAKI',     role:'Companion',            hp:70, joinChapter:11, portrait:'assets/portraits/zaki.jpg'}
+  {id:'san',        name:'SAN',        role:'Sorcerer',            hp:82, joinChapter:0,   portrait:'assets/portraits/san.jpg'},
+  {id:'joel',       name:'JOEL',       role:'Paladin',             hp:95, joinChapter:3,   portrait:'assets/portraits/joel.jpg'},
+  {id:'aisyah',     name:'AISYAH',     role:'Rogue / Merchant',    hp:74, joinChapter:4,   portrait:'assets/portraits/aisyah.jpg'},
+  {id:'eliz',       name:'ELIZ',       role:'Healer',              hp:68, joinChapter:6,   portrait:'assets/portraits/eliz.jpg'},
+  {id:'mezstorm',   name:'MEZSTORM',   role:'Storm Mage',          hp:80, joinChapter:7,   portrait:'assets/portraits/mezstorm.jpg'},
+  {id:'senedra',    name:'SENEDRA',    role:'Scout',               hp:70, joinChapter:11,  portrait:'assets/portraits/senedra.jpg'},
+  {id:'zaki',       name:'ZAKI',       role:'Fighter',             hp:78, joinChapter:11,  portrait:'assets/portraits/zaki.jpg'},
+  {id:'ser_aldric', name:'SER ALDRIC', role:'Knight',              hp:90, joinChapter:73, portrait:'assets/portraits/ser_aldric.jpg'},
+  {id:'sister_wren',name:'SISTER WREN',role:'Healer',              hp:72, joinChapter:74, portrait:'assets/portraits/sister_wren.jpg'}
 ];
 function getActiveParty(){ return ALL_PARTY.filter(m => STATE.completed >= m.joinChapter); }
 function getRecentJoins(){ return ALL_PARTY.filter(m => m.joinChapter === STATE.completed && m.joinChapter > 0); }
