@@ -94,6 +94,8 @@ const STATE = {
   readChapters: [],   // chapter IDs actually opened via the reader — gates Battle
   consumables: {},     // {potionId: count}
   battleItemMenuOpen: false,
+  defending: {},        // {memberId: true} — halves the boss's next hit on them, consumed on use
+  partyStatus: {},      // {memberId: 'diseased'} — inflicted by some boss hits, blocks regen until cured
   journalPage: null
 };
 
@@ -108,7 +110,7 @@ function getSavePayload(){
       frontierBossCooldownUntil: STATE.frontierBossCooldownUntil, frontierCurrentBoss: STATE.frontierCurrentBoss,
       bounties: STATE.bounties, bountyDay: STATE.bountyDay,
       chaptersReadToday: STATE.chaptersReadToday, chaptersReadDay: STATE.chaptersReadDay,
-      readChapters: STATE.readChapters, consumables: STATE.consumables
+      readChapters: STATE.readChapters, consumables: STATE.consumables, partyStatus: STATE.partyStatus
     }
   };
 }
@@ -315,6 +317,7 @@ function applyRegen(){
   if(minutesAway <= 0) return;
   const rate = 0.015 * minutesAway; // fraction of max HP/MP restored
   getActiveParty().forEach(m=>{
+    if(STATE.partyStatus[m.id]==='diseased') return; // no natural recovery while diseased
     const hp = STATE.partyHp[m.id] != null ? STATE.partyHp[m.id] : m.hp;
     const mp = STATE.partyMp[m.id] != null ? STATE.partyMp[m.id] : m.mp;
     if(hp > 0) STATE.partyHp[m.id] = Math.min(m.hp, Math.round(hp + m.hp*rate));
@@ -346,6 +349,54 @@ function logCombat(line){
   if(STATE.combatLogBossId !== currentBossId()){ STATE.combatLog = []; STATE.combatLogBossId = currentBossId(); }
   STATE.combatLog.push(line);
   if(STATE.combatLog.length > 200) STATE.combatLog.shift();
+}
+// ---------------------------------------------------------------------------
+// BOSS COUNTER-ATTACK — previously combat was one-directional (you hit the
+// boss, it just sat there), which made healing spells, potions, DEFEND, and
+// Temple's Resurrect all systems with nothing to actually respond to. Damage
+// scales gently and caps out so it's meaningful without one-shotting anyone,
+// since party max HP doesn't scale with level.
+// ---------------------------------------------------------------------------
+function bossAttackDamage(boss){
+  return Math.round(10 + Math.min(35, (boss.id-8)*0.4));
+}
+// Higher-tier bosses have a real, if modest, chance to inflict disease
+// alongside their hit — gives Cure Disease (Temple, Eliz's high-level skill)
+// and Purify (Eliz/Wren's skill) something to actually do. Ramps in gently
+// so early bosses (Bone Tyrant etc.) never inflict it.
+function diseaseChance(boss){ return Math.min(0.25, Math.max(0, (boss.id-30)*0.004)); }
+function bossCounterAttack(boss){
+  const hp = bossHpFor(boss.id);
+  if(hp<=0) return; // boss just died to the player's action — no counter
+  const party = getActiveParty().filter(m=>{
+    const h = STATE.partyHp[m.id]!=null?STATE.partyHp[m.id]:m.hp;
+    return h>0;
+  });
+  if(!party.length) return; // whole party down — nothing left to hit
+  const target = party[Math.floor(Math.random()*party.length)];
+  let dmg = bossAttackDamage(boss);
+  if(STATE.defending[target.id]){ dmg = Math.round(dmg*0.5); delete STATE.defending[target.id]; }
+  const cur = STATE.partyHp[target.id]!=null?STATE.partyHp[target.id]:target.hp;
+  const next = Math.max(0, cur-dmg);
+  STATE.partyHp[target.id] = next;
+  let diseaseNote = '';
+  if(next>0 && !STATE.partyStatus[target.id] && Math.random() < diseaseChance(boss)){
+    STATE.partyStatus[target.id] = 'diseased';
+    diseaseNote = ` <span style="color:#a8d98a">${esc(target.name)} has fallen ill.</span>`;
+  }
+  logCombat(`${esc(boss.name)} strikes ${esc(target.name)} for ${dmg} damage.${next===0?` <span style="color:#e08a8a">${esc(target.name)} has fallen.</span>`:diseaseNote}`);
+}
+function advanceTurnSkippingFallen(party){
+  let next = (STATE.turn+1)%Math.max(1,party.length);
+  let checked = 0;
+  while(checked < party.length){
+    const m = party[next];
+    const hp = m && (STATE.partyHp[m.id]!=null?STATE.partyHp[m.id]:m.hp);
+    if(!m || hp>0) break;
+    next = (next+1)%party.length;
+    checked++;
+  }
+  STATE.turn = next;
 }
 function chooseAutoAction(actor, party){
   const kit = kitFor(actor.id);
@@ -512,7 +563,7 @@ function partyScreen(){
   const active = getActiveParty();
   const locked = ALL_PARTY.filter(m=>!active.includes(m));
   return panel('Travelling Party','PARTY ROSTER',
-    `<div class="party-list">${active.map(m=>`<article class="party-row"><div class="portrait large"><img src="${m.portrait}" alt="${m.name}"></div><h3>${m.name}</h3><div class="role">${m.role}</div><div class="hp">Level ${level()} · ${m.hp} / ${m.hp} HP</div></article>`).join('')}</div>`+
+    `<div class="party-list">${active.map(m=>{const curHp=STATE.partyHp[m.id]!=null?STATE.partyHp[m.id]:m.hp;const diseased=STATE.partyStatus[m.id]==='diseased';const fallen=curHp<=0;return `<article class="party-row"><div class="portrait large"><img src="${m.portrait}" alt="${m.name}"></div><h3>${m.name}${diseased?' 🤢':''}${fallen?' ⚰️':''}</h3><div class="role">${m.role}</div><div class="hp">Level ${level()} · ${curHp} / ${m.hp} HP${fallen?' · FALLEN':diseased?' · DISEASED':''}</div></article>`;}).join('')}</div>`+
     (locked.length?`<h3 style="font-family:Cinzel;color:#8f7aa8;margin:22px 0 10px;font-size:15px">NOT YET JOINED</h3><div class="party-list">${locked.map(m=>`<article class="party-row" style="opacity:.5"><div class="portrait large"><img src="${m.portrait}" alt="${m.name}"></div><h3>${m.name}</h3><div class="role">${m.role}</div><div class="hp">${m.joinLevel?`Awakens at Level ${m.joinLevel} (currently Lv.${level()})`:`Joins at Chapter ${m.joinChapter}`}</div></article>`).join('')}</div>`:''),
     navButton('Dashboard'));
 }
@@ -796,7 +847,7 @@ function battleScreen(){
     const mode = m.id==='san' ? null : (STATE.companionMode[m.id] || 'assisted');
     html += `<div class="battle-member ${isCurrent?'active-turn':''} ${isDead?'dead':''}">`;
     html += `<div class="battle-member-avatar">${safeImg(m.portrait,m.name)}</div>`;
-    html += `<div class="battle-member-name">${esc(m.name)}</div>`;
+    html += `<div class="battle-member-name">${esc(m.name)}${STATE.partyStatus[m.id]==='diseased'?' 🤢':''}</div>`;
     html += `<div class="battle-member-role">${esc(m.role)}</div>`;
     html += `<div class="battle-hp-bar"><div class="battle-hp-fill" style="width:${hpPct}%"></div></div>`;
     html += `<div class="battle-hp-text">HP: ${mhp}/${m.hp}</div>`;
@@ -857,6 +908,14 @@ function maybeAutoActCompanion(){
   const party = getActiveParty();
   const cur = party[STATE.turn];
   if(!cur || cur.id==='san') return;
+  const curHp = STATE.partyHp[cur.id]!=null?STATE.partyHp[cur.id]:cur.hp;
+  if(curHp<=0){
+    const anyoneAlive = party.some(m=>(STATE.partyHp[m.id]!=null?STATE.partyHp[m.id]:m.hp)>0);
+    if(!anyoneAlive) return; // full party down — nothing to advance to, stop here
+    advanceTurnSkippingFallen(party);
+    go('Battle');
+    return;
+  }
   const mode = STATE.companionMode[cur.id] || 'assisted';
   if(mode !== 'assisted') return;
   const boss = bossFor(currentBossId());
@@ -914,13 +973,22 @@ function battleAction(a){
     const useHigh = kit.highSkill && level() >= kit.highSkill.levelReq;
     const chosenSkill = useHigh ? kit.highSkill : kit.skill;
     if(curMp < chosenSkill.mp){ logCombat(`${esc(actor.name)} doesn't have enough MP for ${chosenSkill.name} — attacks instead.`); dealDamage(baseDmg,'attacks'); }
+    else if(chosenSkill.effect==='cleanse'){
+      spendMp(chosenSkill.mp);
+      const diseased = Object.keys(STATE.partyStatus).filter(id=>STATE.partyStatus[id]==='diseased');
+      diseased.forEach(id=>delete STATE.partyStatus[id]);
+      logCombat(diseased.length
+        ? `${esc(actor.name)} uses ${chosenSkill.icon} ${esc(chosenSkill.name)}, curing ${diseased.length} afflicted part${diseased.length===1?'y member':'y members'}.`
+        : `${esc(actor.name)} uses ${chosenSkill.icon} ${esc(chosenSkill.name)} — no one was afflicted.`);
+    }
     else {
       spendMp(chosenSkill.mp);
       if(chosenSkill.mult) dealDamage(Math.round(baseDmg*chosenSkill.mult), `uses ${chosenSkill.icon} ${esc(chosenSkill.name)}`);
       else logCombat(`${esc(actor.name)} uses ${chosenSkill.icon} ${esc(chosenSkill.name)}.`);
     }
   } else if(a==='DEFEND'){
-    logCombat(`${esc(actor.name)} braces to defend.`);
+    STATE.defending[actor.id] = true;
+    logCombat(`${esc(actor.name)} braces to defend — the next hit against them will be halved.`);
   } else if(a==='ITEM'){
     toggleBattleItemMenu();
     return;
@@ -951,7 +1019,9 @@ function battleAction(a){
       go('Battle');
     }
   } else {
-    STATE.turn=(STATE.turn+1)%Math.max(1,party.length);
+    bossCounterAttack(boss);
+    save();
+    advanceTurnSkippingFallen(party);
     setTimeout(()=>go('Battle'),250);
   }
 }
