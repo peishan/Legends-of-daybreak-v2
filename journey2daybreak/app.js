@@ -24,9 +24,12 @@ const ALL_PARTY = [
   {id:'senedra',    name:'SENEDRA',    role:'Scout',               hp:70, mp:55,  joinChapter:11,  portrait:'assets/portraits/senedra.jpg'},
   {id:'zaki',       name:'ZAKI',       role:'Fighter',             hp:88, mp:35,  joinChapter:11,  portrait:'assets/portraits/zaki.jpg'},
   {id:'ser_aldric', name:'SER ALDRIC', role:'Knight',              hp:90, mp:45,  joinChapter:73,  portrait:'assets/portraits/ser_aldric.jpg'},
-  {id:'sister_wren',name:'SISTER WREN',role:'Healer',              hp:72, mp:100, joinChapter:74,  portrait:'assets/portraits/sister_wren.jpg'}
+  {id:'sister_wren',name:'SISTER WREN',role:'Healer',              hp:72, mp:100, joinChapter:74,  portrait:'assets/portraits/sister_wren.jpg'},
+  {id:'soel',       name:'SOEL',       role:'Spiritual Familiar',  hp:50, mp:80,  joinChapter:0, joinLevel:10, portrait:'assets/portraits/soel.jpg'}
 ];
-function getActiveParty(){ return ALL_PARTY.filter(m => STATE.completed >= m.joinChapter); }
+// Soel unlocks by LEVEL, not story chapter — everyone else uses joinChapter.
+function memberUnlocked(m){ return m.joinLevel ? level() >= m.joinLevel : STATE.completed >= m.joinChapter; }
+function getActiveParty(){ return ALL_PARTY.filter(memberUnlocked); }
 function getRecentJoins(){ return ALL_PARTY.filter(m => m.joinChapter === STATE.completed && m.joinChapter > 0); }
 
 // CHAPTERS comes from chapters-data.js. Full archive now drives progression —
@@ -55,6 +58,7 @@ function xpForChapter(c){
   return 800 + (c.id-8) * 120;
 }
 function bossReward(c){ return 1500 + c.id * 60; }
+function goldReward(c){ return 50 + c.id * 8; }
 
 // ---------------------------------------------------------------------------
 // SAVE / RECOVERY — consolidated single-key save (was 5 separate localStorage
@@ -79,6 +83,15 @@ const STATE = {
   companionMode: {},   // {memberId: 'assisted'|'manual'} — San is always manual, not stored here
   combatLog: [],        // persists across re-renders instead of resetting to one line
   combatLogBossId: null,
+  gold: 100,
+  lastRegenAt: Date.now(),
+  frontierBossCooldownUntil: 0,
+  frontierCurrentBoss: null,
+  bounties: [],
+  bountyDay: null,
+  chaptersReadToday: 0,
+  chaptersReadDay: null,
+  readChapters: [],   // chapter IDs actually opened via the reader — gates Battle
   journalPage: null
 };
 
@@ -89,7 +102,11 @@ function getSavePayload(){
     state: {
       completed: STATE.completed, xp: STATE.xp, bossHp: STATE.bossHp,
       partyHp: STATE.partyHp, partyMp: STATE.partyMp, inventory: STATE.inventory,
-      companionMode: STATE.companionMode
+      companionMode: STATE.companionMode, gold: STATE.gold, lastRegenAt: STATE.lastRegenAt,
+      frontierBossCooldownUntil: STATE.frontierBossCooldownUntil, frontierCurrentBoss: STATE.frontierCurrentBoss,
+      bounties: STATE.bounties, bountyDay: STATE.bountyDay,
+      chaptersReadToday: STATE.chaptersReadToday, chaptersReadDay: STATE.chaptersReadDay,
+      readChapters: STATE.readChapters
     }
   };
 }
@@ -108,7 +125,11 @@ function loadGame(){
     const raw = localStorage.getItem(SAVE_KEY);
     if (raw) {
       const data = JSON.parse(raw);
-      if (data && data.state) { Object.assign(STATE, data.state); return true; }
+      if (data && data.state) {
+        Object.assign(STATE, data.state);
+        backfillReadChapters();
+        return true;
+      }
     }
   } catch(e) { console.warn('Save could not be read, checking legacy keys:', e); }
   // One-time migration from the old per-field keys, if present.
@@ -119,10 +140,19 @@ function loadGame(){
     try { STATE.bossHp = JSON.parse(localStorage.getItem('daybreak_v7_bosshp') || '{}'); } catch(e) {}
     try { STATE.partyHp = JSON.parse(localStorage.getItem('daybreak_v7_partyhp') || '{}'); } catch(e) {}
     try { STATE.partyMp = JSON.parse(localStorage.getItem('daybreak_v7_partymp') || '{}'); } catch(e) {}
+    backfillReadChapters();
     save();
     return true;
   }
   return false;
+}
+// Existing saves predate STATE.readChapters — assume every chapter up through
+// STATE.completed was legitimately reached, so this fix doesn't retroactively
+// lock anyone out of a boss they've already progressed past.
+function backfillReadChapters(){
+  if(STATE.readChapters && STATE.readChapters.length) return;
+  STATE.readChapters = [];
+  for(let i=1;i<=STATE.completed;i++) STATE.readChapters.push(i);
 }
 function restoreRecoverySave(){
   const raw = localStorage.getItem(RECOVERY_KEY);
@@ -166,6 +196,8 @@ function importSave(event){
   reader.readAsText(file);
 }
 loadGame();
+applyRegen();
+save();
 
 // ---------------------------------------------------------------------------
 // BOSSES — Bone Tyrant has dedicated encounter art; the rest (extracted from
@@ -200,6 +232,28 @@ function bossHpFor(id){ const b=bossFor(id); if(!b) return 0; return (id in STAT
 function setBossHp(id, val){ STATE.bossHp[id]=Math.max(0,val); save(); }
 
 // ---------------------------------------------------------------------------
+// OUT-OF-COMBAT REGEN — didn't exist in the codex project either (checked),
+// so this is a new addition rather than a port. 1.5% of max HP/MP per minute
+// away from the app, capped at 24h of accumulated time so a month-old save
+// doesn't come back at full health instantly. Runs both on load (catches up
+// time away between sessions) and on the 30s autosave tick (small trickle
+// while the app is open but not in Battle).
+// ---------------------------------------------------------------------------
+function applyRegen(){
+  const now = Date.now();
+  const minutesAway = Math.min(24*60, Math.max(0, (now - (STATE.lastRegenAt||now)) / 60000));
+  STATE.lastRegenAt = now;
+  if(minutesAway <= 0) return;
+  const rate = 0.015 * minutesAway; // fraction of max HP/MP restored
+  getActiveParty().forEach(m=>{
+    const hp = STATE.partyHp[m.id] != null ? STATE.partyHp[m.id] : m.hp;
+    const mp = STATE.partyMp[m.id] != null ? STATE.partyMp[m.id] : m.mp;
+    if(hp > 0) STATE.partyHp[m.id] = Math.min(m.hp, Math.round(hp + m.hp*rate));
+    STATE.partyMp[m.id] = Math.min(m.mp, Math.round(mp + m.mp*rate));
+  });
+}
+
+// ---------------------------------------------------------------------------
 // CLASS KITS — real per-character spells/skills instead of a generic SPELL
 // button. Also drives assisted-AI so a Storm Mage actually casts instead of
 // always swinging a weapon it doesn't have. Eliz's Cure Disease unlocks at
@@ -215,7 +269,8 @@ const CLASS_KIT = {
   senedra:     {role:'ranged', spell:null, skill:{name:"Hunter's Mark", icon:'🎯', mp:8, effect:'mark'}},
   zaki:        {role:'melee',  spell:null, skill:{name:'Power Strike', icon:'💥', mp:10, mult:1.5}},
   ser_aldric:  {role:'tank',   spell:null, skill:{name:'Holy Strike', icon:'✝️', mp:10, mult:1.4}},
-  sister_wren: {role:'healer', spell:{name:'Blessing of Faith', icon:'🙏', mp:12, healMult:1.1}, skill:{name:'Purify', icon:'🌿', mp:15, effect:'cleanse'}}
+  sister_wren: {role:'healer', spell:{name:'Blessing of Faith', icon:'🙏', mp:12, healMult:1.1}, skill:{name:'Purify', icon:'🌿', mp:15, effect:'cleanse'}},
+  soel:        {role:'caster', spell:{name:"Nine Lives' Ward", icon:'🐾', mp:20, healMult:0.6}, skill:{name:'Lucky Pounce', icon:'✨', mp:8, mult:1.3}}
 };
 function kitFor(id){ return CLASS_KIT[id] || {role:'melee', spell:null, skill:null}; }
 function logCombat(line){
@@ -281,10 +336,10 @@ function awardBossLoot(chapterId, bossName){
 
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(msg){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),1800)}
-function refreshTopbar(){const stats=topbar.querySelectorAll('.stat');const lvl=level();const prev=xpThreshold(lvl-1),next=xpThreshold(lvl);if(stats[0])stats[0].querySelector('.big').textContent=lvl;if(stats[1]){stats[1].querySelector('.num').textContent=`${STATE.xp.toLocaleString()} / ${next.toLocaleString()}`;stats[1].querySelector('.fill').style.width=`${Math.min(100,(STATE.xp-prev)/Math.max(1,next-prev)*100)}%`;}if(stats[2]){stats[2].querySelector('.num').textContent='82 / 82';}if(stats[3]){stats[3].querySelector('.num').textContent='64 / 100';}}
+function refreshTopbar(){const stats=topbar.querySelectorAll('.stat');const lvl=level();const prev=xpThreshold(lvl-1),next=xpThreshold(lvl);if(stats[0])stats[0].querySelector('.big').textContent=lvl;if(stats[1]){stats[1].querySelector('.num').textContent=`${STATE.xp.toLocaleString()} / ${next.toLocaleString()}`;stats[1].querySelector('.fill').style.width=`${Math.min(100,(STATE.xp-prev)/Math.max(1,next-prev)*100)}%`;}if(stats[2]){const san=getActiveParty().find(m=>m.id==='san');const shp=san?(STATE.partyHp['san']!=null?STATE.partyHp['san']:san.hp):82;const smax=san?san.hp:82;stats[2].querySelector('.num').textContent=`${shp} / ${smax}`;const bar=stats[2].querySelector('.fill');if(bar)bar.style.width=`${Math.max(0,Math.min(100,shp/smax*100))}%`;}if(stats[3]){stats[3].querySelector('.num').textContent=STATE.gold.toLocaleString();}}
 function go(name){if(name!=='Battle')clearAutoActTimer();document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.name===name));render(name);window.scrollTo({top:0,behavior:'smooth'})}
 
-function render(name){refreshTopbar();document.querySelectorAll('.soel').forEach(e=>e.remove());let body='';if(name==='Dashboard')body=dashboard();if(name==='Journal')body=journalScreen();if(name==='Quests')body=questsScreen();if(name==='Party')body=partyScreen();if(name==='Spellbook')body=spellbookScreen();if(name==='Inventory')body=inventoryScreen();if(name==='Codex')body=codexScreen();if(name==='Battle')body=battleScreen();main.innerHTML=topbar.outerHTML+body+`<div id="toast" class="toast"></div>`;if(name!=='Battle'){const soel=document.createElement('div');soel.className='soel';soel.innerHTML=`<img src="${soelSrc}"><div class="lock"><b>SOEL</b><small>LOCKED<br/>Awakens at Level 10 🔒</small></div>`;document.querySelector('.app').appendChild(soel)}bind();if(name==='Battle'){const cl=document.getElementById('combatLog');if(cl)cl.scrollTop=cl.scrollHeight;}}
+function render(name){refreshTopbar();document.querySelectorAll('.soel').forEach(e=>e.remove());let body='';if(name==='Dashboard')body=dashboard();if(name==='Journal')body=journalScreen();if(name==='Quests')body=questsScreen();if(name==='Party')body=partyScreen();if(name==='Spellbook')body=spellbookScreen();if(name==='Inventory')body=inventoryScreen();if(name==='Codex')body=codexScreen();if(name==='Battle')body=battleScreen();if(name==='Temple')body=templeScreen();if(name==='Frontier')body=frontierScreen();main.innerHTML=topbar.outerHTML+body+`<div id="toast" class="toast"></div>`;if(name!=='Battle'){const soel=document.createElement('div');soel.className='soel';const soelUnlocked=level()>=10;soel.innerHTML=soelUnlocked?`<img src="${soelSrc}"><div class="lock" style="border-color:#68b58b"><b>SOEL</b><small>AWAKENED ✧<br/>In your active party</small></div>`:`<img src="${soelSrc}"><div class="lock"><b>SOEL</b><small>LOCKED<br/>Awakens at Level 10 🔒</small></div>`;document.querySelector('.app').appendChild(soel)}bind();if(name==='Battle'){const cl=document.getElementById('combatLog');if(cl)cl.scrollTop=cl.scrollHeight;}}
 
 function bind(){
   document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
@@ -347,6 +402,7 @@ function openChapter(id){
   const c = chapterData.find(ch=>ch.id===id);
   if(!c || id>STATE.completed+1) return toast('Complete the previous chapter first');
   STATE.current=id;
+  if(!STATE.readChapters.includes(id)){ STATE.readChapters.push(id); save(); }
   main.innerHTML = topbar.outerHTML + readerHTML(c);
   document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
   window.scrollTo({top:0,behavior:'smooth'});
@@ -356,11 +412,15 @@ function completeChapter(id){
   const c = chapterData.find(ch=>ch.id===id);
   if(c.boss) return toast("Defeat this chapter's boss in Battle to complete it");
   const reward = xpForChapter(c);
+  const gold = Math.round(goldReward(c)*0.4);
   STATE.xp += reward;
+  STATE.gold += gold;
   STATE.completed = id;
+  STATE.chaptersReadToday++;
+  checkBountyProgress('read_chapters', null, 1);
   save();
   const joins = getRecentJoins();
-  toast(`Chapter ${id} complete · +${reward} XP${joins.length?` · ${joins.map(j=>j.name).join(' & ')} joined!`:''}`);
+  toast(`Chapter ${id} complete · +${reward} XP · +${gold}g${joins.length?` · ${joins.map(j=>j.name).join(' & ')} joined!`:''}`);
   setTimeout(()=>go('Journal'), 350);
 }
 function nextChapter(id){ if(id>=chapterData.length) return go('Journal'); openChapter(id+1); }
@@ -372,7 +432,9 @@ function questsScreen(){
   return panel('Quests','STORY OBJECTIVES',
     `<div class="quest-list"><article class="quest active"><div class="mini-ico">▤</div><div><h3>${isBoss?`${c.bossName||c.title} — Chapter ${c.id}`:`Read Chapter ${c.id}: ${esc(c.title)}`}</h3><p>${isBoss?"Read the chapter, then enter the battle to defeat this boss.":'Continue the journal progression. Completing the chapter grants Story XP and advances the party.'}</p><b>REWARD · ${isBoss?'BOSS CLEAR + STORY REWARD':`${xpForChapter(c).toLocaleString()} XP`}</b></div><button class="small-btn primary" data-quest="${c.id}">${isBoss?'READ CHAPTER':'OPEN JOURNAL'}</button></article>`+
     (boss?`<article class="quest"><div class="mini-ico">☠</div><div><h3>${boss.name}</h3><p>Chapter ${boss.id} · Major Encounter · AC ${boss.ac}.</p><b>${STATE.completed>=boss.id?'DEFEATED':STATE.completed>=boss.id-1?'READY · MAJOR ENCOUNTER':'LOCKED · CONTINUE THE JOURNAL'}</b></div><button class="small-btn" data-go="Battle">${STATE.completed>=boss.id-1?'BATTLE':'VIEW'}</button></article>`:'')+
-    `<article class="quest locked"><div class="mini-ico">🐾</div><div><h3>Awaken Soel</h3><p>Soel develops as a spiritual familiar before joining the active party.</p><b>LOCKED · LEVEL 10</b></div></article></div><div class="flow"><div class="flow-step"><strong>ACCEPT QUEST</strong><p>Choose the current story objective.</p></div><div class="flow-arrow">›</div><div class="flow-step"><strong>READ JOURNAL</strong><p>Experience the comic and scenes.</p></div><div class="flow-arrow">›</div><div class="flow-step"><strong>COMPLETE CHAPTER</strong><p>Receive Story XP.</p></div><div class="flow-arrow">›</div><div class="flow-step"><strong>LEVEL UP</strong><p>Progress toward the next gate.</p></div><div class="flow-arrow">›</div><div class="flow-step"><strong>BOSS ENCOUNTER</strong><p>Defeat this arc's boss.</p></div></div>`,
+    `<article class="quest locked"><div class="mini-ico">🐾</div><div><h3>Awaken Soel</h3><p>Soel develops as a spiritual familiar before joining the active party.</p><b>LOCKED · LEVEL 10</b></div></article></div>`+
+    bountyBoardHTML()+
+    `<div class="flow"><div class="flow-step"><strong>ACCEPT QUEST</strong><p>Choose the current story objective.</p></div><div class="flow-arrow">›</div><div class="flow-step"><strong>READ JOURNAL</strong><p>Experience the comic and scenes.</p></div><div class="flow-arrow">›</div><div class="flow-step"><strong>COMPLETE CHAPTER</strong><p>Receive Story XP.</p></div><div class="flow-arrow">›</div><div class="flow-step"><strong>LEVEL UP</strong><p>Progress toward the next gate.</p></div><div class="flow-arrow">›</div><div class="flow-step"><strong>BOSS ENCOUNTER</strong><p>Defeat this arc's boss.</p></div></div>`,
     navButton('Dashboard')+navButton('Journal'));
 }
 function handleQuest(arg){ if(arg==='battle') return go('Battle'); openChapter(Number(arg)); }
@@ -382,8 +444,7 @@ function partyScreen(){
   const locked = ALL_PARTY.filter(m=>!active.includes(m));
   return panel('Travelling Party','PARTY ROSTER',
     `<div class="party-list">${active.map(m=>`<article class="party-row"><div class="portrait large"><img src="${m.portrait}" alt="${m.name}"></div><h3>${m.name}</h3><div class="role">${m.role}</div><div class="hp">Level ${level()} · ${m.hp} / ${m.hp} HP</div></article>`).join('')}</div>`+
-    (locked.length?`<h3 style="font-family:Cinzel;color:#8f7aa8;margin:22px 0 10px;font-size:15px">NOT YET JOINED</h3><div class="party-list">${locked.map(m=>`<article class="party-row" style="opacity:.5"><div class="portrait large"><img src="${m.portrait}" alt="${m.name}"></div><h3>${m.name}</h3><div class="role">${m.role}</div><div class="hp">Joins at Chapter ${m.joinChapter}</div></article>`).join('')}</div>`:'')+
-    `<div class="locked-banner">🐾 SOEL · SPIRITUAL FAMILIAR · LOCKED UNTIL LEVEL 10</div>`,
+    (locked.length?`<h3 style="font-family:Cinzel;color:#8f7aa8;margin:22px 0 10px;font-size:15px">NOT YET JOINED</h3><div class="party-list">${locked.map(m=>`<article class="party-row" style="opacity:.5"><div class="portrait large"><img src="${m.portrait}" alt="${m.name}"></div><h3>${m.name}</h3><div class="role">${m.role}</div><div class="hp">${m.joinLevel?`Awakens at Level ${m.joinLevel} (currently Lv.${level()})`:`Joins at Chapter ${m.joinChapter}`}</div></article>`).join('')}</div>`:''),
     navButton('Dashboard'));
 }
 function spellbookScreen(){
@@ -411,11 +472,202 @@ function inventoryScreen(){
 }
 function codexScreen(){return panel('Codex','WORLD & LORE',`<div class="chapter-grid">${['Aethon','Daybreak','Tomb of Kings','Bone Tyrant','Travelling Party','Spiritual Familiars'].map((x,i)=>`<article class="quest"><div class="mini-ico">${['✦','☼','♜','☠','♟','🐾'][i]}</div><div><h3>${x}</h3><p>World entry revealed through the Season One story.</p></div></article>`).join('')}</div>`,navButton('Dashboard'))}
 
+// ---------------------------------------------------------------------------
+// TEMPLE — Sister Wren's service, unlocked once she's joined (Chapter 74).
+// Resurrect brings a fallen party member back at partial HP; Cure Disease
+// clears any status ailment. Both cost gold, scaling gently with level so
+// they don't trivialize deaths at high level but stay cheap early on.
+// ---------------------------------------------------------------------------
+function templeUnlocked(){ return STATE.completed >= 74; }
+function resurrectCost(){ return 80 + level()*6; }
+function cureDiseaseCost(){ return 40 + level()*3; }
+function templeScreen(){
+  if(!templeUnlocked()){
+    return panel('Temple','SISTER WREN\'S SANCTUM',
+      `<p class="lead">The Temple opens once Sister Wren has joined the party (Chapter 74). Keep reading the journal to unlock resurrection and disease-cure services here.</p>`,
+      navButton('Dashboard'));
+  }
+  const party = getActiveParty();
+  const fallen = party.filter(m => (STATE.partyHp[m.id]!=null?STATE.partyHp[m.id]:m.hp) <= 0);
+  const rCost = resurrectCost(), cCost = cureDiseaseCost();
+  const fallenHTML = fallen.length
+    ? fallen.map(m=>`<article class="quest"><div class="mini-ico">🌟</div><div><h3>${esc(m.name)}</h3><p>Fallen in battle. Resurrect restores them to 40% HP.</p></div><button class="small-btn primary" onclick="templeResurrect('${m.id}')" ${STATE.gold<rCost?'disabled':''}>${rCost}g</button></article>`).join('')
+    : `<article class="quest"><div class="mini-ico">✦</div><div><h3>No one has fallen</h3><p>Your party is standing. Resurrection isn't needed right now.</p></div></article>`;
+  return panel('Temple','SISTER WREN\'S SANCTUM',
+    `<p class="lead">Quiet, incense-lit, and always open to the party. Sister Wren's temple offers what the road can't.</p>
+     <h3 style="font-family:Cinzel;color:#c99aff;margin:18px 0 4px;font-size:16px">🌟 RESURRECTION</h3>
+     <div class="chapter-grid">${fallenHTML}</div>
+     <h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:16px">🌿 CURE DISEASE</h3>
+     <div class="chapter-grid"><article class="quest"><div class="mini-ico">🌿</div><div><h3>Cleanse the Party</h3><p>Removes any lingering status ailment from every active party member.</p></div><button class="small-btn primary" onclick="templeCureDisease()" ${STATE.gold<cCost?'disabled':''}>${cCost}g</button></article></div>
+     <div class="locked-banner" style="margin-top:18px">Gold: <b style="color:#eee">${STATE.gold.toLocaleString()}</b> · Earned from boss victories and completed chapters.</div>`,
+    navButton('Dashboard'));
+}
+function templeResurrect(id){
+  const cost = resurrectCost();
+  if(STATE.gold < cost) return toast('Not enough gold');
+  const m = ALL_PARTY.find(p=>p.id===id);
+  if(!m) return;
+  STATE.gold -= cost;
+  STATE.partyHp[id] = Math.round(m.hp * 0.4);
+  save();
+  toast(`${m.name} resurrected · -${cost}g`);
+  go('Temple');
+}
+function templeCureDisease(){
+  const cost = cureDiseaseCost();
+  if(STATE.gold < cost) return toast('Not enough gold');
+  STATE.gold -= cost;
+  STATE.partyStatus = {};
+  save();
+  toast(`Party cleansed · -${cost}g`);
+  go('Temple');
+}
+
+// ---------------------------------------------------------------------------
+// THE FRAYING FRONTIER — repeatable post-story zone, matching the pattern
+// from your codex project's "Unmapped Road" but using your own established
+// name for it. Regular tiered encounters plus a rotating rematch against any
+// boss you've already defeated (XP + gold only, no duplicate loot), with a
+// randomized cooldown between boss appearances.
+// ---------------------------------------------------------------------------
+const FRONTIER_REGULARS = [
+  {id:'frontier_wisp', name:'Fraying Wisp', icon:'✨', hp:420, xp:180, gold:40, desc:'A spark shaken loose from the edge of the story.'},
+  {id:'frontier_hound', name:'Rift Hound', icon:'🐺', hp:560, xp:230, gold:55, desc:'Follows the seams between finished and unfinished chapters.'},
+  {id:'frontier_sentinel', name:'Unwritten Sentinel', ico:'📖', icon:'📖', hp:760, xp:300, gold:75, desc:'Assembled from pages that haven\'t been drafted yet.'},
+  {id:'frontier_wraith', name:'Threshold Wraith', icon:'🌫️', hp:960, xp:380, gold:95, desc:'Lingers exactly on the border of what\'s known.'}
+];
+function frontierUnlocked(){ return STATE.completed >= 20; } // past the Nexus Planarch
+function frontierEligibleBosses(){ return BOSS_CHAPTERS.filter(b => STATE.completed >= b.id); }
+function ensureFrontierBoss(){
+  if(STATE.frontierCurrentBoss) return STATE.frontierCurrentBoss;
+  if(Date.now() < STATE.frontierBossCooldownUntil) return null;
+  const pool = frontierEligibleBosses();
+  if(!pool.length) return null;
+  const chosen = pool[Math.floor(Math.random()*pool.length)];
+  STATE.frontierCurrentBoss = chosen.id;
+  save();
+  return chosen.id;
+}
+function frontierScreen(){
+  if(!frontierUnlocked()){
+    return panel('The Fraying Frontier','ENDLESS ZONE',
+      `<p class="lead">The Frontier opens after Chapter 20 (the Nexus Planarch). Keep progressing the story to unlock repeatable encounters here.</p>`,
+      navButton('Dashboard'));
+  }
+  const bossId = ensureFrontierBoss();
+  const boss = bossId ? bossFor(bossId) : null;
+  let html = bountyBoardHTML();
+  html += `<p class="lead" style="margin-top:18px">High-level encounters roam here between the delayed return of bosses you've already faced. Regular fights and boss rematches grant XP and gold only — no loot duplication.</p>`;
+  html += `<h3 style="font-family:Cinzel;color:#c99aff;margin:18px 0 4px;font-size:16px">⚔️ REGULAR ENCOUNTERS</h3><div class="chapter-grid">`;
+  FRONTIER_REGULARS.forEach(e=>{
+    html += `<article class="quest"><div class="mini-ico">${e.icon}</div><div><h3>${esc(e.name)}</h3><p>${esc(e.desc)}</p><b>${e.hp} HP · ${e.xp} XP · ${e.gold}g</b></div><button class="small-btn primary" onclick="fightFrontierRegular('${e.id}')">FIGHT</button></article>`;
+  });
+  html += `</div>`;
+  if(boss){
+    html += `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:16px">👑 A BOSS HAS RETURNED</h3><div class="chapter-grid"><article class="quest"><div class="mini-ico">☠</div><div><h3>${esc(boss.name)}</h3><p>An earlier foe, drawn back through the Frontier.</p><b>${boss.hp.toLocaleString()} HP · ${bossReward(chapterData.find(c=>c.id===boss.id)).toLocaleString()} XP · ${goldReward(chapterData.find(c=>c.id===boss.id))}g</b></div><button class="small-btn primary" onclick="fightFrontierBoss()">FIGHT</button></article></div>`;
+  } else {
+    const remaining = Math.max(0, STATE.frontierBossCooldownUntil - Date.now());
+    const mins = Math.ceil(remaining/60000);
+    html += `<div class="locked-banner" style="margin-top:18px">🕰️ No boss present right now — the last one was defeated. Another will drift back through the Frontier in roughly ${mins} minute${mins===1?'':'s'}.</div>`;
+  }
+  html += `<div class="locked-banner" style="margin-top:18px">Gold: <b style="color:#eee">${STATE.gold.toLocaleString()}</b></div>`;
+  return panel('The Fraying Frontier','ENDLESS ZONE', html, navButton('Dashboard'));
+}
+function fightFrontierRegular(id){
+  const e = FRONTIER_REGULARS.find(x=>x.id===id);
+  if(!e) return;
+  STATE.xp += e.xp;
+  STATE.gold += e.gold;
+  checkBountyProgress('frontier_kill', id, 1);
+  save();
+  toast(`${e.name} defeated · +${e.xp} XP · +${e.gold}g`);
+  go('Frontier');
+}
+function fightFrontierBoss(){
+  if(!STATE.frontierCurrentBoss) return;
+  const boss = bossFor(STATE.frontierCurrentBoss);
+  const c = chapterData.find(ch=>ch.id===boss.id);
+  const xp = bossReward(c), gold = goldReward(c);
+  STATE.xp += xp;
+  STATE.gold += gold;
+  STATE.frontierCurrentBoss = null;
+  STATE.frontierBossCooldownUntil = Date.now() + (5+Math.random()*10)*60000; // 5-15 min
+  checkBountyProgress('frontier_boss', boss.name, 1);
+  save();
+  toast(`${boss.name} defeated again · +${xp} XP · +${gold}g`);
+  go('Frontier');
+}
+
+// ---------------------------------------------------------------------------
+// BOUNTY BOARD — adapted from your codex project's bounty system, but
+// re-fit to how Journey to Daybreak actually works: your story bosses are
+// mostly one-time fights, not repeatable "kill 5 Goblins" filler, so bounties
+// here draw from what IS repeatable (Frontier regulars, Frontier boss
+// rematches) plus a reading-pace bounty for chapters completed today. Up to
+// 3 active at once, refreshing once per real calendar day.
+// ---------------------------------------------------------------------------
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+function bountyPool(){
+  const pool = [];
+  FRONTIER_REGULARS.forEach(e=>{
+    pool.push({id:'bounty_kill_'+e.id, type:'frontier_kill', target:e.id, need:3,
+      name:`${e.name} Cull`, desc:`Defeat 3 ${e.name} in the Frontier.`, icon:e.icon,
+      rw:{xp:e.xp*2, gold:e.gold*2}});
+  });
+  if(frontierUnlocked()){
+    pool.push({id:'bounty_frontier_boss', type:'frontier_boss', target:null, need:1,
+      name:'Rematch Bounty', desc:`Defeat whichever boss the Frontier has drawn back today.`, icon:'👑',
+      rw:{xp:400, gold:150}});
+  }
+  pool.push({id:'bounty_read_1', type:'read_chapters', target:null, need:1,
+    name:'A Page Today', desc:'Complete 1 chapter today.', icon:'📖', rw:{xp:150, gold:30}});
+  pool.push({id:'bounty_read_3', type:'read_chapters', target:null, need:3,
+    name:'Deep in the Journal', desc:'Complete 3 chapters today.', icon:'📚', rw:{xp:500, gold:100}});
+  return pool;
+}
+function refreshBounties(){
+  const today = todayKey();
+  if(STATE.chaptersReadDay !== today){ STATE.chaptersReadToday = 0; STATE.chaptersReadDay = today; }
+  if(STATE.bountyDay === today && STATE.bounties.length) return;
+  const pool = bountyPool();
+  const shuffled = pool.map(b=>({...b,c:0,done:false})).sort(()=>Math.random()-0.5);
+  STATE.bounties = shuffled.slice(0, Math.min(3, shuffled.length));
+  STATE.bountyDay = today;
+  save();
+}
+function checkBountyProgress(type, target, amount){
+  refreshBounties();
+  STATE.bounties.forEach(b=>{
+    if(b.done || b.type!==type) return;
+    if(type==='frontier_kill' && b.target!==target) return;
+    b.c = Math.min(b.need, b.c + amount);
+    if(b.c >= b.need){
+      b.done = true;
+      STATE.xp += b.rw.xp;
+      STATE.gold += b.rw.gold;
+      toast(`💰 Bounty complete: ${b.name} · +${b.rw.xp} XP · +${b.rw.gold}g`);
+    }
+  });
+  save();
+}
+function bountyBoardHTML(){
+  refreshBounties();
+  return `<h3 style="font-family:Cinzel;color:#c99aff;margin:0 0 4px;font-size:16px">💰 BOUNTY BOARD</h3><p class="lead" style="margin-bottom:10px">Refreshes daily. Complete these alongside your normal progress for bonus XP and gold.</p><div class="chapter-grid">${STATE.bounties.map(b=>`<article class="quest ${b.done?'':'active'}"><div class="mini-ico">${b.icon}</div><div><h3>${esc(b.name)}</h3><p>${esc(b.desc)}</p><b>${b.done?'COMPLETE ✓':`${b.c}/${b.need} · ${b.rw.xp} XP + ${b.rw.gold}g`}</b></div></article>`).join('')}</div>`;
+}
+
+
 function battleScreen(){
   const bossId = currentBossId();
   const boss = bossFor(bossId);
   if(!boss) return panel('Battle','MAJOR ENCOUNTER','<p class="lead">No boss encounter available yet.</p>', navButton('Dashboard'));
   const locked = STATE.completed < boss.id-1;
+  const notYetRead = !locked && !STATE.readChapters.includes(boss.id);
+  if(notYetRead){
+    const c = chapterData.find(ch=>ch.id===boss.id);
+    return panel('Battle','MAJOR ENCOUNTER',
+      `<div class="locked-banner"><b>READ CHAPTER ${boss.id} FIRST</b><br>${esc(boss.name)}'s encounter follows the story in Chapter ${boss.id}: ${esc(c.title)}. Read it before entering battle.</div>`,
+      `<button class="cta" data-read="${boss.id}">READ CHAPTER ${boss.id} ›</button> ` + navButton('Dashboard'));
+  }
   const hp = bossHpFor(boss.id);
   const hpPercent = Math.max(0, Math.min(100, hp/boss.hp*100));
   const party = getActiveParty();
@@ -595,11 +847,14 @@ function battleAction(a){
   if(hp===0){
     logCombat(`<span style="color:#d5a1f4">${esc(boss.name)} defeated. Chapter ${boss.id} complete.</span>`);
     if(STATE.completed < boss.id){
-      STATE.xp += bossReward(chapterData.find(c=>c.id===boss.id));
+      const c = chapterData.find(c=>c.id===boss.id);
+      const gold = goldReward(c);
+      STATE.xp += bossReward(c);
+      STATE.gold += gold;
       STATE.completed = boss.id;
       const loot = awardBossLoot(boss.id, boss.name);
       save();
-      toast(loot ? `${boss.name} defeated! · ${loot.icon} ${loot.name} obtained` : `${boss.name} defeated!`);
+      toast(loot ? `${boss.name} defeated! · ${loot.icon} ${loot.name} · +${gold}g` : `${boss.name} defeated! +${gold}g`);
     } else {
       toast(`${boss.name} defeated!`);
     }
@@ -615,5 +870,5 @@ go('Dashboard');
 
 // Auto-save every 30s. Piggybacks on the same backup-then-verify save() used
 // everywhere else, so the recovery slot stays fresh too — no separate logic.
-setInterval(()=>{ save(); }, 30000);
+setInterval(()=>{ applyRegen(); save(); }, 30000);
 window.addEventListener('beforeunload', ()=>{ save(); });
