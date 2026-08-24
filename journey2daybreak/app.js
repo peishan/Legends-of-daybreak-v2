@@ -38,7 +38,16 @@ const chapterData = CHAPTERS;
 // Extended with the same formula (100 * n(n+1)/2) so it keeps climbing
 // smoothly past level 20 as more chapters are added, instead of hard-capping.
 // ---------------------------------------------------------------------------
-function xpThreshold(level){ return Math.round(100 * level * (level+1) / 2); }
+// Same table your codex project uses for levels 1-19 (so early-game leveling
+// feels identical across both apps), then the same tail formula beyond it
+// instead of a pure formula the whole way — matches game.js's codexXPThreshold.
+const XP_PER_LEVEL = [0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500, 5500, 6600, 7800, 9100, 10500, 12000, 13600, 15300, 17100, 19000];
+function xpThreshold(lvl){
+  if (lvl < XP_PER_LEVEL.length) return XP_PER_LEVEL[lvl] ?? 0;
+  let xp = XP_PER_LEVEL[XP_PER_LEVEL.length-1];
+  for (let l = XP_PER_LEVEL.length; l <= lvl; l++) xp += Math.round(900 + l*180);
+  return xp;
+}
 function level(){ let l=1; while(xpThreshold(l) <= STATE.xp) l++; return l; }
 function xpForChapter(c){
   if (c.reward) return c.reward;
@@ -47,17 +56,112 @@ function xpForChapter(c){
 }
 function bossReward(c){ return 1500 + c.id * 60; }
 
+// ---------------------------------------------------------------------------
+// SAVE / RECOVERY — consolidated single-key save (was 5 separate localStorage
+// keys with no backup). Before every save, the previous save is copied to a
+// recovery slot, the write is verified by reading it back, and export/import
+// let the whole save leave/enter the browser as a JSON file.
+// ---------------------------------------------------------------------------
+const SAVE_KEY = 'daybreak_v7_save';
+const RECOVERY_KEY = 'daybreak_v7_save_recovery';
+const SAVE_VERSION = 1;
+
 const STATE = {
-  completed: Number(localStorage.getItem('daybreak_v7_completed')||0),
-  xp: Number(localStorage.getItem('daybreak_v7_xp')||0),
+  completed: 0,
+  xp: 0,
   current: 0,
-  battleStarted:false,
-  turn:0,
-  bossHp: JSON.parse(localStorage.getItem('daybreak_v7_bosshp')||'{}'),
-  partyHp: JSON.parse(localStorage.getItem('daybreak_v7_partyhp')||'{}'),
-  partyMp: JSON.parse(localStorage.getItem('daybreak_v7_partymp')||'{}'),
+  battleStarted: false,
+  turn: 0,
+  bossHp: {},
+  partyHp: {},
+  partyMp: {},
+  inventory: [],       // earned boss loot: {id, name, icon, desc, fromChapter, fromBoss}
   journalPage: null
 };
+
+function getSavePayload(){
+  return {
+    version: SAVE_VERSION,
+    savedAt: new Date().toISOString(),
+    state: {
+      completed: STATE.completed, xp: STATE.xp, bossHp: STATE.bossHp,
+      partyHp: STATE.partyHp, partyMp: STATE.partyMp, inventory: STATE.inventory
+    }
+  };
+}
+function save(){
+  try {
+    const prevRaw = localStorage.getItem(SAVE_KEY);
+    if (prevRaw) localStorage.setItem(RECOVERY_KEY, prevRaw);
+    const payload = JSON.stringify(getSavePayload());
+    localStorage.setItem(SAVE_KEY, payload);
+    if (localStorage.getItem(SAVE_KEY) !== payload) { console.warn('Save verification failed'); return false; }
+    return true;
+  } catch(e) { console.warn('Save failed:', e); return false; }
+}
+function loadGame(){
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data && data.state) { Object.assign(STATE, data.state); return true; }
+    }
+  } catch(e) { console.warn('Save could not be read, checking legacy keys:', e); }
+  // One-time migration from the old per-field keys, if present.
+  const legacy = localStorage.getItem('daybreak_v7_completed');
+  if (legacy !== null) {
+    STATE.completed = Number(legacy) || 0;
+    STATE.xp = Number(localStorage.getItem('daybreak_v7_xp') || 0);
+    try { STATE.bossHp = JSON.parse(localStorage.getItem('daybreak_v7_bosshp') || '{}'); } catch(e) {}
+    try { STATE.partyHp = JSON.parse(localStorage.getItem('daybreak_v7_partyhp') || '{}'); } catch(e) {}
+    try { STATE.partyMp = JSON.parse(localStorage.getItem('daybreak_v7_partymp') || '{}'); } catch(e) {}
+    save();
+    return true;
+  }
+  return false;
+}
+function restoreRecoverySave(){
+  const raw = localStorage.getItem(RECOVERY_KEY);
+  if (!raw) return toast('No recovery save available');
+  try {
+    const data = JSON.parse(raw);
+    if (!data || !data.state) throw new Error('invalid');
+    Object.assign(STATE, data.state);
+    save();
+    toast('Recovery save restored');
+    go('Dashboard');
+  } catch(e) { toast('Recovery save could not be read'); }
+}
+function exportSave(){
+  const payload = getSavePayload();
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'daybreak-save-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast('Save exported');
+}
+function importSave(event){
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data || !data.state) throw new Error('Not a Daybreak save');
+      const prevRaw = localStorage.getItem(SAVE_KEY);
+      if (prevRaw) localStorage.setItem(RECOVERY_KEY, prevRaw);
+      Object.assign(STATE, data.state);
+      save();
+      toast('Save imported');
+      go('Dashboard');
+    } catch(e) { alert('That file could not be imported as a Daybreak save.'); }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+loadGame();
 
 // ---------------------------------------------------------------------------
 // BOSSES — Bone Tyrant has dedicated encounter art; the rest (extracted from
@@ -88,12 +192,52 @@ function currentBossId(){
   return next ? next.id : (BOSS_CHAPTERS.length ? BOSS_CHAPTERS[BOSS_CHAPTERS.length-1].id : null);
 }
 function bossHpFor(id){ const b=bossFor(id); if(!b) return 0; return (id in STATE.bossHp) ? STATE.bossHp[id] : b.hp; }
-function setBossHp(id, val){ STATE.bossHp[id]=Math.max(0,val); localStorage.setItem('daybreak_v7_bosshp', JSON.stringify(STATE.bossHp)); }
+function setBossHp(id, val){ STATE.bossHp[id]=Math.max(0,val); save(); }
+
+// ---------------------------------------------------------------------------
+// BOSS LOOT — one themed trophy per boss, awarded once on defeat. Themed by
+// the same fire/ice/storm/echo/etc. keyword matching used for the placeholder
+// art, so a loot drop's flavor matches its card's color scheme.
+// ---------------------------------------------------------------------------
+const LOOT_THEMES = [
+  [['bone','tyrant','undead','skeleton','wraith'], '💀', 'Bone Talisman'],
+  [['rust','bound','foreman','forge'], '⚙️', 'Rusted Gear'],
+  [['fire','ember','infernal','flame'], '🔥', 'Ember'],
+  [['frost','ice','frozen','veil'], '❄️', 'Frost Shard'],
+  [['storm','thunder','lightning','tempest','mezstorm'], '⚡', 'Storm Coil'],
+  [['void','abyss','shadow','hollow','splinter'], '🌑', 'Void Fragment'],
+  [['echo','mirror','tired version','familiar'], '🪞', 'Echo Shard'],
+  [['tide','water','undertow','wave','leviathan'], '🌊', 'Tide Pearl'],
+  [['light','vigil','prophet','wayfinder','guard','horizon'], '✨', 'Radiant Sigil'],
+  [['dragon','elder'], '🐉', 'Dragon Scale'],
+  [['architect','ledger','unity','relapse','question'], '⚙️', 'Cogwork Relic'],
+  [['star','planarch','nexus','fracture','astral','devourer'], '🌌', 'Astral Splinter'],
+  [['scavenger','foreman','king'], '👑', 'Warlord Token'],
+  [['break','unmended','daybreak'], '☀️', 'Sunfire Core'],
+  [['skarrowyn','split horizon'], '🌗', 'Horizon Shard']
+];
+function lootForBoss(bossName){
+  const n = (bossName||'').toLowerCase();
+  for (const [keywords, icon, itemBase] of LOOT_THEMES){
+    if (keywords.some(k=>n.includes(k))) return {icon, itemBase};
+  }
+  return {icon:'⚔️', itemBase:'Trophy'};
+}
+function awardBossLoot(chapterId, bossName){
+  if (STATE.inventory.some(i=>i.fromChapter===chapterId)) return null; // idempotent
+  const {icon, itemBase} = lootForBoss(bossName);
+  const item = {
+    id: 'loot-ch'+chapterId, name: `${bossName}'s ${itemBase}`, icon,
+    desc: `Taken from ${bossName}, Chapter ${chapterId}.`,
+    fromChapter: chapterId, fromBoss: bossName
+  };
+  STATE.inventory.push(item);
+  return item;
+}
 
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(msg){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),1800)}
 function refreshTopbar(){const stats=topbar.querySelectorAll('.stat');const lvl=level();const prev=xpThreshold(lvl-1),next=xpThreshold(lvl);if(stats[0])stats[0].querySelector('.big').textContent=lvl;if(stats[1]){stats[1].querySelector('.num').textContent=`${STATE.xp.toLocaleString()} / ${next.toLocaleString()}`;stats[1].querySelector('.fill').style.width=`${Math.min(100,(STATE.xp-prev)/Math.max(1,next-prev)*100)}%`;}if(stats[2]){stats[2].querySelector('.num').textContent='82 / 82';}if(stats[3]){stats[3].querySelector('.num').textContent='64 / 100';}}
-function save(){localStorage.setItem('daybreak_v7_completed',STATE.completed);localStorage.setItem('daybreak_v7_xp',STATE.xp)}
 function go(name){document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.name===name));render(name);window.scrollTo({top:0,behavior:'smooth'})}
 
 function render(name){refreshTopbar();document.querySelectorAll('.soel').forEach(e=>e.remove());let body='';if(name==='Dashboard')body=dashboard();if(name==='Journal')body=journalScreen();if(name==='Quests')body=questsScreen();if(name==='Party')body=partyScreen();if(name==='Spellbook')body=spellbookScreen();if(name==='Inventory')body=inventoryScreen();if(name==='Codex')body=codexScreen();if(name==='Battle')body=battleScreen();main.innerHTML=topbar.outerHTML+body+`<div id="toast" class="toast"></div>`;if(name!=='Battle'){const soel=document.createElement('div');soel.className='soel';soel.innerHTML=`<img src="${soelSrc}"><div class="lock"><b>SOEL</b><small>LOCKED<br/>Awakens at Level 10 🔒</small></div>`;document.querySelector('.app').appendChild(soel)}bind();}
@@ -199,7 +343,13 @@ function partyScreen(){
     navButton('Dashboard'));
 }
 function spellbookScreen(){return panel('Spellbook','SAN · SPELLS & TECHNIQUES',`<div class="chapter-grid">${['Arcane Bolt','Storm Veil','Astral Lance','Daybreak Ward','Starfall','Aether Pulse'].map((x,i)=>`<article class="quest"><div class="mini-ico">✧</div><div><h3>${x}</h3><p>Technique available to San as her story progression advances.</p></div><b>${[4,6,8,7,12,5][i]} MANA</b></article>`).join('')}</div>`,navButton('Dashboard'))}
-function inventoryScreen(){return panel('Inventory','CARRIED ITEMS',`<div class="chapter-grid">${['Minor Healing Tonic','Aether Shard','Waystone Fragment','Tomb Key','Antique Coin'].map((x,i)=>`<article class="quest"><div class="mini-ico">${['✚','◆','◇','⚿','◈'][i]}</div><div><h3>${x}</h3><p>Carried by the travelling party.</p></div><b>x${i+1}</b></article>`).join('')}</div>`,navButton('Dashboard'))}
+function inventoryScreen(){
+  const trophies = STATE.inventory.length
+    ? `<h3 style="font-family:Cinzel;color:#c99aff;margin:0 0 4px;font-size:18px">BOSS TROPHIES</h3><p class="lead" style="margin-bottom:14px">Earned by defeating story bosses.</p><div class="chapter-grid">${STATE.inventory.map(item=>`<article class="quest"><div class="mini-ico">${item.icon}</div><div><h3>${esc(item.name)}</h3><p>${esc(item.desc)}</p></div></article>`).join('')}</div>`
+    : `<h3 style="font-family:Cinzel;color:#c99aff;margin:0 0 4px;font-size:18px">BOSS TROPHIES</h3><p class="lead">None yet — defeat a boss in Battle to earn your first trophy.</p>`;
+  const supplies = `<h3 style="font-family:Cinzel;color:#8f7aa8;margin:22px 0 4px;font-size:15px">STARTING SUPPLIES</h3><div class="chapter-grid">${['Minor Healing Tonic','Aether Shard','Waystone Fragment','Tomb Key','Antique Coin'].map((x,i)=>`<article class="quest"><div class="mini-ico">${['✚','◆','◇','⚿','◈'][i]}</div><div><h3>${x}</h3><p>Carried by the travelling party.</p></div><b>x${i+1}</b></article>`).join('')}</div>`;
+  return panel('Inventory','CARRIED ITEMS', trophies+supplies, navButton('Dashboard'));
+}
 function codexScreen(){return panel('Codex','WORLD & LORE',`<div class="chapter-grid">${['Aethon','Daybreak','Tomb of Kings','Bone Tyrant','Travelling Party','Spiritual Familiars'].map((x,i)=>`<article class="quest"><div class="mini-ico">${['✦','☼','♜','☠','♟','🐾'][i]}</div><div><h3>${x}</h3><p>World entry revealed through the Season One story.</p></div></article>`).join('')}</div>`,navButton('Dashboard'))}
 
 function battleScreen(){
@@ -300,11 +450,14 @@ function battleAction(a){
     log.innerHTML += `<div>${actor} attacks for ${dmg} damage.</div>`;
     if(hp===0){
       log.innerHTML += `<div style="color:#d5a1f4">${esc(boss.name)} defeated. Chapter ${boss.id} complete.</div>`;
-      toast(`${boss.name} defeated!`);
       if(STATE.completed < boss.id){
         STATE.xp += bossReward(chapterData.find(c=>c.id===boss.id));
         STATE.completed = boss.id;
+        const loot = awardBossLoot(boss.id, boss.name);
         save();
+        toast(loot ? `${boss.name} defeated! · ${loot.icon} ${loot.name} obtained` : `${boss.name} defeated!`);
+      } else {
+        toast(`${boss.name} defeated!`);
       }
     } else {
       STATE.turn=(STATE.turn+1)%Math.max(1,party.length);
