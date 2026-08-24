@@ -605,7 +605,7 @@ function journalScreen(){
     let btn = !unlocked
       ? `<button class="small-btn" disabled>LOCKED</button>`
       : isBoss
-        ? `<button class="small-btn primary" data-read="${c.id}">READ CHAPTER ⚔</button>`
+        ? `<button class="small-btn primary" data-read="${c.id}">${done?'READ AGAIN ⚔':'READ CHAPTER ⚔'}</button>`
         : `<button class="small-btn ${unlocked?'primary':''}" data-read="${c.id}">${done?'READ AGAIN':'READ CHAPTER'}</button>`;
     return `<article class="chapter-card ${unlocked?'':'locked'}"><div class="chapter-art"><img src="${c.thumb||chapterCover}" alt="${esc(c.title)} thumbnail"></div><div><div class="chapter-num">CHAPTER ${String(c.id).padStart(2,'0')}${c.pageCount>1?` · ${c.pageCount}p`:''}${isBoss?' · BOSS':''}</div><h3>${esc(c.title)}</h3><p>${c.summary?esc(c.summary):'Story archive chapter — comic pages only.'}</p><div class="chapter-meta">${metaLabel}</div></div>${btn}<button class="small-btn" data-preview="${c.id}" style="margin-top:6px">PREVIEW ↗</button></article>`;
   }).join('');
