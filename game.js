@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fixed: Busy Day bounties silently skipped when refreshDay was stale \u2014 same root cause as the Contracts bug)';
+const APP_VERSION = '2026-08-17 (Guild Cafe: real macro tracking ported from Daybreak Quest \u2014 365-item food database, Slack Days, keto carb limits)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5533,7 +5533,16 @@ storyJournal: {
   // === GUILD CAFE MEALS ===
   // Zaki (hobby chef) offers a small daily menu; Joel occasionally cooks a Filipino
   // dish specifically. Logged, not scored — same "no penalty for missing" spirit.
-  mealLog: {}, // keyed by 'YYYY-MM-DD' -> array of { slot: 'breakfast'|'lunch'|'dinner', dish, cook, time }
+  mealLog: {}, // keyed by 'YYYY-MM-DD' -> array of { food, cat, fat, protein, carbs, time }
+  // Modified keto macro tracking — ported from the Daybreak Quest tracker's own system.
+  // carbLimit is the normal daily target; slackDayCarbLimit is a deliberately higher
+  // limit for a day explicitly marked as a Slack Day (never automatic — has to be
+  // turned on for that specific date, same "guilt-free, planned, not a failure state"
+  // framing the original app used). periodSweetBiteBonus adds extra allowance on a
+  // logged period day, on top of whatever limit already applies that day.
+  cafeSettings: { carbLimit: 30, vegDayCarbLimit: 50, slackDayCarbLimit: 80, periodSweetBiteBonus: 20 },
+  slackDays: [], // array of 'YYYY-MM-DD' strings, explicitly toggled per date
+  cafeCategory: null, // UI navigation only, not persisted
   // === HOUSEHOLD BILLS (Guild Treasury) ===
   // Ported from the Daybreak Quest tracker's bill structure — folded into the Guild
   // Treasury per request, rather than a standalone tracker. Paying a bill contributes
@@ -20611,7 +20620,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.130';
+const BUILD_ID = '2026-08-17.131';
 // =========================
 
 
@@ -20737,6 +20746,8 @@ function saveGame() {
     sicknessTracking: G.sicknessTracking,
     wellnessChecklist: G.wellnessChecklist,
     mealLog: G.mealLog,
+    cafeSettings: G.cafeSettings,
+    slackDays: G.slackDays,
     bills: G.bills,
     soelCare: G.soelCare,
     guildDutyLastPayoutDay: G.guildDutyLastPayoutDay,
@@ -21081,6 +21092,8 @@ function loadGame() {
     if (data.sicknessTracking) G.sicknessTracking = data.sicknessTracking;
     if (data.wellnessChecklist) G.wellnessChecklist = data.wellnessChecklist;
     if (data.mealLog) G.mealLog = data.mealLog;
+    if (data.cafeSettings) G.cafeSettings = data.cafeSettings;
+    if (data.slackDays) G.slackDays = data.slackDays;
     // Same unbounded-growth pattern as the runes fix above — both are keyed by
     // 'YYYY-MM-DD' with nothing ever removing old days, so they'd otherwise grow
     // forever. 30 days of history is more than enough for anything either screen
@@ -25625,40 +25638,420 @@ function buyGuildCafeDrink(drinkId) {
   render();
 }
 
-// === MEALS ===
-// Zaki's own hobby-chef menu, general fare. Joel's kitchen is kept as its own
-// separate list — Filipino dishes specifically, his own thing, not folded into
-// Zaki's counter. Ordering picks a random dish rather than requiring a manual
-// choice each time, matching the low-friction spirit of everything else logged here.
-const ZAKI_MEAL_MENU = [
-  { dish: 'Fried Rice Sampler', line: 'Zaki slides it over without being asked twice. "Figured you\u2019d want this today."' },
-  { dish: 'Grilled Skewers', line: 'Still smoking a little when it reaches the table. Zaki watches for your reaction like it matters.' },
-  { dish: "Zaki's Own Noodle Soup", line: '"Recipe\u2019s still not finished," he says, "but it\u2019s close enough to serve."' },
-  { dish: 'Pan-Seared Vegetables', line: 'Simple, and better than it has any right to be. Zaki shrugs like it\u2019s nothing.' },
-  { dish: 'Whatever Was Fresh Today', line: 'He doesn\u2019t even tell you what\u2019s in it. "Just eat it," he says. "You\u2019ll like it."' }
-];
-const JOEL_MEAL_MENU = [
-  { dish: 'Adobo', line: 'The kitchen smells like it for an hour before it\u2019s even ready. Joel won\u2019t rush it, not for anyone.' },
-  { dish: 'Sinigang', line: '"Needs to be sour enough," Joel mutters, tasting it a third time before deciding it\u2019s finally right.' },
-  { dish: 'Pancit', line: 'A birthday dish, technically, but Joel makes it whenever he feels like it anyway.' },
-  { dish: 'Lumpia', line: 'He rolls them with the same care every single time, like the shape actually matters.' },
-  { dish: 'Tinola', line: 'Simple, warm, exactly what it needs to be. Joel doesn\u2019t say much while he makes this one.' }
+const CAFE_FOOD_DATABASE = [
+  { n: '1 Egg', cat: 'Egg & Dairy', fat: 5.0, protein: 6.0, carbs: 0.4, icon: '🥚' },
+  { n: '3 Eggs', cat: 'Egg & Dairy', fat: 15.0, protein: 18.0, carbs: 1.2, icon: '🥚' },
+  { n: 'Butter (10ml pkt)', cat: 'Egg & Dairy', fat: 8.0, protein: 0.0, carbs: 0.0, icon: '🧈' },
+  { n: 'Butter (30ml)', cat: 'Egg & Dairy', fat: 25.0, protein: 0.0, carbs: 0.0, icon: '🧈' },
+  { n: 'Cheddar Cheese (30g)', cat: 'Egg & Dairy', fat: 9.0, protein: 7.0, carbs: 0.2, icon: '🧀' },
+  { n: 'Cream Cheese (30g)', cat: 'Egg & Dairy', fat: 10.0, protein: 2.0, carbs: 0.8, icon: '🧀' },
+  { n: 'Tatua Cream (dash ~15ml)', cat: 'Egg & Dairy', fat: 6.0, protein: 0.4, carbs: 0.5, icon: '🫙' },
+  { n: 'Sahara Greek Yogurt (100g)', cat: 'Egg & Dairy', fat: 10.0, protein: 6.0, carbs: 4.0, icon: '🍦' },
+  { n: 'Chobani Greek Yogurt (100g)', cat: 'Egg & Dairy', fat: 3.0, protein: 10.0, carbs: 4.0, icon: '🍦' },
+  { n: 'Chicken Drumstick (skin on)', cat: 'Poultry', fat: 8.0, protein: 22.0, carbs: 0.0, icon: '🍗' },
+  { n: 'Chicken Thigh (skin on, 100g)', cat: 'Poultry', fat: 13.0, protein: 21.0, carbs: 0.0, icon: '🍗' },
+  { n: 'Chicken Breast (skinless, 100g)', cat: 'Poultry', fat: 3.0, protein: 31.0, carbs: 0.0, icon: '🍗' },
+  { n: 'Chicken Wing (1 piece)', cat: 'Poultry', fat: 7.0, protein: 9.0, carbs: 0.0, icon: '🍗' },
+  { n: 'Chicken Feet (100g)', cat: 'Poultry', fat: 15.0, protein: 19.0, carbs: 0.2, icon: '🍗' },
+  { n: 'Chicken Liver (100g)', cat: 'Poultry', fat: 5.0, protein: 25.0, carbs: 1.0, icon: '🍗' },
+  { n: 'Whole Chicken \'Isi\' (mixed cuts, 100g)', cat: 'Poultry', fat: 10.0, protein: 24.0, carbs: 0.0, icon: '🍗' },
+  { n: 'Duck Breast, skin-on (100g)', cat: 'Poultry', fat: 28.0, protein: 18.0, carbs: 0.0, icon: '🦆' },
+  { n: 'Duck Breast, skinless (100g)', cat: 'Poultry', fat: 5.0, protein: 23.0, carbs: 0.0, icon: '🦆' },
+  { n: 'Pork Belly (100g)', cat: 'Pork', fat: 35.0, protein: 17.0, carbs: 0.0, icon: '🥓' },
+  { n: 'Sio Bak / Roast Pork (100g)', cat: 'Pork', fat: 30.0, protein: 18.0, carbs: 0.5, icon: '🥓' },
+  { n: 'Char Siew (2 slices)', cat: 'Pork', fat: 8.0, protein: 12.0, carbs: 4.0, icon: '🥓' },
+  { n: 'Pig Trotters / Lor (100g)', cat: 'Pork', fat: 20.0, protein: 20.0, carbs: 1.0, icon: '🥓' },
+  { n: 'Lup Cheong / Chinese Sausage (1pc)', cat: 'Pork', fat: 11.0, protein: 6.0, carbs: 3.0, icon: '🌭' },
+  { n: 'Bacon (2 rashers, grilled)', cat: 'Pork', fat: 8.0, protein: 10.0, carbs: 0.2, icon: '🥓' },
+  { n: 'Bacon (4 rashers, grilled)', cat: 'Pork', fat: 16.0, protein: 20.0, carbs: 0.4, icon: '🥓' },
+  { n: 'Pork Loin (lean, 100g)', cat: 'Pork', fat: 7.0, protein: 26.0, carbs: 0.0, icon: '🥩' },
+  { n: 'Minced Pork (100g)', cat: 'Pork', fat: 21.0, protein: 17.0, carbs: 0.0, icon: '🥩' },
+  { n: 'Tenggiri / Mackerel (100g)', cat: 'Seafood & Fish', fat: 12.0, protein: 24.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Ikan Bilis / Anchovies, Pusu (20g)', cat: 'Seafood & Fish', fat: 2.0, protein: 9.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Sardines, ½ Can in Olive Oil', cat: 'Seafood & Fish', fat: 9.0, protein: 12.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Ikan Kembung / Round Scad (100g)', cat: 'Seafood & Fish', fat: 8.0, protein: 22.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Salmon (100g)', cat: 'Seafood & Fish', fat: 13.0, protein: 22.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Prawns / Udang (100g, no breading)', cat: 'Seafood & Fish', fat: 1.0, protein: 24.0, carbs: 0.5, icon: '🦐' },
+  { n: 'Squid / Sotong (100g)', cat: 'Seafood & Fish', fat: 1.5, protein: 18.0, carbs: 3.0, icon: '🦑' },
+  { n: 'Crab Meat (100g)', cat: 'Seafood & Fish', fat: 1.0, protein: 19.0, carbs: 0.0, icon: '🦀' },
+  { n: 'Catfish / Ikan Keli (100g)', cat: 'Seafood & Fish', fat: 7.0, protein: 18.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Pomfret / Ikan Bawal (100g)', cat: 'Seafood & Fish', fat: 5.0, protein: 20.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Tilapia (100g)', cat: 'Seafood & Fish', fat: 2.0, protein: 20.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Baby Clams / Lala (100g, meat only)', cat: 'Seafood & Fish', fat: 1.0, protein: 20.0, carbs: 2.5, icon: '🦪' },
+  { n: 'Baby Clams with Curry (100g, incl. sauce)', cat: 'Seafood & Fish', fat: 8.0, protein: 18.0, carbs: 5.0, icon: '🦪' },
+  { n: 'Oysters (100g)', cat: 'Seafood & Fish', fat: 2.5, protein: 9.0, carbs: 4.0, icon: '🦪' },
+  { n: 'Mussels (100g)', cat: 'Seafood & Fish', fat: 4.0, protein: 20.0, carbs: 6.0, icon: '🦪' },
+  { n: 'Scallops (100g)', cat: 'Seafood & Fish', fat: 1.0, protein: 17.0, carbs: 3.0, icon: '🦪' },
+  { n: 'Stingray / Ikan Pari (100g)', cat: 'Seafood & Fish', fat: 1.5, protein: 22.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Tuna, fresh (100g)', cat: 'Seafood & Fish', fat: 1.0, protein: 25.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Eel / Unagi, grilled plain (100g)', cat: 'Seafood & Fish', fat: 15.0, protein: 18.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Cockles / Kupang (100g)', cat: 'Seafood & Fish', fat: 1.0, protein: 14.0, carbs: 4.7, icon: '🦪' },
+  { n: 'Sea Bass / Ikan Siakap (100g)', cat: 'Seafood & Fish', fat: 2.5, protein: 20.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Garoupa / Grouper (100g)', cat: 'Seafood & Fish', fat: 1.5, protein: 24.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Red Snapper / Ikan Merah (100g)', cat: 'Seafood & Fish', fat: 1.5, protein: 22.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Cod (100g)', cat: 'Seafood & Fish', fat: 1.0, protein: 18.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Tempeh (50g)', cat: 'Plant Protein', fat: 4.0, protein: 10.0, carbs: 4.0, icon: '🟫' },
+  { n: 'Tofu / Tau Kwa (100g)', cat: 'Plant Protein', fat: 5.0, protein: 10.0, carbs: 1.5, icon: '⬜' },
+  { n: 'Doubao / Fresh Bean Curd Sheet (100g)', cat: 'Plant Protein', fat: 8.0, protein: 14.0, carbs: 3.0, icon: '🟫' },
+  { n: 'Dried Bean Curd Sheet / Fuzhu (100g)', cat: 'Plant Protein', fat: 9.0, protein: 21.0, carbs: 10.0, icon: '🟫' },
+  { n: 'Edamame (100g)', cat: 'Plant Protein', fat: 5.0, protein: 11.0, carbs: 5.0, icon: '🫛' },
+  { n: 'Ham (2 slices)', cat: 'Plant Protein', fat: 3.0, protein: 8.0, carbs: 0.5, icon: '🥓' },
+  { n: 'Bok Choy / Greens (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.2, protein: 1.5, carbs: 1.5, icon: '🥬' },
+  { n: 'Konjac Noodles (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.0, protein: 0.1, carbs: 1.3, icon: '🍜' },
+  { n: 'Konjac Noodles, full pack (200g)', cat: 'Keto Veg (Low Carb)', fat: 0.0, protein: 0.2, carbs: 2.6, icon: '🍜' },
+  { n: 'Okra / Lady\'s Finger (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.2, protein: 2.0, carbs: 4.0, icon: '🌿' },
+  { n: 'Broccoli (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.4, protein: 3.0, carbs: 4.0, icon: '🥦' },
+  { n: 'Bitter Gourd / Peria (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.2, protein: 1.0, carbs: 3.0, icon: '🥒' },
+  { n: 'Chayote / Labu Siam (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.1, protein: 0.8, carbs: 3.5, icon: '🥒' },
+  { n: 'Brinjal / Eggplant (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.2, protein: 1.0, carbs: 4.0, icon: '🍆' },
+  { n: 'Cauliflower (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.3, protein: 2.0, carbs: 3.0, icon: '🥦' },
+  { n: 'Cabbage (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.1, protein: 1.0, carbs: 4.0, icon: '🥬' },
+  { n: 'Cucumber (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.1, protein: 0.7, carbs: 2.5, icon: '🥒' },
+  { n: 'Tomato (1 medium)', cat: 'Keto Veg (Low Carb)', fat: 0.2, protein: 1.0, carbs: 3.5, icon: '🍅' },
+  { n: 'Spinach (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.4, protein: 2.9, carbs: 1.4, icon: '🥬' },
+  { n: 'Bayam / Amaranth Leaves (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.3, protein: 2.5, carbs: 4.0, icon: '🥬' },
+  { n: 'Sawi / Mustard Greens (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.4, protein: 2.1, carbs: 3.0, icon: '🥬' },
+  { n: 'Kangkong / Water Spinach (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.2, protein: 2.6, carbs: 3.5, icon: '🥬' },
+  { n: 'Midin / Pucuk Paku, Fiddlehead Fern (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.4, protein: 4.0, carbs: 4.5, icon: '🌿' },
+  { n: 'Daun Ubi / Cassava Leaves, cooked (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.4, protein: 5.0, carbs: 5.5, icon: '🥬' },
+  { n: 'Pegaga / Asiatic Pennywort (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.9, protein: 1.8, carbs: 4.5, icon: '🌿' },
+  { n: 'Ulam Raja / Cosmos caudatus (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.4, protein: 2.9, carbs: 0.6, icon: '🌿' },
+  { n: 'Sayur Manis / Katuk (100g)', cat: 'Keto Veg (Low Carb)', fat: 1.0, protein: 6.0, carbs: 9.9, icon: '🥬' },
+  { n: 'Kailan / Chinese Broccoli (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.3, protein: 2.5, carbs: 2.0, icon: '🥬' },
+  { n: 'Bean Sprouts (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.2, protein: 3.0, carbs: 3.0, icon: '🌱' },
+  { n: 'Capsicum / Bell Pepper (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.3, protein: 1.0, carbs: 4.5, icon: '🫑' },
+  { n: 'Mixed Veg (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.3, protein: 2.0, carbs: 5.0, icon: '🥗' },
+  { n: 'Pumpkin (100g)', cat: 'Higher-Carb Veg', fat: 0.1, protein: 1.0, carbs: 6.0, icon: '🎃' },
+  { n: 'Pumpkin (1 cup, ~245g)', cat: 'Higher-Carb Veg', fat: 0.3, protein: 2.5, carbs: 14.5, icon: '🎃' },
+  { n: 'Carrot (100g)', cat: 'Higher-Carb Veg', fat: 0.2, protein: 0.9, carbs: 8.0, icon: '🥕' },
+  { n: 'Carrot (50g)', cat: 'Higher-Carb Veg', fat: 0.1, protein: 0.5, carbs: 4.0, icon: '🥕' },
+  { n: 'Carrot, a few pieces (~20g)', cat: 'Higher-Carb Veg', fat: 0.0, protein: 0.2, carbs: 1.6, icon: '🥕' },
+  { n: 'Peas (100g)', cat: 'Higher-Carb Veg', fat: 0.4, protein: 5.0, carbs: 11.0, icon: '🟢' },
+  { n: 'Corn (100g)', cat: 'Higher-Carb Veg', fat: 1.2, protein: 3.3, carbs: 19.0, icon: '🌽' },
+  { n: 'Potato (100g)', cat: 'Higher-Carb Veg', fat: 0.1, protein: 2.0, carbs: 17.0, icon: '🥔' },
+  { n: 'Tapioca / Cassava, boiled (100g)', cat: 'Higher-Carb Veg', fat: 0.3, protein: 1.0, carbs: 32.0, icon: '🍠' },
+  { n: 'Papaya (100g)', cat: 'Higher-Carb Veg', fat: 0.3, protein: 0.5, carbs: 11.0, icon: '🍈' },
+  { n: '½ Potato (~75g)', cat: 'Higher-Carb Veg', fat: 0.1, protein: 1.5, carbs: 13.0, icon: '🥔' },
+  { n: 'Potato (50g)', cat: 'Higher-Carb Veg', fat: 0.1, protein: 1.0, carbs: 8.5, icon: '🥔' },
+  { n: 'Potato, a few bites (~20g)', cat: 'Higher-Carb Veg', fat: 0.0, protein: 0.4, carbs: 3.4, icon: '🥔' },
+  { n: 'Sweet Potato (100g)', cat: 'Higher-Carb Veg', fat: 0.1, protein: 1.6, carbs: 17.0, icon: '🍠' },
+  { n: 'Sweet Potato (50g)', cat: 'Higher-Carb Veg', fat: 0.1, protein: 0.8, carbs: 8.5, icon: '🍠' },
+  { n: 'Mock Duck / Vegetarian Duck (100g)', cat: 'Mock Meat (SG/TW)', fat: 8.0, protein: 18.0, carbs: 6.0, icon: '🦆' },
+  { n: 'Mock Chicken / Vegetarian Chicken (100g)', cat: 'Mock Meat (SG/TW)', fat: 10.0, protein: 16.0, carbs: 8.0, icon: '🍗' },
+  { n: 'Mock Char Siu (100g)', cat: 'Mock Meat (SG/TW)', fat: 6.0, protein: 14.0, carbs: 12.0, icon: '🍢' },
+  { n: 'Mock Abalone, mushroom-based (3-4pc)', cat: 'Mock Meat (SG/TW)', fat: 2.0, protein: 4.0, carbs: 6.0, icon: '🍄' },
+  { n: 'Vegetarian Bak Kwa (2 slices, ~40g)', cat: 'Mock Meat (SG/TW)', fat: 4.0, protein: 6.0, carbs: 14.0, icon: '🥓' },
+  { n: 'Luohan Zhai / Buddha\'s Delight (1 bowl)', cat: 'Mock Meat (SG/TW)', fat: 10.0, protein: 8.0, carbs: 20.0, icon: '🥘' },
+  { n: 'Tofu Skin / Beancurd Roll (2 rolls)', cat: 'Mock Meat (SG/TW)', fat: 8.0, protein: 10.0, carbs: 8.0, icon: '🌯' },
+  { n: 'Mock Fish / Vegetarian Fish (100g)', cat: 'Mock Meat (SG/TW)', fat: 5.0, protein: 15.0, carbs: 10.0, icon: '🐟' },
+  { n: 'Braised Mock Pork Belly (100g)', cat: 'Mock Meat (SG/TW)', fat: 12.0, protein: 12.0, carbs: 8.0, icon: '🥩' },
+  { n: 'Vegetarian Satay, no sauce (3 sticks)', cat: 'Mock Meat (SG/TW)', fat: 5.0, protein: 10.0, carbs: 6.0, icon: '🍢' },
+  { n: 'Vegetarian Meat Floss (2 tbsp)', cat: 'Mock Meat (SG/TW)', fat: 3.0, protein: 4.0, carbs: 8.0, icon: '🥣' },
+  { n: 'Braised Mock Mutton (100g)', cat: 'Mock Meat (SG/TW)', fat: 9.0, protein: 14.0, carbs: 7.0, icon: '🍖' },
+  { n: 'Vegetarian Spring Rolls, mock meat filling (2pc)', cat: 'Mock Meat (SG/TW)', fat: 8.0, protein: 6.0, carbs: 16.0, icon: '🌯' },
+  { n: 'Mock Prawn / Vegetarian Prawn (4-5pc)', cat: 'Mock Meat (SG/TW)', fat: 3.0, protein: 8.0, carbs: 9.0, icon: '🍤' },
+  { n: 'Beetroot (100g)', cat: 'Higher-Carb Veg', fat: 0.2, protein: 1.6, carbs: 8.0, icon: '🟣' },
+  { n: 'Konjac Dry Rice, cooked (100g)', cat: 'Higher-Carb Veg', fat: 0.3, protein: 1.5, carbs: 13.7, icon: '🍚' },
+  { n: 'Konjac Dry Rice, cooked (½ cup ~80g)', cat: 'Higher-Carb Veg', fat: 0.2, protein: 1.2, carbs: 11.0, icon: '🍚' },
+  { n: 'Mung Beans, boiled (1 cup)', cat: 'Higher-Carb Veg', fat: 0.8, protein: 14.0, carbs: 32.0, icon: '🫘' },
+  { n: 'Mung Beans, boiled (½ cup)', cat: 'Higher-Carb Veg', fat: 0.4, protein: 7.0, carbs: 16.0, icon: '🫘' },
+  { n: 'Black Beans, boiled (100g)', cat: 'Higher-Carb Veg', fat: 0.5, protein: 8.9, carbs: 14.0, icon: '🫘' },
+  { n: 'Black Beans, boiled (50g)', cat: 'Higher-Carb Veg', fat: 0.3, protein: 4.5, carbs: 7.0, icon: '🫘' },
+  { n: 'Black Beans, boiled, small side (~30g)', cat: 'Higher-Carb Veg', fat: 0.2, protein: 2.7, carbs: 4.2, icon: '🫘' },
+  { n: 'Chickpeas / Garbanzo, boiled (100g)', cat: 'Higher-Carb Veg', fat: 2.6, protein: 8.9, carbs: 18.0, icon: '🫘' },
+  { n: 'Chickpeas / Garbanzo, boiled (50g)', cat: 'Higher-Carb Veg', fat: 1.3, protein: 4.5, carbs: 9.0, icon: '🫘' },
+  { n: 'Chickpeas / Garbanzo, boiled, small side (~30g)', cat: 'Higher-Carb Veg', fat: 0.8, protein: 2.7, carbs: 5.4, icon: '🫘' },
+  { n: 'Lentils, boiled (100g)', cat: 'Higher-Carb Veg', fat: 0.4, protein: 9.0, carbs: 14.0, icon: '🫘' },
+  { n: 'Kidney Beans, boiled (100g)', cat: 'Higher-Carb Veg', fat: 0.5, protein: 8.7, carbs: 14.0, icon: '🫘' },
+  { n: 'Kidney Beans, boiled (50g)', cat: 'Higher-Carb Veg', fat: 0.3, protein: 4.4, carbs: 7.0, icon: '🫘' },
+  { n: 'Kidney Beans, boiled, small side (~30g)', cat: 'Higher-Carb Veg', fat: 0.2, protein: 2.6, carbs: 4.2, icon: '🫘' },
+  { n: 'Soya Beans, boiled (100g)', cat: 'Higher-Carb Veg', fat: 9.0, protein: 17.0, carbs: 6.0, icon: '🫘' },
+  { n: 'Edamame, shelled (100g)', cat: 'Higher-Carb Veg', fat: 5.0, protein: 11.0, carbs: 5.0, icon: '🫛' },
+  { n: 'Long Beans / Kacang Panjang (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.1, protein: 1.8, carbs: 3.5, icon: '🌿' },
+  { n: 'Winged Beans / Kacang Botol (100g)', cat: 'Keto Veg (Low Carb)', fat: 1.0, protein: 6.0, carbs: 3.0, icon: '🌿' },
+  { n: 'Sweet Corn Kernels (½ cup)', cat: 'Higher-Carb Veg', fat: 0.6, protein: 1.7, carbs: 10.0, icon: '🌽' },
+  { n: 'Button Mushroom (100g)', cat: 'Mushrooms & Fungus', fat: 0.3, protein: 3.0, carbs: 2.5, icon: '🍄' },
+  { n: 'Shiitake Mushroom (100g)', cat: 'Mushrooms & Fungus', fat: 0.5, protein: 2.2, carbs: 6.8, icon: '🍄' },
+  { n: 'Enoki Mushroom (100g)', cat: 'Mushrooms & Fungus', fat: 0.3, protein: 2.7, carbs: 6.0, icon: '🍄' },
+  { n: 'Oyster Mushroom (100g)', cat: 'Mushrooms & Fungus', fat: 0.3, protein: 3.3, carbs: 3.5, icon: '🍄' },
+  { n: 'King Oyster Mushroom (100g)', cat: 'Mushrooms & Fungus', fat: 0.4, protein: 2.5, carbs: 4.0, icon: '🍄' },
+  { n: 'Hei\'mu\'er Black Fungus (50g, dried→soaked)', cat: 'Mushrooms & Fungus', fat: 0.1, protein: 1.0, carbs: 3.0, icon: '🍄' },
+  { n: 'White Fungus / Snow Fungus (50g)', cat: 'Mushrooms & Fungus', fat: 0.1, protein: 0.5, carbs: 4.0, icon: '🍄' },
+  { n: 'Portobello Mushroom (1 large cap ~100g)', cat: 'Mushrooms & Fungus', fat: 0.4, protein: 3.1, carbs: 3.5, icon: '🍄' },
+  { n: 'Straw Mushroom / Cendawan Jerami (100g)', cat: 'Mushrooms & Fungus', fat: 0.3, protein: 3.5, carbs: 3.0, icon: '🍄' },
+  { n: 'Abalone Mushroom (100g)', cat: 'Mushrooms & Fungus', fat: 0.4, protein: 3.0, carbs: 4.0, icon: '🍄' },
+  { n: 'Shimeji Mushroom, brown (100g)', cat: 'Mushrooms & Fungus', fat: 0.5, protein: 3.0, carbs: 4.5, icon: '🍄' },
+  { n: 'Shimeji Mushroom, white (100g)', cat: 'Mushrooms & Fungus', fat: 0.4, protein: 2.7, carbs: 4.0, icon: '🍄' },
+  { n: 'Maitake / Hen of the Woods (100g)', cat: 'Mushrooms & Fungus', fat: 0.2, protein: 1.9, carbs: 4.4, icon: '🍄' },
+  { n: 'Dried Shiitake, rehydrated (50g)', cat: 'Mushrooms & Fungus', fat: 0.3, protein: 1.5, carbs: 5.0, icon: '🍄' },
+  { n: 'Canned Mushrooms, drained (100g)', cat: 'Mushrooms & Fungus', fat: 0.2, protein: 2.0, carbs: 2.5, icon: '🍄' },
+  { n: 'Mixed Mushrooms stir-fried (100g)', cat: 'Mushrooms & Fungus', fat: 3.0, protein: 3.0, carbs: 3.5, icon: '🍄' },
+  { n: 'Coconut Oil, Virgin (1 tbsp)', cat: 'Fats & Extras', fat: 14.0, protein: 0.0, carbs: 0.0, icon: '🥥' },
+  { n: 'Coconut Oil, Refined (1 tbsp)', cat: 'Fats & Extras', fat: 14.0, protein: 0.0, carbs: 0.0, icon: '🥥' },
+  { n: 'MCT Oil / Fractionated Coconut (1 tbsp)', cat: 'Fats & Extras', fat: 14.0, protein: 0.0, carbs: 0.0, icon: '🥥' },
+  { n: 'Coconut Cream (2 tbsp)', cat: 'Fats & Extras', fat: 9.0, protein: 0.9, carbs: 1.6, icon: '🥥' },
+  { n: 'Coconut Milk, full fat (100ml)', cat: 'Fats & Extras', fat: 15.0, protein: 1.5, carbs: 2.8, icon: '🥥' },
+  { n: 'Olive Oil (1 tbsp)', cat: 'Fats & Extras', fat: 14.0, protein: 0.0, carbs: 0.0, icon: '🫒' },
+  { n: 'Lemon juice (1 tbsp)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.1, carbs: 1.3, icon: '🍋' },
+  { n: 'Lemon (½ whole, squeezed)', cat: 'Aromatics & Condiments', fat: 0.1, protein: 0.3, carbs: 2.5, icon: '🍋' },
+  { n: 'Lemon zest (1 tsp)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.1, carbs: 0.5, icon: '🍋' },
+  { n: 'Ginger, fresh (1 tsp grated)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.1, carbs: 0.8, icon: '🫚' },
+  { n: 'Ginger, fresh (1 thumb slice)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.2, carbs: 1.5, icon: '🫚' },
+  { n: 'Spring Onions / Scallions (1 stalk)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.2, carbs: 0.7, icon: '🌿' },
+  { n: 'Spring Onions (handful, ~30g)', cat: 'Aromatics & Condiments', fat: 0.1, protein: 0.5, carbs: 2.0, icon: '🌿' },
+  { n: 'Chives (1 tbsp chopped)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.1, carbs: 0.1, icon: '🌿' },
+  { n: 'Garlic (1 clove)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.2, carbs: 1.0, icon: '🧄' },
+  { n: 'Onion (¼ medium)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.3, carbs: 2.5, icon: '🧅' },
+  { n: 'Chilli / Cili (1 whole)', cat: 'Aromatics & Condiments', fat: 0.1, protein: 0.3, carbs: 1.0, icon: '🌶️' },
+  { n: 'Soy Sauce (1 tbsp)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 1.0, carbs: 1.0, icon: '🫙' },
+  { n: 'Fish Sauce (1 tbsp)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.9, carbs: 0.7, icon: '🫙' },
+  { n: 'Oyster Sauce (1 tbsp)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.5, carbs: 4.0, icon: '🫙' },
+  { n: 'Sambal Belacan (1 tsp)', cat: 'Aromatics & Condiments', fat: 0.5, protein: 0.3, carbs: 1.0, icon: '🌶️' },
+  { n: 'Vinegar (1 tbsp)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.0, carbs: 0.1, icon: '🫙' },
+  { n: 'A.K. Sea Salt (pinch)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.0, carbs: 0.0, icon: '🧂' },
+  { n: 'Black Pepper (1 tsp)', cat: 'Aromatics & Condiments', fat: 0.1, protein: 0.2, carbs: 1.4, icon: '🫙' },
+  { n: 'Turmeric powder (1 tsp)', cat: 'Aromatics & Condiments', fat: 0.2, protein: 0.3, carbs: 1.4, icon: '🟡' },
+  { n: 'Coriander / Cilantro, fresh (1 tbsp)', cat: 'Herbs & Spices', fat: 0.0, protein: 0.1, carbs: 0.1, icon: '🌿' },
+  { n: 'Lemongrass / Serai (1 stalk)', cat: 'Herbs & Spices', fat: 0.1, protein: 0.2, carbs: 2.5, icon: '🌿' },
+  { n: 'Pandan Leaf (2-3 leaves)', cat: 'Herbs & Spices', fat: 0.0, protein: 0.1, carbs: 0.5, icon: '🌿' },
+  { n: 'Kaffir Lime Leaf (2 leaves)', cat: 'Herbs & Spices', fat: 0.0, protein: 0.1, carbs: 0.3, icon: '🍃' },
+  { n: 'Curry Leaf / Daun Kari (small handful)', cat: 'Herbs & Spices', fat: 0.1, protein: 0.3, carbs: 1.0, icon: '🍃' },
+  { n: 'Basil, fresh (1 tbsp)', cat: 'Herbs & Spices', fat: 0.0, protein: 0.2, carbs: 0.1, icon: '🌿' },
+  { n: 'Mint / Daun Pudina (small handful)', cat: 'Herbs & Spices', fat: 0.0, protein: 0.2, carbs: 0.5, icon: '🌿' },
+  { n: 'Bay Leaf / Daun Salam (2 leaves)', cat: 'Herbs & Spices', fat: 0.1, protein: 0.1, carbs: 0.5, icon: '🍃' },
+  { n: 'Dill, fresh (1 tbsp)', cat: 'Herbs & Spices', fat: 0.0, protein: 0.1, carbs: 0.1, icon: '🌿' },
+  { n: 'Rosemary, fresh (1 sprig)', cat: 'Herbs & Spices', fat: 0.1, protein: 0.1, carbs: 0.3, icon: '🌿' },
+  { n: 'Thyme, fresh (1 tsp)', cat: 'Herbs & Spices', fat: 0.0, protein: 0.1, carbs: 0.2, icon: '🌿' },
+  { n: 'Galangal / Lengkuas (1 slice)', cat: 'Herbs & Spices', fat: 0.0, protein: 0.1, carbs: 1.0, icon: '🫚' },
+  { n: 'Cumin / Jintan Putih (1 tsp)', cat: 'Herbs & Spices', fat: 0.5, protein: 0.4, carbs: 0.9, icon: '🟤' },
+  { n: 'Coriander Seed / Jintan Manis (1 tsp)', cat: 'Herbs & Spices', fat: 0.3, protein: 0.3, carbs: 1.0, icon: '🟤' },
+  { n: 'Cardamom (2 pods)', cat: 'Herbs & Spices', fat: 0.1, protein: 0.1, carbs: 1.0, icon: '🟢' },
+  { n: 'Cinnamon (1 tsp ground)', cat: 'Herbs & Spices', fat: 0.1, protein: 0.1, carbs: 2.0, icon: '🟤' },
+  { n: 'Star Anise (1 piece)', cat: 'Herbs & Spices', fat: 0.1, protein: 0.1, carbs: 1.0, icon: '⭐' },
+  { n: 'Cloves (3-4 whole)', cat: 'Herbs & Spices', fat: 0.3, protein: 0.1, carbs: 1.4, icon: '🟤' },
+  { n: 'Chilli Powder (1 tsp)', cat: 'Herbs & Spices', fat: 0.3, protein: 0.4, carbs: 1.3, icon: '🌶️' },
+  { n: 'Paprika (1 tsp)', cat: 'Herbs & Spices', fat: 0.3, protein: 0.4, carbs: 1.2, icon: '🔴' },
+  { n: 'Belacan / Shrimp Paste (1 tsp)', cat: 'Herbs & Spices', fat: 0.5, protein: 2.0, carbs: 0.5, icon: '🟤' },
+  { n: 'Five Spice Powder (¼ tsp)', cat: 'Herbs & Spices', fat: 0.1, protein: 0.1, carbs: 0.8, icon: '🟤' },
+  { n: 'Sesame Seeds (1 tsp)', cat: 'Herbs & Spices', fat: 1.5, protein: 0.6, carbs: 0.7, icon: '🟡' },
+  { n: 'Sesame Oil (1 tsp)', cat: 'Herbs & Spices', fat: 4.5, protein: 0.0, carbs: 0.0, icon: '🟡' },
+  { n: 'Mayonnaise, full fat (1 tbsp)', cat: 'Dressings & Sauces', fat: 10.0, protein: 0.1, carbs: 0.1, icon: '🫙' },
+  { n: 'Mayonnaise, full fat (2 tbsp)', cat: 'Dressings & Sauces', fat: 20.0, protein: 0.2, carbs: 0.2, icon: '🫙' },
+  { n: 'Japanese Kewpie Mayo (1 tbsp)', cat: 'Dressings & Sauces', fat: 9.0, protein: 0.3, carbs: 0.5, icon: '🫙' },
+  { n: 'Caesar Dressing (2 tbsp)', cat: 'Dressings & Sauces', fat: 16.0, protein: 1.0, carbs: 1.0, icon: '🥗' },
+  { n: 'Ranch Dressing (2 tbsp)', cat: 'Dressings & Sauces', fat: 14.0, protein: 0.4, carbs: 1.5, icon: '🥗' },
+  { n: 'Olive Oil & Lemon Dressing (1 tbsp)', cat: 'Dressings & Sauces', fat: 14.0, protein: 0.0, carbs: 0.5, icon: '🫒' },
+  { n: 'Sesame Ginger Dressing (2 tbsp)', cat: 'Dressings & Sauces', fat: 7.0, protein: 0.5, carbs: 4.0, icon: '🥗' },
+  { n: 'Balsamic Vinegar (1 tbsp)', cat: 'Dressings & Sauces', fat: 0.0, protein: 0.1, carbs: 2.7, icon: '🫙' },
+  { n: 'Apple Cider Vinegar (1 tbsp)', cat: 'Dressings & Sauces', fat: 0.0, protein: 0.0, carbs: 0.1, icon: '🫙' },
+  { n: 'Thousand Island Dressing (2 tbsp)', cat: 'Dressings & Sauces', fat: 11.0, protein: 0.3, carbs: 5.0, icon: '🥗' },
+  { n: 'Sour Cream (2 tbsp)', cat: 'Dressings & Sauces', fat: 5.0, protein: 0.6, carbs: 1.0, icon: '🫙' },
+  { n: 'Tahini / Sesame Paste (1 tbsp)', cat: 'Dressings & Sauces', fat: 8.0, protein: 2.6, carbs: 1.5, icon: '🫙' },
+  { n: 'Lakanto Creamy PB (1 tbsp ~16g)', cat: 'Nut Butters', fat: 6.3, protein: 3.6, carbs: 1.7, icon: '🥜' },
+  { n: 'Lakanto Creamy PB (2 tbsp ~32g)', cat: 'Nut Butters', fat: 12.6, protein: 7.2, carbs: 3.4, icon: '🥜' },
+  { n: 'Generic Peanut Butter, natural (1 tbsp)', cat: 'Nut Butters', fat: 8.0, protein: 3.5, carbs: 3.0, icon: '🥜' },
+  { n: 'Generic Peanut Butter, natural (2 tbsp)', cat: 'Nut Butters', fat: 16.0, protein: 7.0, carbs: 6.0, icon: '🥜' },
+  { n: 'Almond Butter (1 tbsp)', cat: 'Nut Butters', fat: 9.0, protein: 2.4, carbs: 1.5, icon: '🥜' },
+  { n: 'Lakanto Creamy PB (1 tbsp ~16g)', cat: 'Nut Butters', fat: 6.3, protein: 3.6, carbs: 4.9, icon: '🥜' },
+  { n: 'Lakanto Creamy PB (2 tbsp ~32g)', cat: 'Nut Butters', fat: 12.5, protein: 7.2, carbs: 9.8, icon: '🥜' },
+  { n: 'Generic Peanut Butter (1 tbsp ~16g)', cat: 'Nut Butters', fat: 8.0, protein: 3.5, carbs: 3.5, icon: '🥜' },
+  { n: 'Generic Peanut Butter (2 tbsp ~32g)', cat: 'Nut Butters', fat: 16.0, protein: 7.0, carbs: 7.0, icon: '🥜' },
+  { n: 'Almond Butter (1 tbsp)', cat: 'Nut Butters', fat: 9.0, protein: 2.4, carbs: 1.5, icon: '🥜' },
+  { n: 'Lakanto Creamy Peanut Butter (1 tbsp ~16g)', cat: 'Nut Butters', fat: 6.3, protein: 3.6, carbs: 2.0, icon: '🥜' },
+  { n: 'Lakanto Creamy Peanut Butter (2 tbsp ~32g)', cat: 'Nut Butters', fat: 12.6, protein: 7.2, carbs: 4.0, icon: '🥜' },
+  { n: 'Generic Peanut Butter, natural (1 tbsp)', cat: 'Nut Butters', fat: 8.0, protein: 3.5, carbs: 3.0, icon: '🥜' },
+  { n: 'Generic Peanut Butter, natural (2 tbsp)', cat: 'Nut Butters', fat: 16.0, protein: 7.0, carbs: 6.0, icon: '🥜' },
+  { n: 'Almond Butter (1 tbsp)', cat: 'Nut Butters', fat: 9.0, protein: 3.4, carbs: 1.5, icon: '🥜' },
+  { n: 'Almonds, a small handful (~10g)', cat: 'Whole Nuts', fat: 5.0, protein: 2.1, carbs: 2.2, icon: '🥜' },
+  { n: 'Almonds, standard serving (28g)', cat: 'Whole Nuts', fat: 14.0, protein: 6.0, carbs: 6.0, icon: '🥜' },
+  { n: 'Cashews, a small handful (~10g)', cat: 'Whole Nuts', fat: 4.3, protein: 1.8, carbs: 3.2, icon: '🥜' },
+  { n: 'Cashews, standard serving (28g)', cat: 'Whole Nuts', fat: 12.0, protein: 5.0, carbs: 9.0, icon: '🥜' },
+  { n: 'Walnuts, a small handful (~10g)', cat: 'Whole Nuts', fat: 6.4, protein: 1.4, carbs: 1.4, icon: '🥜' },
+  { n: 'Walnuts, standard serving (28g)', cat: 'Whole Nuts', fat: 18.0, protein: 4.0, carbs: 4.0, icon: '🥜' },
+  { n: 'Peanuts, a small handful (~10g)', cat: 'Whole Nuts', fat: 5.0, protein: 2.5, carbs: 1.8, icon: '🥜' },
+  { n: 'Peanuts, standard serving (28g)', cat: 'Whole Nuts', fat: 14.0, protein: 7.0, carbs: 5.0, icon: '🥜' },
+  { n: 'Pistachios, standard serving (28g)', cat: 'Whole Nuts', fat: 13.0, protein: 6.0, carbs: 8.0, icon: '🥜' },
+  { n: 'Macadamia, standard serving (28g)', cat: 'Whole Nuts', fat: 21.0, protein: 2.0, carbs: 4.0, icon: '🥜' },
+  { n: 'Lemon Tea, unsweetened (1 cup)', cat: 'Drinks', fat: 0.0, protein: 0.0, carbs: 1.5, icon: '🍋' },
+  { n: 'Lemon Tea, sweetened (1 cup)', cat: 'Drinks', fat: 0.0, protein: 0.0, carbs: 18.0, icon: '🍋' },
+  { n: 'Lemon Water (1 glass)', cat: 'Drinks', fat: 0.0, protein: 0.0, carbs: 1.5, icon: '🍋' },
+  { n: 'Black Tea, plain (1 cup)', cat: 'Drinks', fat: 0.0, protein: 0.0, carbs: 0.5, icon: '🍵' },
+  { n: 'Soybean Milk, Vitasoy Unsweetened (250ml)', cat: 'Drinks', fat: 7.0, protein: 11.0, carbs: 5.5, icon: '🥛' },
+  { n: 'Green Tea, plain (1 cup)', cat: 'Drinks', fat: 0.0, protein: 0.0, carbs: 0.3, icon: '🍵' },
+  { n: 'Cowhead Butter Pkt (10g)', cat: 'Fats & Extras', fat: 8.0, protein: 0.0, carbs: 0.0, icon: '🧈' },
+  { n: 'Golden Churn Butter Pkt', cat: 'Fats & Extras', fat: 8.0, protein: 0.0, carbs: 0.0, icon: '🧈' },
+  { n: 'Nescafé (plain)', cat: 'Fats & Extras', fat: 0.0, protein: 0.5, carbs: 1.0, icon: '☕' },
+  { n: 'APC / Jersey Coffee', cat: 'Fats & Extras', fat: 2.0, protein: 1.0, carbs: 2.0, icon: '☕' },
+  { n: 'Ayam Penyet (no rice)', cat: 'Common Meals', fat: 20.0, protein: 35.0, carbs: 8.0, icon: '🍛' },
+  { n: 'Chicken Rendang (no rice)', cat: 'Common Meals', fat: 18.0, protein: 28.0, carbs: 5.0, icon: '🍛' },
+  { n: 'Chicken Masala (no sauce, 100g)', cat: 'Common Meals', fat: 8.0, protein: 25.0, carbs: 4.0, icon: '🍛' },
+  { n: 'Chicken Curry with Potatoes (100g, incl. sauce & potato)', cat: 'Common Meals', fat: 7.0, protein: 11.0, carbs: 9.0, icon: '🍛' },
+  { n: 'Breaded Chicken Bites, mini cup (~6-8 pcs)', cat: 'Common Meals', fat: 6.0, protein: 7.0, carbs: 8.0, icon: '🍗' },
+  { n: 'Lelapan (no rice, full)', cat: 'Common Meals', fat: 25.0, protein: 35.0, carbs: 6.0, icon: '🍱' },
+  { n: 'Salty Chicken Soup (bowl)', cat: 'Common Meals', fat: 15.0, protein: 35.0, carbs: 3.0, icon: '🥣' },
+  { n: '1 Poppadom', cat: 'Common Meals', fat: 3.0, protein: 2.0, carbs: 8.0, icon: '🫓' },
+  { n: 'Foo Yung Egg / Fu Rong Dan (1 omelette)', cat: 'Common Meals', fat: 18.0, protein: 14.0, carbs: 3.0, icon: '🍳' },
+  { n: 'Foo Yung Egg with veg & meat filling', cat: 'Common Meals', fat: 20.0, protein: 18.0, carbs: 4.0, icon: '🍳' },
+  { n: 'Yong Chap / Yong Tau Fu, broth (5 pcs, no rice)', cat: 'Common Meals', fat: 6.0, protein: 18.0, carbs: 5.0, icon: '🐟' },
+  { n: 'Yong Chap stuffed brinjal (2 pcs)', cat: 'Common Meals', fat: 4.0, protein: 8.0, carbs: 3.0, icon: '🍆' },
+  { n: 'Yong Chap stuffed bitter gourd (2 pcs)', cat: 'Common Meals', fat: 4.0, protein: 8.0, carbs: 3.0, icon: '🥒' },
+  { n: 'Yong Chap stuffed tofu (2 pcs)', cat: 'Common Meals', fat: 6.0, protein: 10.0, carbs: 2.0, icon: '⬜' },
+  { n: 'Carrot Cake / Lobakau (3 pcs, no sauce)', cat: 'Common Meals', fat: 8.0, protein: 3.0, carbs: 18.0, icon: '🟫' },
+  { n: 'Carrot Cake / Lobakau (3 pcs, with egg)', cat: 'Common Meals', fat: 13.0, protein: 9.0, carbs: 18.0, icon: '🟫' },
+  { n: 'Pork Intestine Soup (1 bowl)', cat: 'Common Meals', fat: 12.0, protein: 22.0, carbs: 2.0, icon: '🥣' },
+  { n: 'Taiwanese Pork Chop (1 piece, no rice)', cat: 'Common Meals', fat: 18.0, protein: 28.0, carbs: 5.0, icon: '🥩' },
+  { n: 'Breaded Roast Pork, Chinese style (100g)', cat: 'Common Meals', fat: 22.0, protein: 18.0, carbs: 8.0, icon: '🥓' },
+  { n: 'Adobo, Pork (no rice, 100g)', cat: 'Common Meals', fat: 18.0, protein: 22.0, carbs: 2.0, icon: '🍛' },
+  { n: 'Adobo, Chicken (no rice, 100g)', cat: 'Common Meals', fat: 10.0, protein: 25.0, carbs: 2.0, icon: '🍛' },
+  { n: 'Tinola, Chicken (1 bowl, no rice)', cat: 'Common Meals', fat: 8.0, protein: 24.0, carbs: 4.0, icon: '🥣' },
+  { n: 'Pinakbet (1 serving, no rice)', cat: 'Common Meals', fat: 8.0, protein: 8.0, carbs: 8.0, icon: '🥗' },
+  { n: 'Paksiw na Isda / Fish in Vinegar (1 serving)', cat: 'Common Meals', fat: 6.0, protein: 20.0, carbs: 2.0, icon: '🐟' },
+  { n: 'Nilaga, Pork (1 bowl, no rice)', cat: 'Common Meals', fat: 14.0, protein: 24.0, carbs: 4.0, icon: '🥣' },
+  { n: 'Kare-Kare (no rice, no bagoong, 1 serving)', cat: 'Common Meals', fat: 20.0, protein: 22.0, carbs: 6.0, icon: '🍲' },
+  { n: 'Gong Cha Milk Tea, no sugar + powdered milk (M)', cat: 'Drinks', fat: 3.0, protein: 1.5, carbs: 8.0, icon: '🧋' },
+  { n: 'Teh O Kosong (plain black tea, no sugar)', cat: 'Drinks', fat: 0.0, protein: 0.0, carbs: 0.5, icon: '🍵' },
+  { n: 'Teh C Kosong (black tea + evap milk, no sugar)', cat: 'Drinks', fat: 1.5, protein: 1.0, carbs: 2.5, icon: '🍵' },
+  { n: 'Whipping Cream, aerosol (2 tbsp ~15g)', cat: 'Fats & Extras', fat: 5.0, protein: 0.3, carbs: 0.8, icon: '🫙' },
+  { n: 'Tom Yum Soup, 1 bowl (no noodles)', cat: 'Thai Dishes', fat: 4.0, protein: 18.0, carbs: 4.0, icon: '🍲' },
+  { n: 'Tom Kha Gai, 1 bowl (coconut chicken soup)', cat: 'Thai Dishes', fat: 18.0, protein: 20.0, carbs: 5.0, icon: '🍲' },
+  { n: 'Green Curry, chicken (no rice, 1 serving)', cat: 'Thai Dishes', fat: 20.0, protein: 22.0, carbs: 7.0, icon: '🍛' },
+  { n: 'Red Curry, chicken (no rice, 1 serving)', cat: 'Thai Dishes', fat: 18.0, protein: 22.0, carbs: 8.0, icon: '🍛' },
+  { n: 'Massaman Curry (no rice, 1 serving)', cat: 'Thai Dishes', fat: 22.0, protein: 20.0, carbs: 12.0, icon: '🍛' },
+  { n: 'Larb Gai / Thai Chicken Salad (1 serving)', cat: 'Thai Dishes', fat: 8.0, protein: 25.0, carbs: 5.0, icon: '🥗' },
+  { n: 'Gai Yang / Thai Grilled Chicken (1 piece)', cat: 'Thai Dishes', fat: 12.0, protein: 28.0, carbs: 2.0, icon: '🍗' },
+  { n: 'Thai Basil Stir Fry, no rice (1 serving)', cat: 'Thai Dishes', fat: 10.0, protein: 22.0, carbs: 5.0, icon: '🌿' },
+  { n: 'Turmeric Chicken / Ayam Kunyit (1 serving)', cat: 'Thai Dishes', fat: 14.0, protein: 28.0, carbs: 3.0, icon: '🟡' },
+  { n: 'Satay, chicken (4 skewers, no sauce)', cat: 'Thai Dishes', fat: 8.0, protein: 22.0, carbs: 1.0, icon: '🍢' },
+  { n: 'Satay, chicken (4 skewers + peanut sauce)', cat: 'Thai Dishes', fat: 14.0, protein: 22.0, carbs: 8.0, icon: '🍢' },
+  { n: 'Ambuyat (1 serving sago, no sides)', cat: 'Bruneian / Malay', fat: 0.2, protein: 0.3, carbs: 28.0, icon: '⚠️' },
+  { n: 'Ikan Bakar / BBQ Fish (1 fillet)', cat: 'Bruneian / Malay', fat: 8.0, protein: 28.0, carbs: 2.0, icon: '🐟' },
+  { n: 'Nasi Lemak — rice & sambal only (skip rice)', cat: 'Bruneian / Malay', fat: 12.0, protein: 8.0, carbs: 4.0, icon: '⚠️' },
+  { n: 'Nasi Lemak sides only (egg, ikan bilis, sambal)', cat: 'Bruneian / Malay', fat: 10.0, protein: 10.0, carbs: 3.0, icon: '🍳' },
+  { n: 'Chicken Curry, Malay style (no rice)', cat: 'Bruneian / Malay', fat: 18.0, protein: 26.0, carbs: 6.0, icon: '🍛' },
+  { n: 'Fish Curry, Malay style (no rice)', cat: 'Bruneian / Malay', fat: 12.0, protein: 24.0, carbs: 5.0, icon: '🐟' },
+  { n: 'Sayur Lodeh (mixed veg in coconut milk)', cat: 'Bruneian / Malay', fat: 10.0, protein: 4.0, carbs: 8.0, icon: '🥥' },
+  { n: 'Gulai Ikan / Fish in Coconut Curry (no rice)', cat: 'Bruneian / Malay', fat: 14.0, protein: 22.0, carbs: 6.0, icon: '🐟' },
+  { n: 'Sambal Goreng (1 serving, no rice)', cat: 'Bruneian / Malay', fat: 12.0, protein: 14.0, carbs: 5.0, icon: '🌶️' },
+  { n: 'Roti Canai (1 piece, no curry dip)', cat: 'Bruneian / Malay', fat: 8.0, protein: 4.0, carbs: 24.0, icon: '⚠️' },
+  { n: 'Laksa, soup only (no noodles)', cat: 'Bruneian / Malay', fat: 14.0, protein: 18.0, carbs: 6.0, icon: '🍲' },
+  { n: 'Sup Ayam / Clear Chicken Soup (1 bowl)', cat: 'Bruneian / Malay', fat: 6.0, protein: 24.0, carbs: 3.0, icon: '🥣' },
+  { n: 'Sup Tulang / Bone Broth Soup (1 bowl)', cat: 'Bruneian / Malay', fat: 8.0, protein: 18.0, carbs: 2.0, icon: '🥣' },
+  { n: 'Pari Bakar / Grilled Stingray (1 serving)', cat: 'Bruneian / Malay', fat: 6.0, protein: 22.0, carbs: 2.0, icon: '🐟' },
+  { n: 'Begedil / Potato Fritters (1 piece)', cat: 'Bruneian / Malay', fat: 5.0, protein: 2.0, carbs: 10.0, icon: '⚠️' },
+  { n: 'Gado-Gado (no lontong, light peanut sauce)', cat: 'Indonesian', fat: 12.0, protein: 10.0, carbs: 10.0, icon: '🥗' },
+  { n: 'Bakso Soup / Meatball Soup (no noodles)', cat: 'Indonesian', fat: 8.0, protein: 18.0, carbs: 4.0, icon: '🥣' },
+  { n: 'Opor Ayam / Chicken in Coconut Milk (no rice)', cat: 'Indonesian', fat: 20.0, protein: 26.0, carbs: 5.0, icon: '🍛' },
+  { n: 'Rendang, Chicken (no rice, 100g)', cat: 'Indonesian', fat: 18.0, protein: 28.0, carbs: 5.0, icon: '🍛' },
+  { n: 'Soto Ayam / Chicken Soup (no rice)', cat: 'Indonesian', fat: 8.0, protein: 22.0, carbs: 4.0, icon: '🥣' },
+  { n: 'Cap Cai / Chinese-Indo Stir Fry Veg (no rice)', cat: 'Indonesian', fat: 6.0, protein: 8.0, carbs: 8.0, icon: '🥗' },
+  { n: 'Peanut Sauce / Satay Sauce (2 tbsp)', cat: 'Aromatics & Condiments', fat: 8.0, protein: 3.0, carbs: 5.0, icon: '🥜' },
+  { n: 'Nam Prik / Thai Chilli Sauce (1 tbsp)', cat: 'Aromatics & Condiments', fat: 0.5, protein: 0.5, carbs: 3.0, icon: '🌶️' },
+  { n: 'Kecap Manis / Sweet Soy Sauce (1 tbsp)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.5, carbs: 8.0, icon: '🫙' },
+  { n: 'Tamarind Paste (1 tsp)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.2, carbs: 2.0, icon: '🟤' },
+  { n: 'Coconut Aminos (1 tbsp, soy sauce sub)', cat: 'Aromatics & Condiments', fat: 0.0, protein: 0.5, carbs: 1.0, icon: '🫙' },
+  { n: 'Shrimp Paste / Cincalok (1 tsp)', cat: 'Aromatics & Condiments', fat: 0.3, protein: 1.5, carbs: 0.3, icon: '🟤' },
+  { n: 'Tempoyak / Fermented Durian (1 tbsp)', cat: 'Aromatics & Condiments', fat: 1.0, protein: 0.5, carbs: 3.0, icon: '🟡' },
+  { n: 'Cacah Dipping Sauce (2 tbsp)', cat: 'Aromatics & Condiments', fat: 1.0, protein: 1.0, carbs: 3.0, icon: '🫙' },
+  { n: 'Sambal Oelek (1 tbsp)', cat: 'Aromatics & Condiments', fat: 0.5, protein: 0.3, carbs: 2.0, icon: '🌶️' },
+  { n: 'Hoisin Sauce (1 tbsp) ⚠️ high sugar', cat: 'Aromatics & Condiments', fat: 0.5, protein: 0.5, carbs: 7.0, icon: '🫙' },
+  { n: 'Sinigang, 1 bowl (pork, no rice)', cat: 'Common Meals', fat: 12.0, protein: 22.0, carbs: 8.0, icon: '🥣' },
+  { n: 'Sinigang, 1 bowl (fish/seafood, no rice)', cat: 'Common Meals', fat: 5.0, protein: 20.0, carbs: 7.0, icon: '🥣' },
+  { n: 'Sinigang, 1 bowl (with kangkong & veg)', cat: 'Common Meals', fat: 10.0, protein: 20.0, carbs: 10.0, icon: '🥣' },
+  { n: 'Breaded Prawns (light, Chinese-style, 6pc)', cat: 'Common Meals', fat: 8.0, protein: 20.0, carbs: 8.0, icon: '🍤' },
+  { n: 'Concoction: Cream', cat: 'Drinks', fat: 54.0, protein: 1.0, carbs: 1.0, icon: '🥛' },
+  { n: 'Concoction: Coconut', cat: 'Drinks', fat: 53.0, protein: 0.8, carbs: 1.5, icon: '🥥' },
+  { n: 'Eggs Boost Breakfast (3 eggs + 10ml butter)', cat: 'Egg & Dairy', fat: 23.0, protein: 18.0, carbs: 1.2, icon: '🍳' },
+  { n: 'Turmeric Chicken / Ayam Kunyit (100g)', cat: 'Common Meals', fat: 10.0, protein: 26.0, carbs: 2.0, icon: '🍗' },
+  { n: 'Curry Chicken, Malay-style, no rice (bowl)', cat: 'Common Meals', fat: 20.0, protein: 24.0, carbs: 6.0, icon: '🍛' },
+  { n: 'Curry Chicken, Indian-style, no rice (bowl)', cat: 'Indian', fat: 16.0, protein: 25.0, carbs: 8.0, icon: '🍛' },
+  { n: 'Chana Masala / Chole, no rice (bowl)', cat: 'Indian', fat: 12.0, protein: 10.0, carbs: 30.0, icon: '🍛' },
+  { n: 'Masala Fish / Fish Curry, Indian-style, no rice (bowl)', cat: 'Indian', fat: 14.0, protein: 22.0, carbs: 8.0, icon: '🐟' },
+  { n: 'Har Gow / Shrimp Dumplings (3pc)', cat: 'Dimsum', fat: 4.0, protein: 9.0, carbs: 8.0, icon: '🥟' },
+  { n: 'Siu Mai / Pork & Shrimp Dumplings (3pc)', cat: 'Dimsum', fat: 10.0, protein: 11.0, carbs: 6.0, icon: '🥟' },
+  { n: 'Vegetarian Siu Mai, mock prawn/cuttlefish (3pc)', cat: 'Dimsum', fat: 6.0, protein: 7.0, carbs: 7.0, icon: '🥟' },
+  { n: 'Char Siu Bao / BBQ Pork Bun, steamed (1pc)', cat: 'Dimsum', fat: 6.0, protein: 8.0, carbs: 28.0, icon: '🥟' },
+  { n: 'Char Siu Sou / BBQ Pork Pastry, baked (1pc)', cat: 'Dimsum', fat: 12.0, protein: 6.0, carbs: 20.0, icon: '🥐' },
+  { n: 'Chee Cheong Fun / Rice Noodle Rolls, plain (3pc)', cat: 'Dimsum', fat: 2.0, protein: 3.0, carbs: 22.0, icon: '🍥' },
+  { n: 'Egg Tart / Dan Tat (1pc)', cat: 'Dimsum', fat: 9.0, protein: 3.0, carbs: 18.0, icon: '🥧' },
+  { n: 'Turnip Cake / Lo Bak Go, pan-fried (2 slices)', cat: 'Dimsum', fat: 8.0, protein: 3.0, carbs: 14.0, icon: '🍘' },
+  { n: 'Spring Roll / Chun Guen (2pc)', cat: 'Dimsum', fat: 9.0, protein: 4.0, carbs: 15.0, icon: '🌯' },
+  { n: 'Lo Mai Gai / Sticky Rice in Lotus Leaf (1pc)', cat: 'Dimsum', fat: 9.0, protein: 12.0, carbs: 45.0, icon: '🍙' },
+  { n: 'Custard Bun / Nai Wong Bao, steamed (1pc)', cat: 'Dimsum', fat: 7.0, protein: 4.0, carbs: 26.0, icon: '🥮' },
+  { n: 'Phoenix Claws / Braised Chicken Feet (100g)', cat: 'Dimsum', fat: 8.0, protein: 14.0, carbs: 5.0, icon: '🍗' },
+  { n: 'Steamed Pork Ribs, black bean sauce (100g)', cat: 'Dimsum', fat: 14.0, protein: 16.0, carbs: 3.0, icon: '🍖' },
+  { n: 'Plain Congee / Rice Porridge (1 bowl)', cat: 'Dimsum', fat: 1.0, protein: 4.0, carbs: 30.0, icon: '🥣' },
+  { n: 'Wu Gok / Deep-fried Taro Dumpling (1pc)', cat: 'Dimsum', fat: 10.0, protein: 3.0, carbs: 16.0, icon: '🥟' },
+  { n: 'Curry Puff, chicken (1pc)', cat: 'Dimsum', fat: 8.0, protein: 2.0, carbs: 14.0, icon: '🥐' },
+  { n: 'Satay, chicken or beef, no sauce (3 sticks)', cat: 'Street Food', fat: 6.0, protein: 15.0, carbs: 4.0, icon: '🍢' },
+  { n: 'Cucur Sayur / Vegetable Fritter (1pc)', cat: 'Street Food', fat: 9.0, protein: 4.0, carbs: 28.0, icon: '🥠' },
+  { n: 'Tauhu Sumbat / Stuffed Tofu (1pc)', cat: 'Street Food', fat: 15.0, protein: 10.0, carbs: 20.0, icon: '🧈' },
+  { n: 'Satay Peanut Sauce (2 tbsp)', cat: 'Street Food', fat: 8.0, protein: 3.0, carbs: 6.0, icon: '🥜' },
+  { n: 'Roti Canai / Prata, plain (1pc)', cat: 'Street Food', fat: 8.0, protein: 4.0, carbs: 30.0, icon: '🫓' },
+  { n: 'Nasi Lemak, rice+egg+anchovies+sambal (1 plate)', cat: 'Street Food', fat: 15.0, protein: 6.0, carbs: 45.0, icon: '🍚' },
+  { n: 'Curry Laksa, with noodles (1 bowl)', cat: 'Street Food', fat: 20.0, protein: 15.0, carbs: 35.0, icon: '🍜' },
+  { n: 'Pad Thai (1 plate)', cat: 'Street Food', fat: 12.0, protein: 15.0, carbs: 45.0, icon: '🍜' },
+  { n: 'Banh Mi sandwich (1 whole)', cat: 'Street Food', fat: 14.0, protein: 18.0, carbs: 40.0, icon: '🥖' },
+  { n: 'Pisang Goreng / Fried Banana (2pc)', cat: 'Street Food', fat: 8.0, protein: 2.0, carbs: 30.0, icon: '🍌' },
+  { n: 'Popiah / Fresh Spring Roll (1pc)', cat: 'Street Food', fat: 4.0, protein: 5.0, carbs: 20.0, icon: '🌯' },
+  { n: 'Otak-Otak / Grilled Fish Cake (2pc)', cat: 'Street Food', fat: 6.0, protein: 8.0, carbs: 4.0, icon: '🐟' },
+  { n: 'Kaya Toast with butter (2 slices)', cat: 'Street Food', fat: 12.0, protein: 5.0, carbs: 30.0, icon: '🍞' },
+  { n: 'Murtabak, chicken (1 slice)', cat: 'Street Food', fat: 14.0, protein: 12.0, carbs: 25.0, icon: '🥟' },
+  { n: 'Mee Goreng / Fried Noodles (1 plate)', cat: 'Street Food', fat: 14.0, protein: 12.0, carbs: 50.0, icon: '🍜' },
+  { n: 'Cendol dessert (1 bowl)', cat: 'Street Food', fat: 8.0, protein: 2.0, carbs: 35.0, icon: '🍧' },
+  { n: 'Fish Ball Skewers (5pc)', cat: 'Street Food', fat: 2.0, protein: 10.0, carbs: 8.0, icon: '🍢' },
+  { n: 'Kuih, assorted sweet (2pc)', cat: 'Street Food', fat: 4.0, protein: 1.0, carbs: 22.0, icon: '🍡' },
+  { n: 'Hainanese Chicken Rice, chicken only, no rice (1 serve)', cat: 'Street Food', fat: 14.0, protein: 26.0, carbs: 2.0, icon: '🍗' },
+  { n: 'Bakso / Meatball Soup (1 bowl)', cat: 'Street Food', fat: 8.0, protein: 14.0, carbs: 10.0, icon: '🍲' },
+  { n: 'Halo-Halo dessert (1 cup)', cat: 'Street Food', fat: 6.0, protein: 3.0, carbs: 40.0, icon: '🍨' },
+  { n: 'Banh Xeo / Savory Crepe (1pc)', cat: 'Street Food', fat: 12.0, protein: 10.0, carbs: 20.0, icon: '🥞' }
 ];
 
-function orderMealFromZaki() {
-  const pick = ZAKI_MEAL_MENU[Math.floor(Math.random() * ZAKI_MEAL_MENU.length)];
-  logMeal(pick.dish, 'Zaki', pick.line);
+// === MEALS ===
+// Real macro tracking, ported from the Daybreak Quest tracker's own food database —
+// pick an actual food item, its real fat/protein/carbs get logged. Replaces the
+// earlier flavor-only random-dish version entirely; that system never actually served
+// the tracking need this was for.
+function todaysCarbLimit() {
+  const dk = todayKey();
+  if (G.slackDays.includes(dk)) return G.cafeSettings.slackDayCarbLimit;
+  return G.cafeSettings.carbLimit;
 }
-function orderMealFromJoel() {
-  const pick = JOEL_MEAL_MENU[Math.floor(Math.random() * JOEL_MEAL_MENU.length)];
-  logMeal(pick.dish, 'Joel', pick.line);
+function isSlackDayToday() {
+  return G.slackDays.includes(todayKey());
 }
-function logMeal(dish, cook, line) {
+function toggleSlackDay() {
+  const dk = todayKey();
+  const idx = G.slackDays.indexOf(dk);
+  if (idx >= 0) {
+    G.slackDays.splice(idx, 1);
+    lg('🍰 Slack Day turned off for today.');
+  } else {
+    G.slackDays.push(dk);
+    lg('🍰 Slack Day on \u2014 carb limit raised to ' + G.cafeSettings.slackDayCarbLimit + 'g today. Enjoy it, then back to normal tomorrow.');
+  }
+  render();
+}
+function getDailyMacroTotals(dateKey) {
+  const meals = G.mealLog[dateKey || todayKey()] || [];
+  const totals = { fat: 0, protein: 0, carbs: 0 };
+  for (let m of meals) { totals.fat += m.fat; totals.protein += m.protein; totals.carbs += m.carbs; }
+  return totals;
+}
+function logMealFromDatabase(foodIdx) {
+  const food = CAFE_FOOD_DATABASE[foodIdx];
+  if (!food) return;
   const dk = todayKey();
   if (!G.mealLog[dk]) G.mealLog[dk] = [];
   const timeLabel = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-  G.mealLog[dk].push({ dish, cook, time: timeLabel });
-  lg('\ud83c\udf7d\ufe0f ' + dish + ' logged. ' + line);
+  G.mealLog[dk].push({ food: food.n, cat: food.cat, fat: food.fat, protein: food.protein, carbs: food.carbs, time: timeLabel });
+  const totals = getDailyMacroTotals(dk);
+  lg(food.icon + ' ' + food.n + ' logged \u2014 ' + totals.carbs.toFixed(1) + 'g carbs today (limit ' + todaysCarbLimit() + 'g), ' + totals.protein.toFixed(1) + 'g protein, ' + totals.fat.toFixed(1) + 'g fat.');
+  render();
+}
+function removeMealEntry(index) {
+  const dk = todayKey();
+  if (!G.mealLog[dk] || !G.mealLog[dk][index]) return;
+  G.mealLog[dk].splice(index, 1);
   render();
 }
 
@@ -25938,23 +26331,59 @@ function rGuildCafe() {
   }
 
   // === MEALS ===
-  // Logging, not nutrition tracking — no calories, no targets, just "did you eat and
-  // what was it." Zaki (hobby chef) covers general fare; Joel specifically cooks
-  // Filipino dishes, kept as its own distinct source rather than folded into Zaki's
-  // menu, since that's specifically his own thing.
-  h += '<div class="panel-title" style="margin:14px 0 8px;">Meals Today</div>';
+  // Real macro tracking against a modified-keto carb limit, ported from the Daybreak
+  // Quest tracker's own food database. Slack Days are explicitly opt-in per date, never
+  // automatic — same "guilt-free, planned, not a failure state" framing the original
+  // app used deliberately.
+  const macros = getDailyMacroTotals();
+  const carbLimit = todaysCarbLimit();
+  const overLimit = macros.carbs > carbLimit;
+  h += '<div class="panel-title" style="margin:14px 0 8px;">Today\u2019s Macros</div>';
+  h += '<div class="panel' + (isSlackDayToday() ? ' panel-gold' : '') + '" style="margin-bottom:10px;">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
+  h += '<div style="font-weight:700;font-size:16px;' + (overLimit ? 'color:#e88;' : '') + '">' + macros.carbs.toFixed(1) + 'g <span style="font-size:11px;color:var(--text-dim);font-weight:400;">/ ' + carbLimit + 'g carbs</span></div>';
+  h += isSlackDayToday()
+    ? '<button onclick="toggleSlackDay()" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;color:var(--gold);">\ud83c\udf70 Slack Day \u2014 on</button>'
+    : '<button onclick="toggleSlackDay()" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;">Turn on Slack Day</button>';
+  h += '</div>';
+  h += '<div class="btn-hint">' + macros.protein.toFixed(1) + 'g protein \u00b7 ' + macros.fat.toFixed(1) + 'g fat</div>';
+  if (isSlackDayToday()) h += '<div class="btn-hint" style="margin-top:4px;color:var(--gold);">A planned, guilt-free higher-carb day \u2014 back to normal tomorrow.</div>';
+  h += '</div>';
+
   const todaysMeals = G.mealLog[todayKey()] || [];
   if (todaysMeals.length > 0) {
-    for (let meal of todaysMeals) {
-      h += '<div class="panel" style="margin-bottom:6px;"><div style="display:flex;justify-content:space-between;"><div style="font-size:12.5px;"><b>' + meal.dish + '</b> \u2014 ' + meal.cook + '</div><div class="btn-hint">' + meal.time + '</div></div></div>';
+    for (let i = 0; i < todaysMeals.length; i++) {
+      const meal = todaysMeals[i];
+      h += '<div class="panel" style="margin-bottom:6px;">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+      h += '<div style="font-size:12.5px;"><b>' + meal.food + '</b><div class="btn-hint">' + meal.carbs.toFixed(1) + 'g carbs \u00b7 ' + meal.protein.toFixed(1) + 'g protein \u00b7 ' + meal.fat.toFixed(1) + 'g fat \u00b7 ' + meal.time + '</div></div>';
+      h += '<button onclick="removeMealEntry(' + i + ')" class="btn-outline-ghost" style="margin:0;padding:2px 8px;font-size:14px;">\u00d7</button>';
+      h += '</div></div>';
+    }
+  }
+
+  // Category browser — 365 items is too many for a flat list, so pick a category first
+  const cafeCat = G.cafeCategory;
+  if (cafeCat) {
+    h += '<button onclick="G.cafeCategory=null;render();" class="btn-outline-ghost" style="width:100%;margin:10px 0;">\u2190 All Categories</button>';
+    h += '<div class="panel-title" style="margin-bottom:8px;">' + cafeCat + '</div>';
+    const items = CAFE_FOOD_DATABASE.map((f, i) => ({ f, i })).filter(x => x.f.cat === cafeCat);
+    for (let { f, i } of items) {
+      h += '<div class="panel" style="margin-bottom:6px;cursor:pointer;" onclick="logMealFromDatabase(' + i + ')">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+      h += '<div><div style="font-weight:700;font-size:12.5px;">' + f.icon + ' ' + f.n + '</div><div class="btn-hint">' + f.carbs.toFixed(1) + 'g carbs \u00b7 ' + f.protein.toFixed(1) + 'g protein \u00b7 ' + f.fat.toFixed(1) + 'g fat</div></div>';
+      h += '<span style="font-size:11px;color:var(--accent-light);">Log</span>';
+      h += '</div></div>';
     }
   } else {
-    h += '<div class="btn-hint" style="margin-bottom:8px;">Nothing logged yet today.</div>';
+    h += '<div class="panel-title" style="margin:14px 0 8px;">Log a Meal</div>';
+    const categories = [...new Set(CAFE_FOOD_DATABASE.map(f => f.cat))];
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">';
+    for (let cat of categories) {
+      h += '<button onclick="G.cafeCategory=\'' + cat + '\';render();" class="btn-outline-ghost" style="margin:0;font-size:11.5px;padding:10px 6px;">' + cat + '</button>';
+    }
+    h += '</div>';
   }
-  h += '<div style="display:flex;gap:8px;margin-bottom:16px;">';
-  h += '<button onclick="orderMealFromZaki()" class="abtn" style="flex:1;">Order from Zaki</button>';
-  h += '<button onclick="orderMealFromJoel()" class="abtn" style="flex:1;">Ask Joel to Cook</button>';
-  h += '</div>';
 
   h += '<div class="panel-title" style="margin:14px 0 8px;">Sit With Someone</div>';
   const pairings = [
