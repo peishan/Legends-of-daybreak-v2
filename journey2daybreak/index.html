@@ -44,7 +44,18 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:lin
 .portrait.large img{object-fit:cover;object-position:center center!important;}
 .turn-row img{object-fit:cover;object-position:center center!important;}
 .soel img{object-position:center center!important;}
-</style><style id="battle-v2-vars">
+</style>
+<style id="boss-landscape-css">
+/* Boss art as a wide block below name/HP instead of the small side avatar —
+   matches the landscape-format art actually being generated now. */
+.boss-section.boss-landscape-layout{ display:block !important; text-align:left; }
+.boss-section.boss-landscape-layout .boss-name{ font-size:1.1rem; margin-bottom:2px; }
+.boss-landscape-art{ width:100%; margin-top:10px; border-radius:10px; overflow:hidden; border:1px solid rgba(192,57,43,.35); box-shadow:0 0 20px rgba(192,57,43,.2); }
+.boss-landscape-art img{ width:100%; display:block; max-height:260px; object-fit:cover; }
+.combat-log{ height:150px; overflow-y:auto; scroll-behavior:smooth; }
+.combat-log div{ padding:2px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+</style>
+<style id="battle-v2-vars">
 .battle-arena {
   --gold-light: #f0d78c; --gold-dark: #8b6914;
   --blue-glow: #4da6ff; --blue-deep: #1a3a5c;

@@ -77,6 +77,8 @@ const STATE = {
   partyMp: {},
   inventory: [],       // earned boss loot: {id, name, icon, desc, fromChapter, fromBoss}
   companionMode: {},   // {memberId: 'assisted'|'manual'} — San is always manual, not stored here
+  combatLog: [],        // persists across re-renders instead of resetting to one line
+  combatLogBossId: null,
   journalPage: null
 };
 
@@ -181,6 +183,7 @@ const BOSS_CHAPTERS = chapterData.filter(c=>c.boss).map(c => ({
   hp: c.id===8 ? 4800 : 4800 + (c.id-8)*260,
   ac: c.id===8 ? 18 : 16 + Math.min(10, Math.floor((c.id-8)/10)),
   art: c.bossArt || null,
+  landscapeArt: c.bossArtLandscape || null,  // wide format — displayed below name/HP now
   phases: BOSS_PHASES[c.id] || null,
   phaseArt: c.bossPhaseArt || null
 }));
@@ -195,6 +198,45 @@ function currentBossId(){
 }
 function bossHpFor(id){ const b=bossFor(id); if(!b) return 0; return (id in STATE.bossHp) ? STATE.bossHp[id] : b.hp; }
 function setBossHp(id, val){ STATE.bossHp[id]=Math.max(0,val); save(); }
+
+// ---------------------------------------------------------------------------
+// CLASS KITS — real per-character spells/skills instead of a generic SPELL
+// button. Also drives assisted-AI so a Storm Mage actually casts instead of
+// always swinging a weapon it doesn't have. Eliz's Cure Disease unlocks at
+// level 30, matching "high level" as requested.
+// ---------------------------------------------------------------------------
+const CLASS_KIT = {
+  san:         {role:'caster', spell:{name:'Astral Lance', icon:'✨', mp:15, mult:1.6}, skill:{name:"Daybreak Ward", icon:'🛡️', mp:10, effect:'ward'}},
+  joel:        {role:'tank',   spell:null, skill:{name:"Guardian's Oath", icon:'⚔️', mp:8, effect:'taunt'}},
+  aisyah:      {role:'melee',  spell:null, skill:{name:'Coup de Grace', icon:'💀', mp:12, mult:1.8}},
+  eliz:        {role:'healer', spell:{name:'Heal', icon:'💚', mp:10, healMult:1}, skill:{name:'Resurrect', icon:'🌟', mp:35, effect:'revive'},
+                highSkill:{name:'Cure Disease', icon:'🌿', mp:20, effect:'cleanse', levelReq:30}},
+  mezstorm:    {role:'caster', spell:{name:'Tempest Fury', icon:'🌀', mp:18, mult:1.7}, skill:{name:'Thunderclap', icon:'🔊', mp:12, effect:'stun'}},
+  senedra:     {role:'ranged', spell:null, skill:{name:"Hunter's Mark", icon:'🎯', mp:8, effect:'mark'}},
+  zaki:        {role:'melee',  spell:null, skill:{name:'Power Strike', icon:'💥', mp:10, mult:1.5}},
+  ser_aldric:  {role:'tank',   spell:null, skill:{name:'Holy Strike', icon:'✝️', mp:10, mult:1.4}},
+  sister_wren: {role:'healer', spell:{name:'Blessing of Faith', icon:'🙏', mp:12, healMult:1.1}, skill:{name:'Purify', icon:'🌿', mp:15, effect:'cleanse'}}
+};
+function kitFor(id){ return CLASS_KIT[id] || {role:'melee', spell:null, skill:null}; }
+function logCombat(line){
+  if(STATE.combatLogBossId !== currentBossId()){ STATE.combatLog = []; STATE.combatLogBossId = currentBossId(); }
+  STATE.combatLog.push(line);
+  if(STATE.combatLog.length > 200) STATE.combatLog.shift();
+}
+function chooseAutoAction(actor, party){
+  const kit = kitFor(actor.id);
+  if(kit.role === 'healer'){
+    const hurt = party.some(m => {
+      const hp = STATE.partyHp[m.id] != null ? STATE.partyHp[m.id] : m.hp;
+      return hp > 0 && hp/m.hp < 0.5;
+    });
+    if(hurt && kit.spell) return 'SPELL';
+    return 'ATTACK';
+  }
+  if(kit.role === 'caster' && kit.spell) return Math.random() < 0.7 ? 'SPELL' : 'ATTACK';
+  if(kit.skill && Math.random() < 0.25) return 'SKILL';
+  return 'ATTACK';
+}
 
 // ---------------------------------------------------------------------------
 // BOSS LOOT — one themed trophy per boss, awarded once on defeat. Themed by
@@ -242,7 +284,7 @@ function toast(msg){let t=document.getElementById('toast');if(!t){t=document.cre
 function refreshTopbar(){const stats=topbar.querySelectorAll('.stat');const lvl=level();const prev=xpThreshold(lvl-1),next=xpThreshold(lvl);if(stats[0])stats[0].querySelector('.big').textContent=lvl;if(stats[1]){stats[1].querySelector('.num').textContent=`${STATE.xp.toLocaleString()} / ${next.toLocaleString()}`;stats[1].querySelector('.fill').style.width=`${Math.min(100,(STATE.xp-prev)/Math.max(1,next-prev)*100)}%`;}if(stats[2]){stats[2].querySelector('.num').textContent='82 / 82';}if(stats[3]){stats[3].querySelector('.num').textContent='64 / 100';}}
 function go(name){if(name!=='Battle')clearAutoActTimer();document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.name===name));render(name);window.scrollTo({top:0,behavior:'smooth'})}
 
-function render(name){refreshTopbar();document.querySelectorAll('.soel').forEach(e=>e.remove());let body='';if(name==='Dashboard')body=dashboard();if(name==='Journal')body=journalScreen();if(name==='Quests')body=questsScreen();if(name==='Party')body=partyScreen();if(name==='Spellbook')body=spellbookScreen();if(name==='Inventory')body=inventoryScreen();if(name==='Codex')body=codexScreen();if(name==='Battle')body=battleScreen();main.innerHTML=topbar.outerHTML+body+`<div id="toast" class="toast"></div>`;if(name!=='Battle'){const soel=document.createElement('div');soel.className='soel';soel.innerHTML=`<img src="${soelSrc}"><div class="lock"><b>SOEL</b><small>LOCKED<br/>Awakens at Level 10 🔒</small></div>`;document.querySelector('.app').appendChild(soel)}bind();}
+function render(name){refreshTopbar();document.querySelectorAll('.soel').forEach(e=>e.remove());let body='';if(name==='Dashboard')body=dashboard();if(name==='Journal')body=journalScreen();if(name==='Quests')body=questsScreen();if(name==='Party')body=partyScreen();if(name==='Spellbook')body=spellbookScreen();if(name==='Inventory')body=inventoryScreen();if(name==='Codex')body=codexScreen();if(name==='Battle')body=battleScreen();main.innerHTML=topbar.outerHTML+body+`<div id="toast" class="toast"></div>`;if(name!=='Battle'){const soel=document.createElement('div');soel.className='soel';soel.innerHTML=`<img src="${soelSrc}"><div class="lock"><b>SOEL</b><small>LOCKED<br/>Awakens at Level 10 🔒</small></div>`;document.querySelector('.app').appendChild(soel)}bind();if(name==='Battle'){const cl=document.getElementById('combatLog');if(cl)cl.scrollTop=cl.scrollHeight;}}
 
 function bind(){
   document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
@@ -344,7 +386,22 @@ function partyScreen(){
     `<div class="locked-banner">🐾 SOEL · SPIRITUAL FAMILIAR · LOCKED UNTIL LEVEL 10</div>`,
     navButton('Dashboard'));
 }
-function spellbookScreen(){return panel('Spellbook','SAN · SPELLS & TECHNIQUES',`<div class="chapter-grid">${['Arcane Bolt','Storm Veil','Astral Lance','Daybreak Ward','Starfall','Aether Pulse'].map((x,i)=>`<article class="quest"><div class="mini-ico">✧</div><div><h3>${x}</h3><p>Technique available to San as her story progression advances.</p></div><b>${[4,6,8,7,12,5][i]} MANA</b></article>`).join('')}</div>`,navButton('Dashboard'))}
+function spellbookScreen(){
+  const lvl = level();
+  const rows = ALL_PARTY.filter(m=>STATE.completed >= m.joinChapter).map(m=>{
+    const kit = kitFor(m.id);
+    const entries = [];
+    if(kit.spell) entries.push({name:kit.spell.name, icon:kit.spell.icon, mp:kit.spell.mp, note: kit.spell.healMult?'Restores HP to the lowest-HP ally':'Damaging spell'});
+    if(kit.skill) entries.push({name:kit.skill.name, icon:kit.skill.icon, mp:kit.skill.mp, note: kit.skill.effect==='revive'?'Revives a fallen ally':kit.skill.effect==='cleanse'?'Removes debuffs':'Class skill'});
+    if(kit.highSkill){
+      const unlocked = lvl >= kit.highSkill.levelReq;
+      entries.push({name:kit.highSkill.name, icon:kit.highSkill.icon, mp:kit.highSkill.mp, note: unlocked?'Cures disease/status ailments':`Unlocks at Level ${kit.highSkill.levelReq} (currently Lv.${lvl})`, locked:!unlocked});
+    }
+    if(!entries.length) entries.push({name:'—', icon:'⚔️', mp:0, note:'Physical attacker — no spells, relies on gear and Attack'});
+    return `<h3 style="font-family:Cinzel;color:#c99aff;margin:18px 0 6px;font-size:16px">${esc(m.name)} · ${esc(m.role)}</h3><div class="chapter-grid">${entries.map(e=>`<article class="quest" style="${e.locked?'opacity:.5':''}"><div class="mini-ico">${e.icon}</div><div><h3>${esc(e.name)}</h3><p>${esc(e.note)}</p></div>${e.mp?`<b>${e.mp} MP</b>`:''}</article>`).join('')}</div>`;
+  }).join('');
+  return panel('Spellbook','PARTY SPELLS & TECHNIQUES', rows, navButton('Dashboard'));
+}
 function inventoryScreen(){
   const trophies = STATE.inventory.length
     ? `<h3 style="font-family:Cinzel;color:#c99aff;margin:0 0 4px;font-size:18px">BOSS TROPHIES</h3><p class="lead" style="margin-bottom:14px">Earned by defeating story bosses.</p><div class="chapter-grid">${STATE.inventory.map(item=>`<article class="quest"><div class="mini-ico">${item.icon}</div><div><h3>${esc(item.name)}</h3><p>${esc(item.desc)}</p></div></article>`).join('')}</div>`
@@ -386,12 +443,13 @@ function battleScreen(){
   html += `<div class="turn-chip turn-chip-boss" title="${esc(boss.name)}">${bossAvatar}</div>`;
   html += '</div>';
 
-  html += '<div class="boss-section v2-boss">';
-  html += `<div class="boss-avatar">${bossAvatar}</div>`;
+  html += '<div class="boss-section v2-boss boss-landscape-layout">';
   html += `<div class="boss-name">${esc(boss.name).toUpperCase()}</div>`;
   html += `<div class="boss-phase">${hp<=0?'DEFEATED':phaseLabel}</div>`;
   html += `<div class="boss-hp-bar"><div class="boss-hp-fill" style="width:${hpPercent}%"></div><div class="boss-hp-text">${hp.toLocaleString()}/${boss.hp.toLocaleString()} HP</div></div>`;
   html += `<div style="font-size:.7rem;color:var(--parchment-dark, #aaa5b4)">AC ${boss.ac}${locked?' · Locked':''}</div>`;
+  const landscapeSrc = boss.landscapeArt || currentArt;
+  if(landscapeSrc) html += `<div class="boss-landscape-art">${safeImg(landscapeSrc, boss.name)}</div>`;
   html += '</div>';
 
   html += '<div class="companion-ai-strip"><span><strong>San</strong> is always yours to control — set each companion below to Assisted (auto-acts) or Manual.</span></div>';
@@ -422,15 +480,28 @@ function battleScreen(){
   const playerControlsThisTurn = !currentMember || currentMember.id==='san' || (STATE.companionMode[currentMember.id]||'assisted')==='manual';
   html += '<div class="battle-actions">';
   if(playerControlsThisTurn){
-    [['ATTACK','⚔️','Basic attack'],['SPELL','✨','Use magic'],['SKILL','🎯','Class skill'],['ITEM','🧪','Use item'],['DEFEND','🛡️','Brace']].forEach(([a,icon,sub])=>{
-      html += `<button class="battle-action-btn" data-battle-action="${a}" ${hp<=0||locked?'disabled':''}><span class="battle-action-icon">${icon}</span><span class="battle-action-label">${a}</span><span class="battle-action-sub">${sub}</span></button>`;
+    const actorKit = currentMember ? kitFor(currentMember.id) : kitFor('san');
+    const level_ = level();
+    const spellAvailable = !!actorKit.spell;
+    const skillAvailable = !!actorKit.skill;
+    const highSkillReady = actorKit.highSkill && level_ >= actorKit.highSkill.levelReq;
+    const actions = [
+      ['ATTACK','⚔️','Basic attack', true],
+      ['SPELL', spellAvailable?actorKit.spell.icon:'✨', spellAvailable?actorKit.spell.name+` (${actorKit.spell.mp} MP)`:'No spells known', spellAvailable],
+      ['SKILL', highSkillReady?actorKit.highSkill.icon:(skillAvailable?actorKit.skill.icon:'🎯'), highSkillReady?actorKit.highSkill.name+` (${actorKit.highSkill.mp} MP)`:(skillAvailable?actorKit.skill.name+` (${actorKit.skill.mp} MP)`:'No skills known'), skillAvailable],
+      ['ITEM','🧪','Use item', true],
+      ['DEFEND','🛡️','Brace', true]
+    ];
+    actions.forEach(([a,icon,sub,enabled])=>{
+      html += `<button class="battle-action-btn" data-battle-action="${a}" ${hp<=0||locked||!enabled?'disabled':''}><span class="battle-action-icon">${icon}</span><span class="battle-action-label">${a}</span><span class="battle-action-sub">${sub}</span></button>`;
     });
   } else {
     html += `<div class="battle-note" style="grid-column:1/-1;text-align:center;padding:10px">${esc(currentMember.name)} is acting on Assisted AI…</div>`;
   }
   html += '</div>';
 
-  html += `<div class="eyebrow" style="margin-top:14px">COMBAT LOG</div><div class="combat-log" id="combatLog">${hp<=0?`<div style="color:#d5a1f4">${esc(boss.name)} defeated. Chapter ${boss.id} complete.</div>`:STATE.battleStarted?'The battle is underway.':'Battle ready. Select the active party member.'}</div>`;
+  const logLines = STATE.combatLog.length ? STATE.combatLog.map(l=>`<div>${l}</div>`).join('') : 'Battle ready. Select the active party member.';
+  html += `<div class="eyebrow" style="margin-top:14px">COMBAT LOG</div><div class="combat-log" id="combatLog">${logLines}</div>`;
 
   html += '</div>'; // .battle-arena
   html += '<div style="margin-top:12px"><button class="cta" data-go="Quests">‹ BACK TO QUESTS</button></div></section>';
@@ -458,7 +529,7 @@ function maybeAutoActCompanion(){
   if(hp<=0) return;
   autoActTimer = setTimeout(()=>{
     autoActTimer = null;
-    battleAction('ATTACK');
+    battleAction(chooseAutoAction(cur, getActiveParty()));
   }, 700);
 }
 function safeImg(src, alt){
@@ -475,31 +546,65 @@ function battleAction(a){
   if(hp<=0) return;
   STATE.battleStarted=true;
   const party = getActiveParty();
-  const actor = party[STATE.turn] ? party[STATE.turn].name : 'San';
-  const log = document.getElementById('combatLog');
-  if(a==='ATTACK'){
-    const dmgTable=[120,105,110,95,90,85,80,60,60];
-    const dmg = dmgTable[STATE.turn % dmgTable.length];
+  const actor = party[STATE.turn] || {name:'San', id:'san', hp:82, mp:100};
+  const kit = kitFor(actor.id);
+  const curMp = STATE.partyMp[actor.id] != null ? STATE.partyMp[actor.id] : actor.mp;
+  const dmgTable = [120,105,110,95,90,85,80,60,60];
+  const baseDmg = dmgTable[STATE.turn % dmgTable.length];
+
+  function spendMp(amount){ STATE.partyMp[actor.id] = Math.max(0, curMp-amount); }
+  function dealDamage(dmg, verb){
     hp = Math.max(0, hp-dmg);
     setBossHp(boss.id, hp);
-    log.innerHTML += `<div>${actor} attacks for ${dmg} damage.</div>`;
-    if(hp===0){
-      log.innerHTML += `<div style="color:#d5a1f4">${esc(boss.name)} defeated. Chapter ${boss.id} complete.</div>`;
-      if(STATE.completed < boss.id){
-        STATE.xp += bossReward(chapterData.find(c=>c.id===boss.id));
-        STATE.completed = boss.id;
-        const loot = awardBossLoot(boss.id, boss.name);
-        save();
-        toast(loot ? `${boss.name} defeated! · ${loot.icon} ${loot.name} obtained` : `${boss.name} defeated!`);
-      } else {
-        toast(`${boss.name} defeated!`);
-      }
+    logCombat(`${esc(actor.name)} ${verb} for ${dmg} damage.`);
+  }
+
+  if(a==='ATTACK'){
+    dealDamage(baseDmg, 'attacks');
+  } else if(a==='SPELL' && kit.spell){
+    if(curMp < kit.spell.mp){ logCombat(`${esc(actor.name)} doesn't have enough MP for ${kit.spell.name} — attacks instead.`); dealDamage(baseDmg,'attacks'); }
+    else if(kit.spell.healMult){
+      spendMp(kit.spell.mp);
+      const healAmt = Math.round(60*kit.spell.healMult);
+      const lowest = party.reduce((min,m)=>{ const h=STATE.partyHp[m.id]!=null?STATE.partyHp[m.id]:m.hp; const minH=STATE.partyHp[min.id]!=null?STATE.partyHp[min.id]:min.hp; return h/m.hp < minH/min.hp ? m : min; }, party[0]);
+      STATE.partyHp[lowest.id] = Math.min(lowest.hp, (STATE.partyHp[lowest.id]!=null?STATE.partyHp[lowest.id]:lowest.hp)+healAmt);
+      logCombat(`${esc(actor.name)} casts ${kit.spell.icon} ${esc(kit.spell.name)}, healing ${esc(lowest.name)} for ${healAmt} HP.`);
     } else {
-      STATE.turn=(STATE.turn+1)%Math.max(1,party.length);
-      setTimeout(()=>go('Battle'),250);
+      spendMp(kit.spell.mp);
+      dealDamage(Math.round(baseDmg*kit.spell.mult), `casts ${kit.spell.icon} ${esc(kit.spell.name)}`);
     }
+  } else if(a==='SKILL' && kit.skill){
+    const useHigh = kit.highSkill && level() >= kit.highSkill.levelReq;
+    const chosenSkill = useHigh ? kit.highSkill : kit.skill;
+    if(curMp < chosenSkill.mp){ logCombat(`${esc(actor.name)} doesn't have enough MP for ${chosenSkill.name} — attacks instead.`); dealDamage(baseDmg,'attacks'); }
+    else {
+      spendMp(chosenSkill.mp);
+      if(chosenSkill.mult) dealDamage(Math.round(baseDmg*chosenSkill.mult), `uses ${chosenSkill.icon} ${esc(chosenSkill.name)}`);
+      else logCombat(`${esc(actor.name)} uses ${chosenSkill.icon} ${esc(chosenSkill.name)}.`);
+    }
+  } else if(a==='DEFEND'){
+    logCombat(`${esc(actor.name)} braces to defend.`);
+  } else if(a==='ITEM'){
+    logCombat(`${esc(actor.name)} rummages for an item, but the pack is still empty.`);
   } else {
-    log.innerHTML += `<div>${actor} uses ${a.toLowerCase()}. The encounter responds.</div>`;
+    dealDamage(baseDmg, 'attacks');
+  }
+
+  save();
+
+  if(hp===0){
+    logCombat(`<span style="color:#d5a1f4">${esc(boss.name)} defeated. Chapter ${boss.id} complete.</span>`);
+    if(STATE.completed < boss.id){
+      STATE.xp += bossReward(chapterData.find(c=>c.id===boss.id));
+      STATE.completed = boss.id;
+      const loot = awardBossLoot(boss.id, boss.name);
+      save();
+      toast(loot ? `${boss.name} defeated! · ${loot.icon} ${loot.name} obtained` : `${boss.name} defeated!`);
+    } else {
+      toast(`${boss.name} defeated!`);
+    }
+    go('Battle');
+  } else {
     STATE.turn=(STATE.turn+1)%Math.max(1,party.length);
     setTimeout(()=>go('Battle'),250);
   }
