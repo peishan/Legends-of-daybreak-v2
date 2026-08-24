@@ -2,232 +2,26 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Journal — Visual Novel Preview</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0f0e17;
-    --bg-card: #1a1925;
-    --border: #2d2b3a;
-    --text: #e8e6f0;
-    --text-dim: #8b8a99;
-    --accent: #7c3aed;
-    --accent-light: #a78bfa;
-    --gold: #f59e0b;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: #050509;
-    color: var(--text);
-    font-family: 'Nunito', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 24px 12px 60px;
-    min-height: 100vh;
-  }
-  h1 {
-    font-family: 'Cinzel', serif;
-    font-size: 19px;
-    color: var(--accent-light);
-    margin: 0 0 4px;
-    text-align: center;
-  }
-  .sub {
-    font-size: 13px;
-    color: var(--text-dim);
-    text-align: center;
-    max-width: 420px;
-    margin-bottom: 20px;
-    line-height: 1.6;
-  }
-  .phone {
-    width: 380px;
-    max-width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 22px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-  }
-
-  /* Full-bleed art as the actual backdrop, not a separate block above the text */
-  .vn-stage {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 3/2;
-    overflow: hidden;
-  }
-  .vn-stage img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .vn-fade {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, rgba(15,14,23,0) 40%, rgba(15,14,23,0.85) 80%, rgba(15,14,23,1) 100%);
-  }
-  .vn-chapter-label {
-    position: absolute;
-    top: 14px;
-    left: 16px;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: rgba(255,255,255,0.85);
-    background: rgba(0,0,0,0.4);
-    padding: 5px 10px;
-    border-radius: 8px;
-    backdrop-filter: blur(4px);
-  }
-
-  /* The dialogue box sits overlapping the bottom of the art, VN-style */
-  .vn-dialogue-wrap {
-    margin-top: -70px;
-    position: relative;
-    z-index: 2;
-    padding: 0 16px 16px;
-  }
-  .vn-box {
-    background: rgba(26,25,37,0.92);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 14px 16px;
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    opacity: 0;
-    transform: translateY(10px);
-    animation: vnIn 0.4s ease-out forwards;
-  }
-  @keyframes vnIn { to { opacity: 1; transform: translateY(0); } }
-  .vn-portrait {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    border: 2px solid var(--accent);
-    overflow: hidden;
-    flex-shrink: 0;
-    background: var(--bg-card);
-  }
-  .vn-portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .vn-body { flex: 1; min-width: 0; }
-  .vn-speaker {
-    font-family: 'Cinzel', serif;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--accent-light);
-    margin-bottom: 4px;
-  }
-  .vn-text {
-    font-size: 14px;
-    line-height: 1.6;
-    color: var(--text);
-    font-style: italic;
-  }
-  .vn-narrator .vn-text {
-    color: var(--text-dim);
-    font-style: normal;
-  }
-  .vn-narrator .vn-speaker { color: var(--text-dim); }
-
-  .vn-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 16px 16px;
-  }
-  .vn-progress { font-size: 11px; color: var(--text-dim); }
-  .vn-next-btn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 18px;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .notes {
-    max-width: 420px;
-    width: 100%;
-    margin-top: 20px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 16px;
-    font-size: 12.5px;
-    line-height: 1.6;
-    color: var(--text-dim);
-  }
-  .notes b { color: var(--accent-light); }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="theme-color" content="#0f0e17">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Daybreak v2">
+<link rel="manifest" href="manifest.json?v=2">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https: fonts.googleapis.com; font-src https: fonts.gstatic.com; connect-src 'self' https://api.github.com;">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>Legends of Daybreak - RPG</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-<h1>Journal — Visual Novel Direction</h1>
-<p class="sub">Real Chapter 3 art and dialogue, not placeholder content. Tap "Next" to step through the scene.</p>
-
-<div class="phone">
-  <div class="vn-stage">
-    <img src="chapter3-first-bond.jpg" alt="">
-    <div class="vn-fade"></div>
-    <div class="vn-chapter-label">Chapter 3 · The First Bond</div>
-  </div>
-  <div class="vn-dialogue-wrap">
-    <div class="vn-box" id="vn-box">
-      <div class="vn-portrait" id="vn-portrait" style="background:linear-gradient(135deg,#7c3aed,#4c1d95);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;">J</div>
-      <div class="vn-body">
-        <div class="vn-speaker" id="vn-speaker">Joel</div>
-        <div class="vn-text" id="vn-text">"You look like you need a shield," a voice says. Joel stands in the doorway, already armored, already certain. The steadfast man from a Philippine village, second of four, breadwinner, stray-feeder, yours.</div>
-      </div>
-    </div>
-  </div>
-  <div class="vn-nav">
-    <span class="vn-progress" id="vn-progress">1 / 3</span>
-    <button class="vn-next-btn" id="vn-next">Next ▸</button>
-  </div>
-</div>
-
-<div class="notes">
-  <b>What's different from the current journal:</b> the art becomes the actual backdrop the dialogue sits on top of, rather than a separate block above plain text — the fade gradient is what makes the text readable regardless of what's in the image. One line at a time, tap to advance, portrait circle keeps the speaker identity clear. Narrator lines drop the portrait and mute the styling, so it reads as scene-setting rather than a character talking.<br><br>
-  <b>Worth deciding:</b> should every chapter show art the whole time (like here), or only during the opening line, with the art fading out once dialogue starts? Full-time art looks better but only works well for chapters that already have generated art — most don't yet.
-</div>
-
-<script>
-const SCENES = [
-  { speaker: 'Joel', text: '"You look like you need a shield," a voice says. Joel stands in the doorway, already armored, already certain. The steadfast man from a Philippine village, second of four, breadwinner, stray-feeder, yours.', initial: 'J' },
-  { speaker: 'Joel', text: '"I do not ask why you are here. I ask if you will let me stand beside you while you find out." He does not look at the mark on your wrist. He looks at your face. He always looks at your face.', initial: 'J' },
-  { speaker: 'Narrator', text: 'Joel joins your party. His shield is heavy. His loyalty is heavier. In this world, as in the last, he is The Steadfast — the one who stands between you and everything that would harm you.', initial: null }
-];
-let idx = 0;
-function render() {
-  const s = SCENES[idx];
-  const box = document.getElementById('vn-box');
-  box.classList.remove('vn-narrator');
-  if (s.speaker === 'Narrator') box.classList.add('vn-narrator');
-  document.getElementById('vn-speaker').textContent = s.speaker;
-  document.getElementById('vn-text').textContent = s.text;
-  document.getElementById('vn-portrait').style.display = s.initial ? 'flex' : 'none';
-  document.getElementById('vn-portrait').textContent = s.initial || '';
-  document.getElementById('vn-progress').textContent = (idx + 1) + ' / ' + SCENES.length;
-  document.getElementById('vn-next').textContent = idx === SCENES.length - 1 ? 'Restart ↺' : 'Next ▸';
-  box.style.animation = 'none';
-  void box.offsetWidth;
-  box.style.animation = 'vnIn 0.4s ease-out forwards';
-}
-document.getElementById('vn-next').addEventListener('click', () => {
-  idx = (idx + 1) % SCENES.length;
-  render();
-});
-</script>
-
+<div id="app"></div>
+<script src="game.js"></script>
 </body>
 </html>
