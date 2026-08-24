@@ -16,15 +16,15 @@ const chapterCover = 'assets/hero/hero-ch1.jpg';
 // which chapter unlocks them.
 // ---------------------------------------------------------------------------
 const ALL_PARTY = [
-  {id:'san',        name:'SAN',        role:'Sorcerer',            hp:82, joinChapter:0,   portrait:'assets/portraits/san.jpg'},
-  {id:'joel',       name:'JOEL',       role:'Paladin',             hp:95, joinChapter:3,   portrait:'assets/portraits/joel.jpg'},
-  {id:'aisyah',     name:'AISYAH',     role:'Rogue / Merchant',    hp:74, joinChapter:4,   portrait:'assets/portraits/aisyah.jpg'},
-  {id:'eliz',       name:'ELIZ',       role:'Healer',              hp:68, joinChapter:6,   portrait:'assets/portraits/eliz.jpg'},
-  {id:'mezstorm',   name:'MEZSTORM',   role:'Storm Mage',          hp:80, joinChapter:7,   portrait:'assets/portraits/mezstorm.jpg'},
-  {id:'senedra',    name:'SENEDRA',    role:'Scout',               hp:70, joinChapter:11,  portrait:'assets/portraits/senedra.jpg'},
-  {id:'zaki',       name:'ZAKI',       role:'Fighter',             hp:78, joinChapter:11,  portrait:'assets/portraits/zaki.jpg'},
-  {id:'ser_aldric', name:'SER ALDRIC', role:'Knight',              hp:90, joinChapter:73, portrait:'assets/portraits/ser_aldric.jpg'},
-  {id:'sister_wren',name:'SISTER WREN',role:'Healer',              hp:72, joinChapter:74, portrait:'assets/portraits/sister_wren.jpg'}
+  {id:'san',        name:'SAN',        role:'Sorcerer',            hp:82, mp:100, joinChapter:0,   portrait:'assets/portraits/san.jpg'},
+  {id:'joel',       name:'JOEL',       role:'Paladin',             hp:95, mp:40,  joinChapter:3,   portrait:'assets/portraits/joel.jpg'},
+  {id:'aisyah',     name:'AISYAH',     role:'Rogue / Merchant',    hp:74, mp:55,  joinChapter:4,   portrait:'assets/portraits/aisyah.jpg'},
+  {id:'eliz',       name:'ELIZ',       role:'Healer',              hp:65, mp:120, joinChapter:6,   portrait:'assets/portraits/eliz.jpg'},
+  {id:'mezstorm',   name:'MEZSTORM',   role:'Storm Mage',          hp:75, mp:110, joinChapter:7,   portrait:'assets/portraits/mezstorm.jpg'},
+  {id:'senedra',    name:'SENEDRA',    role:'Scout',               hp:70, mp:55,  joinChapter:11,  portrait:'assets/portraits/senedra.jpg'},
+  {id:'zaki',       name:'ZAKI',       role:'Fighter',             hp:88, mp:35,  joinChapter:11,  portrait:'assets/portraits/zaki.jpg'},
+  {id:'ser_aldric', name:'SER ALDRIC', role:'Knight',              hp:90, mp:45,  joinChapter:73,  portrait:'assets/portraits/ser_aldric.jpg'},
+  {id:'sister_wren',name:'SISTER WREN',role:'Healer',              hp:72, mp:100, joinChapter:74,  portrait:'assets/portraits/sister_wren.jpg'}
 ];
 function getActiveParty(){ return ALL_PARTY.filter(m => STATE.completed >= m.joinChapter); }
 function getRecentJoins(){ return ALL_PARTY.filter(m => m.joinChapter === STATE.completed && m.joinChapter > 0); }
@@ -54,6 +54,8 @@ const STATE = {
   battleStarted:false,
   turn:0,
   bossHp: JSON.parse(localStorage.getItem('daybreak_v7_bosshp')||'{}'),
+  partyHp: JSON.parse(localStorage.getItem('daybreak_v7_partyhp')||'{}'),
+  partyMp: JSON.parse(localStorage.getItem('daybreak_v7_partymp')||'{}'),
   journalPage: null
 };
 
@@ -63,17 +65,27 @@ const STATE = {
 // exists. HP/AC scale gently with chapter position — reflavor freely.
 // ---------------------------------------------------------------------------
 const BONE_TYRANT_ART = 'assets/battle/bone-tyrant-wide.jpg';
+// Multi-phase bosses (only the Nexus Planarch so far — 5 phases per the journal)
+const BOSS_PHASES = {
+  20: ['Arcane','Fire','Ice','Lightning','Void']
+};
 const BOSS_CHAPTERS = chapterData.filter(c=>c.boss).map(c => ({
   id: c.id,
   name: c.bossName || c.title,
   hp: c.id===8 ? 4800 : 4800 + (c.id-8)*260,
   ac: c.id===8 ? 18 : 16 + Math.min(10, Math.floor((c.id-8)/10)),
-  art: c.id===8 ? BONE_TYRANT_ART : null
+  art: c.bossArt || null,
+  phases: BOSS_PHASES[c.id] || null,
+  phaseArt: c.bossPhaseArt || null
 }));
 function bossFor(chapterId){ return BOSS_CHAPTERS.find(b=>b.id===chapterId); }
 function currentBossId(){
-  const next = BOSS_CHAPTERS.find(b => b.id <= STATE.completed+1);
-  return next ? next.id : (BOSS_CHAPTERS[0] ? BOSS_CHAPTERS[0].id : null);
+  // The next boss the player hasn't reached/cleared yet — the first boss
+  // chapter that is at or beyond their current progress. (Previously this
+  // used `<=`, which always matched Bone Tyrant first since 8<=anything;
+  // every boss past Chapter 8 was unreachable through this lookup.)
+  const next = BOSS_CHAPTERS.find(b => b.id >= STATE.completed+1);
+  return next ? next.id : (BOSS_CHAPTERS.length ? BOSS_CHAPTERS[BOSS_CHAPTERS.length-1].id : null);
 }
 function bossHpFor(id){ const b=bossFor(id); if(!b) return 0; return (id in STATE.bossHp) ? STATE.bossHp[id] : b.hp; }
 function setBossHp(id, val){ STATE.bossHp[id]=Math.max(0,val); localStorage.setItem('daybreak_v7_bosshp', JSON.stringify(STATE.bossHp)); }
@@ -196,11 +208,77 @@ function battleScreen(){
   if(!boss) return panel('Battle','MAJOR ENCOUNTER','<p class="lead">No boss encounter available yet.</p>', navButton('Dashboard'));
   const locked = STATE.completed < boss.id-1;
   const hp = bossHpFor(boss.id);
+  const hpPercent = Math.max(0, Math.min(100, hp/boss.hp*100));
   const party = getActiveParty();
-  const stageArt = boss.art
-    ? `<img class="boss-art" src="${boss.art}" alt="${esc(boss.name)} encounter art">`
-    : `<div class="boss-art" style="display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,#2a1f3d,#0c0a14);border-radius:10px;min-height:260px"><div style="text-align:center"><div style="font-size:64px;line-height:1">☠</div><div style="font-family:Cinzel;color:#c99aff;margin-top:8px;letter-spacing:.05em">ENCOUNTER ART PENDING</div></div></div>`;
-  return `<section class="screen-panel"><div class="eyebrow">MAJOR ENCOUNTER · CHAPTER ${boss.id}</div><h2>BATTLE</h2>${locked?`<div class="locked-banner" style="margin-bottom:12px"><b>${esc(boss.name).toUpperCase()} LOCKED</b><br>Complete Chapters 1–${boss.id-1} to enter this encounter.</div>`:''}<div class="battle-shell"><div class="battle-header"><div><div class="hero-badge">CHAPTER ${boss.id} · MAJOR ENCOUNTER</div><h3>${esc(boss.name).toUpperCase()}</h3><div class="sub">AC ${boss.ac} · ${hp.toLocaleString()} / ${boss.hp.toLocaleString()} HP</div><div class="boss-hp"><i style="width:${hp/boss.hp*100}%"></i></div></div></div><div class="battle-main"><div class="turns"><div class="eyebrow" style="margin-bottom:8px">TURN ORDER</div>${party.map((m,i)=>`<button class="turn-row ${STATE.turn===i?'active':''}" onclick="selectTurn(${i})"><img src="${m.portrait}"><span>${m.name}</span><small>${STATE.turn===i?'ACTIVE':'READY'}</small></button>`).join('')}</div><div class="stage">${stageArt}<div class="boss-title">${esc(boss.name).toUpperCase()}</div></div><div class="combat-side"><div class="eyebrow">ENCOUNTER</div><p class="battle-note">${hp<=0?'Defeated.':'Turn-based encounter · select the active party member.'}</p><div class="eyebrow" style="margin-top:18px">COMBAT LOG</div><div class="combat-log" id="combatLog">${hp<=0?`<div style="color:#d5a1f4">${esc(boss.name)} defeated. Chapter ${boss.id} complete.</div>`:STATE.battleStarted?'The battle is underway.':'Battle ready. Select the active party member.'}</div></div></div><div class="actions">${['ATTACK','SPELL','SKILL','ITEM','DEFEND'].map(a=>`<button data-battle-action="${a}" ${hp<=0||locked?'disabled':''}>${a}</button>`).join('')}</div></div></div><div style="margin-top:12px"><button class="cta" data-go="Quests">‹ BACK TO QUESTS</button></div></section>`;
+  const currentMember = party[STATE.turn];
+  const phaseIndex = boss.phases ? Math.min(boss.phases.length-1, Math.floor((1-hp/boss.hp) * boss.phases.length)) : null;
+  const phaseLabel = boss.phases ? `Phase ${phaseIndex+1}: ${boss.phases[phaseIndex]}` : 'Encounter';
+  const currentArt = (boss.phaseArt && phaseIndex!==null) ? boss.phaseArt[phaseIndex] : boss.art;
+
+  const bossAvatar = currentArt
+    ? safeImg(currentArt, boss.name)
+    : `<span style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:1.8rem">☠</span>`;
+
+  let html = '<section class="screen-panel"><div class="eyebrow">MAJOR ENCOUNTER · CHAPTER '+boss.id+'</div><h2>BATTLE</h2>';
+  if(locked) html += `<div class="locked-banner" style="margin-bottom:12px"><b>${esc(boss.name).toUpperCase()} LOCKED</b><br>Complete Chapters 1–${boss.id-1} to enter this encounter.</div>`;
+
+  html += '<div class="battle-arena">';
+  html += '<div class="battle-v2-header"><div class="battle-v2-round">CHAPTER '+boss.id+'</div><div class="battle-v2-turn">'+
+    (hp<=0 ? 'VICTORY' : currentMember ? esc(currentMember.name)+(currentMember.id==='san'?' — YOUR TURN':' — ACTING') : 'Battle')+'</div></div>';
+
+  html += '<div class="battle-turn-order" aria-label="Turn order">';
+  party.forEach((m,i)=>{
+    const active = STATE.turn===i;
+    html += `<div class="turn-chip ${active?'active':''}" title="${esc(m.name)}" onclick="selectTurn(${i})" style="cursor:pointer">${safeImg(m.portrait,m.name)}</div>`;
+  });
+  html += `<div class="turn-chip turn-chip-boss" title="${esc(boss.name)}">${bossAvatar}</div>`;
+  html += '</div>';
+
+  html += '<div class="boss-section v2-boss">';
+  html += `<div class="boss-avatar">${bossAvatar}</div>`;
+  html += `<div class="boss-name">${esc(boss.name).toUpperCase()}</div>`;
+  html += `<div class="boss-phase">${hp<=0?'DEFEATED':phaseLabel}</div>`;
+  html += `<div class="boss-hp-bar"><div class="boss-hp-fill" style="width:${hpPercent}%"></div><div class="boss-hp-text">${hp.toLocaleString()}/${boss.hp.toLocaleString()} HP</div></div>`;
+  html += `<div style="font-size:.7rem;color:var(--parchment-dark, #aaa5b4)">AC ${boss.ac}${locked?' · Locked':''}</div>`;
+  html += '</div>';
+
+  html += '<div class="companion-ai-strip"><span><strong>Companions</strong> use class AI</span><span class="companion-ai-mode">ASSISTED</span></div>';
+
+  html += '<div class="party-battle-grid">';
+  party.forEach((m,i)=>{
+    const mhp = STATE.partyHp && STATE.partyHp[m.id] != null ? STATE.partyHp[m.id] : m.hp;
+    const mmp = STATE.partyMp && STATE.partyMp[m.id] != null ? STATE.partyMp[m.id] : m.mp;
+    const hpPct = Math.max(0,Math.min(100, mhp/m.hp*100));
+    const mpPct = Math.max(0,Math.min(100, mmp/m.mp*100));
+    const isCurrent = STATE.turn===i;
+    const isDead = mhp<=0;
+    html += `<div class="battle-member ${isCurrent?'active-turn':''} ${isDead?'dead':''}">`;
+    html += `<div class="battle-member-avatar">${safeImg(m.portrait,m.name)}</div>`;
+    html += `<div class="battle-member-name">${esc(m.name)}</div>`;
+    html += `<div class="battle-member-role">${esc(m.role)}</div>`;
+    html += `<div class="battle-hp-bar"><div class="battle-hp-fill" style="width:${hpPct}%"></div></div>`;
+    html += `<div class="battle-hp-text">HP: ${mhp}/${m.hp}</div>`;
+    html += `<div class="battle-mp-bar"><div class="battle-mp-fill" style="width:${mpPct}%"></div></div>`;
+    html += `<div class="battle-mp-text">MP: ${mmp}/${m.mp}</div>`;
+    html += `</div>`;
+  });
+  html += '</div>';
+
+  html += '<div class="battle-actions">';
+  [['ATTACK','⚔️','Basic attack'],['SPELL','✨','Use magic'],['SKILL','🎯','Class skill'],['ITEM','🧪','Use item'],['DEFEND','🛡️','Brace']].forEach(([a,icon,sub])=>{
+    html += `<button class="battle-action-btn" data-battle-action="${a}" ${hp<=0||locked?'disabled':''}><span class="battle-action-icon">${icon}</span><span class="battle-action-label">${a}</span><span class="battle-action-sub">${sub}</span></button>`;
+  });
+  html += '</div>';
+
+  html += `<div class="eyebrow" style="margin-top:14px">COMBAT LOG</div><div class="combat-log" id="combatLog">${hp<=0?`<div style="color:#d5a1f4">${esc(boss.name)} defeated. Chapter ${boss.id} complete.</div>`:STATE.battleStarted?'The battle is underway.':'Battle ready. Select the active party member.'}</div>`;
+
+  html += '</div>'; // .battle-arena
+  html += '<div style="margin-top:12px"><button class="cta" data-go="Quests">‹ BACK TO QUESTS</button></div></section>';
+  return html;
+}
+function safeImg(src, alt){
+  if(!src) return '';
+  return `<img src="${src}" alt="${esc(alt)}" loading="lazy">`;
 }
 function selectTurn(i){STATE.turn=i;go('Battle');const p=getActiveParty()[i];if(p)toast(`${p.name}'s turn`)}
 function battleAction(a){
@@ -215,7 +293,7 @@ function battleAction(a){
   const actor = party[STATE.turn] ? party[STATE.turn].name : 'San';
   const log = document.getElementById('combatLog');
   if(a==='ATTACK'){
-    const dmgTable=[120,105,110,95,90,85,80];
+    const dmgTable=[120,105,110,95,90,85,80,60,60];
     const dmg = dmgTable[STATE.turn % dmgTable.length];
     hp = Math.max(0, hp-dmg);
     setBossHp(boss.id, hp);
