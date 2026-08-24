@@ -76,6 +76,7 @@ const STATE = {
   partyHp: {},
   partyMp: {},
   inventory: [],       // earned boss loot: {id, name, icon, desc, fromChapter, fromBoss}
+  companionMode: {},   // {memberId: 'assisted'|'manual'} — San is always manual, not stored here
   journalPage: null
 };
 
@@ -85,7 +86,8 @@ function getSavePayload(){
     savedAt: new Date().toISOString(),
     state: {
       completed: STATE.completed, xp: STATE.xp, bossHp: STATE.bossHp,
-      partyHp: STATE.partyHp, partyMp: STATE.partyMp, inventory: STATE.inventory
+      partyHp: STATE.partyHp, partyMp: STATE.partyMp, inventory: STATE.inventory,
+      companionMode: STATE.companionMode
     }
   };
 }
@@ -238,7 +240,7 @@ function awardBossLoot(chapterId, bossName){
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(msg){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),1800)}
 function refreshTopbar(){const stats=topbar.querySelectorAll('.stat');const lvl=level();const prev=xpThreshold(lvl-1),next=xpThreshold(lvl);if(stats[0])stats[0].querySelector('.big').textContent=lvl;if(stats[1]){stats[1].querySelector('.num').textContent=`${STATE.xp.toLocaleString()} / ${next.toLocaleString()}`;stats[1].querySelector('.fill').style.width=`${Math.min(100,(STATE.xp-prev)/Math.max(1,next-prev)*100)}%`;}if(stats[2]){stats[2].querySelector('.num').textContent='82 / 82';}if(stats[3]){stats[3].querySelector('.num').textContent='64 / 100';}}
-function go(name){document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.name===name));render(name);window.scrollTo({top:0,behavior:'smooth'})}
+function go(name){if(name!=='Battle')clearAutoActTimer();document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.name===name));render(name);window.scrollTo({top:0,behavior:'smooth'})}
 
 function render(name){refreshTopbar();document.querySelectorAll('.soel').forEach(e=>e.remove());let body='';if(name==='Dashboard')body=dashboard();if(name==='Journal')body=journalScreen();if(name==='Quests')body=questsScreen();if(name==='Party')body=partyScreen();if(name==='Spellbook')body=spellbookScreen();if(name==='Inventory')body=inventoryScreen();if(name==='Codex')body=codexScreen();if(name==='Battle')body=battleScreen();main.innerHTML=topbar.outerHTML+body+`<div id="toast" class="toast"></div>`;if(name!=='Battle'){const soel=document.createElement('div');soel.className='soel';soel.innerHTML=`<img src="${soelSrc}"><div class="lock"><b>SOEL</b><small>LOCKED<br/>Awakens at Level 10 🔒</small></div>`;document.querySelector('.app').appendChild(soel)}bind();}
 
@@ -392,7 +394,7 @@ function battleScreen(){
   html += `<div style="font-size:.7rem;color:var(--parchment-dark, #aaa5b4)">AC ${boss.ac}${locked?' · Locked':''}</div>`;
   html += '</div>';
 
-  html += '<div class="companion-ai-strip"><span><strong>Companions</strong> use class AI</span><span class="companion-ai-mode">ASSISTED</span></div>';
+  html += '<div class="companion-ai-strip"><span><strong>San</strong> is always yours to control — set each companion below to Assisted (auto-acts) or Manual.</span></div>';
 
   html += '<div class="party-battle-grid">';
   party.forEach((m,i)=>{
@@ -402,6 +404,7 @@ function battleScreen(){
     const mpPct = Math.max(0,Math.min(100, mmp/m.mp*100));
     const isCurrent = STATE.turn===i;
     const isDead = mhp<=0;
+    const mode = m.id==='san' ? null : (STATE.companionMode[m.id] || 'assisted');
     html += `<div class="battle-member ${isCurrent?'active-turn':''} ${isDead?'dead':''}">`;
     html += `<div class="battle-member-avatar">${safeImg(m.portrait,m.name)}</div>`;
     html += `<div class="battle-member-name">${esc(m.name)}</div>`;
@@ -410,21 +413,53 @@ function battleScreen(){
     html += `<div class="battle-hp-text">HP: ${mhp}/${m.hp}</div>`;
     html += `<div class="battle-mp-bar"><div class="battle-mp-fill" style="width:${mpPct}%"></div></div>`;
     html += `<div class="battle-mp-text">MP: ${mmp}/${m.mp}</div>`;
+    if(mode) html += `<button class="small-btn" style="margin-top:4px;padding:3px 6px;font-size:9px" onclick="event.stopPropagation();toggleCompanionMode('${m.id}')">${mode==='assisted'?'🤖 ASSISTED':'🎮 MANUAL'}</button>`;
+    else html += `<div style="margin-top:4px;font-size:9px;color:#c99aff">★ YOU CONTROL</div>`;
     html += `</div>`;
   });
   html += '</div>';
 
+  const playerControlsThisTurn = !currentMember || currentMember.id==='san' || (STATE.companionMode[currentMember.id]||'assisted')==='manual';
   html += '<div class="battle-actions">';
-  [['ATTACK','⚔️','Basic attack'],['SPELL','✨','Use magic'],['SKILL','🎯','Class skill'],['ITEM','🧪','Use item'],['DEFEND','🛡️','Brace']].forEach(([a,icon,sub])=>{
-    html += `<button class="battle-action-btn" data-battle-action="${a}" ${hp<=0||locked?'disabled':''}><span class="battle-action-icon">${icon}</span><span class="battle-action-label">${a}</span><span class="battle-action-sub">${sub}</span></button>`;
-  });
+  if(playerControlsThisTurn){
+    [['ATTACK','⚔️','Basic attack'],['SPELL','✨','Use magic'],['SKILL','🎯','Class skill'],['ITEM','🧪','Use item'],['DEFEND','🛡️','Brace']].forEach(([a,icon,sub])=>{
+      html += `<button class="battle-action-btn" data-battle-action="${a}" ${hp<=0||locked?'disabled':''}><span class="battle-action-icon">${icon}</span><span class="battle-action-label">${a}</span><span class="battle-action-sub">${sub}</span></button>`;
+    });
+  } else {
+    html += `<div class="battle-note" style="grid-column:1/-1;text-align:center;padding:10px">${esc(currentMember.name)} is acting on Assisted AI…</div>`;
+  }
   html += '</div>';
 
   html += `<div class="eyebrow" style="margin-top:14px">COMBAT LOG</div><div class="combat-log" id="combatLog">${hp<=0?`<div style="color:#d5a1f4">${esc(boss.name)} defeated. Chapter ${boss.id} complete.</div>`:STATE.battleStarted?'The battle is underway.':'Battle ready. Select the active party member.'}</div>`;
 
   html += '</div>'; // .battle-arena
   html += '<div style="margin-top:12px"><button class="cta" data-go="Quests">‹ BACK TO QUESTS</button></div></section>';
+  maybeAutoActCompanion();
   return html;
+}
+let autoActTimer = null;
+function clearAutoActTimer(){ if(autoActTimer){ clearTimeout(autoActTimer); autoActTimer=null; } }
+function toggleCompanionMode(id){
+  STATE.companionMode[id] = (STATE.companionMode[id]||'assisted')==='assisted' ? 'manual' : 'assisted';
+  save();
+  go('Battle');
+}
+function maybeAutoActCompanion(){
+  if(autoActTimer) return;
+  const party = getActiveParty();
+  const cur = party[STATE.turn];
+  if(!cur || cur.id==='san') return;
+  const mode = STATE.companionMode[cur.id] || 'assisted';
+  if(mode !== 'assisted') return;
+  const boss = bossFor(currentBossId());
+  if(!boss) return;
+  if(STATE.completed < boss.id-1) return;
+  const hp = bossHpFor(boss.id);
+  if(hp<=0) return;
+  autoActTimer = setTimeout(()=>{
+    autoActTimer = null;
+    battleAction('ATTACK');
+  }, 700);
 }
 function safeImg(src, alt){
   if(!src) return '';
@@ -472,3 +507,8 @@ function battleAction(a){
 
 Array.from(document.querySelectorAll('#nav button')).forEach(b=>b.addEventListener('click',()=>go(b.dataset.name)));
 go('Dashboard');
+
+// Auto-save every 30s. Piggybacks on the same backup-then-verify save() used
+// everywhere else, so the recovery slot stays fresh too — no separate logic.
+setInterval(()=>{ save(); }, 30000);
+window.addEventListener('beforeunload', ()=>{ save(); });
