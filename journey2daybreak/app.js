@@ -17,15 +17,15 @@ const chapterCover = 'assets/hero/hero-ch1.jpg';
 // ---------------------------------------------------------------------------
 const ALL_PARTY = [
   {id:'san',        name:'SAN',        role:'Sorcerer',            hp:82, mp:100, joinChapter:0,   portrait:'assets/portraits/san.jpg'},
-  {id:'joel',       name:'JOEL',       role:'Paladin',             hp:95, mp:40,  joinChapter:3,   portrait:'assets/portraits/joel.jpg'},
-  {id:'aisyah',     name:'AISYAH',     role:'Rogue / Merchant',    hp:74, mp:55,  joinChapter:4,   portrait:'assets/portraits/aisyah.jpg'},
+  {id:'joel',       name:'JOEL',       role:'Paladin',             hp:95, mp:0,   joinChapter:3,   portrait:'assets/portraits/joel.jpg'},
+  {id:'aisyah',     name:'AISYAH',     role:'Rogue / Merchant',    hp:74, mp:0,   joinChapter:4,   portrait:'assets/portraits/aisyah.jpg'},
   {id:'eliz',       name:'ELIZ',       role:'Healer',              hp:65, mp:120, joinChapter:6,   portrait:'assets/portraits/eliz.jpg'},
   {id:'mezstorm',   name:'MEZSTORM',   role:'Storm Mage',          hp:75, mp:110, joinChapter:7,   portrait:'assets/portraits/mezstorm.jpg'},
-  {id:'senedra',    name:'SENEDRA',    role:'Scout',               hp:70, mp:55,  joinChapter:11,  portrait:'assets/portraits/senedra.jpg'},
-  {id:'zaki',       name:'ZAKI',       role:'Fighter',             hp:88, mp:35,  joinChapter:11,  portrait:'assets/portraits/zaki.jpg'},
-  {id:'ser_aldric', name:'SER ALDRIC', role:'Knight',              hp:90, mp:45,  joinChapter:73,  portrait:'assets/portraits/ser_aldric.jpg'},
-  {id:'sister_wren',name:'SISTER WREN',role:'Healer',              hp:72, mp:100, joinChapter:74,  portrait:'assets/portraits/sister_wren.jpg'},
-  {id:'soel',       name:'SOEL',       role:'Spiritual Familiar',  hp:50, mp:80,  joinChapter:0, joinLevel:10, portrait:'assets/portraits/soel.jpg'}
+  {id:'senedra',    name:'SENEDRA',    role:'Scout',               hp:70, mp:0,   joinChapter:11,  portrait:'assets/portraits/senedra.jpg'},
+  {id:'zaki',       name:'ZAKI',       role:'Fighter',             hp:88, mp:0,   joinChapter:11,  portrait:'assets/portraits/zaki.jpg'},
+  {id:'ser_aldric', name:'SER ALDRIC', role:'Knight',              hp:90, mp:0,   joinChapter:73,  portrait:'assets/portraits/ser_aldric.jpg'},
+  {id:'sister_wren',name:'SISTER WREN',role:'Healer',              hp:72, mp:0,   joinChapter:74,  portrait:'assets/portraits/sister_wren.jpg'},
+  {id:'soel',       name:'SOEL',       role:'Spiritual Familiar',  hp:50, mp:0,   joinChapter:0, joinLevel:10, portrait:'assets/portraits/soel.jpg'}
 ];
 // Soel unlocks by LEVEL, not story chapter — everyone else uses joinChapter.
 function memberUnlocked(m){ return m.joinLevel ? level() >= m.joinLevel : STATE.completed >= m.joinChapter; }
@@ -100,6 +100,7 @@ const STATE = {
   equippedTrophies: {},  // {memberId: fullTrophyObject} — kept alongside `equipped` for bonus lookup
   lastSeenAt: Date.now(),
   selectedZone: null,
+  roundPosition: 0,   // how many party members have acted so far this round — boss attacks once the round completes, not once per action
   journalPage: null
 };
 
@@ -116,7 +117,7 @@ function getSavePayload(){
       chaptersReadToday: STATE.chaptersReadToday, chaptersReadDay: STATE.chaptersReadDay,
       readChapters: STATE.readChapters, consumables: STATE.consumables, partyStatus: STATE.partyStatus,
       equipped: STATE.equipped, lastSeenAt: STATE.lastSeenAt, equippedTrophies: STATE.equippedTrophies,
-      selectedZone: STATE.selectedZone
+      selectedZone: STATE.selectedZone, roundPosition: STATE.roundPosition
     }
   };
 }
@@ -223,7 +224,7 @@ const BOSS_PHASES = {
 const BOSS_CHAPTERS = chapterData.filter(c=>c.boss).map(c => ({
   id: c.id,
   name: c.bossName || c.title,
-  hp: c.id===8 ? 4800 : 4800 + (c.id-8)*260,
+  hp: c.id===8 ? 1400 : 1400 + Math.min(2500, (c.id-8)*45),
   ac: c.id===8 ? 18 : 16 + Math.min(10, Math.floor((c.id-8)/10)),
   art: c.bossArt || null,
   landscapeArt: c.bossArtLandscape || null,  // wide format — displayed below name/HP now
@@ -304,8 +305,7 @@ function usePotionInBattle(id){
     logCombat(`${esc(actor.name)} drinks a ${p.icon} ${p.name}, recovering ${p.value} MP.`);
   }
   save();
-  STATE.turn=(STATE.turn+1)%Math.max(1,party.length);
-  setTimeout(()=>go('Battle'),250);
+  endTurn(boss, party);
 }
 function toggleBattleItemMenu(){ STATE.battleItemMenuOpen = !STATE.battleItemMenuOpen; go('Battle'); }
 
@@ -364,20 +364,20 @@ function applyIdleGains(){
 // ---------------------------------------------------------------------------
 const CLASS_KIT = {
   san:         {role:'caster', spell:{name:'Astral Lance', icon:'✨', mp:15, mult:1.6}, skill:{name:"Daybreak Ward", icon:'🛡️', mp:10, effect:'ward'}},
-  joel:        {role:'tank',   spell:null, skill:{name:"Guardian's Oath", icon:'⚔️', mp:8, effect:'taunt'}},
-  aisyah:      {role:'melee',  spell:null, skill:{name:'Coup de Grace', icon:'💀', mp:12, mult:1.8}},
+  joel:        {role:'tank',   spell:null, skill:{name:"Guardian's Oath", icon:'⚔️', mp:0, effect:'taunt'}},
+  aisyah:      {role:'melee',  spell:null, skill:{name:'Coup de Grace', icon:'💀', mp:0, mult:1.8}},
   eliz:        {role:'healer', spell:{name:'Heal', icon:'💚', mp:10, healMult:1}, skill:{name:'Resurrect', icon:'🌟', mp:35, effect:'revive'},
                 highSkill:{name:'Cure Disease', icon:'🌿', mp:20, effect:'cleanse', levelReq:30}},
   mezstorm:    {role:'caster', spell:{name:'Tempest Fury', icon:'🌀', mp:18, mult:1.7}, skill:{name:'Thunderclap', icon:'🔊', mp:12, effect:'stun'}},
-  senedra:     {role:'ranged', spell:null, skill:{name:"Hunter's Mark", icon:'🎯', mp:8, effect:'mark'}},
-  zaki:        {role:'melee',  spell:null, skill:{name:'Power Strike', icon:'💥', mp:10, mult:1.5}},
-  ser_aldric:  {role:'tank',   spell:null, skill:{name:'Holy Strike', icon:'✝️', mp:10, mult:1.4}},
-  sister_wren: {role:'healer', spell:{name:'Blessing of Faith', icon:'🙏', mp:12, healMult:1.1}, skill:{name:'Purify', icon:'🌿', mp:15, effect:'cleanse'}},
-  soel:        {role:'caster', spell:{name:"Nine Lives' Ward", icon:'🐾', mp:20, healMult:0.6}, skill:{name:'Lucky Pounce', icon:'✨', mp:8, mult:1.3}}
+  senedra:     {role:'ranged', spell:null, skill:{name:"Hunter's Mark", icon:'🎯', mp:0, effect:'mark'}},
+  zaki:        {role:'melee',  spell:null, skill:{name:'Power Strike', icon:'💥', mp:0, mult:1.5}},
+  ser_aldric:  {role:'tank',   spell:null, skill:{name:'Holy Strike', icon:'✝️', mp:0, mult:1.4}},
+  sister_wren: {role:'healer', spell:{name:'Blessing of Faith', icon:'🙏', mp:0, healMult:1.1}, skill:{name:'Purify', icon:'🌿', mp:0, effect:'cleanse'}},
+  soel:        {role:'caster', spell:{name:"Nine Lives' Ward", icon:'🐾', mp:0, healMult:0.6}, skill:{name:'Lucky Pounce', icon:'✨', mp:0, mult:1.3}}
 };
 function kitFor(id){ return CLASS_KIT[id] || {role:'melee', spell:null, skill:null}; }
 function logCombat(line){
-  if(STATE.combatLogBossId !== currentBossId()){ STATE.combatLog = []; STATE.combatLogBossId = currentBossId(); }
+  if(STATE.combatLogBossId !== currentBossId()){ STATE.combatLog = []; STATE.combatLogBossId = currentBossId(); STATE.roundPosition = 0; }
   STATE.combatLog.push(line);
   if(STATE.combatLog.length > 200) STATE.combatLog.shift();
 }
@@ -396,6 +396,10 @@ function bossAttackDamage(boss){
 // and Purify (Eliz/Wren's skill) something to actually do. Ramps in gently
 // so early bosses (Bone Tyrant etc.) never inflict it.
 function diseaseChance(boss){ return Math.min(0.25, Math.max(0, (boss.id-30)*0.004)); }
+// Eliz (a guardian spirit) and Soel (a spiritual cat who regenerates from
+// spirit flame) never actually fall — narratively unkillable. Damage still
+// lands on them normally; it just can't take them below 1 HP.
+const UNKILLABLE_IDS = new Set(['eliz','soel']);
 function bossCounterAttack(boss){
   const hp = bossHpFor(boss.id);
   if(hp<=0) return; // boss just died to the player's action — no counter
@@ -410,7 +414,8 @@ function bossCounterAttack(boss){
   if(t && t.defPct) dmg = Math.round(dmg*(1-t.defPct));
   if(STATE.defending[target.id]){ dmg = Math.round(dmg*0.5); delete STATE.defending[target.id]; }
   const cur = STATE.partyHp[target.id]!=null?STATE.partyHp[target.id]:target.hp;
-  const next = Math.max(0, cur-dmg);
+  const floor = UNKILLABLE_IDS.has(target.id) ? 1 : 0;
+  const next = Math.max(floor, cur-dmg);
   STATE.partyHp[target.id] = next;
   let diseaseNote = '';
   if(next>0 && !STATE.partyStatus[target.id] && Math.random() < diseaseChance(boss)){
@@ -430,6 +435,23 @@ function advanceTurnSkippingFallen(party){
     checked++;
   }
   STATE.turn = next;
+}
+// Call this whenever a party member's turn ends (attack, spell, skill,
+// defend, or a potion). The boss only gets to counter-attack once every
+// party member has gone, not once per individual action — previously it
+// fired after every single action, so a full party meant the boss attacked
+// 5-9 times before your own next turn came around, easily dropping several
+// members in one round. One attack per round matches how a normal turn-based
+// fight should feel.
+function endTurn(boss, party){
+  STATE.roundPosition++;
+  if(STATE.roundPosition >= party.length){
+    STATE.roundPosition = 0;
+    bossCounterAttack(boss);
+  }
+  save();
+  advanceTurnSkippingFallen(party);
+  setTimeout(()=>go('Battle'),250);
 }
 function chooseAutoAction(actor, party){
   const kit = kitFor(actor.id);
@@ -1024,12 +1046,14 @@ function battleScreen(){
     const mode = m.id==='san' ? null : (STATE.companionMode[m.id] || 'assisted');
     html += `<div class="battle-member ${isCurrent?'active-turn':''} ${isDead?'dead':''}">`;
     html += `<div class="battle-member-avatar">${safeImg(m.portrait,m.name)}</div>`;
-    html += `<div class="battle-member-name">${esc(m.name)}${STATE.partyStatus[m.id]==='diseased'?' 🤢':''}</div>`;
+    html += `<div class="battle-member-name">${esc(m.name)}${UNKILLABLE_IDS.has(m.id)?' 🛡️':''}${STATE.partyStatus[m.id]==='diseased'?' 🤢':''}</div>`;
     html += `<div class="battle-member-role">${esc(m.role)}</div>`;
     html += `<div class="battle-hp-bar"><div class="battle-hp-fill" style="width:${hpPct}%"></div></div>`;
     html += `<div class="battle-hp-text">HP: ${mhp}/${m.hp}</div>`;
-    html += `<div class="battle-mp-bar"><div class="battle-mp-fill" style="width:${mpPct}%"></div></div>`;
-    html += `<div class="battle-mp-text">MP: ${mmp}/${m.mp}</div>`;
+    if(m.mp>0){
+      html += `<div class="battle-mp-bar"><div class="battle-mp-fill" style="width:${mpPct}%"></div></div>`;
+      html += `<div class="battle-mp-text">MP: ${mmp}/${m.mp}</div>`;
+    }
     if(mode) html += `<button class="small-btn" style="margin-top:4px;padding:3px 6px;font-size:9px" onclick="event.stopPropagation();toggleCompanionMode('${m.id}')">${mode==='assisted'?'🤖 ASSISTED':'🎮 MANUAL'}</button>`;
     else html += `<div style="margin-top:4px;font-size:9px;color:#c99aff">★ YOU CONTROL</div>`;
     html += `</div>`;
@@ -1047,8 +1071,8 @@ function battleScreen(){
     const potionCount = Object.values(STATE.consumables).reduce((a,b)=>a+b,0);
     const actions = [
       ['ATTACK','⚔️','Basic attack', true],
-      ['SPELL', spellAvailable?actorKit.spell.icon:'✨', spellAvailable?actorKit.spell.name+` (${actorKit.spell.mp} MP)`:'No spells known', spellAvailable],
-      ['SKILL', highSkillReady?actorKit.highSkill.icon:(skillAvailable?actorKit.skill.icon:'🎯'), highSkillReady?actorKit.highSkill.name+` (${actorKit.highSkill.mp} MP)`:(skillAvailable?actorKit.skill.name+` (${actorKit.skill.mp} MP)`:'No skills known'), skillAvailable],
+      ['SPELL', spellAvailable?actorKit.spell.icon:'✨', spellAvailable?actorKit.spell.name+(actorKit.spell.mp?` (${actorKit.spell.mp} MP)`:''):'No spells known', spellAvailable],
+      ['SKILL', highSkillReady?actorKit.highSkill.icon:(skillAvailable?actorKit.skill.icon:'🎯'), highSkillReady?actorKit.highSkill.name+(actorKit.highSkill.mp?` (${actorKit.highSkill.mp} MP)`:''):(skillAvailable?actorKit.skill.name+(actorKit.skill.mp?` (${actorKit.skill.mp} MP)`:''):'No skills known'), skillAvailable],
       ['ITEM','🧪', potionCount?`${potionCount} potion${potionCount===1?'':'s'} carried`:'No potions — visit the Trader', true],
       ['DEFEND','🛡️','Brace', true]
     ];
@@ -1197,10 +1221,7 @@ function battleAction(a){
       go('Battle');
     }
   } else {
-    bossCounterAttack(boss);
-    save();
-    advanceTurnSkippingFallen(party);
-    setTimeout(()=>go('Battle'),250);
+    endTurn(boss, party);
   }
 }
 
