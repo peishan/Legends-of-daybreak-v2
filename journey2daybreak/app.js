@@ -96,6 +96,10 @@ const STATE = {
   battleItemMenuOpen: false,
   defending: {},        // {memberId: true} — halves the boss's next hit on them, consumed on use
   partyStatus: {},      // {memberId: 'diseased'} — inflicted by some boss hits, blocks regen until cured
+  equipped: {},          // {memberId: trophyItemId} — one trinket slot per member
+  equippedTrophies: {},  // {memberId: fullTrophyObject} — kept alongside `equipped` for bonus lookup
+  lastSeenAt: Date.now(),
+  selectedZone: null,
   journalPage: null
 };
 
@@ -110,7 +114,9 @@ function getSavePayload(){
       frontierBossCooldownUntil: STATE.frontierBossCooldownUntil, frontierCurrentBoss: STATE.frontierCurrentBoss,
       bounties: STATE.bounties, bountyDay: STATE.bountyDay,
       chaptersReadToday: STATE.chaptersReadToday, chaptersReadDay: STATE.chaptersReadDay,
-      readChapters: STATE.readChapters, consumables: STATE.consumables, partyStatus: STATE.partyStatus
+      readChapters: STATE.readChapters, consumables: STATE.consumables, partyStatus: STATE.partyStatus,
+      equipped: STATE.equipped, lastSeenAt: STATE.lastSeenAt, equippedTrophies: STATE.equippedTrophies,
+      selectedZone: STATE.selectedZone
     }
   };
 }
@@ -201,6 +207,7 @@ function importSave(event){
 }
 loadGame();
 applyRegen();
+applyIdleGains();
 save();
 
 // ---------------------------------------------------------------------------
@@ -320,9 +327,33 @@ function applyRegen(){
     if(STATE.partyStatus[m.id]==='diseased') return; // no natural recovery while diseased
     const hp = STATE.partyHp[m.id] != null ? STATE.partyHp[m.id] : m.hp;
     const mp = STATE.partyMp[m.id] != null ? STATE.partyMp[m.id] : m.mp;
-    if(hp > 0) STATE.partyHp[m.id] = Math.min(m.hp, Math.round(hp + m.hp*rate));
-    STATE.partyMp[m.id] = Math.min(m.mp, Math.round(mp + m.mp*rate));
+    if(hp > 0) STATE.partyHp[m.id] = Math.min(effectiveMaxHp(m), Math.round(hp + m.hp*rate));
+    STATE.partyMp[m.id] = Math.min(effectiveMaxMp(m), Math.round(mp + m.mp*rate));
   });
+}
+// ---------------------------------------------------------------------------
+// IDLE GAINS — confirmed this doesn't exist in your codex project either, so
+// it's a new design rather than a port. Applied once per session start (not
+// on the 30s tick, to avoid double-dipping while actively playing) — a
+// "welcome back" catch-up for real time away, capped at 24h and scaled to
+// level so it stays a small trickle rather than a way to skip content.
+// ---------------------------------------------------------------------------
+function applyIdleGains(){
+  const now = Date.now();
+  const minutesAway = Math.min(24*60, Math.max(0, (now - (STATE.lastSeenAt||now)) / 60000));
+  STATE.lastSeenAt = now;
+  if(minutesAway < 1) return;
+  const lvl = level();
+  const xpGain = Math.round(minutesAway * (1.5 + lvl*0.3));
+  const goldGain = Math.round(minutesAway * (1 + lvl*0.15));
+  if(xpGain<=0 && goldGain<=0) return;
+  STATE.xp += xpGain;
+  STATE.gold += goldGain;
+  if(minutesAway >= 10){
+    const hrs = Math.floor(minutesAway/60), mins = Math.round(minutesAway%60);
+    const timeStr = hrs ? `${hrs}h ${mins}m` : `${mins}m`;
+    setTimeout(()=>toast(`Welcome back — away ${timeStr} · +${xpGain.toLocaleString()} XP · +${goldGain.toLocaleString()}g`), 400);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -375,6 +406,8 @@ function bossCounterAttack(boss){
   if(!party.length) return; // whole party down — nothing left to hit
   const target = party[Math.floor(Math.random()*party.length)];
   let dmg = bossAttackDamage(boss);
+  const t = trinketBonus(target.id);
+  if(t && t.defPct) dmg = Math.round(dmg*(1-t.defPct));
   if(STATE.defending[target.id]){ dmg = Math.round(dmg*0.5); delete STATE.defending[target.id]; }
   const cur = STATE.partyHp[target.id]!=null?STATE.partyHp[target.id]:target.hp;
   const next = Math.max(0, cur-dmg);
@@ -442,6 +475,50 @@ function lootForBoss(bossName){
   }
   return {icon:'⚔️', itemBase:'Trophy'};
 }
+// ---------------------------------------------------------------------------
+// EQUIPMENT — one trinket slot per party member. Rather than inventing a
+// whole gear system with separate weapon/armor/loot tables, boss trophies
+// double as equippable trinkets: equip one for a modest passive bonus keyed
+// to the same icon category already used for loot flavor, so a frost trophy
+// makes you tankier and a fire trophy hits harder, etc. Equipping moves the
+// trophy out of the general inventory (so it can't also be spent on
+// crafting) — unequip to get it back.
+// ---------------------------------------------------------------------------
+const TRINKET_BONUS = {
+  '💀':{dmgPct:0.08, label:'+8% damage'}, '🔥':{dmgPct:0.10, label:'+10% damage'},
+  '❄️':{defPct:0.12, label:'-12% damage taken'}, '⚡':{spellPct:0.10, label:'+10% spell damage'},
+  '🌑':{skillPct:0.10, label:'+10% skill damage'}, '🪞':{mpBonus:15, label:'+15 max MP'},
+  '🌊':{hpBonus:15, label:'+15 max HP'}, '✨':{healPct:0.15, label:'+15% healing'},
+  '🐉':{dmgPct:0.12, label:'+12% damage'}, '⚙️':{dmgPct:0.05, defPct:0.05, label:'+5% damage, -5% damage taken'},
+  '🌌':{spellPct:0.12, label:'+12% spell damage'}, '👑':{dmgPct:0.10, label:'+10% damage'},
+  '☀️':{dmgPct:0.10, defPct:0.10, label:'+10% damage, -10% damage taken'}, '🌗':{dmgPct:0.08, label:'+8% damage'}
+};
+function trinketBonus(memberId){
+  const trophy = STATE.equippedTrophies[memberId];
+  if(!trophy) return null;
+  return TRINKET_BONUS[trophy.icon] || null;
+}
+function effectiveMaxHp(m){ const t=trinketBonus(m.id); return m.hp + (t&&t.hpBonus?t.hpBonus:0); }
+function effectiveMaxMp(m){ const t=trinketBonus(m.id); return m.mp + (t&&t.mpBonus?t.mpBonus:0); }
+function equipTrophy(memberId, invIndex){
+  const item = STATE.inventory[invIndex];
+  if(!item) return;
+  unequipTrophy(memberId); // return whatever they had equipped before, if anything
+  STATE.inventory.splice(invIndex,1);
+  STATE.equipped[memberId] = item.id;
+  if(!STATE.equippedTrophies) STATE.equippedTrophies = {};
+  STATE.equippedTrophies[memberId] = item;
+  save();
+  toast(`${item.icon} ${item.name} equipped on ${ALL_PARTY.find(m=>m.id===memberId).name}`);
+  go('Inventory');
+}
+function unequipTrophy(memberId){
+  const trophy = STATE.equippedTrophies && STATE.equippedTrophies[memberId];
+  if(trophy) STATE.inventory.push(trophy);
+  delete STATE.equipped[memberId];
+  if(STATE.equippedTrophies) delete STATE.equippedTrophies[memberId];
+  save();
+}
 function awardBossLoot(chapterId, bossName){
   if (STATE.inventory.some(i=>i.fromChapter===chapterId)) return null; // idempotent
   const {icon, itemBase} = lootForBoss(bossName);
@@ -470,11 +547,23 @@ function bind(){
   document.querySelectorAll('[data-journal-page]').forEach(b=>b.onclick=()=>{STATE.journalPage=Number(b.dataset.journalPage);go('Journal');});
 }
 
+function nextMilestones(){
+  const candidates = [];
+  if(level() < 10) candidates.push({icon:'🐾', label:'LEVEL 10', sub:'Soel awakens', dist: 10-level()});
+  if(!frontierUnlocked()) candidates.push({icon:'🌌', label:`CHAPTER 20`, sub:'The Fraying Frontier opens', dist: 20-STATE.completed});
+  if(!templeUnlocked()) candidates.push({icon:'⛪', label:`CHAPTER 74`, sub:"Sister Wren's Temple opens", dist: 74-STATE.completed});
+  const nb = bossFor(currentBossId());
+  if(nb && STATE.completed < nb.id) candidates.push({icon:'☠', label:`CHAPTER ${nb.id}`, sub:esc(nb.name), dist: nb.id-STATE.completed});
+  candidates.sort((a,b)=>a.dist-b.dist);
+  const top = candidates.slice(0,3);
+  if(!top.length) top.push({icon:'✧', label:'JOURNEY', sub:'All known milestones reached'});
+  return top.map(m=>`<div class="item"><div class="mini-ico">${m.icon}</div><div><b>${m.label}</b><small>${m.sub}</small></div></div>`).join('');
+}
 function dashboard(){
   const c = chapterData[Math.min(STATE.completed, chapterData.length-1)];
   const nextIsBoss = c && c.boss && STATE.completed < chapterData.length;
   const party = getActiveParty();
-  return `<div class="objective"><div><div class="eyebrow">CURRENT OBJECTIVE</div><p>${nextIsBoss?`Face ${c.bossName||c.title} in Chapter ${c.id}.`:`Read Chapter ${c.id}: ${esc(c.title)}`}</p></div><button class="outline" data-go="Quests">◇ VIEW QUESTS</button></div><div class="hero"><img src="${c.thumb||chapterCover}" alt="Daybreak journey"><div class="hero-copy"><div class="hero-badge">CURRENT CHAPTER · ${STATE.completed+1} OF ${chapterData.length}</div><h2>CHAPTER ${c.id} · ${esc(c.title).toUpperCase()}</h2><p>${c.summary?esc(c.summary):'The story continues.'}</p></div></div><div class="grid2"><div class="card"><h3>CURRENT JOURNEY</h3><div class="journey"><div class="book"><img src="${c.thumb||chapterCover}" alt="chapter"></div><div><div class="chapter">Chapter ${c.id}</div><div style="font-family:Cinzel;font-size:17px;color:#c68cf3">${esc(c.title)}</div><div class="sub">${c.summary?esc(c.summary):(nextIsBoss?'Major encounter.':'Story archive chapter.')}</div></div></div><button class="cta" data-read="${c.id}">${nextIsBoss?'VIEW ENCOUNTER':'CONTINUE CHAPTER'} ›</button><div class="progressline"><div class="row"><span>JOURNAL PROGRESS</span><span>${STATE.completed} / ${chapterData.length}</span></div><div class="bar"><div class="fill" style="width:${STATE.completed/chapterData.length*100}%"></div></div></div></div><div class="card"><h3>TRAVELLING PARTY</h3><div class="party">${party.map(m=>`<div class="member"><div class="portrait"><img src="${m.portrait}" alt="${m.name}"></div><div class="name">${m.name}</div><div class="role">${m.role}</div><div class="lv">Lv. ${level()}</div></div>`).join('')}<button class="outline" data-go="Party">♟ VIEW PARTY</button></div></div></div><div class="lower"><div class="card milestones"><h3>NEXT MILESTONES</h3><div class="item"><div class="mini-ico">🐾</div><div><b>LEVEL 10</b><small>Soel awakens</small></div></div><div class="item"><div class="mini-ico">☠</div><div><b>CHAPTER 8</b><small>Bone Tyrant</small></div></div><div class="item"><div class="mini-ico">✧</div><div><b>LEVEL 77</b><small>The True Test</small></div></div></div><div class="card"><h3>SEASON PROGRESS</h3><div class="sub">Story XP <b style="float:right;color:#eee">${STATE.xp.toLocaleString()}</b></div><div class="bar"><div class="fill" style="width:${Math.min(100,(STATE.xp-xpThreshold(level()-1))/Math.max(1,xpThreshold(level())-xpThreshold(level()-1))*100)}%"></div></div><div class="sub">Chapters Completed <b style="float:right;color:#eee">${STATE.completed} / ${chapterData.length}</b></div><div class="bar"><div class="fill" style="width:${STATE.completed/chapterData.length*100}%"></div></div></div><div class="card events"><h3>RECENT EVENTS</h3><div class="item"><div class="mini-ico">▤</div><div><b>Chapter ${Math.max(1,STATE.completed)} ${STATE.completed?'Completed':'Unlocked'}</b><small>${esc(chapterData[Math.max(0,STATE.completed-1)].title)}</small></div></div><div class="item"><div class="mini-ico">⚔</div><div><b>${bossFor(currentBossId())?bossFor(currentBossId()).name:'Bone Tyrant'}</b><small>${nextIsBoss?'Battle available':'Next major encounter'}</small></div></div></div></div><div class="quick"><div class="eyebrow" style="text-align:center">QUICK ACTIONS</div><div class="quick-grid"><button data-go="Journal">▤ JOURNAL</button><button data-go="Quests">⚑ QUESTS</button><button data-go="Inventory">♙ INVENTORY</button><button data-go="Spellbook">✧ SPELLBOOK</button><button data-go="Battle">⚔ BATTLE</button></div></div>`;
+  return `<div class="objective"><div><div class="eyebrow">CURRENT OBJECTIVE</div><p>${nextIsBoss?`Face ${c.bossName||c.title} in Chapter ${c.id}.`:`Read Chapter ${c.id}: ${esc(c.title)}`}</p></div><button class="outline" data-go="Quests">◇ VIEW QUESTS</button></div><div class="hero"><img src="${c.thumb||chapterCover}" alt="Daybreak journey"><div class="hero-copy"><div class="hero-badge">CURRENT CHAPTER · ${STATE.completed+1} OF ${chapterData.length}</div><h2>CHAPTER ${c.id} · ${esc(c.title).toUpperCase()}</h2><p>${c.summary?esc(c.summary):'The story continues.'}</p></div></div><div class="grid2"><div class="card"><h3>CURRENT JOURNEY</h3><div class="journey"><div class="book"><img src="${c.thumb||chapterCover}" alt="chapter"></div><div><div class="chapter">Chapter ${c.id}</div><div style="font-family:Cinzel;font-size:17px;color:#c68cf3">${esc(c.title)}</div><div class="sub">${c.summary?esc(c.summary):(nextIsBoss?'Major encounter.':'Story archive chapter.')}</div></div></div><button class="cta" data-read="${c.id}">${nextIsBoss?'VIEW ENCOUNTER':'CONTINUE CHAPTER'} ›</button><div class="progressline"><div class="row"><span>JOURNAL PROGRESS</span><span>${STATE.completed} / ${chapterData.length}</span></div><div class="bar"><div class="fill" style="width:${STATE.completed/chapterData.length*100}%"></div></div></div></div><div class="card"><h3>TRAVELLING PARTY</h3><div class="party">${party.map(m=>`<div class="member"><div class="portrait"><img src="${m.portrait}" alt="${m.name}"></div><div class="name">${m.name}</div><div class="role">${m.role}</div><div class="lv">Lv. ${level()}</div></div>`).join('')}<button class="outline" data-go="Party">♟ VIEW PARTY</button></div></div></div><div class="lower"><div class="card milestones"><h3>NEXT MILESTONES</h3>${nextMilestones()}</div><div class="card"><h3>SEASON PROGRESS</h3><div class="sub">Story XP <b style="float:right;color:#eee">${STATE.xp.toLocaleString()}</b></div><div class="bar"><div class="fill" style="width:${Math.min(100,(STATE.xp-xpThreshold(level()-1))/Math.max(1,xpThreshold(level())-xpThreshold(level()-1))*100)}%"></div></div><div class="sub">Chapters Completed <b style="float:right;color:#eee">${STATE.completed} / ${chapterData.length}</b></div><div class="bar"><div class="fill" style="width:${STATE.completed/chapterData.length*100}%"></div></div></div><div class="card events"><h3>RECENT EVENTS</h3><div class="item"><div class="mini-ico">▤</div><div><b>Chapter ${Math.max(1,STATE.completed)} ${STATE.completed?'Completed':'Unlocked'}</b><small>${esc(chapterData[Math.max(0,STATE.completed-1)].title)}</small></div></div><div class="item"><div class="mini-ico">⚔</div><div><b>${bossFor(currentBossId())?bossFor(currentBossId()).name:'Bone Tyrant'}</b><small>${nextIsBoss?'Battle available':'Next major encounter'}</small></div></div></div></div><div class="quick"><div class="eyebrow" style="text-align:center">QUICK ACTIONS</div><div class="quick-grid"><button data-go="Journal">▤ JOURNAL</button><button data-go="Quests">⚑ QUESTS</button><button data-go="Inventory">♙ INVENTORY</button><button data-go="Spellbook">✧ SPELLBOOK</button><button data-go="Battle">⚔ BATTLE</button><button data-go="Temple">⛪ TEMPLE</button><button data-go="Frontier">🌌 FRONTIER</button></div></div>`;
 }
 
 function panel(title,eyebrow,body,actions=''){return `<section class="screen-panel"><div class="eyebrow">${eyebrow}</div><h2>${title}</h2>${body}${actions?`<div style="margin-top:14px">${actions}</div>`:''}</section>`}
@@ -594,13 +683,33 @@ function inventoryScreen(){
 
   const craftHTML = `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">⚒️ CRAFTING</h3><p class="lead" style="margin-bottom:10px">Turn boss trophies into potions. You have ${STATE.inventory.length} trophy${STATE.inventory.length===1?'':'ies'}.</p><div class="chapter-grid">${CRAFT_RECIPES.map(r=>`<article class="quest"><div class="mini-ico">${r.icon}</div><div><h3>${esc(r.name)} ×${r.resultQty}</h3><p>${esc(r.desc)}</p></div><button class="small-btn primary" onclick="craftPotion('${r.id}')" ${(STATE.inventory.length<r.trophies||STATE.gold<r.goldCost)?'disabled':''}>${r.trophies} trophies + ${r.goldCost}g</button></article>`).join('')}</div>`;
 
+  const equippedList = Object.entries(STATE.equippedTrophies);
+  const equipHTML = `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">💍 EQUIPMENT</h3><p class="lead" style="margin-bottom:10px">One trinket slot per party member — equip a trophy for a passive combat bonus.</p><div class="chapter-grid">${getActiveParty().map(m=>{const t=STATE.equippedTrophies[m.id];const bonus=t?TRINKET_BONUS[t.icon]:null;return `<article class="quest"><div class="mini-ico">${t?t.icon:'—'}</div><div><h3>${esc(m.name)}</h3><p>${t?`${esc(t.name)} · ${bonus?bonus.label:''}`:'No trinket equipped'}</p></div>${t?`<button class="small-btn" onclick="unequipTrophy('${m.id}');go('Inventory')">UNEQUIP</button>`:''}</article>`;}).join('')}</div>`;
+
   const trophies = STATE.inventory.length
-    ? `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">BOSS TROPHIES</h3><p class="lead" style="margin-bottom:14px">Earned by defeating story bosses. Spend these on crafting above.</p><div class="chapter-grid">${STATE.inventory.map(item=>`<article class="quest"><div class="mini-ico">${item.icon}</div><div><h3>${esc(item.name)}</h3><p>${esc(item.desc)}</p></div></article>`).join('')}</div>`
+    ? `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">BOSS TROPHIES</h3><p class="lead" style="margin-bottom:14px">Earned by defeating story bosses. Spend these on crafting, or equip on a party member above.</p><div class="chapter-grid">${STATE.inventory.map((item,i)=>{const bonus=TRINKET_BONUS[item.icon];return `<article class="quest"><div class="mini-ico">${item.icon}</div><div><h3>${esc(item.name)}</h3><p>${esc(item.desc)}${bonus?` · ${bonus.label}`:''}</p></div><select class="small-btn" onchange="equipTrophy(this.value,${i})" style="cursor:pointer"><option value="">Equip on…</option>${getActiveParty().map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select></article>`;}).join('')}</div>`
     : `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">BOSS TROPHIES</h3><p class="lead">None yet — defeat a boss in Battle to earn your first trophy.</p>`;
   const supplies = `<h3 style="font-family:Cinzel;color:#8f7aa8;margin:22px 0 4px;font-size:15px">STARTING SUPPLIES</h3><div class="chapter-grid">${['Minor Healing Tonic','Aether Shard','Waystone Fragment','Tomb Key','Antique Coin'].map((x,i)=>`<article class="quest"><div class="mini-ico">${['✚','◆','◇','⚿','◈'][i]}</div><div><h3>${x}</h3><p>Carried by the travelling party.</p></div><b>x${i+1}</b></article>`).join('')}</div>`;
-  return panel('Inventory','CARRIED ITEMS', potionsHTML+traderHTML+craftHTML+trophies+supplies, navButton('Dashboard'));
+  return panel('Inventory','CARRIED ITEMS', potionsHTML+traderHTML+craftHTML+equipHTML+trophies+supplies, navButton('Dashboard'));
 }
-function codexScreen(){return panel('Codex','WORLD & LORE',`<div class="chapter-grid">${['Aethon','Daybreak','Tomb of Kings','Bone Tyrant','Travelling Party','Spiritual Familiars'].map((x,i)=>`<article class="quest"><div class="mini-ico">${['✦','☼','♜','☠','♟','🐾'][i]}</div><div><h3>${x}</h3><p>World entry revealed through the Season One story.</p></div></article>`).join('')}</div>`,navButton('Dashboard'))}
+function codexScreen(){
+  const defeated = BOSS_CHAPTERS.filter(b => STATE.completed >= b.id);
+  const nextBoss = bossFor(currentBossId());
+  const bossHTML = defeated.length
+    ? `<div class="chapter-grid">${defeated.map(b=>{const c=chapterData.find(ch=>ch.id===b.id);return `<article class="quest"><div class="mini-ico">☠</div><div><h3>${esc(b.name)}</h3><p>Defeated in Chapter ${b.id}: ${esc(c.title)}.</p></div></article>`;}).join('')}${nextBoss?`<article class="quest" style="opacity:.5"><div class="mini-ico">?</div><div><h3>???</h3><p>An unencountered foe awaits in Chapter ${nextBoss.id}.</p></div></article>`:''}</div>`
+    : `<p class="lead">No bosses encountered yet — the bestiary fills in as you defeat them in Battle.</p>`;
+
+  const active = getActiveParty();
+  const companionHTML = `<div class="chapter-grid">${active.map(m=>{const kit=kitFor(m.id);const move=kit.spell?kit.spell.name:kit.skill?kit.skill.name:'—';return `<article class="quest"><div class="mini-ico">${m.id==='soel'?'🐾':'♟'}</div><div><h3>${esc(m.name)}</h3><p>${esc(m.role)} · Signature: ${esc(move)}</p></div></article>`;}).join('')}</div>`;
+
+  const worldHTML = `<div class="chapter-grid">${['Aethon','Daybreak','Tomb of Kings'].map((x,i)=>`<article class="quest"><div class="mini-ico">${['✦','☼','♜'][i]}</div><div><h3>${x}</h3><p>World entry revealed through the Season One story.</p></div></article>`).join('')}</div>`;
+
+  return panel('Codex','WORLD & LORE',
+    `<h3 style="font-family:Cinzel;color:#c99aff;margin:0 0 4px;font-size:18px">☠ BESTIARY · ${defeated.length}/${BOSS_CHAPTERS.length} ENCOUNTERED</h3>${bossHTML}`+
+    `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">♟ COMPANIONS</h3>${companionHTML}`+
+    `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">✦ WORLD</h3>${worldHTML}`,
+    navButton('Dashboard'));
+}
 
 // ---------------------------------------------------------------------------
 // TEMPLE — Sister Wren's service, unlocked once she's joined (Chapter 74).
@@ -666,7 +775,66 @@ const FRONTIER_REGULARS = [
   {id:'frontier_sentinel', name:'Unwritten Sentinel', ico:'📖', icon:'📖', hp:760, xp:300, gold:75, desc:'Assembled from pages that haven\'t been drafted yet.'},
   {id:'frontier_wraith', name:'Threshold Wraith', icon:'🌫️', hp:960, xp:380, gold:95, desc:'Lingers exactly on the border of what\'s known.'}
 ];
-function frontierUnlocked(){ return STATE.completed >= 20; } // past the Nexus Planarch
+// ---------------------------------------------------------------------------
+// EXPLORATION ZONES — using the actual zone names your story establishes via
+// its own "Unlocks: zone →" banners (The Static Fields at Ch.61, The
+// Unbroken Vale at Ch.72) rather than inventing new ones, plus early zones
+// matching locations already named in Chapters 1-23. The Fraying Frontier
+// stays the special postgame zone (Ch.20+) with the boss-rematch mechanic;
+// the others are straightforward regular-encounter grinding spots.
+// ---------------------------------------------------------------------------
+const ZONES = [
+  {id:'catacombs', name:'The Cursed Catacombs', icon:'⚰️', unlockChapter:1,
+    regulars:[
+      {id:'cat_wight', name:'Restless Wight', icon:'💀', hp:180, xp:60, gold:12, desc:'One of the Bone Tyrant\'s lesser dead.'},
+      {id:'cat_swarm', name:'Grave Swarm', icon:'🦟', hp:140, xp:45, gold:9, desc:'Insects that never left when the tombs sealed.'},
+      {id:'cat_warden', name:'Catacomb Warden', icon:'🗿', hp:260, xp:90, gold:18, desc:'Stone given purpose by something old.'}
+    ]},
+  {id:'frostspire', name:'Frostspire Ruins', icon:'🏔️', unlockChapter:9,
+    regulars:[
+      {id:'fs_wolf', name:'Frostspire Wolf', icon:'🐺', hp:320, xp:110, gold:22, desc:'Hunts in the shadow of the frozen crown.'},
+      {id:'fs_wisp', name:'Rime Wisp', icon:'❄️', hp:260, xp:95, gold:18, desc:'Cold given just enough shape to move.'},
+      {id:'fs_knight', name:'Frozen Sentinel', icon:'🧊', hp:420, xp:150, gold:30, desc:'Stood guard so long it forgot to stop.'}
+    ]},
+  {id:'ashfall', name:'Ashfall Market', icon:'🏚️', unlockChapter:23,
+    regulars:[
+      {id:'am_scavenger', name:'Market Scavenger', icon:'🥀', hp:380, xp:130, gold:35, desc:'Picks through what Ashfall Market left behind.'},
+      {id:'am_debtor', name:'Restless Debtor', icon:'📜', hp:340, xp:120, gold:32, desc:'Still keeping ledgers no one will collect.'},
+      {id:'am_broker', name:'Shadow Broker', icon:'🕴️', hp:520, xp:180, gold:48, desc:'Trades in things that were never for sale.'}
+    ]},
+  {id:'static_fields', name:'The Static Fields', icon:'📡', unlockChapter:61,
+    regulars:[
+      {id:'sf_signal', name:'Dead Signal', icon:'📶', hp:600, xp:220, gold:60, desc:'A transmission that never found its receiver.'},
+      {id:'sf_drone', name:'Salvage Drone', icon:'🤖', hp:680, xp:250, gold:68, desc:'Still running the last order it was given.'},
+      {id:'sf_storm', name:'Static Wraith', icon:'⚡', hp:760, xp:280, gold:76, desc:'Interference that learned to hold a shape.'}
+    ]},
+  {id:'unbroken_vale', name:'The Unbroken Vale', icon:'🌾', unlockChapter:72,
+    regulars:[
+      {id:'uv_warden', name:'Vale Warden', icon:'🌳', hp:820, xp:300, gold:82, desc:'What\'s left standing after everything else broke.'},
+      {id:'uv_echo', name:'Wandering Echo', icon:'🪞', hp:760, xp:280, gold:76, desc:'A memory that kept walking after the story moved on.'},
+      {id:'uv_keeper', name:'Threshold Keeper', icon:'🚪', hp:900, xp:330, gold:90, desc:'Minds the border the Vale was built to hold.'}
+    ]},
+  {id:'fraying_frontier', name:'The Fraying Frontier', icon:'🌌', unlockChapter:20, hasBossRematch:true,
+    regulars: null // uses FRONTIER_REGULARS + the boss-rematch section below, kept as-is
+  }
+];
+function zoneUnlocked(z){ return STATE.completed >= z.unlockChapter; }
+function frontierUnlocked(){ return zoneUnlocked(ZONES.find(z=>z.id==='fraying_frontier')); }
+function fightZoneRegular(zoneId, monsterId){
+  const zone = ZONES.find(z=>z.id===zoneId);
+  const e = zone.regulars.find(x=>x.id===monsterId);
+  if(!e) return;
+  STATE.xp += e.xp;
+  STATE.gold += e.gold;
+  save();
+  toast(`${e.name} defeated · +${e.xp} XP · +${e.gold}g`);
+  go('Frontier');
+}
+function zoneScreenHTML(zone){
+  if(zone.id==='fraying_frontier') return frontierZoneHTML();
+  return `<div class="chapter-grid">${zone.regulars.map(e=>`<article class="quest"><div class="mini-ico">${e.icon}</div><div><h3>${esc(e.name)}</h3><p>${esc(e.desc)}</p><b>${e.hp} HP · ${e.xp} XP · ${e.gold}g</b></div><button class="small-btn primary" onclick="fightZoneRegular('${zone.id}','${e.id}')">FIGHT</button></article>`).join('')}</div>`;
+}
+
 function frontierEligibleBosses(){ return BOSS_CHAPTERS.filter(b => STATE.completed >= b.id); }
 function ensureFrontierBoss(){
   if(STATE.frontierCurrentBoss) return STATE.frontierCurrentBoss;
@@ -678,16 +846,10 @@ function ensureFrontierBoss(){
   save();
   return chosen.id;
 }
-function frontierScreen(){
-  if(!frontierUnlocked()){
-    return panel('The Fraying Frontier','ENDLESS ZONE',
-      `<p class="lead">The Frontier opens after Chapter 20 (the Nexus Planarch). Keep progressing the story to unlock repeatable encounters here.</p>`,
-      navButton('Dashboard'));
-  }
+function frontierZoneHTML(){
   const bossId = ensureFrontierBoss();
   const boss = bossId ? bossFor(bossId) : null;
-  let html = bountyBoardHTML();
-  html += `<p class="lead" style="margin-top:18px">High-level encounters roam here between the delayed return of bosses you've already faced. Regular fights and boss rematches grant XP and gold only — no loot duplication.</p>`;
+  let html = `<p class="lead">High-level encounters roam here between the delayed return of bosses you've already faced. Regular fights and boss rematches grant XP and gold only — no loot duplication.</p>`;
   html += `<h3 style="font-family:Cinzel;color:#c99aff;margin:18px 0 4px;font-size:16px">⚔️ REGULAR ENCOUNTERS</h3><div class="chapter-grid">`;
   FRONTIER_REGULARS.forEach(e=>{
     html += `<article class="quest"><div class="mini-ico">${e.icon}</div><div><h3>${esc(e.name)}</h3><p>${esc(e.desc)}</p><b>${e.hp} HP · ${e.xp} XP · ${e.gold}g</b></div><button class="small-btn primary" onclick="fightFrontierRegular('${e.id}')">FIGHT</button></article>`;
@@ -700,9 +862,24 @@ function frontierScreen(){
     const mins = Math.ceil(remaining/60000);
     html += `<div class="locked-banner" style="margin-top:18px">🕰️ No boss present right now — the last one was defeated. Another will drift back through the Frontier in roughly ${mins} minute${mins===1?'':'s'}.</div>`;
   }
-  html += `<div class="locked-banner" style="margin-top:18px">Gold: <b style="color:#eee">${STATE.gold.toLocaleString()}</b></div>`;
-  return panel('The Fraying Frontier','ENDLESS ZONE', html, navButton('Dashboard'));
+  return html;
 }
+function frontierScreen(){
+  const unlocked = ZONES.filter(zoneUnlocked);
+  if(!unlocked.length){
+    return panel('Exploration Zones','MONSTER ZONES',
+      `<p class="lead">Your first exploration zone (The Cursed Catacombs) opens at Chapter 1 — read on to unlock it.</p>`,
+      navButton('Dashboard'));
+  }
+  if(!STATE.selectedZone || !unlocked.some(z=>z.id===STATE.selectedZone)){
+    STATE.selectedZone = unlocked.slice().sort((a,b)=>b.unlockChapter-a.unlockChapter)[0].id; // truly most-advanced unlocked zone
+  }
+  const zone = ZONES.find(z=>z.id===STATE.selectedZone);
+  const tabs = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">${ZONES.map(z=>{const u=zoneUnlocked(z);return `<button class="small-btn ${z.id===STATE.selectedZone?'primary':''}" ${u?`onclick="selectZone('${z.id}')"`:'disabled'} style="${u?'':'opacity:.4'}">${z.icon} ${esc(z.name)}${u?'':` · Ch.${z.unlockChapter}`}</button>`;}).join('')}</div>`;
+  const body = tabs + zoneScreenHTML(zone) + bountyBoardHTML() + `<div class="locked-banner" style="margin-top:18px">Gold: <b style="color:#eee">${STATE.gold.toLocaleString()}</b></div>`;
+  return panel(zone.name, 'EXPLORATION ZONE', body, navButton('Dashboard'));
+}
+function selectZone(id){ STATE.selectedZone = id; save(); go('Frontier'); }
 function fightFrontierRegular(id){
   const e = FRONTIER_REGULARS.find(x=>x.id===id);
   if(!e) return;
@@ -946,7 +1123,8 @@ function battleAction(a){
   const kit = kitFor(actor.id);
   const curMp = STATE.partyMp[actor.id] != null ? STATE.partyMp[actor.id] : actor.mp;
   const dmgTable = [120,105,110,95,90,85,80,60,60];
-  const baseDmg = dmgTable[STATE.turn % dmgTable.length];
+  const trinket = trinketBonus(actor.id) || {};
+  const baseDmg = Math.round(dmgTable[STATE.turn % dmgTable.length] * (1+(trinket.dmgPct||0)));
 
   function spendMp(amount){ STATE.partyMp[actor.id] = Math.max(0, curMp-amount); }
   function dealDamage(dmg, verb){
@@ -961,13 +1139,13 @@ function battleAction(a){
     if(curMp < kit.spell.mp){ logCombat(`${esc(actor.name)} doesn't have enough MP for ${kit.spell.name} — attacks instead.`); dealDamage(baseDmg,'attacks'); }
     else if(kit.spell.healMult){
       spendMp(kit.spell.mp);
-      const healAmt = Math.round(60*kit.spell.healMult);
+      const healAmt = Math.round(60*kit.spell.healMult*(1+(trinket.healPct||0)));
       const lowest = party.reduce((min,m)=>{ const h=STATE.partyHp[m.id]!=null?STATE.partyHp[m.id]:m.hp; const minH=STATE.partyHp[min.id]!=null?STATE.partyHp[min.id]:min.hp; return h/m.hp < minH/min.hp ? m : min; }, party[0]);
-      STATE.partyHp[lowest.id] = Math.min(lowest.hp, (STATE.partyHp[lowest.id]!=null?STATE.partyHp[lowest.id]:lowest.hp)+healAmt);
+      STATE.partyHp[lowest.id] = Math.min(effectiveMaxHp(lowest), (STATE.partyHp[lowest.id]!=null?STATE.partyHp[lowest.id]:lowest.hp)+healAmt);
       logCombat(`${esc(actor.name)} casts ${kit.spell.icon} ${esc(kit.spell.name)}, healing ${esc(lowest.name)} for ${healAmt} HP.`);
     } else {
       spendMp(kit.spell.mp);
-      dealDamage(Math.round(baseDmg*kit.spell.mult), `casts ${kit.spell.icon} ${esc(kit.spell.name)}`);
+      dealDamage(Math.round(baseDmg*kit.spell.mult*(1+(trinket.spellPct||0))), `casts ${kit.spell.icon} ${esc(kit.spell.name)}`);
     }
   } else if(a==='SKILL' && kit.skill){
     const useHigh = kit.highSkill && level() >= kit.highSkill.levelReq;
@@ -983,7 +1161,7 @@ function battleAction(a){
     }
     else {
       spendMp(chosenSkill.mp);
-      if(chosenSkill.mult) dealDamage(Math.round(baseDmg*chosenSkill.mult), `uses ${chosenSkill.icon} ${esc(chosenSkill.name)}`);
+      if(chosenSkill.mult) dealDamage(Math.round(baseDmg*chosenSkill.mult*(1+(trinket.skillPct||0))), `uses ${chosenSkill.icon} ${esc(chosenSkill.name)}`);
       else logCombat(`${esc(actor.name)} uses ${chosenSkill.icon} ${esc(chosenSkill.name)}.`);
     }
   } else if(a==='DEFEND'){
