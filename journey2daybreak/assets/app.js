@@ -24,9 +24,12 @@ const ALL_PARTY = [
   {id:'senedra',    name:'SENEDRA',    role:'Scout',               hp:70, mp:55,  joinChapter:11,  portrait:'assets/portraits/senedra.jpg'},
   {id:'zaki',       name:'ZAKI',       role:'Fighter',             hp:88, mp:35,  joinChapter:11,  portrait:'assets/portraits/zaki.jpg'},
   {id:'ser_aldric', name:'SER ALDRIC', role:'Knight',              hp:90, mp:45,  joinChapter:73,  portrait:'assets/portraits/ser_aldric.jpg'},
-  {id:'sister_wren',name:'SISTER WREN',role:'Healer',              hp:72, mp:100, joinChapter:74,  portrait:'assets/portraits/sister_wren.jpg'}
+  {id:'sister_wren',name:'SISTER WREN',role:'Healer',              hp:72, mp:100, joinChapter:74,  portrait:'assets/portraits/sister_wren.jpg'},
+  {id:'soel',       name:'SOEL',       role:'Spiritual Familiar',  hp:50, mp:80,  joinChapter:0, joinLevel:10, portrait:'assets/portraits/soel.jpg'}
 ];
-function getActiveParty(){ return ALL_PARTY.filter(m => STATE.completed >= m.joinChapter); }
+// Soel unlocks by LEVEL, not story chapter — everyone else uses joinChapter.
+function memberUnlocked(m){ return m.joinLevel ? level() >= m.joinLevel : STATE.completed >= m.joinChapter; }
+function getActiveParty(){ return ALL_PARTY.filter(memberUnlocked); }
 function getRecentJoins(){ return ALL_PARTY.filter(m => m.joinChapter === STATE.completed && m.joinChapter > 0); }
 
 // CHAPTERS comes from chapters-data.js. Full archive now drives progression —
@@ -89,6 +92,8 @@ const STATE = {
   chaptersReadToday: 0,
   chaptersReadDay: null,
   readChapters: [],   // chapter IDs actually opened via the reader — gates Battle
+  consumables: {},     // {potionId: count}
+  battleItemMenuOpen: false,
   journalPage: null
 };
 
@@ -103,7 +108,7 @@ function getSavePayload(){
       frontierBossCooldownUntil: STATE.frontierBossCooldownUntil, frontierCurrentBoss: STATE.frontierCurrentBoss,
       bounties: STATE.bounties, bountyDay: STATE.bountyDay,
       chaptersReadToday: STATE.chaptersReadToday, chaptersReadDay: STATE.chaptersReadDay,
-      readChapters: STATE.readChapters
+      readChapters: STATE.readChapters, consumables: STATE.consumables
     }
   };
 }
@@ -229,6 +234,73 @@ function bossHpFor(id){ const b=bossFor(id); if(!b) return 0; return (id in STAT
 function setBossHp(id, val){ STATE.bossHp[id]=Math.max(0,val); save(); }
 
 // ---------------------------------------------------------------------------
+// TRADER & CRAFTING — same potion values as your codex project (Health
+// Potion: 30 HP, Mana Potion: 25 MP, Greater Health: 75 HP), and Aisyah gives
+// the same 10% haggle discount when she's in the active party. Crafting is
+// adapted rather than copied: the codex system uses gathered materials
+// (Herb Bundle, Iron Ore, etc.) from monster drops we don't have here, so
+// recipes use boss trophies instead — gives the trophies an actual purpose
+// beyond decoration.
+// ---------------------------------------------------------------------------
+const POTION_CATALOG = [
+  {id:'health_potion', name:'Health Potion', icon:'🧪', effect:'heal', value:30, price:20},
+  {id:'mana_potion', name:'Mana Potion', icon:'🔵', effect:'mana', value:25, price:18},
+  {id:'greater_health_potion', name:'Greater Health Potion', icon:'💊', effect:'heal', value:75, price:55}
+];
+const CRAFT_RECIPES = [
+  {id:'craft_health', name:'Health Potion', icon:'🧪', trophyCost:1, goldCost:8, resultId:'health_potion', resultQty:2, desc:'2 boss trophies of any kind + gold → 2 Health Potions.', trophies:2},
+  {id:'craft_greater', name:'Greater Health Potion', icon:'💊', trophyCost:1, goldCost:30, resultId:'greater_health_potion', resultQty:1, desc:'3 boss trophies + gold → 1 Greater Health Potion.', trophies:3}
+];
+function haggleMultiplier(){ return getActiveParty().some(m=>m.id==='aisyah') ? 0.9 : 1; }
+function potionPrice(p){ return Math.max(1, Math.round(p.price * haggleMultiplier())); }
+function buyPotion(id){
+  const p = POTION_CATALOG.find(x=>x.id===id);
+  if(!p) return;
+  const cost = potionPrice(p);
+  if(STATE.gold < cost) return toast('Not enough gold');
+  STATE.gold -= cost;
+  STATE.consumables[id] = (STATE.consumables[id]||0) + 1;
+  save();
+  toast(`${p.icon} ${p.name} purchased · -${cost}g`);
+  go('Inventory');
+}
+function craftPotion(recipeId){
+  const r = CRAFT_RECIPES.find(x=>x.id===recipeId);
+  if(!r) return;
+  if(STATE.inventory.length < r.trophies) return toast(`Need ${r.trophies} boss trophies`);
+  if(STATE.gold < r.goldCost) return toast('Not enough gold');
+  STATE.inventory.splice(0, r.trophies); // consume the oldest trophies
+  STATE.gold -= r.goldCost;
+  STATE.consumables[r.resultId] = (STATE.consumables[r.resultId]||0) + r.resultQty;
+  save();
+  toast(`Crafted ${r.resultQty}× ${r.name}`);
+  go('Inventory');
+}
+function usePotionInBattle(id){
+  const p = POTION_CATALOG.find(x=>x.id===id);
+  if(!p || !STATE.consumables[id]) return;
+  const boss = bossFor(currentBossId());
+  if(!boss) return;
+  const party = getActiveParty();
+  const actor = party[STATE.turn] || party[0];
+  STATE.consumables[id]--;
+  STATE.battleItemMenuOpen = false;
+  if(p.effect==='heal'){
+    const cur = STATE.partyHp[actor.id]!=null?STATE.partyHp[actor.id]:actor.hp;
+    STATE.partyHp[actor.id] = Math.min(actor.hp, cur+p.value);
+    logCombat(`${esc(actor.name)} drinks a ${p.icon} ${p.name}, recovering ${p.value} HP.`);
+  } else {
+    const cur = STATE.partyMp[actor.id]!=null?STATE.partyMp[actor.id]:actor.mp;
+    STATE.partyMp[actor.id] = Math.min(actor.mp, cur+p.value);
+    logCombat(`${esc(actor.name)} drinks a ${p.icon} ${p.name}, recovering ${p.value} MP.`);
+  }
+  save();
+  STATE.turn=(STATE.turn+1)%Math.max(1,party.length);
+  setTimeout(()=>go('Battle'),250);
+}
+function toggleBattleItemMenu(){ STATE.battleItemMenuOpen = !STATE.battleItemMenuOpen; go('Battle'); }
+
+// ---------------------------------------------------------------------------
 // OUT-OF-COMBAT REGEN — didn't exist in the codex project either (checked),
 // so this is a new addition rather than a port. 1.5% of max HP/MP per minute
 // away from the app, capped at 24h of accumulated time so a month-old save
@@ -266,7 +338,8 @@ const CLASS_KIT = {
   senedra:     {role:'ranged', spell:null, skill:{name:"Hunter's Mark", icon:'🎯', mp:8, effect:'mark'}},
   zaki:        {role:'melee',  spell:null, skill:{name:'Power Strike', icon:'💥', mp:10, mult:1.5}},
   ser_aldric:  {role:'tank',   spell:null, skill:{name:'Holy Strike', icon:'✝️', mp:10, mult:1.4}},
-  sister_wren: {role:'healer', spell:{name:'Blessing of Faith', icon:'🙏', mp:12, healMult:1.1}, skill:{name:'Purify', icon:'🌿', mp:15, effect:'cleanse'}}
+  sister_wren: {role:'healer', spell:{name:'Blessing of Faith', icon:'🙏', mp:12, healMult:1.1}, skill:{name:'Purify', icon:'🌿', mp:15, effect:'cleanse'}},
+  soel:        {role:'caster', spell:{name:"Nine Lives' Ward", icon:'🐾', mp:20, healMult:0.6}, skill:{name:'Lucky Pounce', icon:'✨', mp:8, mult:1.3}}
 };
 function kitFor(id){ return CLASS_KIT[id] || {role:'melee', spell:null, skill:null}; }
 function logCombat(line){
@@ -333,9 +406,9 @@ function awardBossLoot(chapterId, bossName){
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(msg){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),1800)}
 function refreshTopbar(){const stats=topbar.querySelectorAll('.stat');const lvl=level();const prev=xpThreshold(lvl-1),next=xpThreshold(lvl);if(stats[0])stats[0].querySelector('.big').textContent=lvl;if(stats[1]){stats[1].querySelector('.num').textContent=`${STATE.xp.toLocaleString()} / ${next.toLocaleString()}`;stats[1].querySelector('.fill').style.width=`${Math.min(100,(STATE.xp-prev)/Math.max(1,next-prev)*100)}%`;}if(stats[2]){const san=getActiveParty().find(m=>m.id==='san');const shp=san?(STATE.partyHp['san']!=null?STATE.partyHp['san']:san.hp):82;const smax=san?san.hp:82;stats[2].querySelector('.num').textContent=`${shp} / ${smax}`;const bar=stats[2].querySelector('.fill');if(bar)bar.style.width=`${Math.max(0,Math.min(100,shp/smax*100))}%`;}if(stats[3]){stats[3].querySelector('.num').textContent=STATE.gold.toLocaleString();}}
-function go(name){if(name!=='Battle')clearAutoActTimer();document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.name===name));render(name);window.scrollTo({top:0,behavior:'smooth'})}
+function go(name){if(name!=='Battle'){clearAutoActTimer();STATE.battleItemMenuOpen=false;}document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.name===name));render(name);window.scrollTo({top:0,behavior:'smooth'})}
 
-function render(name){refreshTopbar();document.querySelectorAll('.soel').forEach(e=>e.remove());let body='';if(name==='Dashboard')body=dashboard();if(name==='Journal')body=journalScreen();if(name==='Quests')body=questsScreen();if(name==='Party')body=partyScreen();if(name==='Spellbook')body=spellbookScreen();if(name==='Inventory')body=inventoryScreen();if(name==='Codex')body=codexScreen();if(name==='Battle')body=battleScreen();if(name==='Temple')body=templeScreen();if(name==='Frontier')body=frontierScreen();main.innerHTML=topbar.outerHTML+body+`<div id="toast" class="toast"></div>`;if(name!=='Battle'){const soel=document.createElement('div');soel.className='soel';soel.innerHTML=`<img src="${soelSrc}"><div class="lock"><b>SOEL</b><small>LOCKED<br/>Awakens at Level 10 🔒</small></div>`;document.querySelector('.app').appendChild(soel)}bind();if(name==='Battle'){const cl=document.getElementById('combatLog');if(cl)cl.scrollTop=cl.scrollHeight;}}
+function render(name){refreshTopbar();document.querySelectorAll('.soel').forEach(e=>e.remove());let body='';if(name==='Dashboard')body=dashboard();if(name==='Journal')body=journalScreen();if(name==='Quests')body=questsScreen();if(name==='Party')body=partyScreen();if(name==='Spellbook')body=spellbookScreen();if(name==='Inventory')body=inventoryScreen();if(name==='Codex')body=codexScreen();if(name==='Battle')body=battleScreen();if(name==='Temple')body=templeScreen();if(name==='Frontier')body=frontierScreen();main.innerHTML=topbar.outerHTML+body+`<div id="toast" class="toast"></div>`;if(name!=='Battle'){const soel=document.createElement('div');soel.className='soel';const soelUnlocked=level()>=10;soel.innerHTML=soelUnlocked?`<img src="${soelSrc}"><div class="lock" style="border-color:#68b58b"><b>SOEL</b><small>AWAKENED ✧<br/>In your active party</small></div>`:`<img src="${soelSrc}"><div class="lock"><b>SOEL</b><small>LOCKED<br/>Awakens at Level 10 🔒</small></div>`;document.querySelector('.app').appendChild(soel)}bind();if(name==='Battle'){const cl=document.getElementById('combatLog');if(cl)cl.scrollTop=cl.scrollHeight;}}
 
 function bind(){
   document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
@@ -440,8 +513,7 @@ function partyScreen(){
   const locked = ALL_PARTY.filter(m=>!active.includes(m));
   return panel('Travelling Party','PARTY ROSTER',
     `<div class="party-list">${active.map(m=>`<article class="party-row"><div class="portrait large"><img src="${m.portrait}" alt="${m.name}"></div><h3>${m.name}</h3><div class="role">${m.role}</div><div class="hp">Level ${level()} · ${m.hp} / ${m.hp} HP</div></article>`).join('')}</div>`+
-    (locked.length?`<h3 style="font-family:Cinzel;color:#8f7aa8;margin:22px 0 10px;font-size:15px">NOT YET JOINED</h3><div class="party-list">${locked.map(m=>`<article class="party-row" style="opacity:.5"><div class="portrait large"><img src="${m.portrait}" alt="${m.name}"></div><h3>${m.name}</h3><div class="role">${m.role}</div><div class="hp">Joins at Chapter ${m.joinChapter}</div></article>`).join('')}</div>`:'')+
-    `<div class="locked-banner">🐾 SOEL · SPIRITUAL FAMILIAR · LOCKED UNTIL LEVEL 10</div>`,
+    (locked.length?`<h3 style="font-family:Cinzel;color:#8f7aa8;margin:22px 0 10px;font-size:15px">NOT YET JOINED</h3><div class="party-list">${locked.map(m=>`<article class="party-row" style="opacity:.5"><div class="portrait large"><img src="${m.portrait}" alt="${m.name}"></div><h3>${m.name}</h3><div class="role">${m.role}</div><div class="hp">${m.joinLevel?`Awakens at Level ${m.joinLevel} (currently Lv.${level()})`:`Joins at Chapter ${m.joinChapter}`}</div></article>`).join('')}</div>`:''),
     navButton('Dashboard'));
 }
 function spellbookScreen(){
@@ -461,11 +533,21 @@ function spellbookScreen(){
   return panel('Spellbook','PARTY SPELLS & TECHNIQUES', rows, navButton('Dashboard'));
 }
 function inventoryScreen(){
+  const potionsOwned = Object.entries(STATE.consumables).filter(([,n])=>n>0);
+  const potionsHTML = potionsOwned.length
+    ? `<h3 style="font-family:Cinzel;color:#c99aff;margin:0 0 4px;font-size:18px">🧪 POTIONS</h3><div class="chapter-grid">${potionsOwned.map(([id,n])=>{const p=POTION_CATALOG.find(x=>x.id===id);return `<article class="quest"><div class="mini-ico">${p.icon}</div><div><h3>${esc(p.name)}</h3><p>${p.effect==='heal'?`Restores ${p.value} HP`:`Restores ${p.value} MP`}</p></div><b>x${n}</b></article>`;}).join('')}</div>`
+    : `<h3 style="font-family:Cinzel;color:#c99aff;margin:0 0 4px;font-size:18px">🧪 POTIONS</h3><p class="lead">None yet — buy some from the Trader below, or craft them from boss trophies.</p>`;
+
+  const haggle = haggleMultiplier() < 1;
+  const traderHTML = `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">🛒 TRADER</h3><p class="lead" style="margin-bottom:10px">${haggle?'Aisyah is haggling for you — 10% off.':'Aisyah isn\'t in your active party, so no haggle discount right now.'}</p><div class="chapter-grid">${POTION_CATALOG.map(p=>`<article class="quest"><div class="mini-ico">${p.icon}</div><div><h3>${esc(p.name)}</h3><p>${p.effect==='heal'?`Restores ${p.value} HP`:`Restores ${p.value} MP`}</p></div><button class="small-btn primary" onclick="buyPotion('${p.id}')" ${STATE.gold<potionPrice(p)?'disabled':''}>${potionPrice(p)}g</button></article>`).join('')}</div>`;
+
+  const craftHTML = `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">⚒️ CRAFTING</h3><p class="lead" style="margin-bottom:10px">Turn boss trophies into potions. You have ${STATE.inventory.length} trophy${STATE.inventory.length===1?'':'ies'}.</p><div class="chapter-grid">${CRAFT_RECIPES.map(r=>`<article class="quest"><div class="mini-ico">${r.icon}</div><div><h3>${esc(r.name)} ×${r.resultQty}</h3><p>${esc(r.desc)}</p></div><button class="small-btn primary" onclick="craftPotion('${r.id}')" ${(STATE.inventory.length<r.trophies||STATE.gold<r.goldCost)?'disabled':''}>${r.trophies} trophies + ${r.goldCost}g</button></article>`).join('')}</div>`;
+
   const trophies = STATE.inventory.length
-    ? `<h3 style="font-family:Cinzel;color:#c99aff;margin:0 0 4px;font-size:18px">BOSS TROPHIES</h3><p class="lead" style="margin-bottom:14px">Earned by defeating story bosses.</p><div class="chapter-grid">${STATE.inventory.map(item=>`<article class="quest"><div class="mini-ico">${item.icon}</div><div><h3>${esc(item.name)}</h3><p>${esc(item.desc)}</p></div></article>`).join('')}</div>`
-    : `<h3 style="font-family:Cinzel;color:#c99aff;margin:0 0 4px;font-size:18px">BOSS TROPHIES</h3><p class="lead">None yet — defeat a boss in Battle to earn your first trophy.</p>`;
+    ? `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">BOSS TROPHIES</h3><p class="lead" style="margin-bottom:14px">Earned by defeating story bosses. Spend these on crafting above.</p><div class="chapter-grid">${STATE.inventory.map(item=>`<article class="quest"><div class="mini-ico">${item.icon}</div><div><h3>${esc(item.name)}</h3><p>${esc(item.desc)}</p></div></article>`).join('')}</div>`
+    : `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">BOSS TROPHIES</h3><p class="lead">None yet — defeat a boss in Battle to earn your first trophy.</p>`;
   const supplies = `<h3 style="font-family:Cinzel;color:#8f7aa8;margin:22px 0 4px;font-size:15px">STARTING SUPPLIES</h3><div class="chapter-grid">${['Minor Healing Tonic','Aether Shard','Waystone Fragment','Tomb Key','Antique Coin'].map((x,i)=>`<article class="quest"><div class="mini-ico">${['✚','◆','◇','⚿','◈'][i]}</div><div><h3>${x}</h3><p>Carried by the travelling party.</p></div><b>x${i+1}</b></article>`).join('')}</div>`;
-  return panel('Inventory','CARRIED ITEMS', trophies+supplies, navButton('Dashboard'));
+  return panel('Inventory','CARRIED ITEMS', potionsHTML+traderHTML+craftHTML+trophies+supplies, navButton('Dashboard'));
 }
 function codexScreen(){return panel('Codex','WORLD & LORE',`<div class="chapter-grid">${['Aethon','Daybreak','Tomb of Kings','Bone Tyrant','Travelling Party','Spiritual Familiars'].map((x,i)=>`<article class="quest"><div class="mini-ico">${['✦','☼','♜','☠','♟','🐾'][i]}</div><div><h3>${x}</h3><p>World entry revealed through the Season One story.</p></div></article>`).join('')}</div>`,navButton('Dashboard'))}
 
@@ -734,16 +816,22 @@ function battleScreen(){
     const spellAvailable = !!actorKit.spell;
     const skillAvailable = !!actorKit.skill;
     const highSkillReady = actorKit.highSkill && level_ >= actorKit.highSkill.levelReq;
+    const potionCount = Object.values(STATE.consumables).reduce((a,b)=>a+b,0);
     const actions = [
       ['ATTACK','⚔️','Basic attack', true],
       ['SPELL', spellAvailable?actorKit.spell.icon:'✨', spellAvailable?actorKit.spell.name+` (${actorKit.spell.mp} MP)`:'No spells known', spellAvailable],
       ['SKILL', highSkillReady?actorKit.highSkill.icon:(skillAvailable?actorKit.skill.icon:'🎯'), highSkillReady?actorKit.highSkill.name+` (${actorKit.highSkill.mp} MP)`:(skillAvailable?actorKit.skill.name+` (${actorKit.skill.mp} MP)`:'No skills known'), skillAvailable],
-      ['ITEM','🧪','Use item', true],
+      ['ITEM','🧪', potionCount?`${potionCount} potion${potionCount===1?'':'s'} carried`:'No potions — visit the Trader', true],
       ['DEFEND','🛡️','Brace', true]
     ];
     actions.forEach(([a,icon,sub,enabled])=>{
-      html += `<button class="battle-action-btn" data-battle-action="${a}" ${hp<=0||locked||!enabled?'disabled':''}><span class="battle-action-icon">${icon}</span><span class="battle-action-label">${a}</span><span class="battle-action-sub">${sub}</span></button>`;
+      const onclick = a==='ITEM' ? `onclick="toggleBattleItemMenu()"` : `data-battle-action="${a}"`;
+      html += `<button class="battle-action-btn" ${onclick} ${hp<=0||locked||!enabled?'disabled':''}><span class="battle-action-icon">${icon}</span><span class="battle-action-label">${a}</span><span class="battle-action-sub">${sub}</span></button>`;
     });
+    if(STATE.battleItemMenuOpen){
+      const owned = Object.entries(STATE.consumables).filter(([,n])=>n>0);
+      html += `<div class="chapter-grid" style="grid-column:1/-1;margin-top:8px">${owned.length ? owned.map(([id,n])=>{const p=POTION_CATALOG.find(x=>x.id===id);return `<article class="quest"><div class="mini-ico">${p.icon}</div><div><h3>${esc(p.name)} ×${n}</h3><p>${p.effect==='heal'?`+${p.value} HP`:`+${p.value} MP`}</p></div><button class="small-btn primary" onclick="usePotionInBattle('${id}')">USE</button></article>`;}).join('') : '<p class="lead">No potions carried — buy some from the Trader in Inventory.</p>'}</div>`;
+    }
   } else {
     html += `<div class="battle-note" style="grid-column:1/-1;text-align:center;padding:10px">${esc(currentMember.name)} is acting on Assisted AI…</div>`;
   }
@@ -834,7 +922,8 @@ function battleAction(a){
   } else if(a==='DEFEND'){
     logCombat(`${esc(actor.name)} braces to defend.`);
   } else if(a==='ITEM'){
-    logCombat(`${esc(actor.name)} rummages for an item, but the pack is still empty.`);
+    toggleBattleItemMenu();
+    return;
   } else {
     dealDamage(baseDmg, 'attacks');
   }
