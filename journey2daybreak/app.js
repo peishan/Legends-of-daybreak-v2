@@ -618,7 +618,9 @@ function journalScreen(){
 function readerHTML(c){
   const done = c.id <= STATE.completed;
   const isBoss = !!c.boss;
-  const pagesHTML = c.pages.map(p=>`<img src="${p}" alt="${esc(c.title)} page">`).join('');
+  const pagesHTML = c.pages.length
+    ? c.pages.map(p=>`<img src="${p}" alt="${esc(c.title)} page">`).join('')
+    : `<div style="padding:40px 20px;text-align:center;color:#8f7aa8;font-family:Cinzel;border:1px dashed #453a5c;border-radius:10px">📖 Comic artwork not yet drawn for this chapter — read the journal scenes below.</div>`;
   const scenesHTML = c.scenes && c.scenes.length ? `<h4 style="margin-top:14px">JOURNAL SCENES</h4>${c.scenes.map(s=>`<div class="scene"><div class="speaker">${esc(s[0])}</div><p>${esc(s[1])}</p></div>`).join('')}` : '';
   const completeBtn = isBoss
     ? `<button class="cta" onclick="go('Battle')">ENTER BATTLE ⚔</button>`
