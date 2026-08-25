@@ -94,6 +94,8 @@ const STATE = {
   readChapters: [],   // chapter IDs actually opened via the reader — gates Battle
   consumables: {},     // {potionId: count}
   battleItemMenuOpen: false,
+  battleSpellMenuOpen: false,
+  shielded: false,      // party-wide shield from San's Storm Veil — halves the next boss hit on anyone
   defending: {},        // {memberId: true} — halves the boss's next hit on them, consumed on use
   partyStatus: {},      // {memberId: 'diseased'} — inflicted by some boss hits, blocks regen until cured
   equipped: {},          // {memberId: trophyItemId} — one trinket slot per member
@@ -308,6 +310,8 @@ function usePotionInBattle(id){
   endTurn(boss, party);
 }
 function toggleBattleItemMenu(){ STATE.battleItemMenuOpen = !STATE.battleItemMenuOpen; go('Battle'); }
+function toggleBattleSpellMenu(){ STATE.battleSpellMenuOpen = !STATE.battleSpellMenuOpen; go('Battle'); }
+function castNamedSpell(index){ STATE.pendingSpellIndex = index; STATE.battleSpellMenuOpen = false; battleAction('SPELL'); }
 
 // ---------------------------------------------------------------------------
 // OUT-OF-COMBAT REGEN — didn't exist in the codex project either (checked),
@@ -363,12 +367,30 @@ function applyIdleGains(){
 // level 30, matching "high level" as requested.
 // ---------------------------------------------------------------------------
 const CLASS_KIT = {
-  san:         {role:'caster', spell:{name:'Astral Lance', icon:'✨', mp:15, mult:1.6}, skill:{name:"Daybreak Ward", icon:'🛡️', mp:10, effect:'ward'}},
+  san:         {role:'caster',
+    spells:[
+      {name:'Arcane Bolt', icon:'⚡', mp:8, mult:1.2, levelReq:1, desc:'Cheap starter bolt.'},
+      {name:'Astral Lance', icon:'✨', mp:15, mult:1.6, levelReq:1, desc:'Her core damage spell.'},
+      {name:'Storm Veil', icon:'🌫️', mp:14, effect:'shield', levelReq:15, desc:'Shields the whole party from the boss\'s next hit.'},
+      {name:'Starfall', icon:'🌠', mp:28, mult:2.3, levelReq:30, desc:'A heavy single-target strike.'},
+      {name:'Aether Pulse', icon:'🔮', mp:20, effect:'restoreMp', restoreAmt:35, levelReq:45, desc:'Restores MP to whoever needs it most.'}
+    ],
+    skill:{name:"Daybreak Ward", icon:'🛡️', mp:10, effect:'ward'}},
   joel:        {role:'tank',   spell:null, skill:{name:"Guardian's Oath", icon:'⚔️', mp:0, effect:'taunt'}},
   aisyah:      {role:'melee',  spell:null, skill:{name:'Coup de Grace', icon:'💀', mp:0, mult:1.8}},
-  eliz:        {role:'healer', spell:{name:'Heal', icon:'💚', mp:10, healMult:1}, skill:{name:'Resurrect', icon:'🌟', mp:35, effect:'revive'},
-                highSkill:{name:'Cure Disease', icon:'🌿', mp:20, effect:'cleanse', levelReq:30}},
-  mezstorm:    {role:'caster', spell:{name:'Tempest Fury', icon:'🌀', mp:18, mult:1.7}, skill:{name:'Thunderclap', icon:'🔊', mp:12, effect:'stun'}},
+  eliz:        {role:'healer',
+    spells:[
+      {name:'Heal', icon:'💚', mp:10, healMult:1, levelReq:1, desc:'Restores HP to the lowest-HP ally.'},
+      {name:'Well of Light', icon:'💧', mp:15, effect:'restoreMp', restoreAmt:40, levelReq:12, desc:"Restores MP to San specifically — Eliz's aura answers hers first."}
+    ],
+    skill:{name:'Resurrect', icon:'🌟', mp:35, effect:'revive'},
+    highSkill:{name:'Cure Disease', icon:'🌿', mp:20, effect:'cleanse', levelReq:30}},
+  mezstorm:    {role:'caster',
+    spells:[
+      {name:'Tempest Fury', icon:'🌀', mp:18, mult:1.7, levelReq:1, desc:'His core damage spell.'},
+      {name:'Storm Share', icon:'🤝', mp:15, effect:'shareMp', restoreAmt:35, levelReq:12, desc:"Spends his own MP to restore an ally's."}
+    ],
+    skill:{name:'Thunderclap', icon:'🔊', mp:12, effect:'stun'}},
   senedra:     {role:'ranged', spell:null, skill:{name:"Hunter's Mark", icon:'🎯', mp:0, effect:'mark'}},
   zaki:        {role:'melee',  spell:null, skill:{name:'Power Strike', icon:'💥', mp:0, mult:1.5}},
   ser_aldric:  {role:'tank',   spell:null, skill:{name:'Holy Strike', icon:'✝️', mp:0, mult:1.4}},
@@ -412,6 +434,7 @@ function bossCounterAttack(boss){
   let dmg = bossAttackDamage(boss);
   const t = trinketBonus(target.id);
   if(t && t.defPct) dmg = Math.round(dmg*(1-t.defPct));
+  if(STATE.shielded){ dmg = Math.round(dmg*0.5); STATE.shielded = false; }
   if(STATE.defending[target.id]){ dmg = Math.round(dmg*0.5); delete STATE.defending[target.id]; }
   const cur = STATE.partyHp[target.id]!=null?STATE.partyHp[target.id]:target.hp;
   const floor = UNKILLABLE_IDS.has(target.id) ? 1 : 0;
@@ -685,7 +708,12 @@ function spellbookScreen(){
   const rows = ALL_PARTY.filter(m=>STATE.completed >= m.joinChapter).map(m=>{
     const kit = kitFor(m.id);
     const entries = [];
-    if(kit.spell) entries.push({name:kit.spell.name, icon:kit.spell.icon, mp:kit.spell.mp, note: kit.spell.healMult?'Restores HP to the lowest-HP ally':'Damaging spell'});
+    if(kit.spells){
+      kit.spells.forEach(s=>{
+        const unlocked = lvl >= s.levelReq;
+        entries.push({name:s.name, icon:s.icon, mp:s.mp, note: unlocked?(s.desc||'Spell'):`Unlocks at Level ${s.levelReq} (currently Lv.${lvl})`, locked:!unlocked});
+      });
+    } else if(kit.spell) entries.push({name:kit.spell.name, icon:kit.spell.icon, mp:kit.spell.mp, note: kit.spell.healMult?'Restores HP to the lowest-HP ally':'Damaging spell'});
     if(kit.skill) entries.push({name:kit.skill.name, icon:kit.skill.icon, mp:kit.skill.mp, note: kit.skill.effect==='revive'?'Revives a fallen ally':kit.skill.effect==='cleanse'?'Removes debuffs':'Class skill'});
     if(kit.highSkill){
       const unlocked = lvl >= kit.highSkill.levelReq;
@@ -1067,24 +1095,36 @@ function battleScreen(){
   if(playerControlsThisTurn){
     const actorKit = currentMember ? kitFor(currentMember.id) : kitFor('san');
     const level_ = level();
-    const spellAvailable = !!actorKit.spell;
+    const hasMultiSpells = Array.isArray(actorKit.spells);
+    const unlockedSpells = hasMultiSpells ? actorKit.spells.filter(s=>level_>=s.levelReq) : [];
+    const spellAvailable = hasMultiSpells ? unlockedSpells.length>0 : !!actorKit.spell;
     const skillAvailable = !!actorKit.skill;
     const highSkillReady = actorKit.highSkill && level_ >= actorKit.highSkill.levelReq;
     const potionCount = Object.values(STATE.consumables).reduce((a,b)=>a+b,0);
+    const spellSub = hasMultiSpells
+      ? (spellAvailable ? `${unlockedSpells.length} spell${unlockedSpells.length===1?'':'s'} known` : 'No spells known')
+      : (spellAvailable ? actorKit.spell.name+(actorKit.spell.mp?` (${actorKit.spell.mp} MP)`:'') : 'No spells known');
+    const spellIcon = hasMultiSpells ? '📖' : (spellAvailable?actorKit.spell.icon:'✨');
     const actions = [
       ['ATTACK','⚔️','Basic attack', true],
-      ['SPELL', spellAvailable?actorKit.spell.icon:'✨', spellAvailable?actorKit.spell.name+(actorKit.spell.mp?` (${actorKit.spell.mp} MP)`:''):'No spells known', spellAvailable],
+      ['SPELL', spellIcon, spellSub, spellAvailable],
       ['SKILL', highSkillReady?actorKit.highSkill.icon:(skillAvailable?actorKit.skill.icon:'🎯'), highSkillReady?actorKit.highSkill.name+(actorKit.highSkill.mp?` (${actorKit.highSkill.mp} MP)`:''):(skillAvailable?actorKit.skill.name+(actorKit.skill.mp?` (${actorKit.skill.mp} MP)`:''):'No skills known'), skillAvailable],
       ['ITEM','🧪', potionCount?`${potionCount} potion${potionCount===1?'':'s'} carried`:'No potions — visit the Trader', true],
       ['DEFEND','🛡️','Brace', true]
     ];
     actions.forEach(([a,icon,sub,enabled])=>{
-      const onclick = a==='ITEM' ? `onclick="toggleBattleItemMenu()"` : `data-battle-action="${a}"`;
+      let onclick;
+      if(a==='ITEM') onclick = `onclick="toggleBattleItemMenu()"`;
+      else if(a==='SPELL' && hasMultiSpells) onclick = `onclick="toggleBattleSpellMenu()"`;
+      else onclick = `data-battle-action="${a}"`;
       html += `<button class="battle-action-btn" ${onclick} ${hp<=0||locked||!enabled?'disabled':''}><span class="battle-action-icon">${icon}</span><span class="battle-action-label">${a}</span><span class="battle-action-sub">${sub}</span></button>`;
     });
     if(STATE.battleItemMenuOpen){
       const owned = Object.entries(STATE.consumables).filter(([,n])=>n>0);
       html += `<div class="chapter-grid" style="grid-column:1/-1;margin-top:8px">${owned.length ? owned.map(([id,n])=>{const p=POTION_CATALOG.find(x=>x.id===id);return `<article class="quest"><div class="mini-ico">${p.icon}</div><div><h3>${esc(p.name)} ×${n}</h3><p>${p.effect==='heal'?`+${p.value} HP`:`+${p.value} MP`}</p></div><button class="small-btn primary" onclick="usePotionInBattle('${id}')">USE</button></article>`;}).join('') : '<p class="lead">No potions carried — buy some from the Trader in Inventory.</p>'}</div>`;
+    }
+    if(STATE.battleSpellMenuOpen && hasMultiSpells){
+      html += `<div class="chapter-grid" style="grid-column:1/-1;margin-top:8px">${actorKit.spells.map((s,i)=>{const unlocked=level_>=s.levelReq;return `<article class="quest" style="${unlocked?'':'opacity:.45'}"><div class="mini-ico">${s.icon}</div><div><h3>${esc(s.name)}${s.mp?` · ${s.mp} MP`:''}</h3><p>${esc(s.desc||'')}${unlocked?'':` · Unlocks at Level ${s.levelReq}`}</p></div><button class="small-btn primary" onclick="castNamedSpell(${i})" ${unlocked?'':'disabled'}>CAST</button></article>`;}).join('')}</div>`;
     }
   } else {
     html += `<div class="battle-note" style="grid-column:1/-1;text-align:center;padding:10px">${esc(currentMember.name)} is acting on Assisted AI…</div>`;
@@ -1161,17 +1201,39 @@ function battleAction(a){
 
   if(a==='ATTACK'){
     dealDamage(baseDmg, 'attacks');
-  } else if(a==='SPELL' && kit.spell){
-    if(curMp < kit.spell.mp){ logCombat(`${esc(actor.name)} doesn't have enough MP for ${kit.spell.name} — attacks instead.`); dealDamage(baseDmg,'attacks'); }
-    else if(kit.spell.healMult){
-      spendMp(kit.spell.mp);
-      const healAmt = Math.round(60*kit.spell.healMult*(1+(trinket.healPct||0)));
+  } else if(a==='SPELL' && (kit.spell || kit.spells)){
+    const chosenSpell = kit.spells ? kit.spells[STATE.pendingSpellIndex] : kit.spell;
+    if(!chosenSpell){ dealDamage(baseDmg,'attacks'); }
+    else if(curMp < chosenSpell.mp){ logCombat(`${esc(actor.name)} doesn't have enough MP for ${chosenSpell.name} — attacks instead.`); dealDamage(baseDmg,'attacks'); }
+    else if(chosenSpell.healMult){
+      spendMp(chosenSpell.mp);
+      const healAmt = Math.round(60*chosenSpell.healMult*(1+(trinket.healPct||0)));
       const lowest = party.reduce((min,m)=>{ const h=STATE.partyHp[m.id]!=null?STATE.partyHp[m.id]:m.hp; const minH=STATE.partyHp[min.id]!=null?STATE.partyHp[min.id]:min.hp; return h/m.hp < minH/min.hp ? m : min; }, party[0]);
       STATE.partyHp[lowest.id] = Math.min(effectiveMaxHp(lowest), (STATE.partyHp[lowest.id]!=null?STATE.partyHp[lowest.id]:lowest.hp)+healAmt);
-      logCombat(`${esc(actor.name)} casts ${kit.spell.icon} ${esc(kit.spell.name)}, healing ${esc(lowest.name)} for ${healAmt} HP.`);
+      logCombat(`${esc(actor.name)} casts ${chosenSpell.icon} ${esc(chosenSpell.name)}, healing ${esc(lowest.name)} for ${healAmt} HP.`);
+    } else if(chosenSpell.effect==='restoreMp'){
+      spendMp(chosenSpell.mp);
+      const target = party.find(m=>m.id==='san') || party[0];
+      const curTargetMp = STATE.partyMp[target.id]!=null?STATE.partyMp[target.id]:target.mp;
+      STATE.partyMp[target.id] = Math.min(effectiveMaxMp(target), curTargetMp+chosenSpell.restoreAmt);
+      logCombat(`${esc(actor.name)} casts ${chosenSpell.icon} ${esc(chosenSpell.name)}, restoring ${chosenSpell.restoreAmt} MP to ${esc(target.name)}.`);
+    } else if(chosenSpell.effect==='shareMp'){
+      const eligible = party.filter(m=>m.id!==actor.id && m.mp>0);
+      if(curMp < chosenSpell.mp + 10 || !eligible.length){ logCombat(`${esc(actor.name)} doesn't have enough spare MP to share — attacks instead.`); dealDamage(baseDmg,'attacks'); }
+      else {
+        spendMp(chosenSpell.mp);
+        const target = eligible.reduce((min,m)=>{ const mp=STATE.partyMp[m.id]!=null?STATE.partyMp[m.id]:m.mp; const minMp=STATE.partyMp[min.id]!=null?STATE.partyMp[min.id]:min.mp; return mp/m.mp < minMp/min.mp ? m : min; }, eligible[0]);
+        const curTargetMp = STATE.partyMp[target.id]!=null?STATE.partyMp[target.id]:target.mp;
+        STATE.partyMp[target.id] = Math.min(effectiveMaxMp(target), curTargetMp+chosenSpell.restoreAmt);
+        logCombat(`${esc(actor.name)} casts ${chosenSpell.icon} ${esc(chosenSpell.name)}, sharing ${chosenSpell.restoreAmt} MP with ${esc(target.name)}.`);
+      }
+    } else if(chosenSpell.effect==='shield'){
+      spendMp(chosenSpell.mp);
+      STATE.shielded = true;
+      logCombat(`${esc(actor.name)} casts ${chosenSpell.icon} ${esc(chosenSpell.name)} — the party is shielded from the next hit.`);
     } else {
-      spendMp(kit.spell.mp);
-      dealDamage(Math.round(baseDmg*kit.spell.mult*(1+(trinket.spellPct||0))), `casts ${kit.spell.icon} ${esc(kit.spell.name)}`);
+      spendMp(chosenSpell.mp);
+      dealDamage(Math.round(baseDmg*chosenSpell.mult*(1+(trinket.spellPct||0))), `casts ${chosenSpell.icon} ${esc(chosenSpell.name)}`);
     }
   } else if(a==='SKILL' && kit.skill){
     const useHigh = kit.highSkill && level() >= kit.highSkill.levelReq;
