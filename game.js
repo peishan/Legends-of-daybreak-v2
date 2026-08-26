@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Guild Cafe: real macro tracking ported from Daybreak Quest \u2014 365-item food database, Slack Days, keto carb limits)';
+const APP_VERSION = '2026-08-17 (Brada Shah: Artillery/Support hybrid + new Quartermaster trader for all 8 swappable members\u2019 gear)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -249,7 +249,7 @@ const G = {
     { n: 'Soel', t: 'The Familiar', r: 'Support', hp: 55, mhp: 55, atk: 5, def: 4, spd: 8, on: false, ul: 10, d: 'Your loyal spirit cat companion. He came with the rain. He chose you. That is rare. That is everything. He is not merely a cat. He is a spirit. He is a choice made flesh. He is the space between San and Joel — the letters overlapping, the sounds merging. He cannot be killed — he reforms from spirit flame.', b: '+10% All stats · Spirit Cat (unkillable)', col: '#7c2d12', spiritCat: true, affinityBonuses: [], gear: null, base: { mhp: 55, atk: 5, def: 4, spd: 8 }, eq: { weapon: null, armor: null, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'KW Liang', t: 'Quick Hands', r: 'Scout', hp: 70, mhp: 70, atk: 9, def: 4, spd: 9, on: false, ul: 999, recruitGated: true, d: 'A personal shopper turned survivor turned something else entirely. Quick, sharp, and finally committed to something worth the trouble of showing up for. He still carries the Bunnies with him, quietly, even when he is laughing. Snowball, small and quick, never strays far.', b: '+15% Crit chance \u00b7 Snowball (18% dodge chance)', col: '#0d9488', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 9, def: 4, spd: 9 }, eq: { weapon: { n: "Quick Hands' Edge", slot: 'weapon', forCompanion: 'KW Liang', r: 'rare', ilvl: 28, atk: 24, spd: 10, d: "Twin blades for Liang. +24 ATK, +10 SPD" }, armor: { n: "Scavenger's Wrap", slot: 'armor', forCompanion: 'KW Liang', r: 'rare', ilvl: 28, def: 16, spd: 8, d: "Light armor for Liang. +16 DEF, +8 SPD" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Mimi', t: 'Dreamwalker', r: 'Divination Mage', hp: 55, mhp: 55, atk: 11, def: 3, spd: 7, on: false, ul: 999, recruitGated: true, d: 'She already knew you would ask before you finished asking. That is not a figure of speech with Mimi \u2014 the Dreamsight sees the shape of a fight before it happens, and she has learned to trust it completely.', b: '+15% Crit chance', col: '#a855f7', affinityBonuses: [], gear: null, base: { mhp: 55, atk: 11, def: 3, spd: 7 }, eq: { weapon: { n: 'Dreamsight Focus', slot: 'weapon', forCompanion: 'Mimi', r: 'rare', ilvl: 28, atk: 26, def: 4, d: "Focus for Mimi. +26 ATK, +4 DEF" }, armor: { n: "Dreamwalker's Shawl", slot: 'armor', forCompanion: 'Mimi', r: 'rare', ilvl: 28, def: 14, spd: 6, d: "Light robes for Mimi. +14 DEF, +6 SPD" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
-    { n: 'Brada Shah', t: 'Steady Hand', r: 'Artillery', hp: 90, mhp: 90, atk: 13, def: 7, spd: 3, on: false, ul: 999, recruitGated: true, d: "Mimi's partner, and steady in every sense of the word \u2014 ballistas, siege lines, anything that rewards patience over speed. Slow to move, impossible to rush, and devastating once he actually lines up the shot.", b: '+15% Attack damage', col: '#78716c', affinityBonuses: [], gear: null, base: { mhp: 90, atk: 13, def: 7, spd: 3 }, eq: { weapon: { n: "Steady Hand's Ballista-Bow", slot: 'weapon', forCompanion: 'Brada Shah', r: 'rare', ilvl: 28, atk: 30, def: 10, d: "Heavy siege bow for Brada. +30 ATK, +10 DEF" }, armor: { n: 'Siege-Line Plating', slot: 'armor', forCompanion: 'Brada Shah', r: 'rare', ilvl: 28, def: 22, d: "Heavy plating for Brada. +22 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    { n: 'Brada Shah', t: 'Steady Hand', r: 'Artillery Support', hp: 90, mhp: 90, atk: 13, def: 7, spd: 3, on: false, ul: 999, recruitGated: true, d: "Mimi's partner, and steady in every sense of the word \u2014 ballistas, siege lines, anything that rewards patience over speed. Somewhere between reloading and firing he picked up an instrument built into the same frame, and never really put either half of it down. Slow to move, impossible to rush, and just as devastating with a held note as a lined-up shot.", b: '+15% Attack damage \u00b7 +6% Healing (party)', col: '#78716c', affinityBonuses: [], gear: null, base: { mhp: 90, atk: 13, def: 7, spd: 3 }, eq: { weapon: { n: "Steady Hand's Resonant Ballista", slot: 'weapon', forCompanion: 'Brada Shah', r: 'rare', ilvl: 28, atk: 30, def: 10, d: "A round-bodied instrument with a ballista mechanism built into the frame \u2014 the strings double as the draw-cords. +30 ATK, +10 DEF" }, armor: { n: 'Siege-Line Plating', slot: 'armor', forCompanion: 'Brada Shah', r: 'rare', ilvl: 28, def: 22, d: "Heavy plating for Brada. +22 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Dr. AA', t: 'Steady Hands', r: 'Healer', hp: 70, mhp: 70, atk: 5, def: 6, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Calm under pressure in the specific way only someone who has already seen the worst of it can be. Keeps a ghost story ready for the ride there, and a steady hand ready for whatever happens once you arrive.', b: '+20% Healing potency', col: '#0284c7', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 5, def: 6, spd: 5 }, eq: { weapon: { n: 'Old-World Medical Kit', slot: 'weapon', forCompanion: 'Dr. AA', r: 'rare', ilvl: 28, atk: 14, def: 10, d: "Field kit for Dr. AA. +14 ATK, +10 DEF" }, armor: { n: "Physician's Coat", slot: 'armor', forCompanion: 'Dr. AA', r: 'rare', ilvl: 28, def: 18, atk: 4, d: "Coat for Dr. AA. +18 DEF, +4 ATK" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Sister Wren', t: 'True Devotion', r: 'Healer', hp: 68, mhp: 68, atk: 4, def: 8, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Spent a long time devoted to something that was never real. Knows real when she finally gets to stand next to it \u2014 and stands between the party and whatever comes next, calling on the Temple\u2019s grace when it is needed.', b: '+10% Defense (party) \u00b7 Intercession (DEF buff) \u00b7 Temple\u2019s Grace (cure chance)', col: '#f0abfc', affinityBonuses: [], gear: null, base: { mhp: 68, atk: 4, def: 8, spd: 5 }, eq: { weapon: { n: 'Temple-Blessed Censer', slot: 'weapon', forCompanion: 'Sister Wren', r: 'rare', ilvl: 28, atk: 12, def: 12, d: "Censer for Sister Wren. +12 ATK, +12 DEF" }, armor: { n: 'Vestments of Intercession', slot: 'armor', forCompanion: 'Sister Wren', r: 'rare', ilvl: 28, def: 20, d: "Sacred vestments for Sister Wren. +20 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Ser Aldric', t: 'The Other Kind of Found', r: 'Knight', hp: 110, mhp: 110, atk: 7, def: 9, spd: 3, on: false, ul: 999, recruitGated: true, d: 'Spent a long time being found by things. Guild work feels like the other version of that \u2014 chosen instead of caught. Holds a line like it is a personal promise, because to him, it is.', b: '+15% Defense', col: '#57534e', affinityBonuses: [], gear: null, base: { mhp: 110, atk: 7, def: 9, spd: 3 }, eq: { weapon: { n: "The Other Kind of Found's Blade", slot: 'weapon', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, atk: 20, def: 14, d: "Sword for Ser Aldric. +20 ATK, +14 DEF" }, armor: { n: "Knight's Unbroken Plate", slot: 'armor', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, def: 26, d: "Heavy plate for Ser Aldric. +26 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
@@ -715,6 +715,11 @@ const G = {
     { n: 'An Ordinary Afternoon of Fixing Things', lv: 530, elem: 'none', d: "Nobody asks the party to be heroes here. The well needs clearing. The roof needs finishing, properly this time. San re-shelves a small pile of books nobody's opened in years, out of habit more than need. It is, entire, the most unremarkable afternoon anyone in this party has had in longer than they can actually count. Nobody complains about that even once.", en: ['A Cat Supervising Closely', 'Something Unbothered by the Work', 'A Barn Cat, Mildly Helpful'], loot: ['A Properly Finished Roof', 'A Well, Actually Clear', 'An Afternoon With Nothing Urgent In It'], xp: 5750, g: 3450, dg: 'low' },
     { n: 'What Joel and San Never Get, Usually', lv: 540, elem: 'none', d: "No crisis waiting. No grief to process. No door to open carefully or badly. Just an evening, a porch, two cups of something warm, and the specific, uncomplicated quiet of two people who have earned an ordinary night together and, for once, actually get to have one.", en: ['A Cat, Entirely Uninterested', 'Something Purring Nearby', 'A Sleepy Guardian'], loot: ['A Warm, Uneventful Evening', 'Two Cups, Both Empty Now', 'Nothing Urgent At All'], xp: 5800, g: 3480, dg: 'low' },
     { n: 'Wherever Soel Actually Came From', lv: 550, elem: 'none', d: "Not a dramatic origin. Not a hidden destiny. Just the plain, gentle truth, offered without ceremony: this was always going to be a place cats kept, with or without a Guardian Spirit to call their own — and Soel, San understands now, did not choose her because anything about her was special. He chose her the way any cat chooses anyone. Because he decided to. Because that was, quietly, always enough.", en: ['An Old Cat, Watching', 'Something Content, Finally', 'The Last Kitten of the Litter'], loot: ['A Small, Unremarkable Truth', 'Proof Some Choices Need No Reason', 'Soel\u2019s Own Quiet Answer'], xp: 5900, g: 3540, dg: 'low' },
+    // A threshold, not yet understood as one — sits between Soel's world and World 6
+    // proper on purpose. Nothing here reads as ominous or quest-marked; that's the
+    // point. Whatever this place actually is only becomes clear much later, once the
+    // party has a reason to come back and look at it differently.
+    { n: 'Where the Water Runs Clear', lv: 555, elem: 'none', d: "No ruins. No warning signs. Just a creek, clear enough to see the bottom, running through ground that has never once needed defending. The kind of place a party stops at because it looks like somewhere to rest, not because anything told them to.", en: ['A Deer, Unbothered', 'Something Small in the Reeds', 'A Bird That Does Not Fly Off'], loot: ['A Smooth River Stone', 'Water in a Borrowed Flask', 'Nothing Worth Naming Yet'], xp: 6000, g: 3600, dg: 'low' },
     // === WORLD 6: THE WORLD THAT DROWNED IN WANTING (Lv 560-650) ===
     // Held in reserve since Soel's World closed at 550, waiting for the right idea
     // instead of getting padded out for its own sake. Core theme: what happens when
@@ -1262,6 +1267,25 @@ const G = {
         { n: 'Elixir of Swift Growth: Full Set', t: 'bundle', bundleContents: ELIXIR_BUNDLE_ITEMS, q: 1, r: 'legendary', price: 10500, d: "Not his usual line of work, but he got his hands on a full case and figures somebody should get use out of it. One of each bottle, no Temple standing required." }
       ],
       unlocked: false, zone: 'The Static Fields', zoneLv: 41, visitCount: 0 },
+    // Every swappable Guild War member (Ser Aldric, Mimi, Brada Shah, Dr. AA, Sister
+    // Wren, KW Liang, Iris, Renn Evergreen) previously had ZERO trader source for
+    // gear — starting kit only, everything else combat-drop dependent. This is the
+    // first dedicated shop for the wider roster's remaining empty slots. ilvl 28 to
+    // match their existing starting kits exactly; trader purchase scaling (already
+    // fixed elsewhere) brings these up to the player's current level automatically.
+    { n: 'Ferris', t: 'trader', title: 'The Quartermaster', icon: '📦', col: '#71717a', zone: 'The Breaking', zoneLv: 30,
+      d: "Keeps a ledger for every name on the Guild War roster, not just the ones who show up to collect. \"Somebody has to think about the ones still waiting on their gear,\" he says, like it's the most obvious thing in the world. It probably is.",
+      stock: [
+        { n: "The Other Kind of Found's Oath Ring", slot: 'ring', forCompanion: 'Ser Aldric', q: 1, r: 'rare', price: 650, ilvl: 28, def: 14, hp: 20, d: "Ring for Ser Aldric. +14 DEF, +20 HP" },
+        { n: 'Dreamsight Locket', slot: 'amulet', forCompanion: 'Mimi', q: 1, r: 'rare', price: 650, ilvl: 28, atk: 12, spd: 6, d: "Amulet for Mimi. +12 ATK, +6 SPD" },
+        { n: 'Resonance Charm', slot: 'amulet', forCompanion: 'Brada Shah', q: 1, r: 'rare', price: 700, ilvl: 28, atk: 8, def: 6, hp: 15, d: "Amulet for Brada. +8 ATK, +6 DEF, +15 HP \u2014 tuned to whichever half of him needs it more that day." },
+        { n: "Steady Hands' Gloves", slot: 'hands', forCompanion: 'Dr. AA', q: 1, r: 'rare', price: 650, ilvl: 28, atk: 10, def: 8, d: "Gloves for Dr. AA. +10 ATK, +8 DEF" },
+        { n: 'Circlet of Intercession', slot: 'head', forCompanion: 'Sister Wren', q: 1, r: 'rare', price: 650, ilvl: 28, def: 12, hp: 18, d: "Circlet for Sister Wren. +12 DEF, +18 HP" },
+        { n: "Quick Hands' Boots", slot: 'feet', forCompanion: 'KW Liang', q: 1, r: 'rare', price: 650, ilvl: 28, spd: 12, def: 6, d: "Boots for Liang. +12 SPD, +6 DEF" },
+        { n: "Ash's Claw", slot: 'ring', forCompanion: 'Iris', q: 1, r: 'rare', price: 650, ilvl: 28, atk: 10, spd: 8, d: "Ring for Iris. +10 ATK, +8 SPD" },
+        { n: 'Centuries-Worn Spectacles', slot: 'head', forCompanion: 'Renn Evergreen', q: 1, r: 'rare', price: 650, ilvl: 28, atk: 8, def: 8, hp: 10, d: "Spectacles for Renn. +8 ATK, +8 DEF, +10 HP" }
+      ],
+      unlocked: false, zone: 'The Breaking', zoneLv: 30, visitCount: 0 },
     { n: 'Wahyu', t: 'trader', title: 'The Printmaker', icon: '👕', col: '#0e7490', zone: 'The Static Fields', zoneLv: 41,
       d: "Joel's other dorm-mate — used to run a little side business printing custom tees back in the old world. Here, that same eye for making something one-of-a-kind shows up as armor built with extra room worked into the seams. He calls them customs. You call them a very good reason to keep a spare rune around.",
       stock: [
@@ -5350,6 +5374,26 @@ storyJournal: {
           { speaker: 'Narrator', text: 'Soel, for his part, has already curled up against her side like no time has passed at all \u2014 and like he fully intends to be the one who decides when it is time to leave.' },
         ]
       }
+,{
+        id: 'journal_156',
+        title: 'Where the Water Runs Clear',
+        chapter: 156,
+        unlockType: 'zone',
+        unlockAt: 'Where the Water Runs Clear',
+        icon: '💧',
+        summary: 'Nothing about the day is remarkable. That is more or less the point of it.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It is not a place anyone was looking for. No warning marked the road here, no shift in the air, nothing that would make a party stop and take notice. It is simply a creek, clear enough that you can see stones on the bottom of it, running quiet through ground that has clearly never had to defend itself from anything.' },
+          { speaker: 'Joel', text: '"We could stop here," Joel says, already unshouldering his pack before anyone actually answers him. "It has been a while since anywhere looked this easy."' },
+          { speaker: 'Narrator', text: 'Nobody argues. The party settles in without ceremony \u2014 the kind of stop that does not need a reason beyond the water looking clean and the ground looking flat.' },
+          { speaker: 'San', text: 'You kneel at the edge of it, cup your hands, and drink \u2014 cold, plain, unremarkable in every way water is supposed to be unremarkable. Joel does the same beside you, then the rest of the party in turn, refilling flasks without much thought given to any of it.' },
+          { speaker: 'Narrator', text: 'Nothing happens. No warmth spreads through the water as it goes down. No light catches where it should not. It tastes like a creek, because that is what it is.' },
+          { speaker: 'Joel', text: '"Good water," Joel says, which is the whole of his review, and the whole of anyone\u2019s, and entirely sufficient.' },
+          { speaker: 'Narrator', text: 'The evening passes the way ordinary evenings do. Someone gets a small fire going. Someone else complains about their boots. San leans into Joel\u2019s side without really deciding to, and he lets her, and neither of them says anything about it because there is nothing that needs saying.' },
+          { speaker: 'San', text: 'You sleep well that night \u2014 better than you have in a while, actually, though you do not think much of it at the time. It is just a good night\u2019s rest, in a place that asked nothing of you and gave you a little more than it needed to.' },
+          { speaker: 'Narrator', text: 'By morning the party is packing up again, the creek already turning into one more decent stopping point among many, nothing about it marked for remembering. You will think about this evening again eventually. Not yet.' },
+        ]
+      }
     ]
   },
 
@@ -5386,6 +5430,10 @@ storyJournal: {
     { id: 'ic_tavern', name: 'The Molten Chalice', type: 'tavern', zone: 'Infernal Crucible', zoneLv: 23, desc: 'Fireproof stone tavern. The ale is served in cooled obsidian mugs. Everything glows.', unlocked: false, icon: '🍺', cost: 45 },
         { id: 'ms_spring1', name: 'Ethereal Mana Spring', type: 'mana_spring', zone: 'Arcane Planar Tower', zoneLv: 11, desc: 'A natural spring of pure mana. The energy is overwhelming — you can only endure it briefly.', unlocked: false, icon: '💧', cost: 10, entryLimit: 3, entriesUsed: 0 },
     { id: 'ms_spring2', name: 'Astral Mana Spring', type: 'mana_spring', zone: 'The Astral Maelstrom', zoneLv: 22, desc: 'Liquid starlight pools in a crater of fallen meteors. Each sip rewires your magic.', unlocked: false, icon: '💧', cost: 15 },
+    // Uncapped on purpose, unlike the other two — this one was never meant to feel like
+    // a resource to ration. Free, too; nothing about this place should read as
+    // transactional. What it actually is only becomes clear much later.
+    { id: 'ms_creek', name: 'Where the Water Runs Clear', type: 'mana_spring', zone: 'Where the Water Runs Clear', zoneLv: 555, desc: 'A creek, plain and clear, running through ground that has never needed defending. Nothing about it announces itself.', unlocked: false, icon: '💧', cost: 0 },
         // === PHASE 3: LV 21-29 REST SITES ===
     { id: 'fv_camp2', name: 'Fractured Veil Hollow', type: 'camp', zone: 'The Fractured Veil', zoneLv: 21, desc: 'A pocket of stable reality within the tearing veil. The walls hum with harmonic dissonance.', unlocked: false, icon: '⛺', cost: 0 },
     { id: 'sv_camp', name: 'Scorched Veil Camp', type: 'camp', zone: 'The Scorched Vein', zoneLv: 24, desc: 'A heat-shielded overhang of glassy stone. The magma glows beneath like a second sun.', unlocked: false, icon: '⛺', cost: 0 },
@@ -6332,7 +6380,7 @@ const COMPANION_GEAR_ROLES = {
   // ones, matched to each member's established flavor.
   'Ser Aldric': { weaponType: 'sword', weaponLabel: 'Blade', armorType: 'heavy', armorLabel: 'Plate' },
   Mimi: { weaponType: 'staff', weaponLabel: 'Staff', armorType: 'robe', armorLabel: 'Robes' },
-  'Brada Shah': { weaponType: 'bow', weaponLabel: 'Bow', armorType: 'light', armorLabel: 'Light Armor' },
+  'Brada Shah': { weaponType: 'bow', weaponLabel: 'Resonant Ballista', armorType: 'light', armorLabel: 'Light Armor' },
   'Dr. AA': { weaponType: 'mace', weaponLabel: 'Mace', armorType: 'robe', armorLabel: 'Robes' },
   'Sister Wren': { weaponType: 'mace', weaponLabel: 'Mace', armorType: 'robe', armorLabel: 'Robes' },
   'KW Liang': { weaponType: 'dagger', weaponLabel: 'Dagger', armorType: 'light', armorLabel: 'Light Armor' },
@@ -12814,16 +12862,19 @@ const GUILD_MEMBERS = [
       'Mimi: "I already knew this was coming. Doesn\'t make it less annoying."',
       'Mimi: "Two floors away, I\'d have heard about this fight before it started."'
     ] },
-  { id: 'brada', npcName: 'Brada Shah', role: 'Artillery', icon: '🎯',
+  { id: 'brada', npcName: 'Brada Shah', role: 'Artillery Support', icon: '🎯',
     bountyArchetype: 'DPS',
     hallSpot: 'near the hearth, always with an audience',
     recruitReq: { type: 'journal', journalId: 'journal_111' },
-    fieldBuff: { atkPct: 0.04 },
+    // The hearth spot and "silver tongue" banter were already there before this ever
+    // became official — turns out the audience wasn't just for war stories.
+    fieldBuff: { atkPct: 0.04, healPct: 0.02 },
     gatherMats: ['Iron Ore'],
     hubBanter: [
       'Brada: "A gentle heart and a silver tongue only gets you so far. Turns out it gets you pretty far, actually."',
       'Brada: "Somebody has to make this Hall sound less like a war council. I volunteered."',
-      'Brada: "Ask me about half the gear in this hall sometime. I\'m never busy. I love the sound of my own stories."'
+      'Brada: "Ask me about half the gear in this hall sometime. I\'m never busy. I love the sound of my own stories."',
+      'Brada: "Same instrument does both jobs. People act surprised every time. I don\'t know why \u2014 patience is patience."'
     ],
     recruitLine: "Brada doesn't need much convincing. \"Mimi already told me you'd probably ask eventually. Ballistas, siege lines, anything that needs a steady hand and a longer memory than most people have \u2014 that's mine. Glad to actually put it to use.\"",
     barks: [
@@ -13366,7 +13417,12 @@ function openGuildChest() {
   } else if (type === 'upgrade') {
     const id = recruitedIds[Math.floor(Math.random() * recruitedIds.length)];
     const def = getGuildMemberDef(id);
-    const stat = Object.keys(def.fieldBuff)[0];
+    // Previously always picked the first fieldBuff key specifically — meant a
+    // multi-buff member (like Brada, once he has two) could never have their second
+    // stat actually upgraded via the Chest. Picks randomly among whichever keys they
+    // actually have now.
+    const buffKeys = Object.keys(def.fieldBuff);
+    const stat = buffKeys[Math.floor(Math.random() * buffKeys.length)];
     if (!G.guildChestUpgrades[id]) G.guildChestUpgrades[id] = {};
     const current = G.guildChestUpgrades[id][stat] || 0;
     if (current >= GUILD_CHEST_UPGRADE_CAP) {
@@ -20620,7 +20676,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.131';
+const BUILD_ID = '2026-08-17.132';
 // =========================
 
 
@@ -24726,13 +24782,17 @@ function rGuildWar() {
     }
     h += '</div>';
     const onProbation = G.guildProbation[def.id];
-    const buffKey = Object.keys(def.fieldBuff)[0];
-    const buffVal = getGuildMemberFieldBuffValue(def.id, buffKey);
-    const buffLabel = buffKey === 'atkPct' ? '+' + Math.floor(buffVal*100) + '% ATK when fielded'
-      : buffKey === 'critPct' ? '+' + Math.floor(buffVal*100) + '% Crit when fielded'
-      : buffKey === 'xpPct' ? '+' + Math.floor(buffVal*100) + '% XP when fielded'
-      : '+' + Math.floor(buffVal*100) + '% Gold when fielded';
-    h += '<div style="font-size:10.5px;color:var(--text-dim);margin-top:4px;">' + buffLabel + (G.guildChestUpgrades[def.id] ? ' \u2728' : '') + (onProbation ? ' \u2014 <span style="color:var(--accent-light);">on probation, half strength</span>' : '') + '</div>';
+    // Previously only ever read the first fieldBuff key and hardcoded a 4-way label
+    // mapping that silently mislabeled anything else as "Gold" — needed fixing before
+    // giving Brada a genuine second buff type (healPct), rather than have it display
+    // wrong. Loops every key now, with real labels for every established type.
+    const buffLabelMap = { atkPct: 'ATK', critPct: 'Crit', xpPct: 'XP', goldPct: 'Gold', healPct: 'Healing', defPct: 'DEF' };
+    const buffLines = Object.keys(def.fieldBuff).map(key => {
+      const val = getGuildMemberFieldBuffValue(def.id, key);
+      const label = buffLabelMap[key] || key;
+      return '+' + Math.floor(val * 100) + '% ' + label + ' when fielded';
+    });
+    h += '<div style="font-size:10.5px;color:var(--text-dim);margin-top:4px;">' + buffLines.join(' \u00b7 ') + (G.guildChestUpgrades[def.id] ? ' \u2728' : '') + (onProbation ? ' \u2014 <span style="color:var(--accent-light);">on probation, half strength</span>' : '') + '</div>';
     h += '</div>';
   }
 
