@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Ch.157-158: Arc B \u2014 San notices, tells Joel, the pregnancy discovery begins)';
+const APP_VERSION = '2026-08-17 (Ch.162-163: Arc D \u2014 labor, the Hall rallying, and the birth itself)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5434,6 +5434,112 @@ storyJournal: {
           { speaker: 'San', text: '"Not yet," you admit. "But I think I want to find out properly. Soon."' },
           { speaker: 'Joel', text: '"Then we find out properly," Joel says, simple, like it is already decided, because it is. "Together. Whatever it turns out to be."' },
           { speaker: 'Narrator', text: 'Neither of you says the word again that night. You do not need to. It is already sitting in the space between you, quiet and enormous, waiting to be confirmed.' },
+        ]
+      }
+,{
+        id: 'journal_159',
+        title: 'Confirmed',
+        chapter: 159,
+        unlockType: 'level',
+        unlockAt: 580,
+        icon: '🩺',
+        summary: 'Jovie makes it official, in her own quiet way. Word travels through the Hall the way it always does \u2014 slowly, then all at once.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Jovie does not make a production of it. She never does. She checks what needs checking, asks the questions that need asking, and then sits back for a moment before she actually says anything.' },
+          { speaker: 'Jovie', text: '"You are pregnant," she says, plain, the same voice she would use to confirm anything else. Then, softer, breaking her own rule just this once: "Congratulations, San."' },
+          { speaker: 'Narrator', text: 'You had already known, somewhere underneath the disbelief. Hearing it said out loud by someone else still lands like something new.' },
+          { speaker: 'San', text: 'You find Joel waiting just outside, trying and failing to look like he was not waiting at all. You do not need to say anything. He reads it off your face before you get a single word out.' },
+          { speaker: 'Joel', text: '"Okay," Joel says, quiet, like he is testing the shape of the word against something enormous. "Okay."' },
+          { speaker: 'Narrator', text: 'Word moves through the Hall the way it always does once it starts \u2014 not an announcement, just Jovie mentioning it to Dr. AA over the kit, Dr. AA mentioning it to Sister Wren, and by evening most of the Hall already knows without anyone having formally said it.' },
+          { speaker: 'Narrator', text: 'You call Mama that night. She is quiet for a moment \u2014 the specific quiet of someone doing several years of math very quickly \u2014 and then she is not quiet at all.' },
+          { speaker: 'Mama', text: '"After everything," Mama says, voice thick, "after all this time \u2014 San. San, I am so happy. I am so happy for you both."' },
+          { speaker: 'San', text: '"We did not expect this," you tell her, still turning the fact over yourself. "We had genuinely stopped expecting this."' },
+          { speaker: 'Mama', text: '"Good things do that sometimes," Mama says. "They wait until you have stopped holding your breath for them."' },
+        ]
+      }
+,{
+        id: 'journal_160',
+        title: 'An Ordinary Day',
+        chapter: 160,
+        unlockType: 'level',
+        unlockAt: 590,
+        icon: '📖',
+        summary: 'Most days are just ordinary days. This one happens to have Elian in it, learning something new, and San watching from a chair someone insisted she actually sit in.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The Hall does not stop being the Hall just because there is news in it. There are still duties posted, still contracts to fill, still a boy underfoot who has strong opinions about which of the guild members are currently the most interesting.' },
+          { speaker: 'Narrator', text: 'Today it is Sister Wren, apparently, who has Elian sitting cross-legged in front of her while she walks him through something slow and careful with his hands.' },
+          { speaker: 'Sister Wren', text: '"Gentle," Wren says, guiding his fingers without taking over for him. "It is not about strength. Healing rarely is."' },
+          { speaker: 'Elian', text: '"I am being gentle," Elian says, with the particular seriousness of a child who has been told the same instruction four times already and is beginning to take it as a personal challenge.' },
+          { speaker: 'Narrator', text: 'San watches from a chair near the hearth \u2014 not because she asked for one, but because Zaki brought it over without comment and set it down close enough that objecting would have taken more energy than sitting.' },
+          { speaker: 'Zaki', text: '"You looked tired," Zaki says, by way of explanation, already walking away before she can argue about it.' },
+          { speaker: 'San', text: '"I am not that tired," you say, to no one in particular, and stay in the chair anyway.' },
+          { speaker: 'Narrator', text: 'Across the room, Ser Aldric watches Elian\u2019s lesson with the specific attention of someone quietly deciding whether the boy is ready for something a little more advanced yet. He is not, not quite. Aldric does not say so out loud. He rarely does, with Elian \u2014 he just waits until the boy is actually ready, and somehow always seems to know exactly when that is.' },
+          { speaker: 'Narrator', text: 'Nothing remarkable happens for the rest of the day. Elian gets frustrated once, then does not, then gets the exercise right on his fifth try and looks so pleased with himself that half the Hall notices. San dozes off in the chair for twenty minutes without meaning to. Joel finds her there afterward and does not wake her.' },
+        ]
+      }
+,{
+        id: 'journal_161',
+        title: 'Getting Ready',
+        chapter: 161,
+        unlockType: 'level',
+        unlockAt: 600,
+        icon: '🌿',
+        summary: 'The Hall starts making room, quietly and without being asked. Elian has questions. San and Joel do not have all the answers yet, and that is alright too.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Nobody calls a meeting about it. It just starts happening \u2014 a corner of the Infirmary slowly filling with things that do not belong to anyone currently living in the Hall. Renn shows up one afternoon with a small, carefully carved cradle he will not admit to having spent weeks on.' },
+          { speaker: 'Renn', text: '"I had the time," Renn says, when San tries to thank him properly. "I generally have the time. It was not a hardship."' },
+          { speaker: 'Narrator', text: 'Jovie starts keeping a second, smaller kit separate from the main one, stocked with things San has never had a reason to ask about before. She does not make an announcement of it either. She just does it, the way she does most things that matter.' },
+          { speaker: 'Narrator', text: 'Elian, for his part, has Opinions.' },
+          { speaker: 'Elian', text: '"Is it going to be a boy or a girl?" he asks San directly, with no preamble, the way children ask the questions adults are still working up to asking each other.' },
+          { speaker: 'San', text: '"We do not know yet," you tell him, honestly. "Does it matter to you?"' },
+          { speaker: 'Elian', text: 'He considers this with real seriousness. "No," he decides, eventually. "I just want someone smaller than me for once."' },
+          { speaker: 'Joel', text: 'Joel laughs, surprised into it. "That is a very honest reason, Elian."' },
+          { speaker: 'Elian', text: '"I am always honest," Elian says, with the particular dignity of a child repeating something Sister Wren has clearly told him more than once.' },
+          { speaker: 'Narrator', text: 'That evening, San finds Joel in the half-finished corner of the Infirmary, turning the small cradle over in his hands like he is trying to memorize the shape of something that is not real yet and is, somehow, already becoming more real by the day.' },
+          { speaker: 'Joel', text: '"We are actually doing this," Joel says, not really a question, more just a fact he is still getting used to holding.' },
+          { speaker: 'San', text: '"We are," you agree, and sit beside him, and for a while neither of you says anything else, because there is nothing else that needs saying yet.' },
+        ]
+      }
+,{
+        id: 'journal_162',
+        title: 'Labor',
+        chapter: 162,
+        unlockType: 'level',
+        unlockAt: 615,
+        icon: '🕯️',
+        summary: 'It starts in the middle of an ordinary evening, the way these things apparently do. The whole Hall rearranges itself around it without needing to be told twice.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It starts without any warning worth the name \u2014 a tightening low and sudden, gone before you can name it, back again a few minutes later with rather less ambiguity the second time.' },
+          { speaker: 'San', text: '"Joel." Just his name, again, the same way you said it the night you first told him \u2014 except this time he understands immediately, already moving before you finish getting the rest out.' },
+          { speaker: 'Narrator', text: 'The Hall rearranges itself around the news with a speed that would be alarming if it were not so clearly practiced. Jovie is already moving toward the Infirmary before anyone has formally told her anything. Dr. AA has the kit open before he has fully processed what it is for.' },
+          { speaker: 'Sister Wren', text: '"I have Elian," Wren says, simply, already steering the boy toward somewhere quieter, one hand on his shoulder before he can ask a single question about what is happening.' },
+          { speaker: 'Narrator', text: 'Ser Aldric posts himself at the Infirmary door without being asked, the way he posts himself at anything that matters enough to guard, and does not move from it for the rest of the night.' },
+          { speaker: 'Joel', text: 'Joel does not leave your side. He does not perform calm, either \u2014 you can feel exactly how much this is costing him to hold steady, and love him more for the fact that he holds it anyway, entirely for you.' },
+          { speaker: 'Joel', text: '"I am here," Joel says, more than once, quieter each time, like the repetition itself is doing some of the work of getting through this. "I am right here."' },
+          { speaker: 'Narrator', text: 'The night stretches long in the particular way that pain stretches time \u2014 not longer exactly, just realer, every minute weighing more than a minute usually does. Jovie\u2019s voice stays even through all of it, steady instructions delivered like she has done this a hundred times, because in some form, doing exactly this kind of steady work under pressure, she has.' },
+          { speaker: 'Narrator', text: 'Somewhere past the worst of it, past the point where you stop being able to track time at all, there is a sound that is not yours \u2014 small, and furious, and entirely new to the world.' },
+        ]
+      }
+,{
+        id: 'journal_163',
+        title: 'Newborn',
+        chapter: 163,
+        unlockType: 'level',
+        unlockAt: 616,
+        icon: '👶',
+        summary: 'A baby. Just a baby \u2014 small, loud, and entirely, uncomplicatedly theirs. Nothing unusual has happened yet. That part comes later.',
+        scenes: [
+          { speaker: 'Narrator', text: 'He is small, and furious about it, and entirely, uncomplicatedly real \u2014 a baby, nothing more and nothing less, exactly the way any baby is supposed to arrive.' },
+          { speaker: 'Jovie', text: '"A boy," Jovie says, quiet, setting him carefully into your arms before you have fully caught your breath. "Healthy. Loud, which is a good sign, whatever it feels like right now."' },
+          { speaker: 'Narrator', text: 'You look down at him and something in your chest simply gives way \u2014 not the enormous, world-ending feeling you might have expected, but something smaller and far more total: just his face, and the weight of him, and the specific, overwhelming fact that he exists at all.' },
+          { speaker: 'San', text: '"Joel," you say, and that is all you manage, and it is enough, because he is already right there, already looking down at his son with an expression you have genuinely never seen on him before.' },
+          { speaker: 'Joel', text: '"Hello," Joel says to the baby, absurdly formal, voice cracking on the single word. "Hello. I am \u2014 I suppose I am your father."' },
+          { speaker: 'Narrator', text: 'The baby, entirely unimpressed by the introduction, keeps crying. Joel laughs anyway, wet and helpless, and presses his mouth briefly to your temple, and neither of you says anything else for a long moment because there is nothing that could actually match the size of it.' },
+          { speaker: 'San', text: '"We have not picked a name," you realize, out loud, faintly stunned by the oversight, as though a name were the sort of thing you could have prepared for properly.' },
+          { speaker: 'Joel', text: '"We have time," Joel says, still not looking away from him. "He is not going anywhere. Neither are we."' },
+          { speaker: 'Narrator', text: 'Outside the door, word is already moving through the Hall the way it always does \u2014 fast, warm, entirely unofficial. Ser Aldric is the first to hear it directly, and for once in his life says absolutely nothing, just presses one hand briefly to the doorframe like he needs the wall to hold him up.' },
+          { speaker: 'Narrator', text: 'Nothing unusual has happened. He is simply a newborn, small and loud and theirs, sleeping now against San\u2019s chest with the specific, boneless trust that only the very new are capable of.' },
+          { speaker: 'Narrator', text: 'That part comes later. Tonight is just this \u2014 San, and Joel, and a baby, and a Hall full of people who love them all already, quietly making room.' },
         ]
       }
     ]
@@ -20718,7 +20824,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.133';
+const BUILD_ID = '2026-08-17.135';
 // =========================
 
 
