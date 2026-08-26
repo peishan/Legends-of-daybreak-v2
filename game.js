@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Brada Shah: Artillery/Support hybrid + new Quartermaster trader for all 8 swappable members\u2019 gear)';
+const APP_VERSION = '2026-08-17 (Ch.157-158: Arc B \u2014 San notices, tells Joel, the pregnancy discovery begins)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5392,6 +5392,48 @@ storyJournal: {
           { speaker: 'Narrator', text: 'The evening passes the way ordinary evenings do. Someone gets a small fire going. Someone else complains about their boots. San leans into Joel\u2019s side without really deciding to, and he lets her, and neither of them says anything about it because there is nothing that needs saying.' },
           { speaker: 'San', text: 'You sleep well that night \u2014 better than you have in a while, actually, though you do not think much of it at the time. It is just a good night\u2019s rest, in a place that asked nothing of you and gave you a little more than it needed to.' },
           { speaker: 'Narrator', text: 'By morning the party is packing up again, the creek already turning into one more decent stopping point among many, nothing about it marked for remembering. You will think about this evening again eventually. Not yet.' },
+        ]
+      }
+,{
+        id: 'journal_157',
+        title: 'Something Different',
+        chapter: 157,
+        unlockType: 'level',
+        unlockAt: 565,
+        icon: '🌙',
+        summary: 'San notices something is off, and dismisses it, and notices it again anyway. She has done this before. She knows exactly what this is starting to look like. She does not want to know that yet.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It starts small enough to ignore, which is exactly how you ignore it. Tired in a way that a full night\u2019s sleep does not fix. A meal that turns your stomach for no reason you can name. You put it down to the road \u2014 too many zones, too little rest, the ordinary wear of a life that rarely slows down.' },
+          { speaker: 'San', text: '"I am just tired," you tell Joel, and mostly believe it, because the alternative is not something you have let yourself consider in a long time.' },
+          { speaker: 'Narrator', text: 'A few days later it is still there. Not worse, exactly. Just present, in the specific, familiar way that starts to feel less like exhaustion and more like something your body already recognizes before your mind is willing to.' },
+          { speaker: 'San', text: 'You have done this before. You know the shape of it \u2014 the tiredness that is not quite tiredness, the way certain smells turn on you without warning, the small persistent wrongness that used to mean exactly one thing and only one thing.' },
+          { speaker: 'San', text: '"No," you say out loud, alone, to no one. "That is not \u2014 we have been careful. We have been careful for years."' },
+          { speaker: 'Narrator', text: 'You count days you have not thought to count in a long time, and the counting does not give you the answer you are hoping for.' },
+          { speaker: 'San', text: 'You tell yourself it could be anything else. Stress. The altitude at the last few zones. Something you ate. You tell yourself this several times, with decreasing success, over the following days.' },
+          { speaker: 'Narrator', text: 'By the end of the week you are no longer telling yourself anything. You are just watching Joel across the fire some evenings, saying nothing, trying to work out how to say the thing you are almost, almost certain of.' },
+        ]
+      }
+,{
+        id: 'journal_158',
+        title: 'Telling Joel',
+        chapter: 158,
+        unlockType: 'level',
+        unlockAt: 570,
+        icon: '💜',
+        summary: 'She tells him. Neither of them quite knows what to do with it yet, and that turns out to be alright.',
+        scenes: [
+          { speaker: 'Narrator', text: 'You wait until the two of you are actually alone \u2014 no fire crackling for an excuse to look somewhere else, no one within earshot to soften what you are about to say into something smaller than it is.' },
+          { speaker: 'San', text: '"Joel." You say his name and then do not immediately follow it with anything, which is answer enough on its own that something is different.' },
+          { speaker: 'Joel', text: '"You have been quiet," Joel says, setting down what he was holding, giving you the whole of his attention the way he always does when your voice changes shape like that. "What is it?"' },
+          { speaker: 'San', text: '"I think," you start, and stop, and start again. "I think I might be pregnant."' },
+          { speaker: 'Narrator', text: 'He does not say anything for a long moment. Not shock exactly \u2014 something quieter and more total than that, like the ground has shifted very slightly under a life he had already finished building on the assumption this would not happen.' },
+          { speaker: 'Joel', text: '"We have been careful," Joel says, not disbelieving, just working through it out loud the way he does with anything that matters this much. "For years. We agreed \u2014 we both stopped expecting \u2014"' },
+          { speaker: 'San', text: '"I know," you say. "I know exactly how long we have been careful for. I have been trying to explain it to myself since I first noticed."' },
+          { speaker: 'Narrator', text: 'He crosses the space between you without finishing the sentence, and holds you the way he has held you through harder things than this, except this is not a hard thing, not exactly \u2014 just enormous, and unexpected, and entirely too large for either of you to hold the shape of yet.' },
+          { speaker: 'Joel', text: '"Are you certain?" he asks, quiet, against your hair.' },
+          { speaker: 'San', text: '"Not yet," you admit. "But I think I want to find out properly. Soon."' },
+          { speaker: 'Joel', text: '"Then we find out properly," Joel says, simple, like it is already decided, because it is. "Together. Whatever it turns out to be."' },
+          { speaker: 'Narrator', text: 'Neither of you says the word again that night. You do not need to. It is already sitting in the space between you, quiet and enormous, waiting to be confirmed.' },
         ]
       }
     ]
@@ -20676,7 +20718,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.132';
+const BUILD_ID = '2026-08-17.133';
 // =========================
 
 
