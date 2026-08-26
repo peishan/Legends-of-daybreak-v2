@@ -95,7 +95,11 @@ const STATE = {
   consumables: {},     // {potionId: count}
   battleItemMenuOpen: false,
   battleSpellMenuOpen: false,
-  shielded: false,      // party-wide shield from San's Storm Veil — halves the next boss hit on anyone
+  shieldTurns: 0,        // multi-turn defense buff (Shield, Evasion Ward, Stoneskin, etc.) — reduces next N boss hits
+  shieldPct: 0,
+  hasteTurns: 0,         // multi-turn damage buff (Haste, Improved Haste, Guildbound Surge)
+  hastePct: 0,
+  timeStopTurns: 0,      // boss skips its counter-attack entirely for N turns
   defending: {},        // {memberId: true} — halves the boss's next hit on them, consumed on use
   partyStatus: {},      // {memberId: 'diseased'} — inflicted by some boss hits, blocks regen until cured
   equipped: {},          // {memberId: trophyItemId} — one trinket slot per member
@@ -369,11 +373,51 @@ function applyIdleGains(){
 const CLASS_KIT = {
   san:         {role:'caster',
     spells:[
-      {name:'Arcane Bolt', icon:'⚡', mp:8, mult:1.2, levelReq:1, desc:'Cheap starter bolt.'},
-      {name:'Astral Lance', icon:'✨', mp:15, mult:1.6, levelReq:1, desc:'Her core damage spell.'},
-      {name:'Storm Veil', icon:'🌫️', mp:14, effect:'shield', levelReq:15, desc:'Shields the whole party from the boss\'s next hit.'},
-      {name:'Starfall', icon:'🌠', mp:28, mult:2.3, levelReq:30, desc:'A heavy single-target strike.'},
-      {name:'Aether Pulse', icon:'🔮', mp:20, effect:'restoreMp', restoreAmt:35, levelReq:45, desc:'Restores MP to whoever needs it most.'}
+      {name:"Magic Missile", icon:"\u2728", mp:10, levelReq:1, tier:1, desc:"A flurry of arcane darts that never miss.", dice:"1d8"},
+      {name:"Chromatic Orb", icon:"\u26a1", mp:12, levelReq:2, tier:1, desc:"A sphere of shifting elemental energy.", dice:"1d10", status:{type:"shock",chance:0.15,turns:1}},
+      {name:"Shield", icon:"\ud83d\udee1\ufe0f", mp:8, levelReq:4, tier:1, desc:"A wall of force deflects incoming blows.", buffType:"defense", buffVal:4, buffTurns:3},
+      {name:"Melf's Acid Arrow", icon:"\ud83e\uddea", mp:14, levelReq:6, tier:1, desc:"A bolt of acid that keeps corroding.", dice:"1d10", status:{type:"poison",chance:0.35,dmg:3,turns:3}},
+      {name:"Evasion Ward", icon:"\ud83d\udee1\ufe0f", mp:16, levelReq:7, tier:2, desc:"Illusory duplicates make you harder to pin down.", buffType:"defense", buffVal:6, buffTurns:3},
+      {name:"Web of Frost", icon:"\u26a1", mp:18, levelReq:9, tier:2, desc:"Freezing strands ensnare the target.", dice:"1d12", status:{type:"shock",chance:0.25,turns:1}},
+      {name:"Fireshield (Blue)", icon:"\ud83d\udee1\ufe0f", mp:15, levelReq:10, tier:2, desc:"+5 AC for 3 turns, chilling attackers.", buffType:"defense", buffVal:5, buffTurns:3},
+      {name:"Vampiric Touch", icon:"\ud83e\uddea", mp:20, levelReq:12, tier:2, desc:"A withering grasp that drains vitality.", dice:"1d10", status:{type:"poison",chance:0.3,dmg:4,turns:3}},
+      {name:"Fireball", icon:"\ud83d\udd25", mp:25, levelReq:13, tier:3, desc:"Classic D&D fireball.", dice:"2d6", status:{type:"burn",chance:0.3,dmg:3,turns:3}},
+      {name:"Lightning Bolt", icon:"\u26a1", mp:30, levelReq:15, tier:3, desc:"A crackling bolt of lightning.", dice:"3d8", status:{type:"shock",chance:0.2,turns:1}},
+      {name:"Haste", icon:"\ud83d\udca8", mp:22, levelReq:16, tier:3, desc:"Time quickens around you. Your strikes land harder and faster.", buffType:"haste", buffVal:6, buffTurns:3},
+      {name:"Time Lag", icon:"\u26a1", mp:24, levelReq:18, tier:3, desc:"The target stumbles a half-second behind reality.", dice:"1d10", status:{type:"shock",chance:0.3,turns:1}},
+      {name:"Stoneskin", icon:"\ud83d\udee1\ufe0f", mp:28, levelReq:19, tier:4, desc:"Flesh hardens to stone, shrugging off blows.", buffType:"defense", buffVal:10, buffTurns:4},
+      {name:"Greater Evasion", icon:"\ud83d\udee1\ufe0f", mp:30, levelReq:21, tier:4, desc:"A deeper illusion \u2014 nearly untouchable.", buffType:"defense", buffVal:8, buffTurns:4},
+      {name:"Ice Storm", icon:"\u26a1", mp:32, levelReq:22, tier:4, desc:"A driving hail of razor ice.", dice:"2d10", status:{type:"shock",chance:0.25,turns:1}},
+      {name:"Mind Shatter", icon:"\ud83e\uddea", mp:30, levelReq:24, tier:4, desc:"A psychic assault that unravels the target's will.", dice:"2d8", status:{type:"poison",chance:0.4,dmg:4,turns:3}},
+      {name:"Cone of Cold", icon:"\u26a1", mp:36, levelReq:25, tier:5, desc:"A blast of absolute cold.", dice:"3d8", status:{type:"shock",chance:0.3,turns:1}},
+      {name:"Chaotic Surge", icon:"\ud83d\udd25", mp:38, levelReq:27, tier:5, desc:"Raw, unstable magic tears loose.", dice:"2d12", status:{type:"burn",chance:0.35,dmg:5,turns:3}},
+      {name:"Sunfire", icon:"\ud83d\udd25", mp:40, levelReq:28, tier:5, desc:"A miniature sun erupts outward.", dice:"3d10", status:{type:"burn",chance:0.4,dmg:6,turns:3}},
+      {name:"Mesmeric Hold", icon:"\u26a1", mp:34, levelReq:29, tier:5, desc:"The target is locked in place by force of mind.", dice:"2d10", status:{type:"shock",chance:0.4,turns:1}},
+      {name:"Wondrous Recall", icon:"\ud83d\udd37", mp:10, levelReq:30, tier:6, desc:"Regain a used spell slot, drawing expended magic back into your mind.", buffType:"manaRestore", buffVal:30},
+      {name:"Chain Lightning", icon:"\u26a1", mp:45, levelReq:31, tier:6, desc:"Lightning arcs from foe to foe.", dice:"4d8", status:{type:"shock",chance:0.3,turns:1}},
+      {name:"Withering Fog", icon:"\ud83e\uddea", mp:42, levelReq:33, tier:6, desc:"A caustic mist that eats through armor and flesh alike.", dice:"3d10", status:{type:"poison",chance:0.5,dmg:8,turns:3}},
+      {name:"Improved Haste", icon:"\ud83d\udca8", mp:35, levelReq:34, tier:6, desc:"Time bends further still.", buffType:"haste", buffVal:10, buffTurns:4},
+      {name:"Finger of Death", icon:"\ud83e\uddea", mp:55, levelReq:35, tier:7, desc:"A single word that unmakes.", dice:"5d8", status:{type:"poison",chance:0.4,dmg:10,turns:3}},
+      {name:"Spectral Blade", icon:"\u2728", mp:50, levelReq:37, tier:7, desc:"A conjured blade strikes with independent will.", dice:"4d10"},
+      {name:"Prismatic Spray", icon:"\ud83d\udd25", mp:52, levelReq:38, tier:7, desc:"Seven rays of pure devastation.", dice:"4d12", status:{type:"burn",chance:0.4,dmg:8,turns:3}},
+      {name:"Arcane Ward", icon:"\ud83d\udee1\ufe0f", mp:40, levelReq:39, tier:7, desc:"A standing ward of pre-cast protection.", buffType:"defense", buffVal:12, buffTurns:4},
+      {name:"Incendiary Cloud", icon:"\ud83d\udd25", mp:60, levelReq:40, tier:8, desc:"A roiling cloud of superheated ash.", dice:"5d10", status:{type:"burn",chance:0.5,dmg:10,turns:3}},
+      {name:"Sunburst", icon:"\ud83d\udd25", mp:65, levelReq:42, tier:8, desc:"Radiant fire scours the battlefield.", dice:"5d12", status:{type:"burn",chance:0.5,dmg:12,turns:3}},
+      {name:"Horrid Wilting", icon:"\ud83e\uddea", mp:62, levelReq:43, tier:8, desc:"Moisture is torn from the target's very cells.", dice:"6d8", status:{type:"poison",chance:0.5,dmg:12,turns:3}},
+      {name:"Planar Banish", icon:"\u26a1", mp:50, levelReq:44, tier:8, desc:"A rift briefly opens beneath the target's feet.", dice:"4d10", status:{type:"shock",chance:0.5,turns:1}},
+      {name:"Black Blade of Disaster", icon:"\u2728", mp:70, levelReq:45, tier:9, desc:"A blade of pure entropy that unmakes what it touches.", dice:"6d10"},
+      {name:"Meteor Swarm", icon:"\ud83d\udd25", mp:60, levelReq:47, tier:9, desc:"Ultimate destruction from the sky.", dice:"4d10", status:{type:"burn",chance:0.5,dmg:5,turns:3}},
+      {name:"Wish Fulfilled", icon:"\ud83c\udf1f", mp:50, levelReq:48, tier:9, desc:"Reality bends briefly in your favor.", buffType:"fullRestore"},
+      {name:"Time Stop", icon:"\u23f3", mp:80, levelReq:50, tier:9, desc:"The world freezes. You alone still move.", buffType:"timeStop"},
+      {name:"Farseer's Reach", icon:"\u26a1", mp:85, levelReq:60, tier:10, desc:"Varel taught you this without meaning to \u2014 see the strike land before you throw it.", dice:"5d12", status:{type:"shock",chance:0.35,turns:1}},
+      {name:"Guildbound Surge", icon:"\ud83d\udca8", mp:40, levelReq:90, tier:11, desc:"Something in you moves faster once you stop carrying everything alone.", buffType:"haste", buffVal:8, buffTurns:4},
+      {name:"Muster's Call", icon:"\u26a1", mp:90, levelReq:120, tier:12, desc:"The line holds because everyone actually shows up. This is what showing up sounds like.", dice:"6d12", status:{type:"shock",chance:0.4,turns:1}},
+      {name:"Kindled Resolve", icon:"\ud83d\udee1\ufe0f", mp:45, levelReq:150, tier:13, desc:"A small, steady flame that has survived worse than this.", buffType:"defense", buffVal:9, buffTurns:4},
+      {name:"Threshold Whisper", icon:"\ud83d\udd37", mp:35, levelReq:180, tier:14, desc:"Something on the other side is already listening. You listen back.", buffType:"manaRestore", buffVal:35},
+      {name:"Breach Strike", icon:"\ud83e\uddea", mp:100, levelReq:210, tier:15, desc:"The door opened once. This is what walked through with you.", dice:"7d12", status:{type:"poison",chance:0.4,dmg:6,turns:3}},
+      {name:"Kaya Kaya", icon:"\ud83c\udf1f", mp:55, levelReq:240, tier:16, desc:"An old joke that stopped being a joke. Still means the same thing: I am glad you are here.", buffType:"fullRestore"},
+      {name:"Steady Hand", icon:"\u26a1", mp:95, levelReq:260, tier:17, desc:"Line up the shot. Wait. Then wait a little longer than that.", dice:"6d14", status:{type:"shock",chance:0.45,turns:1}},
+      {name:"What the Journey Kept", icon:"\u23f3", mp:110, levelReq:300, tier:18, desc:"Everyone who stayed, all the way to here. This is theirs too.", buffType:"timeStop"}
     ],
     skill:{name:"Daybreak Ward", icon:'🛡️', mp:10, effect:'ward'}},
   joel:        {role:'tank',   spell:null, skill:{name:"Guardian's Oath", icon:'⚔️', mp:0, effect:'taunt'}},
@@ -398,6 +442,18 @@ const CLASS_KIT = {
   soel:        {role:'caster', spell:{name:"Nine Lives' Ward", icon:'🐾', mp:0, healMult:0.6}, skill:{name:'Lucky Pounce', icon:'✨', mp:0, mult:1.3}}
 };
 function kitFor(id){ return CLASS_KIT[id] || {role:'melee', spell:null, skill:null}; }
+// D&D-style dice notation ("2d6") -> rolled sum. San's spellbook is ported
+// straight from the real game's dice values, scaled so the whole 1d8->7d12
+// range maps onto our damage economy (basic attack ~100, capstone ~1000+).
+const DICE_SCALE = 26;
+function rollDice(notation){
+  const m = /^(\d+)d(\d+)$/.exec(notation);
+  if(!m) return 0;
+  const [,count,sides] = m.map(Number);
+  let sum = 0;
+  for(let i=0;i<count;i++) sum += 1+Math.floor(Math.random()*sides);
+  return sum;
+}
 function logCombat(line){
   if(STATE.combatLogBossId !== currentBossId()){ STATE.combatLog = []; STATE.combatLogBossId = currentBossId(); STATE.roundPosition = 0; }
   STATE.combatLog.push(line);
@@ -425,6 +481,11 @@ const UNKILLABLE_IDS = new Set(['eliz','soel']);
 function bossCounterAttack(boss){
   const hp = bossHpFor(boss.id);
   if(hp<=0) return; // boss just died to the player's action — no counter
+  if(STATE.timeStopTurns > 0){
+    STATE.timeStopTurns--;
+    logCombat(`Time holds still — ${esc(boss.name)} cannot act.`);
+    return;
+  }
   const party = getActiveParty().filter(m=>{
     const h = STATE.partyHp[m.id]!=null?STATE.partyHp[m.id]:m.hp;
     return h>0;
@@ -434,7 +495,7 @@ function bossCounterAttack(boss){
   let dmg = bossAttackDamage(boss);
   const t = trinketBonus(target.id);
   if(t && t.defPct) dmg = Math.round(dmg*(1-t.defPct));
-  if(STATE.shielded){ dmg = Math.round(dmg*0.5); STATE.shielded = false; }
+  if(STATE.shieldTurns > 0){ dmg = Math.round(dmg*(1-STATE.shieldPct)); STATE.shieldTurns--; }
   if(STATE.defending[target.id]){ dmg = Math.round(dmg*0.5); delete STATE.defending[target.id]; }
   const cur = STATE.partyHp[target.id]!=null?STATE.partyHp[target.id]:target.hp;
   const floor = UNKILLABLE_IDS.has(target.id) ? 1 : 0;
@@ -1190,7 +1251,7 @@ function battleAction(a){
   const curMp = STATE.partyMp[actor.id] != null ? STATE.partyMp[actor.id] : actor.mp;
   const dmgTable = [120,105,110,95,90,85,80,60,60];
   const trinket = trinketBonus(actor.id) || {};
-  const baseDmg = Math.round(dmgTable[STATE.turn % dmgTable.length] * (1+(trinket.dmgPct||0)));
+  const baseDmg = Math.round(dmgTable[STATE.turn % dmgTable.length] * (1+(trinket.dmgPct||0)) * (1+(STATE.hastePct||0)));
 
   function spendMp(amount){ STATE.partyMp[actor.id] = Math.max(0, curMp-amount); }
   function dealDamage(dmg, verb){
@@ -1229,8 +1290,51 @@ function battleAction(a){
       }
     } else if(chosenSpell.effect==='shield'){
       spendMp(chosenSpell.mp);
-      STATE.shielded = true;
+      STATE.shieldTurns = 1; STATE.shieldPct = 0.5;
       logCombat(`${esc(actor.name)} casts ${chosenSpell.icon} ${esc(chosenSpell.name)} — the party is shielded from the next hit.`);
+    } else if(chosenSpell.buffType==='defense'){
+      spendMp(chosenSpell.mp);
+      STATE.shieldTurns = chosenSpell.buffTurns || 3;
+      STATE.shieldPct = Math.min(0.6, (chosenSpell.buffVal||5)/20); // buffVal ~4-12 -> 20-60% reduction
+      logCombat(`${esc(actor.name)} casts ${chosenSpell.icon} ${esc(chosenSpell.name)} — damage reduced by ${Math.round(STATE.shieldPct*100)}% for ${STATE.shieldTurns} of the boss's turns.`);
+    } else if(chosenSpell.buffType==='haste'){
+      spendMp(chosenSpell.mp);
+      STATE.hasteTurns = chosenSpell.buffTurns || 3;
+      STATE.hastePct = Math.min(0.5, (chosenSpell.buffVal||6)/20);
+      logCombat(`${esc(actor.name)} casts ${chosenSpell.icon} ${esc(chosenSpell.name)} — attacks hit ${Math.round(STATE.hastePct*100)}% harder for ${STATE.hasteTurns} turns.`);
+    } else if(chosenSpell.buffType==='manaRestore'){
+      spendMp(chosenSpell.mp);
+      const newMp = Math.min(effectiveMaxMp(actor), curMp-chosenSpell.mp+chosenSpell.buffVal);
+      STATE.partyMp[actor.id] = newMp;
+      logCombat(`${esc(actor.name)} casts ${chosenSpell.icon} ${esc(chosenSpell.name)}, recovering ${chosenSpell.buffVal} MP.`);
+    } else if(chosenSpell.buffType==='fullRestore'){
+      spendMp(chosenSpell.mp);
+      party.forEach(m=>{
+        const curHp2 = STATE.partyHp[m.id]!=null?STATE.partyHp[m.id]:m.hp;
+        if(curHp2>0) STATE.partyHp[m.id] = effectiveMaxHp(m);
+        STATE.partyMp[m.id] = effectiveMaxMp(m);
+      });
+      logCombat(`${esc(actor.name)} casts ${chosenSpell.icon} ${esc(chosenSpell.name)} — the whole party is fully restored.`);
+    } else if(chosenSpell.buffType==='timeStop'){
+      spendMp(chosenSpell.mp);
+      STATE.timeStopTurns = 1;
+      logCombat(`${esc(actor.name)} casts ${chosenSpell.icon} ${esc(chosenSpell.name)} — time itself stops. ${esc(boss.name)} will not act next turn.`);
+    } else if(chosenSpell.dice){
+      spendMp(chosenSpell.mp);
+      const rolled = rollDice(chosenSpell.dice) * DICE_SCALE;
+      const withBonus = Math.round(rolled * (1+(trinket.spellPct||0)) * (1+(STATE.hastePct||0)));
+      dealDamage(withBonus, `casts ${chosenSpell.icon} ${esc(chosenSpell.name)} (${chosenSpell.dice})`);
+      if(chosenSpell.status && Math.random() < chosenSpell.status.chance){
+        const st = chosenSpell.status;
+        if(st.dmg){
+          const bonusDmg = st.dmg * DICE_SCALE;
+          hp = Math.max(0, hp - bonusDmg);
+          setBossHp(boss.id, hp);
+          logCombat(`${esc(boss.name)} is afflicted with ${st.type} for an extra ${bonusDmg} damage.`);
+        } else {
+          logCombat(`${esc(boss.name)} is ${st.type==='shock'?'stunned':st.type} by the spell.`);
+        }
+      }
     } else {
       spendMp(chosenSpell.mp);
       dealDamage(Math.round(baseDmg*chosenSpell.mult*(1+(trinket.spellPct||0))), `casts ${chosenSpell.icon} ${esc(chosenSpell.name)}`);
@@ -1261,6 +1365,8 @@ function battleAction(a){
   } else {
     dealDamage(baseDmg, 'attacks');
   }
+
+  if(STATE.hasteTurns > 0 && a!=='ITEM'){ STATE.hasteTurns--; if(STATE.hasteTurns===0) STATE.hastePct = 0; }
 
   save();
 
