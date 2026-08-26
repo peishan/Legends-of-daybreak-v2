@@ -59,6 +59,13 @@ function xpForChapter(c){
 }
 function bossReward(c){ return 1500 + c.id * 60; }
 function goldReward(c){ return 50 + c.id * 8; }
+function addGold(amount){
+  const active = getActiveParty().some(m=>m.id==='aisyah');
+  const bonusPct = active ? (affinityFor('aisyah').fx.goldPct || 0) : 0;
+  const total = Math.round(amount * (1+bonusPct));
+  STATE.gold += total;
+  return total;
+}
 
 // ---------------------------------------------------------------------------
 // SAVE / RECOVERY — consolidated single-key save (was 5 separate localStorage
@@ -94,12 +101,17 @@ const STATE = {
   readChapters: [],   // chapter IDs actually opened via the reader — gates Battle
   consumables: {},     // {potionId: count}
   battleItemMenuOpen: false,
+  autoBattleMode: false,   // when on, San's own turns also auto-resolve — full hands-off fights
   battleSpellMenuOpen: false,
   shieldTurns: 0,        // multi-turn defense buff (Shield, Evasion Ward, Stoneskin, etc.) — reduces next N boss hits
   shieldPct: 0,
   hasteTurns: 0,         // multi-turn damage buff (Haste, Improved Haste, Guildbound Surge)
   hastePct: 0,
   timeStopTurns: 0,      // boss skips its counter-attack entirely for N turns
+  markedBoss: false,     // Storm's Mark — guarantees San's next attack crits
+  nervousCourageActive: false,
+  discoveredAbilities: [],   // growth ability ids that have fired at least once
+  growthUsedThisBattle: {},  // {abilityId: true} — once per encounter, reset on new boss
   defending: {},        // {memberId: true} — halves the boss's next hit on them, consumed on use
   partyStatus: {},      // {memberId: 'diseased'} — inflicted by some boss hits, blocks regen until cured
   equipped: {},          // {memberId: trophyItemId} — one trinket slot per member
@@ -122,6 +134,7 @@ function getSavePayload(){
       bounties: STATE.bounties, bountyDay: STATE.bountyDay,
       chaptersReadToday: STATE.chaptersReadToday, chaptersReadDay: STATE.chaptersReadDay,
       readChapters: STATE.readChapters, consumables: STATE.consumables, partyStatus: STATE.partyStatus,
+      discoveredAbilities: STATE.discoveredAbilities, autoBattleMode: STATE.autoBattleMode,
       equipped: STATE.equipped, lastSeenAt: STATE.lastSeenAt, equippedTrophies: STATE.equippedTrophies,
       selectedZone: STATE.selectedZone, roundPosition: STATE.roundPosition
     }
@@ -356,11 +369,11 @@ function applyIdleGains(){
   const goldGain = Math.round(minutesAway * (1 + lvl*0.15));
   if(xpGain<=0 && goldGain<=0) return;
   STATE.xp += xpGain;
-  STATE.gold += goldGain;
+  const goldAdded = addGold(goldGain);
   if(minutesAway >= 10){
     const hrs = Math.floor(minutesAway/60), mins = Math.round(minutesAway%60);
     const timeStr = hrs ? `${hrs}h ${mins}m` : `${mins}m`;
-    setTimeout(()=>toast(`Welcome back — away ${timeStr} · +${xpGain.toLocaleString()} XP · +${goldGain.toLocaleString()}g`), 400);
+    setTimeout(()=>toast(`Welcome back — away ${timeStr} · +${xpGain.toLocaleString()} XP · +${goldAdded.toLocaleString()}g`), 400);
   }
 }
 
@@ -441,6 +454,41 @@ const CLASS_KIT = {
   sister_wren: {role:'healer', spell:{name:'Blessing of Faith', icon:'🙏', mp:0, healMult:1.1}, skill:{name:'Purify', icon:'🌿', mp:0, effect:'cleanse'}},
   soel:        {role:'caster', spell:{name:"Nine Lives' Ward", icon:'🐾', mp:0, healMult:0.6}, skill:{name:'Lucky Pounce', icon:'✨', mp:0, mult:1.3}}
 };
+// ---------------------------------------------------------------------------
+// AFFINITY BONUSES — real per-companion passive tiers ported from the codex
+// project. Source game gates these behind a bond-point stat earned through
+// story interactions we don't have (no dialogue-choice system here), so
+// they're mapped onto player LEVEL instead — same substitution already used
+// for San's spellbook and Eliz's Cure Disease. Only the highest unlocked
+// tier applies (not cumulative), matching the source's own tier-replaces-tier
+// design (each tier's description reads as a successor, not a stack).
+// ---------------------------------------------------------------------------
+const AFFINITY_TIERS = {
+  aisyah:  [ {lv:40,n:'Quick Fingers',fx:{goldPct:0.10}}, {lv:70,n:'Treasure Sense',fx:{goldPct:0.15}}, {lv:100,n:"Dragon's Hoard",fx:{goldPct:0.25}}, {lv:150,n:'Silver Tongue',fx:{goldPct:0.20}}, {lv:200,n:'Golden Touch',fx:{goldPct:0.35}} ],
+  senedra: [ {lv:40,n:'Eagle Eye',fx:{critPct:0.10}}, {lv:70,n:'Deadeye',fx:{critPct:0.15}}, {lv:100,n:"Storm's Arrow",fx:{critPct:0.25}}, {lv:150,n:"Hawk's Precision",fx:{critPct:0.20}}, {lv:200,n:'Perfect Shot',fx:{critPct:0.35}} ],
+  zaki:    [ {lv:40,n:'Iron Discipline',fx:{def:3}}, {lv:70,n:'Battle Hardened',fx:{hpPct:0.15}}, {lv:100,n:'Immortal Wall',fx:{def:5,atk:3}}, {lv:150,n:'Unbroken Will',fx:{def:8,atk:5}}, {lv:200,n:'Legendary Blade',fx:{def:10,atk:8}} ]
+};
+function affinityFor(id){
+  const tiers = AFFINITY_TIERS[id];
+  if(!tiers) return {fx:{}, n:null};
+  const lvl = level();
+  const unlocked = tiers.filter(t=>lvl>=t.lv);
+  return unlocked.length ? unlocked[unlocked.length-1] : {fx:{}, n:null};
+}
+const CRIT_BASE = 0.10; // everyone's baseline crit chance on a basic ATTACK
+// ---------------------------------------------------------------------------
+// GROWTH ABILITIES — one signature ability per companion, unlocked by level
+// like everything else, but hidden from the UI (name/desc included) until it
+// actually fires once in combat. Auto-triggers on its own condition rather
+// than being player-selected. STATE.discoveredAbilities tracks what's been
+// revealed; STATE.growthUsedThisBattle is a once-per-encounter flag, reset
+// whenever a new boss fight starts.
+// ---------------------------------------------------------------------------
+const GROWTH_ABILITIES = {
+  aisyah:  {id:'long_con', name:'The Long Con', levelReq:26, desc:"A perfect strike, and her hand is already in the enemy's pocket before they hit the ground. Landing a critical hit has a chance to skim bonus gold."},
+  senedra: {id:'storms_mark', name:"Storm's Mark", levelReq:35, desc:"A critical hit marks the target. Her aim is good enough that San's next strike against a marked foe is guaranteed to land true."},
+  zaki:    {id:'nervous_courage', name:'Nervous Courage', levelReq:15, desc:"When everyone else has fallen and it's just him and San left standing, the boy who checked his pack seventeen times finds he doesn't need to anymore. +6 ATK, +4 DEF for the rest of the fight."}
+};
 function kitFor(id){ return CLASS_KIT[id] || {role:'melee', spell:null, skill:null}; }
 // D&D-style dice notation ("2d6") -> rolled sum. San's spellbook is ported
 // straight from the real game's dice values, scaled so the whole 1d8->7d12
@@ -454,8 +502,14 @@ function rollDice(notation){
   for(let i=0;i<count;i++) sum += 1+Math.floor(Math.random()*sides);
   return sum;
 }
+function ensureFreshBattleState(){
+  if(STATE.combatLogBossId !== currentBossId()){
+    STATE.combatLog = []; STATE.combatLogBossId = currentBossId(); STATE.roundPosition = 0;
+    STATE.growthUsedThisBattle = {}; STATE.nervousCourageActive = false; STATE.markedBoss = false;
+  }
+}
 function logCombat(line){
-  if(STATE.combatLogBossId !== currentBossId()){ STATE.combatLog = []; STATE.combatLogBossId = currentBossId(); STATE.roundPosition = 0; }
+  ensureFreshBattleState();
   STATE.combatLog.push(line);
   if(STATE.combatLog.length > 200) STATE.combatLog.shift();
 }
@@ -478,6 +532,54 @@ function diseaseChance(boss){ return Math.min(0.25, Math.max(0, (boss.id-30)*0.0
 // spirit flame) never actually fall — narratively unkillable. Damage still
 // lands on them normally; it just can't take them below 1 HP.
 const UNKILLABLE_IDS = new Set(['eliz','soel']);
+function triggerCritGrowthAbility(actor){
+  const lvl = level();
+  if(actor.id==='aisyah' && lvl>=GROWTH_ABILITIES.aisyah.levelReq){
+    const ability = GROWTH_ABILITIES.aisyah;
+    if(!STATE.growthUsedThisBattle[ability.id] && Math.random() < 0.4){
+      STATE.growthUsedThisBattle[ability.id] = true;
+      const bonusGold = addGold(30 + Math.round(level()*0.8));
+      if(!STATE.discoveredAbilities.includes(ability.id)){
+        STATE.discoveredAbilities.push(ability.id);
+        logCombat(`<span style="color:#e8c96a">✦ Growth ability discovered: ${ability.name}</span> — ${esc(ability.desc)}`);
+      }
+      logCombat(`Aisyah's hand is already in the enemy's pocket — ${bonusGold}g skimmed from the encounter.`);
+    }
+  }
+  if(actor.id==='senedra' && lvl>=GROWTH_ABILITIES.senedra.levelReq){
+    const ability = GROWTH_ABILITIES.senedra;
+    if(!STATE.growthUsedThisBattle[ability.id]){
+      STATE.growthUsedThisBattle[ability.id] = true;
+      STATE.markedBoss = true;
+      if(!STATE.discoveredAbilities.includes(ability.id)){
+        STATE.discoveredAbilities.push(ability.id);
+        logCombat(`<span style="color:#e8c96a">✦ Growth ability discovered: ${ability.name}</span> — ${esc(ability.desc)}`);
+      }
+      logCombat(`Senedra's shot marks the target — San's next strike is guaranteed to land true.`);
+    }
+  }
+}
+function checkNervousCourage(party){
+  const ability = GROWTH_ABILITIES.zaki;
+  if(level() < ability.levelReq || STATE.growthUsedThisBattle[ability.id]) return;
+  // Eliz/Soel can't truly fall (floor at 1 HP), so they don't count toward
+  // "who's still standing" — otherwise this condition would be practically
+  // unreachable once they've joined, since they'd always read as alive.
+  const fallable = party.filter(m => !UNKILLABLE_IDS.has(m.id));
+  const aliveIds = fallable.filter(m=>{
+    const hp = STATE.partyHp[m.id]!=null?STATE.partyHp[m.id]:m.hp;
+    return hp>0;
+  }).map(m=>m.id);
+  if(aliveIds.length===2 && aliveIds.includes('san') && aliveIds.includes('zaki')){
+    STATE.growthUsedThisBattle[ability.id] = true;
+    STATE.nervousCourageActive = true;
+    if(!STATE.discoveredAbilities.includes(ability.id)){
+      STATE.discoveredAbilities.push(ability.id);
+      logCombat(`<span style="color:#e8c96a">✦ Growth ability discovered: ${ability.name}</span> — ${esc(ability.desc)}`);
+    }
+    logCombat(`It's just Zaki and San left standing — he doesn't check his pack this time. +6 ATK, +4 DEF for the rest of the fight.`);
+  }
+}
 function bossCounterAttack(boss){
   const hp = bossHpFor(boss.id);
   if(hp<=0) return; // boss just died to the player's action — no counter
@@ -495,6 +597,11 @@ function bossCounterAttack(boss){
   let dmg = bossAttackDamage(boss);
   const t = trinketBonus(target.id);
   if(t && t.defPct) dmg = Math.round(dmg*(1-t.defPct));
+  if(target.id==='zaki'){
+    let defVal = affinityFor('zaki').fx.def || 0;
+    if(STATE.nervousCourageActive) defVal += 4;
+    dmg = Math.max(1, dmg - defVal);
+  }
   if(STATE.shieldTurns > 0){ dmg = Math.round(dmg*(1-STATE.shieldPct)); STATE.shieldTurns--; }
   if(STATE.defending[target.id]){ dmg = Math.round(dmg*0.5); delete STATE.defending[target.id]; }
   const cur = STATE.partyHp[target.id]!=null?STATE.partyHp[target.id]:target.hp;
@@ -507,6 +614,7 @@ function bossCounterAttack(boss){
     diseaseNote = ` <span style="color:#a8d98a">${esc(target.name)} has fallen ill.</span>`;
   }
   logCombat(`${esc(boss.name)} strikes ${esc(target.name)} for ${dmg} damage.${next===0?` <span style="color:#e08a8a">${esc(target.name)} has fallen.</span>`:diseaseNote}`);
+  checkNervousCourage(getActiveParty());
 }
 function advanceTurnSkippingFallen(party){
   let next = (STATE.turn+1)%Math.max(1,party.length);
@@ -729,9 +837,8 @@ function completeChapter(id){
   const c = chapterData.find(ch=>ch.id===id);
   if(c.boss) return toast("Defeat this chapter's boss in Battle to complete it");
   const reward = xpForChapter(c);
-  const gold = Math.round(goldReward(c)*0.4);
+  const gold = addGold(Math.round(goldReward(c)*0.4));
   STATE.xp += reward;
-  STATE.gold += gold;
   STATE.completed = id;
   STATE.chaptersReadToday++;
   checkBountyProgress('read_chapters', null, 1);
@@ -938,9 +1045,9 @@ function fightZoneRegular(zoneId, monsterId){
   const e = zone.regulars.find(x=>x.id===monsterId);
   if(!e) return;
   STATE.xp += e.xp;
-  STATE.gold += e.gold;
+  const goldAdded = addGold(e.gold);
   save();
-  toast(`${e.name} defeated · +${e.xp} XP · +${e.gold}g`);
+  toast(`${e.name} defeated · +${e.xp} XP · +${goldAdded}g`);
   go('Frontier');
 }
 function zoneScreenHTML(zone){
@@ -997,10 +1104,10 @@ function fightFrontierRegular(id){
   const e = FRONTIER_REGULARS.find(x=>x.id===id);
   if(!e) return;
   STATE.xp += e.xp;
-  STATE.gold += e.gold;
+  const goldAdded = addGold(e.gold);
   checkBountyProgress('frontier_kill', id, 1);
   save();
-  toast(`${e.name} defeated · +${e.xp} XP · +${e.gold}g`);
+  toast(`${e.name} defeated · +${e.xp} XP · +${goldAdded}g`);
   go('Frontier');
 }
 function fightFrontierBoss(){
@@ -1009,12 +1116,12 @@ function fightFrontierBoss(){
   const c = chapterData.find(ch=>ch.id===boss.id);
   const xp = bossReward(c), gold = goldReward(c);
   STATE.xp += xp;
-  STATE.gold += gold;
+  const goldAdded = addGold(gold);
   STATE.frontierCurrentBoss = null;
   STATE.frontierBossCooldownUntil = Date.now() + (5+Math.random()*10)*60000; // 5-15 min
   checkBountyProgress('frontier_boss', boss.name, 1);
   save();
-  toast(`${boss.name} defeated again · +${xp} XP · +${gold}g`);
+  toast(`${boss.name} defeated again · +${xp} XP · +${goldAdded}g`);
   go('Frontier');
 }
 
@@ -1064,8 +1171,8 @@ function checkBountyProgress(type, target, amount){
     if(b.c >= b.need){
       b.done = true;
       STATE.xp += b.rw.xp;
-      STATE.gold += b.rw.gold;
-      toast(`💰 Bounty complete: ${b.name} · +${b.rw.xp} XP · +${b.rw.gold}g`);
+      const goldAdded = addGold(b.rw.gold);
+      toast(`💰 Bounty complete: ${b.name} · +${b.rw.xp} XP · +${goldAdded}g`);
     }
   });
   save();
@@ -1124,7 +1231,7 @@ function battleScreen(){
   if(landscapeSrc) html += `<div class="boss-landscape-art">${safeImg(landscapeSrc, boss.name)}</div>`;
   html += '</div>';
 
-  html += '<div class="companion-ai-strip"><span><strong>San</strong> is always yours to control — set each companion below to Assisted (auto-acts) or Manual.</span></div>';
+  html += `<div class="companion-ai-strip" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span><strong>${STATE.autoBattleMode?'Auto-Battle is ON':'San is yours to control'}</strong> — set each companion below to Assisted (auto-acts) or Manual.</span><button class="small-btn ${STATE.autoBattleMode?'primary':''}" onclick="toggleAutoBattle()">${STATE.autoBattleMode?'🤖 AUTO-BATTLE: ON':'🎮 AUTO-BATTLE: OFF'}</button></div>`;
 
   html += '<div class="party-battle-grid">';
   party.forEach((m,i)=>{
@@ -1151,7 +1258,7 @@ function battleScreen(){
   });
   html += '</div>';
 
-  const playerControlsThisTurn = !currentMember || currentMember.id==='san' || (STATE.companionMode[currentMember.id]||'assisted')==='manual';
+  const playerControlsThisTurn = !currentMember || (currentMember.id==='san' ? !STATE.autoBattleMode : (STATE.companionMode[currentMember.id]||'assisted')==='manual');
   html += '<div class="battle-actions">';
   if(playerControlsThisTurn){
     const actorKit = currentMember ? kitFor(currentMember.id) : kitFor('san');
@@ -1188,7 +1295,8 @@ function battleScreen(){
       html += `<div class="chapter-grid" style="grid-column:1/-1;margin-top:8px">${actorKit.spells.map((s,i)=>{const unlocked=level_>=s.levelReq;return `<article class="quest" style="${unlocked?'':'opacity:.45'}"><div class="mini-ico">${s.icon}</div><div><h3>${esc(s.name)}${s.mp?` · ${s.mp} MP`:''}</h3><p>${esc(s.desc||'')}${unlocked?'':` · Unlocks at Level ${s.levelReq}`}</p></div><button class="small-btn primary" onclick="castNamedSpell(${i})" ${unlocked?'':'disabled'}>CAST</button></article>`;}).join('')}</div>`;
     }
   } else {
-    html += `<div class="battle-note" style="grid-column:1/-1;text-align:center;padding:10px">${esc(currentMember.name)} is acting on Assisted AI…</div>`;
+    const autoMsg = currentMember.id==='san' ? 'San is acting on Auto-Battle…' : `${esc(currentMember.name)} is acting on Assisted AI…`;
+    html += `<div class="battle-note" style="grid-column:1/-1;text-align:center;padding:10px">${autoMsg}</div>`;
   }
   html += '</div>';
 
@@ -1202,22 +1310,54 @@ function battleScreen(){
 }
 let autoActTimer = null;
 function clearAutoActTimer(){ if(autoActTimer){ clearTimeout(autoActTimer); autoActTimer=null; } }
+function toggleAutoBattle(){
+  STATE.autoBattleMode = !STATE.autoBattleMode;
+  save();
+  toast(STATE.autoBattleMode ? '🤖 Auto-Battle on — San will act on her own too' : '🎮 Auto-Battle off — you control San again');
+  go('Battle');
+}
 function toggleCompanionMode(id){
   STATE.companionMode[id] = (STATE.companionMode[id]||'assisted')==='assisted' ? 'manual' : 'assisted';
   save();
   go('Battle');
 }
+function chooseSanAutoAction(){
+  const lvl = level();
+  const sanMember = ALL_PARTY.find(m=>m.id==='san');
+  const mp = STATE.partyMp['san']!=null?STATE.partyMp['san']:sanMember.mp;
+  const spells = kitFor('san').spells.filter(s=>lvl>=s.levelReq && mp>=s.mp);
+  // Prefer the strongest affordable damage spell (dice-based); fall back to
+  // healing/utility only if the party actually needs it; otherwise ATTACK.
+  const damageSpells = spells.filter(s=>s.dice).sort((a,b)=>b.mp-a.mp); // higher MP cost ~= stronger tier
+  if(damageSpells.length && Math.random() < 0.75){
+    STATE.pendingSpellIndex = kitFor('san').spells.indexOf(damageSpells[0]);
+    return 'SPELL';
+  }
+  return 'ATTACK';
+}
 function maybeAutoActCompanion(){
   if(autoActTimer) return;
   const party = getActiveParty();
   const cur = party[STATE.turn];
-  if(!cur || cur.id==='san') return;
+  if(!cur) return;
   const curHp = STATE.partyHp[cur.id]!=null?STATE.partyHp[cur.id]:cur.hp;
   if(curHp<=0){
     const anyoneAlive = party.some(m=>(STATE.partyHp[m.id]!=null?STATE.partyHp[m.id]:m.hp)>0);
     if(!anyoneAlive) return; // full party down — nothing to advance to, stop here
     advanceTurnSkippingFallen(party);
     go('Battle');
+    return;
+  }
+  if(cur.id==='san'){
+    if(!STATE.autoBattleMode) return;
+    const boss = bossFor(currentBossId());
+    if(!boss) return;
+    if(STATE.completed < boss.id-1) return;
+    if(bossHpFor(boss.id) <= 0) return;
+    autoActTimer = setTimeout(()=>{
+      autoActTimer = null;
+      battleAction(chooseSanAutoAction());
+    }, 700);
     return;
   }
   const mode = STATE.companionMode[cur.id] || 'assisted';
@@ -1242,6 +1382,7 @@ function battleAction(a){
   const boss = bossFor(bossId);
   if(!boss) return;
   if(STATE.completed < boss.id-1) return toast(`Complete previous chapters before this encounter`);
+  ensureFreshBattleState();
   let hp = bossHpFor(boss.id);
   if(hp<=0) return;
   STATE.battleStarted=true;
@@ -1261,7 +1402,19 @@ function battleAction(a){
   }
 
   if(a==='ATTACK'){
-    dealDamage(baseDmg, 'attacks');
+    let dmg = baseDmg;
+    let critChance = CRIT_BASE;
+    if(actor.id==='senedra') critChance += (affinityFor('senedra').fx.critPct || 0);
+    if(actor.id==='zaki'){
+      const atkBonus = (affinityFor('zaki').fx.atk || 0) + (STATE.nervousCourageActive ? 6 : 0);
+      dmg = Math.round(dmg * (1 + atkBonus/20));
+    }
+    let guaranteedCrit = false;
+    if(actor.id==='san' && STATE.markedBoss){ guaranteedCrit = true; STATE.markedBoss = false; }
+    const isCrit = guaranteedCrit || Math.random() < critChance;
+    if(isCrit) dmg = Math.round(dmg * 2);
+    dealDamage(dmg, isCrit ? (guaranteedCrit ? "strikes the marked foe true — a guaranteed critical" : 'lands a critical hit') : 'attacks');
+    if(isCrit) triggerCritGrowthAbility(actor);
   } else if(a==='SPELL' && (kit.spell || kit.spells)){
     const chosenSpell = kit.spells ? kit.spells[STATE.pendingSpellIndex] : kit.spell;
     if(!chosenSpell){ dealDamage(baseDmg,'attacks'); }
@@ -1376,11 +1529,11 @@ function battleAction(a){
       const c = chapterData.find(c=>c.id===boss.id);
       const gold = goldReward(c);
       STATE.xp += bossReward(c);
-      STATE.gold += gold;
+      const goldAdded = addGold(gold);
       STATE.completed = boss.id;
       const loot = awardBossLoot(boss.id, boss.name);
       save();
-      toast(loot ? `${boss.name} defeated! · ${loot.icon} ${loot.name} · +${gold}g` : `${boss.name} defeated! +${gold}g`);
+      toast(loot ? `${boss.name} defeated! · ${loot.icon} ${loot.name} · +${goldAdded}g` : `${boss.name} defeated! +${goldAdded}g`);
       // Same pattern as a regular chapter completion: land back on the
       // Journal instead of parking on Battle, which would otherwise show a
       // static "read the next chapter first" message the player has to
