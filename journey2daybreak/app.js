@@ -119,6 +119,8 @@ const STATE = {
   growthUsedThisBattle: {},  // {abilityId: true} — once per encounter, reset on new boss
   guildRep: 0, guildRepBalance: 0, guildContracts: [], guildContractWeek: null,
   visionMachineLastDay: null, joelLetterCount: 0, lastVision: null,
+  currentEncounter: null,  // {type:'regular'|'frontierBoss', ...} — null means "the next story boss"
+  regularHp: {},            // {encounterKey: currentHp} for Zone/Frontier regular monsters
   defending: {},        // {memberId: true} — halves the boss's next hit on them, consumed on use
   partyStatus: {},      // {memberId: 'diseased'} — inflicted by some boss hits, blocks regen until cured
   equipped: {},          // {memberId: trophyItemId} — one trinket slot per member
@@ -145,6 +147,7 @@ function getSavePayload(){
       guildRep: STATE.guildRep, guildRepBalance: STATE.guildRepBalance, guildContracts: STATE.guildContracts,
       guildContractWeek: STATE.guildContractWeek, visionMachineLastDay: STATE.visionMachineLastDay,
       joelLetterCount: STATE.joelLetterCount, lastVision: STATE.lastVision,
+      currentEncounter: STATE.currentEncounter, regularHp: STATE.regularHp,
       equipped: STATE.equipped, lastSeenAt: STATE.lastSeenAt, equippedTrophies: STATE.equippedTrophies,
       selectedZone: STATE.selectedZone, roundPosition: STATE.roundPosition
     }
@@ -271,6 +274,71 @@ function currentBossId(){
 }
 function bossHpFor(id){ const b=bossFor(id); if(!b) return 0; return (id in STATE.bossHp) ? STATE.bossHp[id] : b.hp; }
 function setBossHp(id, val){ STATE.bossHp[id]=Math.max(0,val); save(); }
+// ---------------------------------------------------------------------------
+// ACTIVE ENCOUNTER — normalizes what's currently loaded in the Battle screen,
+// whether that's the next story boss (default), a Frontier boss rematch, or
+// a Zone regular monster. Lets battleScreen/battleAction/bossCounterAttack
+// work against one shape regardless of source, instead of three separate
+// code paths.
+// ---------------------------------------------------------------------------
+function activeEncounter(){
+  if(STATE.currentEncounter){
+    const enc = STATE.currentEncounter;
+    if(enc.type==='regular'){
+      const zone = ZONES.find(z=>z.id===enc.zoneId);
+      if(!zone) { STATE.currentEncounter=null; return activeEncounter(); }
+      const list = zone.id==='fraying_frontier' ? FRONTIER_REGULARS : zone.regulars;
+      const e = list.find(x=>x.id===enc.monsterId);
+      if(!e) { STATE.currentEncounter=null; return activeEncounter(); }
+      return {id:enc.key, name:e.name, hp:e.hp, ac:12, art:null, phases:null, phaseArt:null,
+        isRegular:true, xpReward:e.xp, goldReward:e.gold, zoneId:enc.zoneId, monsterId:enc.monsterId};
+    }
+    if(enc.type==='frontierBoss'){
+      const b = bossFor(enc.bossId);
+      if(!b) { STATE.currentEncounter=null; return activeEncounter(); }
+      return Object.assign({}, b, {isFrontierBoss:true});
+    }
+  }
+  const b = bossFor(currentBossId());
+  if(!b) return null;
+  return Object.assign({}, b, {isStoryBoss:true});
+}
+function activeEncounterHp(enc){
+  if(!enc) return 0;
+  if(enc.isRegular) return (STATE.regularHp[enc.id]!=null) ? STATE.regularHp[enc.id] : enc.hp;
+  return bossHpFor(enc.id);
+}
+function setActiveEncounterHp(enc, val){
+  if(enc.isRegular){ STATE.regularHp[enc.id] = Math.max(0,val); save(); }
+  else setBossHp(enc.id, val);
+}
+function startRegularEncounter(zoneId, monsterId){
+  const zone = ZONES.find(z=>z.id===zoneId);
+  const list = zone.id==='fraying_frontier' ? FRONTIER_REGULARS : zone.regulars;
+  const e = list.find(x=>x.id===monsterId);
+  if(!e) return;
+  const key = zoneId+'_'+monsterId;
+  STATE.currentEncounter = {type:'regular', zoneId, monsterId, key};
+  STATE.regularHp[key] = e.hp;
+  STATE.combatLog = []; STATE.combatLogBossId = 'enc_'+key; STATE.roundPosition = 0;
+  STATE.growthUsedThisBattle = {}; STATE.nervousCourageActive = false; STATE.markedBoss = false;
+  STATE.turn = 0;
+  save();
+  go('Battle');
+}
+function startFrontierBossEncounter(){
+  if(!STATE.frontierCurrentBoss) return;
+  STATE.currentEncounter = {type:'frontierBoss', bossId: STATE.frontierCurrentBoss};
+  STATE.combatLog = []; STATE.combatLogBossId = 'enc_fb_'+STATE.frontierCurrentBoss; STATE.roundPosition = 0;
+  STATE.growthUsedThisBattle = {}; STATE.nervousCourageActive = false; STATE.markedBoss = false;
+  STATE.turn = 0;
+  save();
+  go('Battle');
+}
+function endNonStoryEncounter(){
+  STATE.currentEncounter = null;
+  save();
+}
 
 // ---------------------------------------------------------------------------
 // TRADER & CRAFTING — same potion values as your codex project (Health
@@ -512,9 +580,16 @@ function rollDice(notation){
   for(let i=0;i<count;i++) sum += 1+Math.floor(Math.random()*sides);
   return sum;
 }
+function encounterKey(){
+  if(STATE.currentEncounter){
+    const enc = STATE.currentEncounter;
+    return enc.type==='regular' ? 'enc_'+enc.key : 'enc_fb_'+enc.bossId;
+  }
+  return currentBossId();
+}
 function ensureFreshBattleState(){
-  if(STATE.combatLogBossId !== currentBossId()){
-    STATE.combatLog = []; STATE.combatLogBossId = currentBossId(); STATE.roundPosition = 0;
+  if(STATE.combatLogBossId !== encounterKey()){
+    STATE.combatLog = []; STATE.combatLogBossId = encounterKey(); STATE.roundPosition = 0;
     STATE.growthUsedThisBattle = {}; STATE.nervousCourageActive = false; STATE.markedBoss = false;
   }
 }
@@ -590,8 +665,47 @@ function checkNervousCourage(party){
     logCombat(`It's just Zaki and San left standing — he doesn't check his pack this time. +6 ATK, +4 DEF for the rest of the fight.`);
   }
 }
+// ---------------------------------------------------------------------------
+// PERSONAL-ANTAGONIST TAUNTS — Robin C. (Ch.86) and Jeff (Ch.87) get their
+// real taunt lines and defeat lines from the source game, since those carry
+// real narrative weight for these two specifically. Not porting their exact
+// HP/stats/mechanics (120k/115k HP, scripted turn-5 events) — wildly out of
+// scale with this game's rebalanced curve, and disproportionate engineering
+// for 2 of 49 bosses. Robin's "bound by fine print" flavor reuses the
+// existing disease system instead of a new freeze mechanic.
+// ---------------------------------------------------------------------------
+const BOSS_TAUNTS = {
+  86: { // Robin C.
+    taunts: [
+      "I can't break the retainer.",
+      "Are you working, or are you on your phone?",
+      "Everyone's replaceable. That's just how the firm works.",
+      "You should be grateful for the opportunity, honestly.",
+      "I don't recall approving overtime for complaining.",
+      "This conversation isn't billable. Get back to it.",
+      "I built this practice. You just worked in it.",
+      "Loyalty is nice. It doesn't show up on a balance sheet.",
+      "You'll thank me for this someday. Probably not today."
+    ],
+    diseaseFlavor: "bound by fine print",
+    defeatLine: "Robin goes down mid-sentence, and the ledger San has been carrying since the old world finally closes. Nine years for a hundred dollars was never a fair trade — this one is."
+  },
+  87: { // Jeff, the SK Son-in-Law
+    taunts: [
+      "No more MC, or I'm not renewing your contract.",
+      "Joel, your performance now is bad.",
+      "Joel talked up during the meeting, is he stupid?",
+      "Nothing to do? Go clean the forest.",
+      "I'm the boss here. You will do as I say.",
+      "Your stepfather ruined my reputation. I still want that public apology.",
+      "The public apology is normal in Singapore."
+    ],
+    diseaseFlavor: null,
+    defeatLine: "He goes down still talking, mid-sentence, the way men like him always do — certain right up until the certainty runs out. Joel does not say anything for a while afterward. He does not need to. His shoulders, for once, are perfectly still."
+  }
+};
 function bossCounterAttack(boss){
-  const hp = bossHpFor(boss.id);
+  const hp = activeEncounterHp(boss);
   if(hp<=0) return; // boss just died to the player's action — no counter
   if(STATE.timeStopTurns > 0){
     STATE.timeStopTurns--;
@@ -621,9 +735,13 @@ function bossCounterAttack(boss){
   let diseaseNote = '';
   if(next>0 && !STATE.partyStatus[target.id] && Math.random() < diseaseChance(boss)){
     STATE.partyStatus[target.id] = 'diseased';
-    diseaseNote = ` <span style="color:#a8d98a">${esc(target.name)} has fallen ill.</span>`;
+    const bt = BOSS_TAUNTS[boss.id];
+    const flavor = (bt && bt.diseaseFlavor) ? bt.diseaseFlavor : 'fallen ill';
+    diseaseNote = ` <span style="color:#a8d98a">${esc(target.name)} is ${esc(flavor)}.</span>`;
   }
-  logCombat(`${esc(boss.name)} strikes ${esc(target.name)} for ${dmg} damage.${next===0?` <span style="color:#e08a8a">${esc(target.name)} has fallen.</span>`:diseaseNote}`);
+  const taunt = BOSS_TAUNTS[boss.id];
+  const taunterLine = taunt && Math.random() < 0.5 ? `<div style="color:#c9a3a3;font-style:italic;margin-top:2px">"${esc(taunt.taunts[Math.floor(Math.random()*taunt.taunts.length)])}"</div>` : '';
+  logCombat(`${esc(boss.name)} strikes ${esc(target.name)} for ${dmg} damage.${next===0?` <span style="color:#e08a8a">${esc(target.name)} has fallen.</span>`:diseaseNote}${taunterLine}`);
   checkNervousCourage(getActiveParty());
 }
 function advanceTurnSkippingFallen(party){
@@ -1049,19 +1167,9 @@ const ZONES = [
 ];
 function zoneUnlocked(z){ return STATE.completed >= z.unlockChapter; }
 function frontierUnlocked(){ return zoneUnlocked(ZONES.find(z=>z.id==='fraying_frontier')); }
-function fightZoneRegular(zoneId, monsterId){
-  const zone = ZONES.find(z=>z.id===zoneId);
-  const e = zone.regulars.find(x=>x.id===monsterId);
-  if(!e) return;
-  addXp(e.xp);
-  const goldAdded = addGold(e.gold);
-  save();
-  toast(`${e.name} defeated · +${e.xp} XP · +${goldAdded}g`);
-  go('Frontier');
-}
 function zoneScreenHTML(zone){
   if(zone.id==='fraying_frontier') return frontierZoneHTML();
-  return `<div class="chapter-grid">${zone.regulars.map(e=>`<article class="quest"><div class="mini-ico">${e.icon}</div><div><h3>${esc(e.name)}</h3><p>${esc(e.desc)}</p><b>${e.hp} HP · ${e.xp} XP · ${e.gold}g</b></div><button class="small-btn primary" onclick="fightZoneRegular('${zone.id}','${e.id}')">FIGHT</button></article>`).join('')}</div>`;
+  return `<div class="chapter-grid">${zone.regulars.map(e=>`<article class="quest"><div class="mini-ico">${e.icon}</div><div><h3>${esc(e.name)}</h3><p>${esc(e.desc)}</p><b>${e.hp} HP · ${e.xp} XP · ${e.gold}g</b></div><button class="small-btn primary" onclick="startRegularEncounter('${zone.id}','${e.id}')">FIGHT</button></article>`).join('')}</div>`;
 }
 
 function frontierEligibleBosses(){ return BOSS_CHAPTERS.filter(b => STATE.completed >= b.id); }
@@ -1081,11 +1189,11 @@ function frontierZoneHTML(){
   let html = `<p class="lead">High-level encounters roam here between the delayed return of bosses you've already faced. Regular fights and boss rematches grant XP and gold only — no loot duplication.</p>`;
   html += `<h3 style="font-family:Cinzel;color:#c99aff;margin:18px 0 4px;font-size:16px">⚔️ REGULAR ENCOUNTERS</h3><div class="chapter-grid">`;
   FRONTIER_REGULARS.forEach(e=>{
-    html += `<article class="quest"><div class="mini-ico">${e.icon}</div><div><h3>${esc(e.name)}</h3><p>${esc(e.desc)}</p><b>${e.hp} HP · ${e.xp} XP · ${e.gold}g</b></div><button class="small-btn primary" onclick="fightFrontierRegular('${e.id}')">FIGHT</button></article>`;
+    html += `<article class="quest"><div class="mini-ico">${e.icon}</div><div><h3>${esc(e.name)}</h3><p>${esc(e.desc)}</p><b>${e.hp} HP · ${e.xp} XP · ${e.gold}g</b></div><button class="small-btn primary" onclick="startRegularEncounter('fraying_frontier','${e.id}')">FIGHT</button></article>`;
   });
   html += `</div>`;
   if(boss){
-    html += `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:16px">👑 A BOSS HAS RETURNED</h3><div class="chapter-grid"><article class="quest"><div class="mini-ico">☠</div><div><h3>${esc(boss.name)}</h3><p>An earlier foe, drawn back through the Frontier.</p><b>${boss.hp.toLocaleString()} HP · ${bossReward(chapterData.find(c=>c.id===boss.id)).toLocaleString()} XP · ${goldReward(chapterData.find(c=>c.id===boss.id))}g</b></div><button class="small-btn primary" onclick="fightFrontierBoss()">FIGHT</button></article></div>`;
+    html += `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:16px">👑 A BOSS HAS RETURNED</h3><div class="chapter-grid"><article class="quest"><div class="mini-ico">☠</div><div><h3>${esc(boss.name)}</h3><p>An earlier foe, drawn back through the Frontier.</p><b>${boss.hp.toLocaleString()} HP · ${bossReward(chapterData.find(c=>c.id===boss.id)).toLocaleString()} XP · ${goldReward(chapterData.find(c=>c.id===boss.id))}g</b></div><button class="small-btn primary" onclick="startFrontierBossEncounter()">FIGHT</button></article></div>`;
   } else {
     const remaining = Math.max(0, STATE.frontierBossCooldownUntil - Date.now());
     const mins = Math.ceil(remaining/60000);
@@ -1267,30 +1375,6 @@ function frontierScreen(){
   return panel(zone.name, 'EXPLORATION ZONE', body, navButton('Dashboard'));
 }
 function selectZone(id){ STATE.selectedZone = id; save(); go('Frontier'); }
-function fightFrontierRegular(id){
-  const e = FRONTIER_REGULARS.find(x=>x.id===id);
-  if(!e) return;
-  addXp(e.xp);
-  const goldAdded = addGold(e.gold);
-  checkBountyProgress('frontier_kill', id, 1);
-  save();
-  toast(`${e.name} defeated · +${e.xp} XP · +${goldAdded}g`);
-  go('Frontier');
-}
-function fightFrontierBoss(){
-  if(!STATE.frontierCurrentBoss) return;
-  const boss = bossFor(STATE.frontierCurrentBoss);
-  const c = chapterData.find(ch=>ch.id===boss.id);
-  const xp = bossReward(c), gold = goldReward(c);
-  addXp(xp);
-  const goldAdded = addGold(gold);
-  STATE.frontierCurrentBoss = null;
-  STATE.frontierBossCooldownUntil = Date.now() + (5+Math.random()*10)*60000; // 5-15 min
-  checkBountyProgress('frontier_boss', boss.name, 1);
-  save();
-  toast(`${boss.name} defeated again · +${xp} XP · +${goldAdded}g`);
-  go('Frontier');
-}
 
 // ---------------------------------------------------------------------------
 // BOUNTY BOARD — adapted from your codex project's bounty system, but
@@ -1351,18 +1435,17 @@ function bountyBoardHTML(){
 
 
 function battleScreen(){
-  const bossId = currentBossId();
-  const boss = bossFor(bossId);
+  const boss = activeEncounter();
   if(!boss) return panel('Battle','MAJOR ENCOUNTER','<p class="lead">No boss encounter available yet.</p>', navButton('Dashboard'));
-  const locked = STATE.completed < boss.id-1;
-  const notYetRead = !locked && !STATE.readChapters.includes(boss.id);
+  const locked = boss.isStoryBoss && STATE.completed < boss.id-1;
+  const notYetRead = boss.isStoryBoss && !locked && !STATE.readChapters.includes(boss.id);
   if(notYetRead){
     const c = chapterData.find(ch=>ch.id===boss.id);
     return panel('Battle','MAJOR ENCOUNTER',
       `<div class="locked-banner"><b>READ CHAPTER ${boss.id} FIRST</b><br>${esc(boss.name)}'s encounter follows the story in Chapter ${boss.id}: ${esc(c.title)}. Read it before entering battle.</div>`,
       `<button class="cta" data-read="${boss.id}">READ CHAPTER ${boss.id} ›</button> ` + navButton('Dashboard'));
   }
-  const hp = bossHpFor(boss.id);
+  const hp = activeEncounterHp(boss);
   const hpPercent = Math.max(0, Math.min(100, hp/boss.hp*100));
   const party = getActiveParty();
   const currentMember = party[STATE.turn];
@@ -1471,7 +1554,8 @@ function battleScreen(){
   html += `<div class="eyebrow" style="margin-top:14px">COMBAT LOG</div><div class="combat-log" id="combatLog">${logLines}</div>`;
 
   html += '</div>'; // .battle-arena
-  html += '<div style="margin-top:12px"><button class="cta" data-go="Quests">‹ BACK TO QUESTS</button></div></section>';
+  const backTarget = boss.isRegular || boss.isFrontierBoss ? 'Frontier' : 'Quests';
+  html += `<div style="margin-top:12px"><button class="cta" data-go="${backTarget}">‹ BACK TO ${backTarget.toUpperCase()}</button></div></section>`;
   maybeAutoActCompanion();
   return html;
 }
@@ -1517,10 +1601,10 @@ function maybeAutoActCompanion(){
   }
   if(cur.id==='san'){
     if(!STATE.autoBattleMode) return;
-    const boss = bossFor(currentBossId());
+    const boss = activeEncounter();
     if(!boss) return;
-    if(STATE.completed < boss.id-1) return;
-    if(bossHpFor(boss.id) <= 0) return;
+    if(boss.isStoryBoss && STATE.completed < boss.id-1) return;
+    if(activeEncounterHp(boss) <= 0) return;
     autoActTimer = setTimeout(()=>{
       autoActTimer = null;
       battleAction(chooseSanAutoAction());
@@ -1529,10 +1613,10 @@ function maybeAutoActCompanion(){
   }
   const mode = STATE.companionMode[cur.id] || 'assisted';
   if(mode !== 'assisted') return;
-  const boss = bossFor(currentBossId());
+  const boss = activeEncounter();
   if(!boss) return;
-  if(STATE.completed < boss.id-1) return;
-  const hp = bossHpFor(boss.id);
+  if(boss.isStoryBoss && STATE.completed < boss.id-1) return;
+  const hp = activeEncounterHp(boss);
   if(hp<=0) return;
   autoActTimer = setTimeout(()=>{
     autoActTimer = null;
@@ -1545,12 +1629,11 @@ function safeImg(src, alt){
 }
 function selectTurn(i){STATE.turn=i;go('Battle');const p=getActiveParty()[i];if(p)toast(`${p.name}'s turn`)}
 function battleAction(a){
-  const bossId = currentBossId();
-  const boss = bossFor(bossId);
+  const boss = activeEncounter();
   if(!boss) return;
-  if(STATE.completed < boss.id-1) return toast(`Complete previous chapters before this encounter`);
+  if(boss.isStoryBoss && STATE.completed < boss.id-1) return toast(`Complete previous chapters before this encounter`);
   ensureFreshBattleState();
-  let hp = bossHpFor(boss.id);
+  let hp = activeEncounterHp(boss);
   if(hp<=0) return;
   STATE.battleStarted=true;
   const party = getActiveParty();
@@ -1564,7 +1647,7 @@ function battleAction(a){
   function spendMp(amount){ STATE.partyMp[actor.id] = Math.max(0, curMp-amount); }
   function dealDamage(dmg, verb){
     hp = Math.max(0, hp-dmg);
-    setBossHp(boss.id, hp);
+    setActiveEncounterHp(boss, hp);
     logCombat(`${esc(actor.name)} ${verb} for ${dmg} damage.`);
   }
 
@@ -1649,7 +1732,7 @@ function battleAction(a){
         if(st.dmg){
           const bonusDmg = st.dmg * DICE_SCALE;
           hp = Math.max(0, hp - bonusDmg);
-          setBossHp(boss.id, hp);
+          setActiveEncounterHp(boss, hp);
           logCombat(`${esc(boss.name)} is afflicted with ${st.type} for an extra ${bonusDmg} damage.`);
         } else {
           logCombat(`${esc(boss.name)} is ${st.type==='shock'?'stunned':st.type} by the spell.`);
@@ -1691,8 +1774,30 @@ function battleAction(a){
   save();
 
   if(hp===0){
-    logCombat(`<span style="color:#d5a1f4">${esc(boss.name)} defeated. Chapter ${boss.id} complete.</span>`);
-    if(STATE.completed < boss.id){
+    if(boss.isRegular){
+      logCombat(`<span style="color:#d5a1f4">${esc(boss.name)} defeated.</span>`);
+      addXp(boss.xpReward);
+      const goldAdded = addGold(boss.goldReward);
+      checkBountyProgress('frontier_kill', boss.monsterId, 1);
+      endNonStoryEncounter();
+      save();
+      toast(`${boss.name} defeated · +${boss.xpReward} XP · +${goldAdded}g`);
+      setTimeout(()=>go('Frontier'), 600);
+    } else if(boss.isFrontierBoss){
+      logCombat(`<span style="color:#d5a1f4">${esc(boss.name)} defeated again.</span>`);
+      const c = chapterData.find(ch=>ch.id===boss.id);
+      const xpAdded = addXp(bossReward(c));
+      const goldAdded = addGold(goldReward(c));
+      STATE.frontierCurrentBoss = null;
+      STATE.frontierBossCooldownUntil = Date.now() + (5+Math.random()*10)*60000;
+      checkBountyProgress('frontier_boss', boss.name, 1);
+      endNonStoryEncounter();
+      save();
+      toast(`${boss.name} defeated again · +${xpAdded} XP · +${goldAdded}g`);
+      setTimeout(()=>go('Frontier'), 600);
+    } else if(STATE.completed < boss.id){
+      logCombat(`<span style="color:#d5a1f4">${esc(boss.name)} defeated. Chapter ${boss.id} complete.</span>`);
+      if(BOSS_TAUNTS[boss.id]) logCombat(`<div style="margin-top:6px;color:#c9b8d8">${esc(BOSS_TAUNTS[boss.id].defeatLine)}</div>`);
       const c = chapterData.find(c=>c.id===boss.id);
       const gold = goldReward(c);
       addXp(bossReward(c));
@@ -1708,6 +1813,7 @@ function battleAction(a){
       // click through manually if the next chapter is also a boss.
       setTimeout(()=>go('Journal'), 600);
     } else {
+      logCombat(`<span style="color:#d5a1f4">${esc(boss.name)} defeated. Chapter ${boss.id} complete.</span>`);
       toast(`${boss.name} defeated!`);
       go('Battle');
     }
