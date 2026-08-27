@@ -1,4 +1,36 @@
 <head>
+<script>
+// SELF-HEAL — sw.js is just another file, exposed to the same CDN/browser
+// caching problem that caused every issue before it. Rather than trust the
+// browser to notice sw.js changed, this actively checks: if the BUILD_ID
+// baked into THIS page doesn't match what was seen last time, that means a
+// genuinely new index.html made it through — so proactively nuke any old
+// service worker + all caches and do one clean reload, instead of hoping
+// the browser's own update-detection catches it.
+var BUILD_ID = '2026-08-27.7';
+(function selfHeal(){
+  try {
+    var lastSeen = localStorage.getItem('daybreak_build_seen');
+    if(lastSeen !== BUILD_ID){
+      localStorage.setItem('daybreak_build_seen', BUILD_ID);
+      var cleanup = [];
+      if('serviceWorker' in navigator){
+        cleanup.push(navigator.serviceWorker.getRegistrations().then(function(regs){
+          return Promise.all(regs.map(function(r){ return r.unregister(); }));
+        }));
+      }
+      if('caches' in window){
+        cleanup.push(caches.keys().then(function(names){
+          return Promise.all(names.map(function(n){ return caches.delete(n); }));
+        }));
+      }
+      if(lastSeen !== null){ // skip the reload on a genuine first-ever visit — nothing stale to heal from yet
+        Promise.all(cleanup).then(function(){ location.reload(); });
+      }
+    }
+  } catch(e) {}
+})();
+</script>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -763,15 +795,15 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:lin
 <div style="padding:40px;text-align:center;color:#8f899f;font-family:Cinzel">Loading the journey…</div>
 </main>
 </div>
-<script src="chapters-data.js?v=2026-08-27.6"></script>
-<script src="app.js?v=2026-08-27.6"></script>
+<script src="chapters-data.js?v=2026-08-27.7"></script>
+<script src="app.js?v=2026-08-27.7"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
+    navigator.serviceWorker.register('sw.js').then((reg)=>{ reg.update(); }).catch(()=>{});
   });
 }
 </script>
-<div id="buildBadge" style="position:fixed;bottom:8px;right:8px;z-index:9999;background:rgba(8,10,18,.92);border:1px solid #3a3352;border-radius:6px;padding:4px 9px;color:#8f7aa8;font-size:10px;font-family:Cinzel,serif;letter-spacing:.04em;pointer-events:none">BUILD 2026-08-27.6</div>
+<div id="buildBadge" style="position:fixed;bottom:8px;right:8px;z-index:9999;background:rgba(8,10,18,.92);border:1px solid #3a3352;border-radius:6px;padding:4px 9px;color:#8f7aa8;font-size:10px;font-family:Cinzel,serif;letter-spacing:.04em;pointer-events:none">BUILD 2026-08-27.7</div>
 </body>
 </html>
