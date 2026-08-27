@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Ch.162-163: Arc D \u2014 labor, the Hall rallying, and the birth itself)';
+const APP_VERSION = '2026-08-17 (Ch.168-169: Arc G \u2014 Kai points the way, the party returns to the drowned world, and it does not attack)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -265,7 +265,13 @@ const G = {
     { members: ['Senedra', 'Soel'], name: 'Scout & Familiar', desc: 'Keen senses. +25% crit chance, find secret loot.', bonus: { critPct: 0.25, secretLoot: true }, icon: '🏹🐱' },
     { members: ['Zaki', 'Joel'], name: 'Warrior Wall', desc: 'Two shields. +20% DEF, damage reduction.', bonus: { defPct: 0.20, dmgRed: 0.10 }, icon: '🛡️⚔️' },
     { members: ['Soel', 'San'], name: 'Familiar Bond', desc: 'Soul-linked. +5% all stats.', bonus: { allStatsPct: 0.05 }, icon: '🐱💜' },
-    { members: ['Eliz', 'San'], name: "Healer's Grace", desc: "San's aura soothes. +20% healing potency.", bonus: { healPct: 0.20 }, icon: '💚💜' }
+    { members: ['Eliz', 'San'], name: "Healer's Grace", desc: "San's aura soothes. +20% healing potency.", bonus: { healPct: 0.20 }, icon: '💚💜' },
+    // Optional bonus if both happen to be active together, not a requirement — they
+    // were previously a forced linked pair (selecting one auto-selected the other),
+    // which didn't match established comic canon: Brada isn't shown accompanying
+    // Mimi in her own chapters, so the party screen shouldn't assume they're always
+    // a package deal either.
+    { members: ['Mimi', 'Brada Shah'], name: 'Steady & Sight', desc: 'Read each other without needing to look. +12% ATK, +10% Crit chance.', bonus: { atkPct: 0.12, critPct: 0.10 }, icon: '🎯🔮' }
   ],
 
   affinityUnlocks: {
@@ -5542,6 +5548,134 @@ storyJournal: {
           { speaker: 'Narrator', text: 'That part comes later. Tonight is just this \u2014 San, and Joel, and a baby, and a Hall full of people who love them all already, quietly making room.' },
         ]
       }
+,{
+        id: 'journal_164',
+        title: 'Something in the Night',
+        chapter: 164,
+        unlockType: 'level',
+        unlockAt: 617,
+        icon: '🌌',
+        summary: 'San wakes twice in the night for reasons she cannot quite name. The second time, Soel is already there ahead of her, watching the crib like he has been waiting for something.',
+        scenes: [
+          { speaker: 'Narrator', text: 'You drift in and out the way new parents do, half-sleep tuned entirely to the small sounds from the crib. The first time you stir it is nothing \u2014 a shift, a soft settling breath, the baby simply being a baby.' },
+          { speaker: 'Narrator', text: 'The second time is different, though you could not immediately say how. The room feels warmer than it should, in a way that has nothing to do with the fire. The air itself seems to be holding very still.' },
+          { speaker: 'San', text: 'You sit up, careful not to wake Joel, and find Soel already there \u2014 not curled up asleep the way he usually is by now, but sitting upright at the edge of the crib, perfectly alert, watching.' },
+          { speaker: 'San', text: '"Soel?" You keep your voice to a whisper. He does not look at you. His attention stays entirely on the baby, ears forward, tail still, in the exact posture he takes when something is happening that he alone understands.' },
+          { speaker: 'Narrator', text: 'You look into the crib yourself and cannot immediately say what has changed, only that something has \u2014 the baby\u2019s breathing slower and deeper than it was hours ago, his small hands loosely curled in a way that looks, somehow, less like sleep and more like growth.' },
+          { speaker: 'Joel', text: 'Joel wakes beside you, some instinct catching up to what you are already feeling. "What is it?"' },
+          { speaker: 'San', text: '"I do not know," you admit, and find that it is true, and find that you are not frightened yet, only watchful, the way you get before a storm you cannot see the shape of.' },
+          { speaker: 'Narrator', text: 'Soel does not move from his post at the crib for the rest of the night. Neither, in the end, do either of you \u2014 the three of you keeping a strange, quiet vigil together over something none of you can name, until exhaustion finally pulls you under sometime near dawn.' },
+        ]
+      }
+,{
+        id: 'journal_165',
+        title: 'By Morning',
+        chapter: 165,
+        unlockType: 'level',
+        unlockAt: 618,
+        icon: '✨',
+        summary: 'They wake to a toddler where a newborn slept the night before. The fear lasts exactly as long as it takes Jovie to confirm he is perfectly, impossibly healthy \u2014 and Soel already seems to have known.',
+        scenes: [
+          { speaker: 'Narrator', text: 'San wakes first, and for one full, suspended second does not understand what she is looking at. The crib is too small. There is a child in it \u2014 not a newborn, unmistakably not a newborn, sitting up on his own and looking back at her with eyes she would know anywhere.' },
+          { speaker: 'San', text: '"Joel." Your voice comes out wrong, too thin, and he is awake instantly, following your stare into the crib, and goes very, very still.' },
+          { speaker: 'Joel', text: '"That is not \u2014" Joel starts, and cannot finish it, because there is no sentence built to hold what he is currently looking at.' },
+          { speaker: 'Narrator', text: 'The child \u2014 unmistakably the same child, the same eyes, some small unplaceable resemblance to them both already visible in his face \u2014 makes a small, curious sound and reaches one hand toward San, entirely unbothered by whatever has happened to him overnight.' },
+          { speaker: 'Narrator', text: 'Soel is already curled against the crib\u2019s edge, calm in a way that reads, in hindsight, like he expected exactly this.' },
+          { speaker: 'San', text: 'You do not remember calling for Jovie. You remember her arriving fast enough that she must have already been moving before anyone summoned her, kit in hand, expression carefully, professionally unreadable.' },
+          { speaker: 'Jovie', text: 'She checks him over with total focus, murmuring findings to herself as she goes \u2014 heartbeat, breath, reflexes, the things she would check on any child, and then several things she is fairly certain she has never had reason to check on any child before.' },
+          { speaker: 'Jovie', text: '"He is healthy," Jovie says, finally, straightening up, and something in her own voice suggests she does not fully believe the word even as she says it. "Genuinely healthy. Whatever happened to him \u2014 it did not hurt him. I do not understand it. But it did not hurt him."' },
+          { speaker: 'Narrator', text: 'The fear does not vanish all at once. It loosens, slowly, replaced by something more complicated \u2014 relief, and bewilderment, and underneath both of those, already, the specific fierce love that does not actually care how a child arrived at being loved, only that he is here.' },
+          { speaker: 'Joel', text: '"He is still ours," Joel says, quiet, mostly to himself, like he needs to say it out loud to fully believe it. "Whatever this is. He is still ours."' },
+          { speaker: 'San', text: '"He is," you agree, and hold your son \u2014 toddler-sized now, entirely unbothered, patting your face with one small curious hand \u2014 and do not let go of him for a long time.' },
+          { speaker: 'Narrator', text: 'Nobody in the Hall has an explanation that morning. Nobody will, for a while yet. But Soel stays close to him for the rest of the day, unhurried and entirely certain of himself, the way he gets when he already knows something everyone else is still working out.' },
+        ]
+      }
+,{
+        id: 'journal_166',
+        title: 'A Name, at Last',
+        chapter: 166,
+        unlockType: 'level',
+        unlockAt: 625,
+        icon: '🌊',
+        summary: 'They finally settle on a name. And San notices, quietly, that her son watches things she cannot see.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It takes longer than either of you expected to actually settle on something \u2014 not from lack of trying, just from how much heavier every option feels once you say it out loud and picture it belonging to an actual person.' },
+          { speaker: 'Joel', text: '"What about something tied to the water?" Joel suggests, one evening, watching their son doze against San\u2019s shoulder. "Given where this all actually started."' },
+          { speaker: 'San', text: '"Kai," you say, testing the shape of it, and something about it settles immediately, the way a name is supposed to settle and so rarely actually does. "Kai."' },
+          { speaker: 'Joel', text: 'Joel tries it too, quiet, like he is checking it against something. "Kai," he agrees. "That is him. That is actually him."' },
+          { speaker: 'Narrator', text: 'It is decided that easily, in the end \u2014 no ceremony, no long deliberation, just two people who already knew and only needed to hear it said once to be certain.' },
+          { speaker: 'Narrator', text: 'A few days later, San notices something small. Kai is sitting on the floor of the Infirmary, perfectly content, watching a spot on the wall that is, as far as San can tell, entirely empty.' },
+          { speaker: 'San', text: '"What is it, sweetheart?" you ask, following his gaze and finding nothing \u2014 no draft, no shadow, nothing that should hold a toddler\u2019s attention this completely.' },
+          { speaker: 'Narrator', text: 'Kai does not answer, obviously \u2014 he is barely past a year old, whatever his body currently looks like. But he laughs, once, delighted, at something only he seems able to perceive, and reaches one hand toward the empty air like he is greeting it.' },
+          { speaker: 'Narrator', text: 'Soel, curled nearby, opens one eye, watches this happen without any particular alarm, and goes back to sleep. Whatever it is, it does not concern him. San files the moment away without quite knowing what to do with it yet.' },
+        ]
+      }
+,{
+        id: 'journal_167',
+        title: 'The Child Who Listens',
+        chapter: 167,
+        unlockType: 'level',
+        unlockAt: 635,
+        icon: '🕊️',
+        summary: 'It stops being a private, easily-explained thing the day the whole Hall watches Kai calm something none of the rest of them could even see.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It happens in the middle of an ordinary afternoon, which somehow makes it stranger than if it had happened anywhere dramatic. A courier\u2019s pack spirit \u2014 small, easily startled, the kind of minor spiritual companion half the Hall has grown used to without ever really noticing \u2014 bolts in through an open door, clearly terrified of something outside, and will not settle for anyone.' },
+          { speaker: 'Narrator', text: 'It knocks over a stack of supplies trying to get away from hands that only want to help it. Half the Hall is trying, gently, and failing, and the poor thing only grows more frantic for the attention.' },
+          { speaker: 'Narrator', text: 'Kai, watching from San\u2019s arms, makes a small, insistent sound and reaches toward it \u2014 not grabbing, just reaching, the way he reaches toward things he has decided are safe.' },
+          { speaker: 'San', text: '"Kai, no, sweetheart, it is scared \u2014" you start, and then stop, because the spirit has already gone still, watching him back with the same wary attention it had been giving everyone else, except somehow different.' },
+          { speaker: 'Narrator', text: 'San sets him down, carefully, and the small creature actually approaches him \u2014 not fully calm, but calmer, drawn toward him in a way it was not drawn toward anyone else in the room.' },
+          { speaker: 'Renn', text: '"That is not typical," Renn says, quiet, watching with the specific focused stillness he usually reserves for very old books. "Spirit creatures do not generally trust a room full of strangers. They especially do not trust one this young."' },
+          { speaker: 'Narrator', text: 'By the time the spirit finally settles fully, curled small and unafraid against Kai\u2019s side, most of the Hall has gone quiet, watching.' },
+          { speaker: 'Sister Wren', text: '"He is not doing anything I recognize," Wren admits, careful about the words. "Not a blessing. Not a working. He is just \u2014 there. And it trusts him for it."' },
+          { speaker: 'Joel', text: 'Joel crouches beside his son, watching the small spirit breathe easy against him, something unreadable moving behind his eyes. "Kai," he says, quiet, almost to himself. "What are you?"' },
+          { speaker: 'Narrator', text: 'Kai, entirely unbothered by the question, pats the spirit creature once, gently, the way he has learned to pat Soel, and goes back to watching the empty corners of the room like they have always had something worth watching in them.' },
+          { speaker: 'Narrator', text: 'Nobody has an answer that day either. But the Hall starts watching him a little differently after that \u2014 not with fear, not yet with understanding, just with the dawning sense that whatever Kai is, he is not simply a toddler who happens to be theirs.' },
+        ]
+      }
+,{
+        id: 'journal_168',
+        title: 'He Knows the Way',
+        chapter: 168,
+        unlockType: 'level',
+        unlockAt: 645,
+        icon: '🧭',
+        summary: 'Years pass, and Kai stays small while everything else about him keeps growing. Then one week he will not stop saying the same three words, and San starts listening properly.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Years settle over the Hall the way years do \u2014 quietly, in increments too small to notice until you look back and realize how much has actually changed. Kai has not grown an inch since that first strange morning, but everything else about him has: his words, his questions, the particular sharpness in the way he watches a room now.' },
+          { speaker: 'Narrator', text: 'It starts, this time, with a phrase he will not put down. He says it at breakfast. He says it again that evening, tugging insistently at San\u2019s sleeve, pointing toward nothing San can see.' },
+          { speaker: 'Kai', text: '"Still hungry," Kai says, small and certain, pointing the same direction he has been pointing for three days now. "It is still hungry, Mama."' },
+          { speaker: 'San', text: '"What is, sweetheart?" you ask, crouching to his level, keeping your voice gentle even as something in your chest goes very still.' },
+          { speaker: 'Kai', text: 'He does not have better words for it than that yet. He just repeats it, patient with you the way he is patient with everyone who does not understand him right away. "Still hungry. It wants to stop. It does not know how."' },
+          { speaker: 'Narrator', text: 'You bring it to Joel that night, and he goes quiet the way he does when something genuinely unsettles him, turning the words over.' },
+          { speaker: 'Joel', text: '"That does not sound like something a child invents," Joel says, finally. "That sounds like something he is hearing."' },
+          { speaker: 'Narrator', text: 'You bring it to Renn next, half-expecting him to explain it away. He does not. He goes very still instead, the specific stillness of a scholar recognizing something he has read about only in fragments.' },
+          { speaker: 'Renn', text: '"There is a world," Renn says, slowly, "that answers to exactly that description. Something that took, and took, and never learned how to stop \u2014 and never asked to be that way, either." He looks at Kai for a long moment. "I do not think your son is imagining this."' },
+          { speaker: 'Narrator', text: 'That night, San and Joel sit together long after Kai has fallen asleep, working through the same quiet, enormous question neither of them wants to say first.' },
+          { speaker: 'Joel', text: '"If he is telling us something real," Joel says, eventually, "then I think we have to actually go and listen to it properly. Not send him alone into anything. Just \u2014 go, with him, and see."' },
+          { speaker: 'San', text: '"Together," you agree. "Whatever it turns out to be."' },
+        ]
+      }
+,{
+        id: 'journal_169',
+        title: 'Back Into the Drowned World',
+        chapter: 169,
+        unlockType: 'level',
+        unlockAt: 650,
+        icon: '🌊',
+        summary: 'The party returns to the world with the Taotie \u2014 not by accident this time, and not alone. Something there already seems to know Kai is coming.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The water looks the same as it did the first time \u2014 the same drowned rooflines beneath a tide that never fully settled, the same heavy, waiting quiet. It does not feel the same. Nothing about walking back in with a reason feels the way walking in blind once did.' },
+          { speaker: 'Narrator', text: 'Kai rides against Joel\u2019s chest, wrapped secure, watching the flooded border with none of the wariness anyone else in the party is carrying. If anything, he looks almost relieved, like he is finally somewhere that makes sense to him.' },
+          { speaker: 'Kai', text: '"Hello," Kai says, to the water, to no one visible at all, entirely unprompted. "We came."' },
+          { speaker: 'Narrator', text: 'For a long moment nothing answers. Then, at the water\u2019s edge, something shifts \u2014 not threatening, not the way the guardians here usually announce themselves. A shape beneath the surface simply pauses, and turns, and seems, unmistakably, to be looking back at him.' },
+          { speaker: 'Narrator', text: 'It is the first time anything in this world has reacted to the party without hostility. San feels Joel go tense beside her, one hand instinctively finding his weapon, and then slowly, uncertainly, easing off it again as the shape in the water simply watches, unmoving, making no move to attack at all.' },
+          { speaker: 'San', text: '"It knows him," you say, quiet, mostly to yourself, though Joel hears it too. "Joel \u2014 it actually knows him."' },
+          { speaker: 'Narrator', text: 'Kai reaches one small hand toward the water, entirely unafraid, and says something too quiet for anyone else to catch. Whatever it is, the shape beneath the surface goes still in a different way \u2014 listening, rather than watching.' },
+          { speaker: 'Joel', text: '"We are not here to fight it," Joel says, carefully, to the water, to whatever is down there listening through his son. "We came because he asked us to."' },
+          { speaker: 'Narrator', text: 'The shape does not answer in any way the party can understand. But it does not vanish, either, and it does not attack \u2014 it simply stays, watching Kai with the patient, ancient attention of something that has been waiting a very long time for someone who could actually hear it.' },
+          { speaker: 'Narrator', text: 'Nobody in the party fully understands what just happened. But for the first time since any of them set foot in this drowned world, it does not feel like a place that only knows how to take.' },
+        ]
+      }
     ]
   },
 
@@ -9727,8 +9861,10 @@ function submitDiscipleResponse(optionIndex) {
 }
 
 // Toggles a swappable-pool member in or out of the active party, respecting the slot
-// cap and keeping linked pairs (Mimi/Brada) together — selecting one always selects
-// or deselects both, since they were never meant to be split apart.
+// cap and keeping any remaining linked pairs (currently just Senedra/Zaki) together —
+// selecting one always selects or deselects both. Mimi/Brada are no longer linked this
+// way; getLinkedPartyPartner() simply returns null for them now, so they fall through
+// to normal independent single-member selection below.
 function toggleActivePartyMember(name) {
   const p = G.party.find(x => x.n === name);
   if (!p || !SWAPPABLE_PARTY_POOL.includes(name)) return;
@@ -19660,11 +19796,13 @@ function triggerLevelUpAnimation(newLevel) {
 // San, Joel, and Aisyah are the fixed trio — never appear in the swappable pool, can
 // never be benched. Soel is a familiar and doesn't take a slot at all. Everyone else
 // competes for ACTIVE_PARTY_SLOTS spots, unlocked either by level (the original four)
-// or by Guild recruitment (the six added later). Mimi and Brada are a linked pair —
-// selecting one selects both, together consuming 2 of the 4 slots, never split apart.
+// or by Guild recruitment (the six added later). Mimi and Brada were previously a
+// forced linked pair here — removed to match established comic canon, where Brada
+// isn't shown accompanying Mimi in her own chapters. They can now be selected
+// independently; partySynergies rewards fielding them together instead of requiring it.
 const ACTIVE_PARTY_SLOTS = 4;
 const SWAPPABLE_PARTY_POOL = ['Mezstorm', 'Eliz', 'Senedra', 'Zaki', 'KW Liang', 'Mimi', 'Brada Shah', 'Dr. AA', 'Sister Wren', 'Ser Aldric', 'Iris', 'Renn Evergreen'];
-const LINKED_PARTY_PAIRS = [['Mimi', 'Brada Shah'], ['Senedra', 'Zaki']];
+const LINKED_PARTY_PAIRS = [['Senedra', 'Zaki']];
 // Maps a swappable party member's name to the Guild Member id that gates their
 // availability, for the six who are recruit-gated rather than level-gated.
 const PARTY_MEMBER_GUILD_GATE = {
@@ -19698,7 +19836,6 @@ function unlockSwappablePartyMember(p) {
   }
   if (ORIGINAL_FOUR_GUILD_ID[p.n]) recruitGuildMember(ORIGINAL_FOUR_GUILD_ID[p.n]);
 }
-
 function getLinkedPartyPartner(name) {
   for (const pair of LINKED_PARTY_PAIRS) {
     if (pair[0] === name) return pair[1];
@@ -20824,7 +20961,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.135';
+const BUILD_ID = '2026-08-17.139';
 // =========================
 
 
