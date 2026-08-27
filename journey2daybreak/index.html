@@ -1,4 +1,5 @@
 <head>
+<link rel="manifest" href="manifest.json">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -760,8 +761,15 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:lin
 <div style="padding:40px;text-align:center;color:#8f899f;font-family:Cinzel">Loading the journey…</div>
 </main>
 </div>
-<script src="chapters-data.js?v=2026-08-27.2"></script>
-<script src="app.js?v=2026-08-27.2"></script>
-<div id="buildBadge" style="position:fixed;bottom:8px;right:8px;z-index:9999;background:rgba(8,10,18,.92);border:1px solid #3a3352;border-radius:6px;padding:4px 9px;color:#8f7aa8;font-size:10px;font-family:Cinzel,serif;letter-spacing:.04em;pointer-events:none">BUILD 2026-08-27.2</div>
+<script src="chapters-data.js?v=2026-08-27.3"></script>
+<script src="app.js?v=2026-08-27.3"></script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+<div id="buildBadge" style="position:fixed;bottom:8px;right:8px;z-index:9999;background:rgba(8,10,18,.92);border:1px solid #3a3352;border-radius:6px;padding:4px 9px;color:#8f7aa8;font-size:10px;font-family:Cinzel,serif;letter-spacing:.04em;pointer-events:none">BUILD 2026-08-27.3</div>
 </body>
 </html>

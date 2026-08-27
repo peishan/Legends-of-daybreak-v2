@@ -1,0 +1,10 @@
+{
+  "name": "Legends of Daybreak — Journey to Daybreak",
+  "short_name": "Daybreak",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#05070d",
+  "theme_color": "#05070d",
+  "orientation": "portrait",
+  "icons": []
+}
