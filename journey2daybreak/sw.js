@@ -10,7 +10,7 @@
 // behaving correctly anywhere in the chain.
 //
 // Bump CACHE_VERSION whenever this file changes so old caches get cleared.
-const CACHE_VERSION = 'daybreak-v1';
+const CACHE_VERSION = 'daybreak-v2';
 const CORE_FILES = ['./', './index.html', './app.js', './chapters-data.js', './reader.html'];
 
 self.addEventListener('install', (event) => {
