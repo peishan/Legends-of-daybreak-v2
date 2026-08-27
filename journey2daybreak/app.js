@@ -239,10 +239,34 @@ function importSave(event){
   };
   reader.readAsText(file);
 }
-loadGame();
-applyRegen();
-applyIdleGains();
-save();
+// ---------------------------------------------------------------------------
+// CRASH-PROOF STARTUP — previously go('Dashboard') ran completely unguarded
+// at the bottom of the script. If ANY save data shape from an older build
+// caused a render to throw (very plausible after this many STATE fields
+// were added across sessions), the whole script would halt right there,
+// leaving "Loading the journey..." stuck forever — and it would persist
+// across reloads (same bad save every time) while incognito/clearing cache
+// would sidestep it (no old save to trip over). That matches the symptoms
+// better than a pure caching issue would. This wraps startup so a bad save
+// degrades gracefully instead of hard-crashing the whole app.
+// ---------------------------------------------------------------------------
+try {
+  loadGame();
+  applyRegen();
+  applyIdleGains();
+  save();
+} catch(e) {
+  console.warn('Startup failed with current save, attempting recovery slot:', e);
+  try {
+    const recoveryRaw = localStorage.getItem(RECOVERY_KEY);
+    if(recoveryRaw){
+      const recovery = JSON.parse(recoveryRaw);
+      if(recovery && recovery.state) Object.assign(STATE, recovery.state);
+    }
+  } catch(e2) {
+    console.warn('Recovery slot also failed, starting fresh:', e2);
+  }
+}
 
 // ---------------------------------------------------------------------------
 // BOSSES — Bone Tyrant has dedicated encounter art; the rest (extracted from
@@ -422,6 +446,9 @@ function applyRegen(){
   const minutesAway = Math.min(24*60, Math.max(0, (now - (STATE.lastRegenAt||now)) / 60000));
   STATE.lastRegenAt = now;
   if(minutesAway <= 0) return;
+  if(!STATE.partyStatus) STATE.partyStatus = {};
+  if(!STATE.partyHp) STATE.partyHp = {};
+  if(!STATE.partyMp) STATE.partyMp = {};
   const rate = 0.015 * minutesAway; // fraction of max HP/MP restored
   getActiveParty().forEach(m=>{
     if(STATE.partyStatus[m.id]==='diseased') return; // no natural recovery while diseased
@@ -881,7 +908,7 @@ const TRINKET_BONUS = {
   '☀️':{dmgPct:0.10, defPct:0.10, label:'+10% damage, -10% damage taken'}, '🌗':{dmgPct:0.08, label:'+8% damage'}
 };
 function trinketBonus(memberId){
-  const trophy = STATE.equippedTrophies[memberId];
+  const trophy = (STATE.equippedTrophies || {})[memberId];
   if(!trophy) return null;
   return TRINKET_BONUS[trophy.icon] || null;
 }
@@ -1868,9 +1895,25 @@ function battleAction(a){
 }
 
 Array.from(document.querySelectorAll('#nav button')).forEach(b=>b.addEventListener('click',()=>go(b.dataset.name)));
-go('Dashboard');
+try {
+  go('Dashboard');
+} catch(e) {
+  console.warn('Dashboard render failed, resetting to a clean save and retrying:', e);
+  Object.assign(STATE, {
+    completed:0, xp:0, current:0, battleStarted:false, turn:0, bossHp:{}, partyHp:{}, partyMp:{},
+    inventory:[], companionMode:{}, combatLog:[], combatLogBossId:null, gold:100, lastRegenAt:Date.now(),
+    frontierBossCooldownUntil:0, frontierCurrentBoss:null, bounties:[], bountyDay:null, chaptersReadToday:0,
+    chaptersReadDay:null, readChapters:[], consumables:{}, battleItemMenuOpen:false, autoBattleMode:false,
+    musicMuted:false, shieldTurns:0, shieldPct:0, hasteTurns:0, hastePct:0, timeStopTurns:0, markedBoss:false,
+    nervousCourageActive:false, discoveredAbilities:[], growthUsedThisBattle:{}, guildRep:0, guildRepBalance:0,
+    guildContracts:[], guildContractWeek:null, visionMachineLastDay:null, joelLetterCount:0, lastVision:null,
+    currentEncounter:null, regularHp:{}, equipped:{}, equippedTrophies:{}, selectedZone:null, journalPage:null
+  });
+  save();
+  go('Dashboard');
+}
 
 // Auto-save every 30s. Piggybacks on the same backup-then-verify save() used
 // everywhere else, so the recovery slot stays fresh too — no separate logic.
-setInterval(()=>{ applyRegen(); save(); }, 30000);
+setInterval(()=>{ try{ applyRegen(); save(); }catch(e){ console.warn('Periodic regen/save tick failed:', e); } }, 30000);
 window.addEventListener('beforeunload', ()=>{ save(); });
