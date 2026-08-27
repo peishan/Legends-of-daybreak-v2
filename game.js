@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (New: Elixir Quickbar on the Today screen \u2014 one-tap reapply between battles, no more digging through Inventory)';
+const APP_VERSION = '2026-08-17 (URGENT FIX: 117 enemy names across the whole game spawned dead (0 HP) \u2014 full registry audit, all now fixed)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -7110,6 +7110,137 @@ function generateEnemyStats(zoneLevel, templateKey, elem) {
 
 // Enemy type registry for dynamic lookup
 const ENEMY_REGISTRY = {
+  // The following were referenced in zone en: arrays but never actually registered
+  // here or in the Lv1-20 hardcoded list below — meaning they spawned with hp:0/mhp:0
+  // (dead on arrival) in combat. Found via a full audit cross-referencing every zone's
+  // enemy list against both stat-resolution paths. zoneLv/elem matched to whichever
+  // zone each name first appears in; template cycled for combat variety.
+  // These last three were missed by the first audit pass specifically because their
+  // zone ("Every Door It Ever Drew") uses double-quote delimiters in its name field
+  // rather than single quotes like every other zone — a regex gap, not a data gap.
+  'Unopened Door': { zoneLv: 340, template: 'balanced', elem: 'none' },
+  'Something Behind It': { zoneLv: 340, template: 'striker', elem: 'none' },
+  'A Door That Recognizes You': { zoneLv: 340, template: 'tank', elem: 'none' },
+  // Same mixed-quote-delimiter gap as above — this zone's en: array mixes single and
+  // double quotes within the same array depending on whether each name contains an
+  // apostrophe, which broke straightforward regex scanning entirely.
+  'The Last Draft': { zoneLv: 360, template: 'balanced', elem: 'none' },
+  'What the Plan Was Actually For': { zoneLv: 360, template: 'elite', elem: 'none' },
+  'The Architect\u2019s Final Intention': { zoneLv: 360, template: 'tank', elem: 'none' },
+  'A Barn Cat, Mildly Helpful': { zoneLv: 530, template: 'balanced', elem: 'none' }, // An Ordinary Afternoon of Fixing Things
+  'A Bird That Does Not Fly Off': { zoneLv: 555, template: 'striker', elem: 'none' }, // Where the Water Runs Clear
+  'A Border Enforcer': { zoneLv: 600, template: 'tank', elem: 'none' }, // Two Peoples, One Half-Drowned Border
+  'A Cartography Ward': { zoneLv: 440, template: 'brute', elem: 'none' }, // A Map With Nothing Missing
+  'A Cat Supervising Closely': { zoneLv: 530, template: 'elite', elem: 'none' }, // An Ordinary Afternoon of Fixing Things
+  'A Cat, Entirely Uninterested': { zoneLv: 540, template: 'balanced', elem: 'none' }, // What Joel and San Never Get, Usually
+  'A Complete-Map Guardian': { zoneLv: 440, template: 'striker', elem: 'none' }, // A Map With Nothing Missing
+  'A Consumption Wraith': { zoneLv: 620, template: 'tank', elem: 'none' }, // What Actually Pulled This World Under
+  'A Contested Ground Guardian': { zoneLv: 600, template: 'brute', elem: 'none' }, // Two Peoples, One Half-Drowned Border
+  'A Cost Nobody Advertises': { zoneLv: 390, template: 'elite', elem: 'none' }, // What Patience Actually Costs
+  'A Curious Stray': { zoneLv: 510, template: 'balanced', elem: 'none' }, // The Path Only Soel Knew
+  'A Current-Shaped Sentinel': { zoneLv: 580, template: 'striker', elem: 'water' }, // What They Adapted Rather Than Lost
+  'A Debt Given Shape': { zoneLv: 620, template: 'tank', elem: 'none' }, // What Actually Pulled This World Under
+  'A Deer, Unbothered': { zoneLv: 555, template: 'brute', elem: 'none' }, // Where the Water Runs Clear
+  'A Displaced Orc Sentry': { zoneLv: 590, template: 'elite', elem: 'none' }, // The Ground the Orcs Still Miss
+  'A Door That Never Finished Closing': { zoneLv: 380, template: 'balanced', elem: 'none' }, // A Door Forced Open Wrong
+  'A Door That Waits': { zoneLv: 350, template: 'striker', elem: 'none' }, // The Door With a Familiar Shape
+  'A Drowned Watcher': { zoneLv: 560, template: 'tank', elem: 'none' }, // The Water That Remembers Why
+  'A Garden Ward': { zoneLv: 420, template: 'brute', elem: 'none' }, // The Garden That Remembers Every Path
+  'A Ground Still Being Asked': { zoneLv: 100, template: 'elite', elem: 'void' }, // The Endless Thinning
+  'A Guard Who\u2019d Rather Not Fight': { zoneLv: 370, template: 'balanced', elem: 'none' }, // Someone Else\u2019s Careful Door
+  'A Guardian Built To Last': { zoneLv: 410, template: 'striker', elem: 'none' }, // A Door That Knew It Was a Door
+  'A Guardian Given One Last Purpose': { zoneLv: 650, template: 'tank', elem: 'none' }, // The Debt Finally Come Due
+  'A Half-Understood Copy': { zoneLv: 361, template: 'brute', elem: 'none' }, // What the Index Now Draws
+  'A Hoard-Ward': { zoneLv: 630, template: 'elite', elem: 'none' }, // The Relic Nobody Should Reach For
+  'A Household Cat, Unbothered': { zoneLv: 520, template: 'balanced', elem: 'none' }, // The Place Cats Kept Anyway
+  'A Kitten, Deeply Unafraid': { zoneLv: 520, template: 'striker', elem: 'none' }, // The Place Cats Kept Anyway
+  'A Ledger Kept In Silence': { zoneLv: 390, template: 'tank', elem: 'none' }, // What Patience Actually Costs
+  'A Lesson Left Deliberately Intact': { zoneLv: 480, template: 'brute', elem: 'none' }, // What They Learned Not to Rush
+  'A Merfolk Elder\u2019s Guard': { zoneLv: 580, template: 'elite', elem: 'water' }, // What They Adapted Rather Than Lost
+  'A Page Taken Too Literally': { zoneLv: 361, template: 'balanced', elem: 'none' }, // What the Index Now Draws
+  'A Pattern Keeper': { zoneLv: 420, template: 'striker', elem: 'none' }, // The Garden That Remembers Every Path
+  'A Place That Moved': { zoneLv: 280, template: 'tank', elem: 'none' }, // Where the Map Gives Up
+  'A Post Never Formally Stood Down': { zoneLv: 460, template: 'brute', elem: 'none' }, // Whoever Kept the Roads Safe
+  'A Practice Ward': { zoneLv: 430, template: 'elite', elem: 'none' }, // Where They Practiced Leaving Gently
+  'A Price Nobody Has Paid In Years': { zoneLv: 450, template: 'balanced', elem: 'none' }, // The Toll They Chose to Pay
+  'A Reckoning, Approaching': { zoneLv: 640, template: 'striker', elem: 'none' }, // When the Old Guardians Wake in Force
+  'A Recorded Failure, Still Guarded': { zoneLv: 480, template: 'tank', elem: 'none' }, // What They Learned Not to Rush
+  'A Reef Guardian': { zoneLv: 570, template: 'brute', elem: 'water' }, // Where the Merfolk Chose to Stay
+  'A Roadwarden Remnant': { zoneLv: 460, template: 'elite', elem: 'none' }, // Whoever Kept the Roads Safe
+  'A Sleepy Guardian': { zoneLv: 540, template: 'balanced', elem: 'none' }, // What Joel and San Never Get, Usually
+  'A Steady Sentinel': { zoneLv: 410, template: 'striker', elem: 'none' }, // A Door That Knew It Was a Door
+  'A Taotie Broodguard': { zoneLv: 640, template: 'tank', elem: 'none' }, // When the Old Guardians Wake in Force
+  'A Taotie Sentinel, Watching Closely': { zoneLv: 630, template: 'brute', elem: 'none' }, // The Relic Nobody Should Reach For
+  'A Taotie-Marked Relic Guard': { zoneLv: 610, template: 'elite', elem: 'none' }, // Where the First Warning Still Stands
+  'A Threshold Given Willingly': { zoneLv: 500, template: 'balanced', elem: 'none' }, // The Door the Roadwardens Kept
+  'A Threshold Guardian, Still Active': { zoneLv: 470, template: 'striker', elem: 'none' }, // The Last Working Threshold
+  'A Tide-Worn Sentinel': { zoneLv: 560, template: 'tank', elem: 'none' }, // The Water That Remembers Why
+  'A Tidecaller\u2019s Ward': { zoneLv: 570, template: 'brute', elem: 'water' }, // Where the Merfolk Chose to Stay
+  'A Toll Keeper': { zoneLv: 450, template: 'elite', elem: 'none' }, // The Toll They Chose to Pay
+  'A Trainer\u2019s Echo': { zoneLv: 430, template: 'balanced', elem: 'none' }, // Where They Practiced Leaving Gently
+  'A Warcamp Watcher': { zoneLv: 590, template: 'striker', elem: 'none' }, // The Ground the Orcs Still Miss
+  'A Warning Given Bronze Teeth': { zoneLv: 610, template: 'tank', elem: 'none' }, // Where the First Warning Still Stands
+  'A Wary Circle Sentry': { zoneLv: 370, template: 'brute', elem: 'none' }, // Someone Else\u2019s Careful Door
+  'A Watchful Tabby': { zoneLv: 510, template: 'elite', elem: 'none' }, // The Path Only Soel Knew
+  'An Old Cat, Watching': { zoneLv: 550, template: 'balanced', elem: 'none' }, // Wherever Soel Actually Came From
+  'An Unwritten Thing': { zoneLv: 310, template: 'striker', elem: 'none' }, // What It Was Becoming
+  'Blueprint Echo': { zoneLv: 320, template: 'tank', elem: 'none' }, // A Door Never Finished
+  'Contradiction Walker': { zoneLv: 280, template: 'brute', elem: 'none' }, // Where the Map Gives Up
+  'Drafting Remnant': { zoneLv: 320, template: 'elite', elem: 'none' }, // A Door Never Finished
+  'Flickering Presence': { zoneLv: 270, template: 'balanced', elem: 'none' }, // The First Uncertainty
+  'Load-Bearing Ghost': { zoneLv: 330, template: 'striker', elem: 'none' }, // The Scaffold Behind Everything
+  'Scaffold Wraith': { zoneLv: 290, template: 'tank', elem: 'none' }, // The Half-Finished Hall
+  'Someone Else\u2019s Attempt': { zoneLv: 361, template: 'brute', elem: 'none' }, // What the Index Now Draws
+  'Something Content, Finally': { zoneLv: 550, template: 'elite', elem: 'none' }, // Wherever Soel Actually Came From
+  'Something Fully Awake Now': { zoneLv: 640, template: 'balanced', elem: 'none' }, // When the Old Guardians Wake in Force
+  'Something Guarding It Gently': { zoneLv: 350, template: 'striker', elem: 'none' }, // The Door With a Familiar Shape
+  'Something Guarding the Last Dry Ground': { zoneLv: 590, template: 'tank', elem: 'none' }, // The Ground the Orcs Still Miss
+  'Something Holding This Up': { zoneLv: 330, template: 'brute', elem: 'none' }, // The Scaffold Behind Everything
+  'Something Napping in the Rafters': { zoneLv: 520, template: 'elite', elem: 'none' }, // The Place Cats Kept Anyway
+  'Something Protecting The Honest Account': { zoneLv: 480, template: 'balanced', elem: 'none' }, // What They Learned Not to Rush
+  'Something Protecting What Works': { zoneLv: 470, template: 'striker', elem: 'none' }, // The Last Working Threshold
+  'Something Purring Nearby': { zoneLv: 540, template: 'tank', elem: 'none' }, // What Joel and San Never Get, Usually
+  'Something Small in the Reeds': { zoneLv: 555, template: 'brute', elem: 'none' }, // Where the Water Runs Clear
+  'Something Still Arriving': { zoneLv: 380, template: 'elite', elem: 'none' }, // A Door Forced Open Wrong
+  'Something Still Being Built': { zoneLv: 290, template: 'balanced', elem: 'none' }, // The Half-Finished Hall
+  'Something Still Being Paid For': { zoneLv: 390, template: 'striker', elem: 'none' }, // What Patience Actually Costs
+  'Something Still Collecting': { zoneLv: 450, template: 'tank', elem: 'none' }, // The Toll They Chose to Pay
+  'Something Still Deciding': { zoneLv: 270, template: 'brute', elem: 'none' }, // The First Uncertainty
+  'Something Still Keeping the Old Border': { zoneLv: 560, template: 'elite', elem: 'none' }, // The Water That Remembers Why
+  'Something Still On Watch': { zoneLv: 460, template: 'balanced', elem: 'none' }, // Whoever Kept the Roads Safe
+  'Something Still Running Drills': { zoneLv: 430, template: 'striker', elem: 'none' }, // Where They Practiced Leaving Gently
+  'Something Still Sketching': { zoneLv: 320, template: 'tank', elem: 'none' }, // A Door Never Finished
+  'Something Sunning Itself': { zoneLv: 510, template: 'brute', elem: 'none' }, // The Path Only Soel Knew
+  'Something Tending The Paths': { zoneLv: 420, template: 'elite', elem: 'none' }, // The Garden That Remembers Every Path
+  'Something Testing Strangers': { zoneLv: 570, template: 'balanced', elem: 'water' }, // Where the Merfolk Chose to Stay
+  'Something Testing Whoever Reaches': { zoneLv: 630, template: 'striker', elem: 'none' }, // The Relic Nobody Should Reach For
+  'Something Testing You First': { zoneLv: 370, template: 'tank', elem: 'none' }, // Someone Else\u2019s Careful Door
+  'Something Testing the Truce': { zoneLv: 600, template: 'brute', elem: 'none' }, // Two Peoples, One Half-Drowned Border
+  'Something That Judges Excess': { zoneLv: 610, template: 'elite', elem: 'none' }, // Where the First Warning Still Stands
+  'Something That Recognizes Purpose': { zoneLv: 410, template: 'balanced', elem: 'none' }, // A Door That Knew It Was a Door
+  'Something That Remembers Breathing Air': { zoneLv: 580, template: 'striker', elem: 'water' }, // What They Adapted Rather Than Lost
+  'Something That Remembers Every Debt': { zoneLv: 650, template: 'tank', elem: 'none' }, // The Debt Finally Come Due
+  'Something That Took Too Much, Once': { zoneLv: 620, template: 'brute', elem: 'none' }, // What Actually Pulled This World Under
+  'Something Unbothered by the Work': { zoneLv: 530, template: 'elite', elem: 'none' }, // An Ordinary Afternoon of Fixing Things
+  'Something Verifying The Map': { zoneLv: 440, template: 'balanced', elem: 'none' }, // A Map With Nothing Missing
+  'Something Watching Itself Decide': { zoneLv: 310, template: 'striker', elem: 'none' }, // What It Was Becoming
+  'Something Welcoming, For Once': { zoneLv: 500, template: 'tank', elem: 'none' }, // The Door the Roadwardens Kept
+  'Structural Ward': { zoneLv: 330, template: 'brute', elem: 'none' }, // The Scaffold Behind Everything
+  'The Door\u2019s Last Guardian, Standing Down': { zoneLv: 500, template: 'elite', elem: 'none' }, // The Door the Roadwardens Kept
+  'The Door\u2019s Own Ward': { zoneLv: 470, template: 'balanced', elem: 'none' }, // The Last Working Threshold
+  'The Index\u2019s Last Line': { zoneLv: 400, template: 'striker', elem: 'none' }, // The Last Page of the Index
+  'The Last Kitten of the Litter': { zoneLv: 550, template: 'tank', elem: 'none' }, // Wherever Soel Actually Came From
+  'The Reckoning\u2019s Own Vanguard': { zoneLv: 650, template: 'brute', elem: 'none' }, // The Debt Finally Come Due
+  'The Shape Before The Choice': { zoneLv: 310, template: 'elite', elem: 'none' }, // What It Was Becoming
+  'The Vault\u2019s Final Ward': { zoneLv: 400, template: 'balanced', elem: 'none' }, // The Last Page of the Index
+  'The Weight Of Almost Knowing': { zoneLv: 350, template: 'striker', elem: 'none' }, // The Door With a Familiar Shape
+  'The Wrong Direction': { zoneLv: 280, template: 'tank', elem: 'none' }, // Where the Map Gives Up
+  'Unfinished Guardian': { zoneLv: 290, template: 'brute', elem: 'none' }, // The Half-Finished Hall
+  'Unsettled Form': { zoneLv: 270, template: 'elite', elem: 'none' }, // The First Uncertainty
+  'Unspooling Current': { zoneLv: 100, template: 'balanced', elem: 'void' }, // The Endless Thinning
+  'What Rushing It Left Behind': { zoneLv: 380, template: 'striker', elem: 'none' }, // A Door Forced Open Wrong
+  'What Was Left To Guard The Warning': { zoneLv: 400, template: 'tank', elem: 'none' }, // The Last Page of the Index
+  'Whatever Keeps Arriving': { zoneLv: 100, template: 'brute', elem: 'void' }, // The Endless Thinning
   // Lv 1-10 (existing - keep hardcoded for compatibility)
   'Goblin': null, 'Wolf': null, 'Slime': null,
   'Skeleton': null, 'Zombie': null, 'Ghost': null,
@@ -7150,8 +7281,6 @@ const ENEMY_REGISTRY = {
   'Phase Walker': { template: 'balanced', elem: 'arcane', zoneLv: 22 },
   'Rift Rat': { template: 'striker', elem: 'void', zoneLv: 22 },
       // === PHASE 1: LV 23 NEW ENEMIES (Lv 22 enemies already exist) ===
-    'Ember Wraith': { template: 'brute', elem: 'fire', zoneLv: 23 },
-  'Ash Phantom': { template: 'striker', elem: 'fire', zoneLv: 23 },
   'Flame Serpent': { template: 'striker', elem: 'fire', zoneLv: 23 },
   'Magma Titan': { template: 'tank', elem: 'fire', zoneLv: 23 },
 
@@ -21002,7 +21131,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.141';
+const BUILD_ID = '2026-08-17.142';
 // =========================
 
 
