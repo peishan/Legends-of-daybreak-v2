@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Ch.170-171: Arc H \u2014 the creek and the drowned world revealed as the same water; Spirit Shaman arc closes with a beginning, not an ending)';
+const APP_VERSION = '2026-08-17 (New: Elixir Quickbar on the Today screen \u2014 one-tap reapply between battles, no more digging through Inventory)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -21002,7 +21002,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.140';
+const BUILD_ID = '2026-08-17.141';
 // =========================
 
 
@@ -24132,6 +24132,33 @@ function rToday() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">📅 Today</div>';
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Everything worth a quick look, in one place \u2014 for whenever you\'ve got three minutes and nothing else to point them at.</div>';
+
+  // Elixir Quickbar — reapplying a growth elixir between battles previously meant
+  // opening the full Inventory screen, tabbing to Potions, and scrolling past every
+  // other consumable to find the right duration. This skips all of that: one tap,
+  // routed through the same useI() the Inventory screen itself calls, so it's the
+  // exact same activation logic, just reachable directly from the Today hub.
+  const activeElixir = G.expBooster && G.expBooster.expiresAt > Date.now() ? G.expBooster : null;
+  const ownedElixirs = G.p.inv.map((it, i) => ({ it, i })).filter(x => x.it.eff === 'xp_boost' && x.it.q > 0);
+  if (activeElixir || ownedElixirs.length > 0) {
+    h += '<div class="panel" style="margin-bottom:14px;">';
+    h += '<div class="panel-title" style="margin-bottom:6px;">✨ Growth Elixirs</div>';
+    if (activeElixir) {
+      const minsLeft = Math.ceil((activeElixir.expiresAt - Date.now()) / 60000);
+      h += '<div class="btn-hint" style="margin-bottom:8px;color:var(--gold);">Active: +' + Math.floor(activeElixir.mult * 100) + '% XP \u2014 ' + minsLeft + 'm left</div>';
+    }
+    if (ownedElixirs.length > 0) {
+      h += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+      for (let { it, i } of ownedElixirs) {
+        const durLabel = it.v >= 60 ? Math.floor(it.v / 60) + 'h' : it.v + 'm';
+        h += '<button onclick="useI(' + i + ')" class="btn-outline-ghost" style="margin:0;padding:6px 10px;font-size:11.5px;">' + durLabel + ' \u00d7' + it.q + '</button>';
+      }
+      h += '</div>';
+    } else if (activeElixir) {
+      h += '<div class="btn-hint">No more elixirs in inventory right now.</div>';
+    }
+    h += '</div>';
+  }
 
   // Guild Member Request — a pending request needs actual response buttons, not just
   // a log line, same reasoning as the Missed-Day Catch-Up panel above.
