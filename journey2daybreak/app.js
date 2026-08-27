@@ -61,9 +61,14 @@ function bossReward(c){ return 1500 + c.id * 60; }
 function goldReward(c){ return 50 + c.id * 8; }
 function addGold(amount){
   const active = getActiveParty().some(m=>m.id==='aisyah');
-  const bonusPct = active ? (affinityFor('aisyah').fx.goldPct || 0) : 0;
+  const bonusPct = (active ? (affinityFor('aisyah').fx.goldPct || 0) : 0) + guildBonus('gold');
   const total = Math.round(amount * (1+bonusPct));
   STATE.gold += total;
+  return total;
+}
+function addXp(amount){
+  const total = Math.round(amount * (1+guildBonus('xp')));
+  STATE.xp += total;
   return total;
 }
 
@@ -112,6 +117,8 @@ const STATE = {
   nervousCourageActive: false,
   discoveredAbilities: [],   // growth ability ids that have fired at least once
   growthUsedThisBattle: {},  // {abilityId: true} — once per encounter, reset on new boss
+  guildRep: 0, guildRepBalance: 0, guildContracts: [], guildContractWeek: null,
+  visionMachineLastDay: null, joelLetterCount: 0, lastVision: null,
   defending: {},        // {memberId: true} — halves the boss's next hit on them, consumed on use
   partyStatus: {},      // {memberId: 'diseased'} — inflicted by some boss hits, blocks regen until cured
   equipped: {},          // {memberId: trophyItemId} — one trinket slot per member
@@ -135,6 +142,9 @@ function getSavePayload(){
       chaptersReadToday: STATE.chaptersReadToday, chaptersReadDay: STATE.chaptersReadDay,
       readChapters: STATE.readChapters, consumables: STATE.consumables, partyStatus: STATE.partyStatus,
       discoveredAbilities: STATE.discoveredAbilities, autoBattleMode: STATE.autoBattleMode,
+      guildRep: STATE.guildRep, guildRepBalance: STATE.guildRepBalance, guildContracts: STATE.guildContracts,
+      guildContractWeek: STATE.guildContractWeek, visionMachineLastDay: STATE.visionMachineLastDay,
+      joelLetterCount: STATE.joelLetterCount, lastVision: STATE.lastVision,
       equipped: STATE.equipped, lastSeenAt: STATE.lastSeenAt, equippedTrophies: STATE.equippedTrophies,
       selectedZone: STATE.selectedZone, roundPosition: STATE.roundPosition
     }
@@ -368,12 +378,12 @@ function applyIdleGains(){
   const xpGain = Math.round(minutesAway * (1.5 + lvl*0.3));
   const goldGain = Math.round(minutesAway * (1 + lvl*0.15));
   if(xpGain<=0 && goldGain<=0) return;
-  STATE.xp += xpGain;
+  const xpAdded = addXp(xpGain);
   const goldAdded = addGold(goldGain);
   if(minutesAway >= 10){
     const hrs = Math.floor(minutesAway/60), mins = Math.round(minutesAway%60);
     const timeStr = hrs ? `${hrs}h ${mins}m` : `${mins}m`;
-    setTimeout(()=>toast(`Welcome back — away ${timeStr} · +${xpGain.toLocaleString()} XP · +${goldAdded.toLocaleString()}g`), 400);
+    setTimeout(()=>toast(`Welcome back — away ${timeStr} · +${xpAdded.toLocaleString()} XP · +${goldAdded.toLocaleString()}g`), 400);
   }
 }
 
@@ -750,7 +760,7 @@ function toast(msg){let t=document.getElementById('toast');if(!t){t=document.cre
 function refreshTopbar(){const stats=topbar.querySelectorAll('.stat');const lvl=level();const prev=xpThreshold(lvl-1),next=xpThreshold(lvl);if(stats[0])stats[0].querySelector('.big').textContent=lvl;if(stats[1]){stats[1].querySelector('.num').textContent=`${STATE.xp.toLocaleString()} / ${next.toLocaleString()}`;stats[1].querySelector('.fill').style.width=`${Math.min(100,(STATE.xp-prev)/Math.max(1,next-prev)*100)}%`;}if(stats[2]){const san=getActiveParty().find(m=>m.id==='san');const shp=san?(STATE.partyHp['san']!=null?STATE.partyHp['san']:san.hp):82;const smax=san?san.hp:82;stats[2].querySelector('.num').textContent=`${shp} / ${smax}`;const bar=stats[2].querySelector('.fill');if(bar)bar.style.width=`${Math.max(0,Math.min(100,shp/smax*100))}%`;}if(stats[3]){stats[3].querySelector('.num').textContent=STATE.gold.toLocaleString();}}
 function go(name){if(name!=='Battle'){clearAutoActTimer();STATE.battleItemMenuOpen=false;}document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.name===name));render(name);window.scrollTo({top:0,behavior:'smooth'})}
 
-function render(name){refreshTopbar();document.querySelectorAll('.soel').forEach(e=>e.remove());let body='';if(name==='Dashboard')body=dashboard();if(name==='Journal')body=journalScreen();if(name==='Quests')body=questsScreen();if(name==='Party')body=partyScreen();if(name==='Spellbook')body=spellbookScreen();if(name==='Inventory')body=inventoryScreen();if(name==='Codex')body=codexScreen();if(name==='Battle')body=battleScreen();if(name==='Temple')body=templeScreen();if(name==='Frontier')body=frontierScreen();main.innerHTML=topbar.outerHTML+body+`<div id="toast" class="toast"></div>`;if(name!=='Battle'){const soel=document.createElement('div');soel.className='soel';const soelUnlocked=level()>=10;soel.innerHTML=soelUnlocked?`<img src="${soelSrc}"><div class="lock" style="border-color:#68b58b"><b>SOEL</b><small>AWAKENED ✧<br/>In your active party</small></div>`:`<img src="${soelSrc}"><div class="lock"><b>SOEL</b><small>LOCKED<br/>Awakens at Level 10 🔒</small></div>`;document.querySelector('.app').appendChild(soel)}bind();if(name==='Battle'){const cl=document.getElementById('combatLog');if(cl)cl.scrollTop=cl.scrollHeight;}}
+function render(name){refreshTopbar();document.querySelectorAll('.soel').forEach(e=>e.remove());let body='';if(name==='Dashboard')body=dashboard();if(name==='Journal')body=journalScreen();if(name==='Quests')body=questsScreen();if(name==='Party')body=partyScreen();if(name==='Spellbook')body=spellbookScreen();if(name==='Inventory')body=inventoryScreen();if(name==='Codex')body=codexScreen();if(name==='Battle')body=battleScreen();if(name==='Temple')body=templeScreen();if(name==='Frontier')body=frontierScreen();if(name==='Guild')body=guildScreen();main.innerHTML=topbar.outerHTML+body+`<div id="toast" class="toast"></div>`;if(name!=='Battle'){const soel=document.createElement('div');soel.className='soel';const soelUnlocked=level()>=10;soel.innerHTML=soelUnlocked?`<img src="${soelSrc}"><div class="lock" style="border-color:#68b58b"><b>SOEL</b><small>AWAKENED ✧<br/>In your active party</small></div>`:`<img src="${soelSrc}"><div class="lock"><b>SOEL</b><small>LOCKED<br/>Awakens at Level 10 🔒</small></div>`;document.querySelector('.app').appendChild(soel)}bind();if(name==='Battle'){const cl=document.getElementById('combatLog');if(cl)cl.scrollTop=cl.scrollHeight;}}
 
 function bind(){
   document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
@@ -836,9 +846,8 @@ function completeChapter(id){
   if(id!==STATE.completed+1){ if(id<=STATE.completed) return; return toast('Read chapters in sequence'); }
   const c = chapterData.find(ch=>ch.id===id);
   if(c.boss) return toast("Defeat this chapter's boss in Battle to complete it");
-  const reward = xpForChapter(c);
   const gold = addGold(Math.round(goldReward(c)*0.4));
-  STATE.xp += reward;
+  const reward = addXp(xpForChapter(c));
   STATE.completed = id;
   STATE.chaptersReadToday++;
   checkBountyProgress('read_chapters', null, 1);
@@ -1044,7 +1053,7 @@ function fightZoneRegular(zoneId, monsterId){
   const zone = ZONES.find(z=>z.id===zoneId);
   const e = zone.regulars.find(x=>x.id===monsterId);
   if(!e) return;
-  STATE.xp += e.xp;
+  addXp(e.xp);
   const goldAdded = addGold(e.gold);
   save();
   toast(`${e.name} defeated · +${e.xp} XP · +${goldAdded}g`);
@@ -1084,6 +1093,164 @@ function frontierZoneHTML(){
   }
   return html;
 }
+// ---------------------------------------------------------------------------
+// GUILD — real rank system ported from the codex project (10 tiers, lifetime
+// reputation, genuine passive bonuses to gold/XP/crit). Guild Contracts are
+// adapted rather than copied: the source's 27 contracts target a mix of
+// generic isekai monsters and its own story bosses, most of which don't
+// exist here — so contracts are generated from OUR actual boss list and
+// Frontier regulars instead, refreshing weekly like the source, level-gated
+// so early contracts don't show up once you've outgrown them.
+// ---------------------------------------------------------------------------
+const GUILD_RANKS = [
+  {rank:1, name:'Guild Initiate', repReq:0, desc:'Joined the Guild. The Contract Board is open to you.'},
+  {rank:2, name:'Guild Associate', repReq:150, desc:'+5% gold from every victory.', goldBonus:0.05},
+  {rank:3, name:'Guild Adventurer', repReq:500, desc:'+5% XP from every victory.', xpBonus:0.05},
+  {rank:4, name:'Guild Veteran', repReq:1200, desc:'Another +5% gold and +5% XP.', goldBonus:0.05, xpBonus:0.05},
+  {rank:5, name:'Guild Champion', repReq:2500, desc:'+5% crit chance in combat.', critBonus:0.05},
+  {rank:6, name:'Guildmaster', repReq:5000, desc:'Another +10% gold and +10% XP.', goldBonus:0.10, xpBonus:0.10},
+  {rank:7, name:'Guild Legend', repReq:10000, desc:'The kind of reputation that outlasts the person who earned it. Another +10% gold.', goldBonus:0.10},
+  {rank:8, name:'Guild Paragon', repReq:20000, desc:'Another +10% XP and +5% crit chance.', xpBonus:0.10, critBonus:0.05},
+  {rank:9, name:'Guild Mythic', repReq:40000, desc:'Another +15% gold and +15% XP.', goldBonus:0.15, xpBonus:0.15},
+  {rank:10, name:'Guild Eternal', repReq:75000, desc:'The Guild has nothing left to teach you. Another +5% crit chance.', critBonus:0.05}
+];
+function guildRankInfo(){
+  const rep = STATE.guildRep || 0;
+  let current = GUILD_RANKS[0], next = GUILD_RANKS[1] || null;
+  for(let i=0;i<GUILD_RANKS.length;i++){
+    if(rep >= GUILD_RANKS[i].repReq){ current = GUILD_RANKS[i]; next = GUILD_RANKS[i+1] || null; }
+  }
+  return {current, next};
+}
+function guildBonus(type){
+  const {current} = guildRankInfo();
+  let total = 0;
+  for(const r of GUILD_RANKS){
+    if((STATE.guildRep||0) >= r.repReq){
+      if(type==='gold' && r.goldBonus) total += r.goldBonus;
+      if(type==='xp' && r.xpBonus) total += r.xpBonus;
+      if(type==='crit' && r.critBonus) total += r.critBonus;
+    }
+  }
+  return total;
+}
+function addGuildRep(amount){
+  STATE.guildRep = (STATE.guildRep||0) + amount;
+  STATE.guildRepBalance = (STATE.guildRepBalance||0) + amount;
+}
+function guildWeekKey(){
+  const d = new Date();
+  const onejan = new Date(d.getFullYear(),0,1);
+  const week = Math.ceil((((d - onejan) / 86400000) + onejan.getDay()+1)/7);
+  return `${d.getFullYear()}-W${week}`;
+}
+function guildContractPool(){
+  const pool = [];
+  BOSS_CHAPTERS.forEach(b=>{
+    pool.push({id:'gc_boss_'+b.id, type:'boss', target:b.id, name:'Contract: '+b.name,
+      desc:`Defeat ${b.name} for the Guild.`, rw:{xp:bossReward(chapterData.find(c=>c.id===b.id))*2, gold:goldReward(chapterData.find(c=>c.id===b.id))*2, rep:80+b.id*4}});
+  });
+  FRONTIER_REGULARS.forEach(e=>{
+    pool.push({id:'gc_kill_'+e.id, type:'frontier_kill', target:e.id, name:e.name+' Purge',
+      desc:`Defeat 5 ${e.name} for the Guild.`, need:5, rw:{xp:e.xp*4, gold:e.gold*4, rep:60}});
+  });
+  return pool;
+}
+function refreshGuildContracts(){
+  const wk = guildWeekKey();
+  if(STATE.guildContractWeek === wk && STATE.guildContracts.length) return;
+  const eligible = guildContractPool().filter(c=>{
+    if(c.type==='boss') return STATE.completed >= c.target - 8; // roughly reachable soon or already
+    return true;
+  });
+  const shuffled = eligible.map(c=>({...c,c:0,done:false})).sort(()=>Math.random()-0.5);
+  STATE.guildContracts = shuffled.slice(0, Math.min(4, shuffled.length));
+  STATE.guildContractWeek = wk;
+  save();
+}
+function checkGuildContractProgress(type, target, amount){
+  refreshGuildContracts();
+  STATE.guildContracts.forEach(c=>{
+    if(c.done || c.type!==type) return;
+    if(type==='frontier_kill' && c.target!==target) return;
+    if(type==='boss' && c.target!==target) return;
+    c.c = Math.min(c.need||1, (c.c||0)+amount);
+    if(c.c >= (c.need||1)){
+      c.done = true;
+      addXp(c.rw.xp);
+      const goldAdded = addGold(c.rw.gold);
+      addGuildRep(c.rw.rep);
+      save();
+      toast(`🏛️ Guild Contract complete: ${c.name} · +${c.rw.xp} XP · +${goldAdded}g · +${c.rw.rep} Rep`);
+    }
+  });
+}
+// ---------------------------------------------------------------------------
+// VISION MACHINE — Varel Farseer's window. Ported faithfully, not adapted:
+// the exact vignette text, cost, once-per-day limit, and Joel's letter
+// mechanic from your own project, since this is your own established
+// writing about San's real parents. Unlocks after Chapter 95 ("The First
+// Vision"), where Varel and the machine are actually introduced.
+// ---------------------------------------------------------------------------
+const VISION_MACHINE_COST = 1000000;
+const VISION_VIGNETTES = [
+  "Your mother is in the kitchen, mid-afternoon light through the curtain, humming something you cannot quite place. She sets the kettle down and does not look toward the window. She has no reason to.",
+  "Your father is asleep in the good chair, a blanket someone else must have draped over him, the television on low with the sound turned down further than it needs to be. He looks tired. He also looks, for now, at rest.",
+  "Both your parents are on the porch, not talking, just sitting the way people do after decades of not needing to fill every silence. Your mother is peeling something into a bowl. Your father is watching her do it.",
+  "Your mother is on the phone, laughing at something, one hand braced on the counter. You cannot hear who she is talking to. You decide, for tonight, that it does not matter — only that she is laughing.",
+  "Your father is slower getting up from the chair than he used to be. He makes it anyway, unhurried, and pauses to steady himself against the doorframe for exactly as long as he needs to, then keeps going.",
+  "Your mother is fussing over a pot that clearly does not need fussing over, the exact same way she always has, muttering at it under her breath like it might argue back.",
+  "One of your cousins is there too, sitting across from your mother at the small table, the two of them going through something — bills, maybe, or nothing important at all. You cannot tell which, and for once it is a relief not to know.",
+  "Your father is in the garden, crouched slower than he used to crouch, tending something green that is doing better than it has any right to. He straightens up, presses a hand to his back, and keeps going anyway.",
+  "The house is quiet, mid-morning, nobody visibly in frame — just light through familiar windows, a ceiling fan turning, a kettle steaming on the stove that someone will come back for in a moment. Ordinary. Undramatic. Still standing.",
+  "Your mother is folding laundry on the bed, the same unhurried rhythm she has always folded laundry in, and for just a moment she pauses, mid-fold, and looks toward the window — and you will never know if she felt anything at all, or if it was nothing, just a mother pausing in an ordinary afternoon.",
+  "An old friend of your father's has stopped by — someone from the old sales days, still telling the same stories he always told, still making your father laugh at the parts he has heard a hundred times already. Some friendships, apparently, never needed an occasion.",
+  "The window catches on someone you did not expect — Jeff's wife, though she does not carry that name anymore, laughing at something across a table with someone new. Someone who is actually looking at her children, not past them. She found out about all of it eventually, you learn, and it was not even the first time. She simply decided, finally, that she did not have to keep choosing him. Some doors, it turns out, were always hers to close."
+];
+const JOEL_LETTER_REPLIES = [
+  "The window holds a moment longer than usual. Something comes back through with it this time — his mother's handwriting, familiar even distorted through whatever this is. \"I keep them all,\" it says. \"Every one. I do not need you to come home to know you are still my son.\"",
+  "A reply, brief, unmistakably hers: \"Your daughter asked about you today. I told her the truth — that you are far away, and that you write, and that far away has never once meant gone.\"",
+  "This time something answers: \"Stop apologizing in every letter. I forgave you before you ever thought to ask. A mother does not keep score the way you are afraid I do.\"",
+  "Her handwriting again, shorter than usual: \"She drew you a picture today. I do not have a way to send it to you. I am keeping it anyway, for whenever that changes.\""
+];
+function isVisionMachineUnlocked(){ return STATE.completed >= 95; }
+function canUseVisionMachine(){ return isVisionMachineUnlocked() && STATE.visionMachineLastDay !== todayKey() && STATE.gold >= VISION_MACHINE_COST; }
+function useVisionMachine(){
+  if(!isVisionMachineUnlocked()) return toast('🔮 The Vision Machine has not been built yet.');
+  if(STATE.visionMachineLastDay === todayKey()) return toast('🔮 The window already opened once today. It needs to rest before it can hold that much again.');
+  if(STATE.gold < VISION_MACHINE_COST) return toast('🔮 Varel: "It is not stubbornness. The frame genuinely needs that much to hold open. Come back when you have it."');
+  STATE.gold -= VISION_MACHINE_COST;
+  STATE.visionMachineLastDay = todayKey();
+  STATE.joelLetterCount = (STATE.joelLetterCount||0) + 1;
+  const vignette = VISION_VIGNETTES[Math.floor(Math.random()*VISION_VIGNETTES.length)];
+  let logText = `👁️ ${vignette}\n\n✉️ Joel sends another letter through. "For my mother," he says, same as always.`;
+  if(STATE.joelLetterCount >= 3 && Math.random() < 0.15){
+    logText += `\n\n${JOEL_LETTER_REPLIES[Math.floor(Math.random()*JOEL_LETTER_REPLIES.length)]}`;
+  }
+  STATE.lastVision = logText;
+  save();
+  go('Guild');
+}
+function guildScreen(){
+  refreshGuildContracts();
+  const {current, next} = guildRankInfo();
+  const rep = STATE.guildRep || 0;
+  const rankHTML = `<h3 style="font-family:Cinzel;color:#c99aff;margin:0 0 4px;font-size:18px">🏛️ ${esc(current.name)}</h3><p class="lead" style="margin-bottom:6px">${esc(current.desc)}</p>${next?`<div class="bar"><div class="fill" style="width:${Math.min(100,(rep-current.repReq)/(next.repReq-current.repReq)*100)}%"></div></div><p class="lead" style="margin-top:6px">${rep.toLocaleString()} / ${next.repReq.toLocaleString()} Rep to ${esc(next.name)}</p>`:`<p class="lead">Max rank reached — ${rep.toLocaleString()} lifetime Reputation.</p>`}`;
+
+  const contractsHTML = `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">📜 GUILD CONTRACTS · REFRESHES WEEKLY</h3><div class="chapter-grid">${STATE.guildContracts.map(c=>`<article class="quest ${c.done?'':'active'}"><div class="mini-ico">${c.type==='boss'?'☠':'⚔️'}</div><div><h3>${esc(c.name)}</h3><p>${esc(c.desc)}</p><b>${c.done?'COMPLETE ✓':`${c.c||0}/${c.need||1} · ${c.rw.xp} XP + ${c.rw.gold}g + ${c.rw.rep} Rep`}</b></div></article>`).join('')}</div>`;
+
+  const vmUnlocked = isVisionMachineUnlocked();
+  let vmHTML;
+  if(!vmUnlocked){
+    vmHTML = `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">🔮 THE VISION MACHINE</h3><p class="lead">Varel Farseer's window opens after Chapter 95. Keep reading.</p>`;
+  } else {
+    const can = canUseVisionMachine();
+    vmHTML = `<h3 style="font-family:Cinzel;color:#c99aff;margin:22px 0 4px;font-size:18px">🔮 THE VISION MACHINE</h3><p class="lead" style="margin-bottom:10px">Varel's window into what's left behind. Costs ${VISION_MACHINE_COST.toLocaleString()}g, once per day.</p>${STATE.lastVision?`<div class="locked-banner" style="white-space:pre-line;margin-bottom:12px">${esc(STATE.lastVision)}</div>`:''}<button class="cta" onclick="useVisionMachine()" ${can?'':'disabled'}>${STATE.visionMachineLastDay===todayKey()?'ALREADY OPENED TODAY':`OPEN THE WINDOW · ${VISION_MACHINE_COST.toLocaleString()}g`}</button>`;
+  }
+
+  return panel('Guild Hall','GUILD & VISION', rankHTML+contractsHTML+vmHTML, navButton('Dashboard'));
+}
+
 function frontierScreen(){
   const unlocked = ZONES.filter(zoneUnlocked);
   if(!unlocked.length){
@@ -1103,7 +1270,7 @@ function selectZone(id){ STATE.selectedZone = id; save(); go('Frontier'); }
 function fightFrontierRegular(id){
   const e = FRONTIER_REGULARS.find(x=>x.id===id);
   if(!e) return;
-  STATE.xp += e.xp;
+  addXp(e.xp);
   const goldAdded = addGold(e.gold);
   checkBountyProgress('frontier_kill', id, 1);
   save();
@@ -1115,7 +1282,7 @@ function fightFrontierBoss(){
   const boss = bossFor(STATE.frontierCurrentBoss);
   const c = chapterData.find(ch=>ch.id===boss.id);
   const xp = bossReward(c), gold = goldReward(c);
-  STATE.xp += xp;
+  addXp(xp);
   const goldAdded = addGold(gold);
   STATE.frontierCurrentBoss = null;
   STATE.frontierBossCooldownUntil = Date.now() + (5+Math.random()*10)*60000; // 5-15 min
@@ -1170,9 +1337,9 @@ function checkBountyProgress(type, target, amount){
     b.c = Math.min(b.need, b.c + amount);
     if(b.c >= b.need){
       b.done = true;
-      STATE.xp += b.rw.xp;
+      const xpAdded = addXp(b.rw.xp);
       const goldAdded = addGold(b.rw.gold);
-      toast(`💰 Bounty complete: ${b.name} · +${b.rw.xp} XP · +${goldAdded}g`);
+      toast(`💰 Bounty complete: ${b.name} · +${xpAdded} XP · +${goldAdded}g`);
     }
   });
   save();
@@ -1403,7 +1570,7 @@ function battleAction(a){
 
   if(a==='ATTACK'){
     let dmg = baseDmg;
-    let critChance = CRIT_BASE;
+    let critChance = CRIT_BASE + guildBonus('crit');
     if(actor.id==='senedra') critChance += (affinityFor('senedra').fx.critPct || 0);
     if(actor.id==='zaki'){
       const atkBonus = (affinityFor('zaki').fx.atk || 0) + (STATE.nervousCourageActive ? 6 : 0);
@@ -1528,10 +1695,11 @@ function battleAction(a){
     if(STATE.completed < boss.id){
       const c = chapterData.find(c=>c.id===boss.id);
       const gold = goldReward(c);
-      STATE.xp += bossReward(c);
+      addXp(bossReward(c));
       const goldAdded = addGold(gold);
       STATE.completed = boss.id;
       const loot = awardBossLoot(boss.id, boss.name);
+      checkGuildContractProgress('boss', boss.id, 1);
       save();
       toast(loot ? `${boss.name} defeated! · ${loot.icon} ${loot.name} · +${goldAdded}g` : `${boss.name} defeated! +${goldAdded}g`);
       // Same pattern as a regular chapter completion: land back on the
