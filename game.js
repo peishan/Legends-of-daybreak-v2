@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Ch.168-169: Arc G \u2014 Kai points the way, the party returns to the drowned world, and it does not attack)';
+const APP_VERSION = '2026-08-17 (Ch.170-171: Arc H \u2014 the creek and the drowned world revealed as the same water; Spirit Shaman arc closes with a beginning, not an ending)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -5674,6 +5674,47 @@ storyJournal: {
           { speaker: 'Joel', text: '"We are not here to fight it," Joel says, carefully, to the water, to whatever is down there listening through his son. "We came because he asked us to."' },
           { speaker: 'Narrator', text: 'The shape does not answer in any way the party can understand. But it does not vanish, either, and it does not attack \u2014 it simply stays, watching Kai with the patient, ancient attention of something that has been waiting a very long time for someone who could actually hear it.' },
           { speaker: 'Narrator', text: 'Nobody in the party fully understands what just happened. But for the first time since any of them set foot in this drowned world, it does not feel like a place that only knows how to take.' },
+        ]
+      }
+,{
+        id: 'journal_170',
+        title: 'The Same Water',
+        chapter: 170,
+        unlockType: 'level',
+        unlockAt: 655,
+        icon: '🌌',
+        summary: "The drowned world finally answers, in the only way it knows how \u2014 through Kai, in feeling rather than words. The creek was never separate from any of this. It never had to be a coincidence at all.",
+        scenes: [
+          { speaker: 'Narrator', text: 'It happens on the second day, when the shape in the water finally rises close enough to properly see \u2014 old beyond any way of counting, more grief than monster, nothing at all like the guarded, wanting thing the rest of this world seems to have become.' },
+          { speaker: 'Narrator', text: 'Kai goes very quiet, the way he does when he is listening to something no one else can hear. Then, slowly, carefully, he starts to speak \u2014 not quite his own words, San realizes, watching him. Something coming through him.' },
+          { speaker: 'Kai', text: '"Before it was hungry," Kai says, voice strange and layered in a way a toddler\u2019s voice has no business being, "it was just water. Clean water. Like ours."' },
+          { speaker: 'San', text: 'Something cold moves through your chest. "Ours," you repeat. "Kai \u2014 do you mean the creek? Where we \u2014"' },
+          { speaker: 'Kai', text: '"Same," Kai says, simple, certain, patting the ground beside the water like he is confirming something obvious. "Same water. Far away, but same. It remembers being clean. It remembers you."' },
+          { speaker: 'Narrator', text: 'Joel goes very still beside you, working through the shape of what that actually means \u2014 that the quiet, unremarkable creek you drank from years ago was never separate from this place at all. Some deeper vein of the same water, running under everything, remembering what it used to be before this particular stretch of it drowned.' },
+          { speaker: 'Joel', text: '"That is why he is \u2014" Joel starts, and cannot quite finish the sentence, though he does not need to. You already understand it too.' },
+          { speaker: 'San', text: '"Not a prophecy," you say slowly, working it out loud. "Not a chosen anything. Just water that remembered what it wanted to be, finding its way to two people who happened to need exactly that, without either of us ever asking for it."' },
+          { speaker: 'Narrator', text: 'The shape in the water does not confirm this, exactly \u2014 it has no words of its own to give, only what moves through Kai. But something in the way it settles, easing lower into the water, feels like agreement. Or relief. Perhaps, after so long, both.' },
+          { speaker: 'Kai', text: '"It is still hungry," Kai says again, the same phrase from before, quieter now, sadder. "But less. Now that someone finally heard it."' },
+        ]
+      }
+,{
+        id: 'journal_171',
+        title: 'What He Is Going to Become',
+        chapter: 171,
+        unlockType: 'level',
+        unlockAt: 660,
+        icon: '🕊️',
+        summary: "Nothing is fully resolved, and nothing needs to be \u2014 just a beginning, properly understood at last. Kai is not a mystery to be solved. He is a bridge, and bridges are for standing on, not finishing.",
+        scenes: [
+          { speaker: 'Narrator', text: 'The party does not stay in the drowned world long after that \u2014 there is nothing left to fight here, and Kai, worn thin from whatever it cost him to listen that hard, falls asleep against Joel\u2019s shoulder before they have even reached the border back out.' },
+          { speaker: 'Narrator', text: 'Back at the Hall, the story spreads the way stories do \u2014 not as an announcement, just guild members finding each other in twos and threes, trying to fit what happened into some shape they can hold.' },
+          { speaker: 'Renn', text: '"A bridge," Renn says, turning the idea over with real care, the way he turns over anything he suspects he will spend years still learning about. "Between us and them. Between what a place was and what it became. That is rarer than any prophecy I have ever actually read about."' },
+          { speaker: 'Sister Wren', text: '"He is still just a little boy, underneath all of it," Wren adds, gently, watching Kai sleep. "Whatever he is going to become \u2014 he is that first. That does not stop being true."' },
+          { speaker: 'Narrator', text: 'That evening, San sits with Joel while Kai sleeps between them, small and ordinary again, nothing about him currently suggesting he spent the afternoon speaking for a wounded, ancient world.' },
+          { speaker: 'Joel', text: '"Do you think this is finished?" Joel asks, quiet. "Whatever this was. Do you think it is over?"' },
+          { speaker: 'San', text: '"No," you say, honestly, and find you are not afraid of the answer the way you might once have been. "I think it is just starting. I think we are going to spend a long time still learning what he actually is."' },
+          { speaker: 'Joel', text: '"Together," Joel says, the same word from the night you first told him, and it means the same thing it meant then \u2014 whatever it turns out to be.' },
+          { speaker: 'Narrator', text: 'Kai stirs faintly in his sleep, one small hand finding San\u2019s without waking, entirely unaware of the enormous, quiet thing he has already become to everyone who loves him. Not a chosen one. Not a prophecy fulfilled. Just theirs \u2014 and, it turns out, something the world itself has been waiting a very long time to have back.' },
         ]
       }
     ]
@@ -20961,7 +21002,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.139';
+const BUILD_ID = '2026-08-17.140';
 // =========================
 
 
