@@ -107,6 +107,7 @@ const STATE = {
   consumables: {},     // {potionId: count}
   battleItemMenuOpen: false,
   autoBattleMode: false,   // when on, San's own turns also auto-resolve — full hands-off fights
+  musicMuted: false,
   battleSpellMenuOpen: false,
   shieldTurns: 0,        // multi-turn defense buff (Shield, Evasion Ward, Stoneskin, etc.) — reduces next N boss hits
   shieldPct: 0,
@@ -143,7 +144,7 @@ function getSavePayload(){
       bounties: STATE.bounties, bountyDay: STATE.bountyDay,
       chaptersReadToday: STATE.chaptersReadToday, chaptersReadDay: STATE.chaptersReadDay,
       readChapters: STATE.readChapters, consumables: STATE.consumables, partyStatus: STATE.partyStatus,
-      discoveredAbilities: STATE.discoveredAbilities, autoBattleMode: STATE.autoBattleMode,
+      discoveredAbilities: STATE.discoveredAbilities, autoBattleMode: STATE.autoBattleMode, musicMuted: STATE.musicMuted,
       guildRep: STATE.guildRep, guildRepBalance: STATE.guildRepBalance, guildContracts: STATE.guildContracts,
       guildContractWeek: STATE.guildContractWeek, visionMachineLastDay: STATE.visionMachineLastDay,
       joelLetterCount: STATE.joelLetterCount, lastVision: STATE.lastVision,
@@ -587,10 +588,54 @@ function encounterKey(){
   }
   return currentBossId();
 }
+// ---------------------------------------------------------------------------
+// BATTLE MUSIC — scoped to the Battle screen only, not app-wide, so it stays
+// a deliberate moment rather than something you have to mute during regular
+// use. Climax tracks for the story's true superbosses, a quieter/darker
+// track for the personal antagonists (Robin, Jeff, the Ex-family wraiths),
+// standard rotation for everything else. Autoplay only works after a real
+// user gesture, which entering Battle always is (a tap), so this should
+// play cleanly — the mute toggle covers browsers that are still stricter.
+// ---------------------------------------------------------------------------
+const CLIMAX_BOSS_IDS = new Set([20,41,94,95]);
+const ANTAGONIST_BOSS_IDS = new Set([24,79,80,81,82,83,86,87]);
+let battleAudioEl = null;
+function pickBattleTrack(boss){
+  if(!boss) return null;
+  if(boss.isRegular){
+    const n = (boss.id.charCodeAt(0) + boss.id.length) % 2;
+    return `assets/audio/battle-standard-${n+1}.mp3`;
+  }
+  if(CLIMAX_BOSS_IDS.has(boss.id)) return 'assets/audio/battle-climax.mp3';
+  if(ANTAGONIST_BOSS_IDS.has(boss.id)) return 'assets/audio/battle-antagonist.mp3';
+  return `assets/audio/battle-standard-${(boss.id%2)+1}.mp3`;
+}
+function playBattleMusic(boss){
+  const track = pickBattleTrack(boss);
+  if(!track) return;
+  if(battleAudioEl && battleAudioEl.dataset && battleAudioEl.dataset.track===track && !battleAudioEl.paused) return;
+  if(battleAudioEl) battleAudioEl.pause();
+  battleAudioEl = new Audio(track);
+  battleAudioEl.dataset.track = track;
+  battleAudioEl.loop = true;
+  battleAudioEl.volume = 0.35;
+  if(!STATE.musicMuted) battleAudioEl.play().catch(()=>{}); // autoplay-blocked errors are silently ignored — mute toggle covers it
+}
+function stopBattleMusic(){
+  if(battleAudioEl){ battleAudioEl.pause(); battleAudioEl = null; }
+}
+function toggleMusicMute(){
+  STATE.musicMuted = !STATE.musicMuted;
+  save();
+  if(STATE.musicMuted) stopBattleMusic();
+  else { const boss = activeEncounter(); if(boss) playBattleMusic(boss); }
+  go('Battle');
+}
 function ensureFreshBattleState(){
   if(STATE.combatLogBossId !== encounterKey()){
     STATE.combatLog = []; STATE.combatLogBossId = encounterKey(); STATE.roundPosition = 0;
     STATE.growthUsedThisBattle = {}; STATE.nervousCourageActive = false; STATE.markedBoss = false;
+    playBattleMusic(activeEncounter());
   }
 }
 function logCombat(line){
@@ -876,7 +921,7 @@ function awardBossLoot(chapterId, bossName){
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(msg){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),1800)}
 function refreshTopbar(){const stats=topbar.querySelectorAll('.stat');const lvl=level();const prev=xpThreshold(lvl-1),next=xpThreshold(lvl);if(stats[0])stats[0].querySelector('.big').textContent=lvl;if(stats[1]){stats[1].querySelector('.num').textContent=`${STATE.xp.toLocaleString()} / ${next.toLocaleString()}`;stats[1].querySelector('.fill').style.width=`${Math.min(100,(STATE.xp-prev)/Math.max(1,next-prev)*100)}%`;}if(stats[2]){const san=getActiveParty().find(m=>m.id==='san');const shp=san?(STATE.partyHp['san']!=null?STATE.partyHp['san']:san.hp):82;const smax=san?san.hp:82;stats[2].querySelector('.num').textContent=`${shp} / ${smax}`;const bar=stats[2].querySelector('.fill');if(bar)bar.style.width=`${Math.max(0,Math.min(100,shp/smax*100))}%`;}if(stats[3]){stats[3].querySelector('.num').textContent=STATE.gold.toLocaleString();}}
-function go(name){if(name!=='Battle'){clearAutoActTimer();STATE.battleItemMenuOpen=false;}document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.name===name));render(name);window.scrollTo({top:0,behavior:'smooth'})}
+function go(name){if(name!=='Battle'){clearAutoActTimer();STATE.battleItemMenuOpen=false;stopBattleMusic();}document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.name===name));render(name);window.scrollTo({top:0,behavior:'smooth'})}
 
 function render(name){refreshTopbar();document.querySelectorAll('.soel').forEach(e=>e.remove());let body='';if(name==='Dashboard')body=dashboard();if(name==='Journal')body=journalScreen();if(name==='Quests')body=questsScreen();if(name==='Party')body=partyScreen();if(name==='Spellbook')body=spellbookScreen();if(name==='Inventory')body=inventoryScreen();if(name==='Codex')body=codexScreen();if(name==='Battle')body=battleScreen();if(name==='Temple')body=templeScreen();if(name==='Frontier')body=frontierScreen();if(name==='Guild')body=guildScreen();main.innerHTML=topbar.outerHTML+body+`<div id="toast" class="toast"></div>`;if(name!=='Battle'){const soel=document.createElement('div');soel.className='soel';const soelUnlocked=level()>=10;soel.innerHTML=soelUnlocked?`<img src="${soelSrc}"><div class="lock" style="border-color:#68b58b"><b>SOEL</b><small>AWAKENED ✧<br/>In your active party</small></div>`:`<img src="${soelSrc}"><div class="lock"><b>SOEL</b><small>LOCKED<br/>Awakens at Level 10 🔒</small></div>`;document.querySelector('.app').appendChild(soel)}bind();if(name==='Battle'){const cl=document.getElementById('combatLog');if(cl)cl.scrollTop=cl.scrollHeight;}}
 
@@ -1481,7 +1526,7 @@ function battleScreen(){
   if(landscapeSrc) html += `<div class="boss-landscape-art">${safeImg(landscapeSrc, boss.name)}</div>`;
   html += '</div>';
 
-  html += `<div class="companion-ai-strip" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span><strong>${STATE.autoBattleMode?'Auto-Battle is ON':'San is yours to control'}</strong> — set each companion below to Assisted (auto-acts) or Manual.</span><button class="small-btn ${STATE.autoBattleMode?'primary':''}" onclick="toggleAutoBattle()">${STATE.autoBattleMode?'🤖 AUTO-BATTLE: ON':'🎮 AUTO-BATTLE: OFF'}</button></div>`;
+  html += `<div class="companion-ai-strip" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span><strong>${STATE.autoBattleMode?'Auto-Battle is ON':'San is yours to control'}</strong> — set each companion below to Assisted (auto-acts) or Manual.</span><span style="display:flex;gap:8px"><button class="small-btn" onclick="toggleMusicMute()" title="Toggle battle music">${STATE.musicMuted?'🔇':'🔊'}</button><button class="small-btn ${STATE.autoBattleMode?'primary':''}" onclick="toggleAutoBattle()">${STATE.autoBattleMode?'🤖 AUTO-BATTLE: ON':'🎮 AUTO-BATTLE: OFF'}</button></span></div>`;
 
   html += '<div class="party-battle-grid">';
   party.forEach((m,i)=>{
