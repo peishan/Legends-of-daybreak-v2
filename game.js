@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Cafe: meal backlogging (past 7 days) added \u2014 was never carried over from Daybreak Quest; new items: Koukakis yogurt, Goldilocks Polvoron)';
+const APP_VERSION = '2026-08-17 (New: World 10 \u2014 The World Where Wishes Take Their Own Shape (Lv960-1050), djinn treated with real nuance)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -755,6 +755,78 @@ const G = {
     { n: 'The Relic Nobody Should Reach For', lv: 630, elem: 'none', d: "It would be so easy to take. That is, San understands slowly, exactly the point of it being here at all — a temptation left deliberately in reach, watched closely by something that has judged exactly this choice before and is fully prepared to judge it again.", en: ['A Hoard-Ward', 'Something Testing Whoever Reaches', 'A Taotie Sentinel, Watching Closely'], loot: ['A Relic, Deliberately Left Reachable', 'Proof the Test Was Real', 'Something That Chose Not to Take It'], xp: 7300, g: 4380, dg: 'impossible' },
     { n: 'When the Old Guardians Wake in Force', lv: 640, elem: 'none', d: "Not provoked — timed. Whatever kept these guardians dormant has finally run its course, and the whole drowned border wakes at once, bronze eyes opening in water that has waited a very long time to be taken seriously again.", en: ['A Taotie Broodguard', 'Something Fully Awake Now', 'A Reckoning, Approaching'], loot: ['A Broodguard\u2019s Cast-Off Plate', 'Proof the Waiting Is Over', 'Bronze Still Warm From Waking'], xp: 7600, g: 4560, dg: 'impossible' },
     { n: 'The Debt Finally Come Due', lv: 650, elem: 'none', d: "The last stretch before the reckoning itself \u2014 merfolk and orcs both, for once, standing the same line instead of opposite ones, because whatever is about to surface does not particularly care which side of the old border anyone was standing on.", en: ['The Reckoning\u2019s Own Vanguard', 'Something That Remembers Every Debt', 'A Guardian Given One Last Purpose'], loot: ['Proof Both Sides Finally Stood Together', 'A Debt About to Be Called', 'The Last Warning Before the Reckoning'], xp: 7900, g: 4740, dg: 'impossible' },
+    // === WORLD 7: THE WORLD THAT KEPT WHAT IT SHOULD HAVE LET GO (Lv 660-750) ===
+    // Throughline: every creature here is defined by refusing an ending that should
+    // have happened. Vampires cheated death. Werewolves are split permanently between
+    // two selves, neither of them whole. Mummies chose preservation over passage.
+    // Vampires use vampire/nosferatu/bloodless/undying in their names (undead
+    // archetype, triggers Vampiric Drain specifically — see the name-check ahead of
+    // the generic undead check in the damage-resolution code). Werewolves use
+    // wolf/hound (beast archetype, correctly NOT undead — a curse on something still
+    // alive, not a reanimated one). Mummies use mummy/embalmed/preserved/wrapped/
+    // husk/remnant/shade (undead archetype, triggers generic disease + Turn Undead).
+    { n: 'The Place That Never Quite Ended', lv: 660, elem: 'none', d: "Every road here leads somewhere that should have finished a long time ago \u2014 a battle that never resolved, a season that never turned, a threshold nobody ever actually crossed. It is not haunted, exactly. It is unfinished.", en: ['Something Still Waiting to Be Over', 'A Guard Who Never Stood Down', 'Whatever This Place Refuses to Become'], loot: ['A Clock With No Hands', 'Proof Something Here Was Supposed to End', 'An Ending, Postponed Indefinitely'], xp: 8100, g: 4860, dg: 'impossible' },
+    { n: 'Two Shapes, One Body', lv: 670, elem: 'none', d: "Not a transformation \u2014 a permanent argument. Every creature out here is caught mid-change, forever, neither fully the person nor fully the beast, both halves furious that neither ever gets to actually win.", en: ['A Hound Wearing Someone\u2019s Old Face', 'Something Caught Between Two Selves', 'The Wolf That Never Finished Becoming'], loot: ['A Torn Collar, Still Fastened', 'Proof Neither Half Ever Wins', 'Fur That Grows Back Wrong'], xp: 8300, g: 4980, dg: 'impossible' },
+    { n: 'What Refused the Grave', lv: 680, elem: 'none', d: "The dirt here has been dug up and refilled more times than anyone could count \u2014 not by grave robbers. By the graves themselves, emptying out from the inside, every single time someone tries to make the ending stick.", en: ['A Nosferatu, Freshly Refused', 'Something Bloodless and Still Standing', 'The Undying, Mid-Argument With Its Own Grave'], loot: ['Soil That Will Not Stay Settled', 'A Coffin Lid, Pushed From Beneath', 'Proof the Grave Lost This Round Too'], xp: 8500, g: 5100, dg: 'impossible' },
+    { n: 'Wrapped Against Forgetting', lv: 690, elem: 'none', d: "Every surface here is bound in cloth, sealed, labeled, preserved \u2014 not out of reverence, but out of a specific, desperate refusal to let anything here be allowed to fade the way things are supposed to fade.", en: ['A Remnant, Carefully Wrapped', 'Something Embalmed Against Its Own Wishes', 'The Husk That Insists It Remembers Everything'], loot: ['Linen Wound Too Many Times to Count', 'A Preserved Thing That Should Have Faded', 'Proof Memory Can Be a Kind of Prison'], xp: 8700, g: 5220, dg: 'impossible' },
+    { n: 'The Hunger That Outlived Its Reason', lv: 700, elem: 'none', d: "Whatever originally justified this hunger is long gone \u2014 the war, the wound, the reason. The hunger itself never got the message. It simply kept going, past the point of having anything left to actually want.", en: ['Something Bloodless, Still Hungry Anyway', 'A Vampire Past the Point of Wanting Anything Specific', 'The Undying Thing That Forgot Why'], loot: ['A Reason, Long Since Expired', 'Hunger With Nothing Left to Justify It', 'Proof Wanting Can Outlive Its Own Point'], xp: 8900, g: 5340, dg: 'impossible' },
+    { n: 'Neither Fully Wolf Nor Fully Free', lv: 710, elem: 'none', d: "The pack here does not hunt for food. It hunts because the alternative is holding still long enough to feel exactly how stuck each of them actually is, and none of them can afford that stillness.", en: ['A Hound That Will Not Stop Moving', 'Something Running From Its Own Stillness', 'The Pack That Forgot How to Rest'], loot: ['A Path Worn Down by Constant Running', 'Proof Stillness Is the Real Enemy Here', 'Claws Worn Smooth From Never Stopping'], xp: 9100, g: 5460, dg: 'impossible' },
+    { n: 'Preserved Past the Point of Meaning', lv: 720, elem: 'none', d: "Whatever this place was originally trying to protect stopped mattering centuries ago. The preservation continued anyway \u2014 thorough, dutiful, and entirely beside the point by now.", en: ['A Husk Guarding Something Long Since Irrelevant', 'Something Preserved for No Remaining Reason', 'The Wrapped Thing That Outlasted Its Own Purpose'], loot: ['A Purpose, Well Past Its Expiration', 'Preservation With Nothing Left Worth Preserving', 'Proof Duty Can Outlive Its Own Point'], xp: 9300, g: 5580, dg: 'impossible' },
+    { n: 'Where Every Ending Got Interrupted', lv: 730, elem: 'none', d: "All three of them, together now \u2014 the ones who would not die, the ones who never finished changing, the ones who would not let go. None of them agree on much. They agree entirely on refusing to end.", en: ['Something Undying and Something Unwolfed, Working Together', 'A Wrapped Remnant Standing Guard Over Both', 'The Alliance That Refuses Every Ending'], loot: ['Proof Even Refusal Can Find Common Ground', 'Three Different Curses, One Shared Instinct', 'An Ending, Interrupted From Three Directions at Once'], xp: 9500, g: 5700, dg: 'impossible' },
+    { n: 'The Last Refusal', lv: 740, elem: 'none', d: "Whatever is at the center of this world is close now \u2014 close enough that even the ground refuses to hold still, close enough that everything out here seems to be listening for the same distant, unfinished thing.", en: ['Something That Answers to the Center', 'A Guardian of the Last Refusal', 'The Thing That Was Sent Ahead to Warn You'], loot: ['A Warning, Sent Too Late to Matter', 'Proof the Center Already Knows You Are Coming', 'Something That Was Never Meant to Be Found This Close'], xp: 9700, g: 5820, dg: 'impossible' },
+    { n: 'What Should Have Been Let Go', lv: 750, elem: 'none', d: "The center of it, finally \u2014 not a monster exactly, not anymore. Just the sheer, accumulated weight of every ending this whole world has ever refused, together, all at once, still refusing.", en: ['The Weight of Every Postponed Ending', 'Something That Remembers Refusing All of Them', 'A Guardian Older Than Its Own Refusal'], loot: ['An Ending, Finally Within Reach', 'Proof Refusal Has a Limit After All', 'The Last Thing This World Was Ever Keeping'], xp: 9900, g: 5940, dg: 'impossible' },
+    // === WORLD 8: THE WORLD THAT LEARNED NOT TO LOOK (Lv 760-850) ===
+    // Throughline: the gaze itself is the danger here. Every world before this one
+    // rewarded looking closer, understanding more, actually seeing what was in front
+    // of you — this one inverts that instinct entirely. Basilisk/serpent-type names
+    // use serpent/snake/basilisk (existing 'serpent' archetype, no change needed).
+    // Gorgon/Medusa-type names use gorgon/gaze/unblinking/stone-touched/petrif/turned
+    // to stone/stares back (triggers Creeping Petrification specifically, checked
+    // ahead of the broader archetype rules — see the damage-resolution code).
+    { n: 'Where Looking Costs Something', lv: 760, elem: 'none', d: "Nothing here announces itself as dangerous. That is exactly the danger \u2014 whatever is actually threatening you is only threatening once you have already looked directly at it, and by then the looking is already done.", en: ['Something That Waits to Be Seen', 'A Watcher That Prefers Not to Be Watched Back', 'Whatever Stares Back First'], loot: ['A Mirror, Deliberately Cracked', 'Proof Looking Away Was the Right Choice', 'Something Nobody Should Have Looked At Directly'], xp: 10100, g: 6060, dg: 'impossible' },
+    { n: 'The Serpent\u2019s Own Territory', lv: 770, elem: 'none', d: "The ground here moves before anything visible does \u2014 coiled shapes under loose stone, patient in a way that has nothing to do with hunting and everything to do with simply being sure of the outcome already.", en: ['A Basilisk, Old Enough to Be Patient', 'Something Coiled and Entirely Unhurried', 'The Serpent That Already Knows How This Ends'], loot: ['Scales Shed From Something Enormous', 'Proof Patience Can Be Its Own Weapon', 'A Fang, Still Warm'], xp: 10300, g: 6180, dg: 'impossible' },
+    { n: 'Faces That Forgot How to Move', lv: 780, elem: 'none', d: "They are arranged like a garden here, almost gently \u2014 shapes mid-gesture, mid-word, mid-flinch, every single one of them caught at the exact moment they made the mistake of looking directly at something they should not have.", en: ['A Gorgon, Unhurried About It', 'Something With an Unblinking Stare', 'The Gaze That Does Not Miss'], loot: ['A Statue That Was Once Mid-Sentence', 'Proof the Gaze Does Not Discriminate', 'Stone That Still Remembers Being Skin'], xp: 10500, g: 6300, dg: 'impossible' },
+    { n: 'Those Who Looked Anyway', lv: 790, elem: 'none', d: "Every figure here made the same choice, for different reasons \u2014 curiosity, defiance, simple bad luck \u2014 and arrived at exactly the same ending regardless of which reason they thought excused it.", en: ['Something Stone-Touched but Still Moving', 'A Guardian That Looked Once and Regretted It Slowly', 'The Curious Ones, Preserved Mid-Curiosity'], loot: ['A Reason That Did Not Actually Excuse Anything', 'Proof Curiosity Has a Real Cost Here', 'Something Half-Turned, Still Deciding'], xp: 10700, g: 6420, dg: 'impossible' },
+    { n: 'Where the Serpents Actually Nest', lv: 800, elem: 'none', d: "Deeper in, the ground stops pretending to be solid at all \u2014 scale over scale, coil over coil, a nest built by something that has clearly never once needed to worry about being interrupted.", en: ['The Nest\u2019s Own Eldest Basilisk', 'Something That Has Never Been Successfully Hunted', 'A Serpent That Stopped Counting Its Own Age'], loot: ['An Egg, Impossibly Warm', 'Proof This Nest Has Never Once Been Threatened', 'Venom Aged Past the Point of Having a Cure'], xp: 10900, g: 6540, dg: 'impossible' },
+    { n: 'The Gallery of Unblinking Things', lv: 810, elem: 'none', d: "Rows of them now, deliberate, almost curated \u2014 whatever keeps this place insists on arranging its victims like an exhibit, as if the stillness itself were the entire point rather than a byproduct.", en: ['A Gorgon Who Curates Her Own Gallery', 'Something That Arranges Rather Than Simply Kills', 'The Unblinking Thing That Calls This Art'], loot: ['A Placard With No Name Written On It', 'Proof Even Cruelty Can Develop a Sense of Order', 'Something Posed Rather Than Simply Left'], xp: 11100, g: 6660, dg: 'impossible' },
+    { n: 'What the Stone Still Remembers', lv: 820, elem: 'none', d: "Touch it long enough and the stone here answers back \u2014 not words exactly, just fragments, impressions, the last thing each petrified shape was actually thinking before the stillness took the rest.", en: ['Something Stone That Still Half-Remembers', 'A Guardian Caught Between Memory and Silence', 'The Petrified Thing That Almost Speaks'], loot: ['A Memory, Trapped Halfway to Being Forgotten', 'Proof Stone Is Not Actually Silent, Just Slow', 'Something the Stillness Never Quite Finished Taking'], xp: 11300, g: 6780, dg: 'impossible' },
+    { n: 'Where Serpent and Stone Share a Border', lv: 830, elem: 'none', d: "The two threats stopped competing here long ago \u2014 the basilisks patient enough to wait, the gorgons certain enough not to rush, both content to let this place do most of the actual work for them.", en: ['A Basilisk and a Gorgon, Working the Same Ground', 'Something That Benefits From Neither Side Winning', 'The Border Where Two Different Stillnesses Meet'], loot: ['Proof Even Rivals Can Share Territory Peacefully', 'A Truce Neither Side Ever Had to Announce', 'Something Caught Exactly Between Both Threats'], xp: 11500, g: 6900, dg: 'impossible' },
+    { n: 'The Last Thing Worth Not Looking At', lv: 840, elem: 'none', d: "Whatever is at the center of this world is close now, and everything out here seems built specifically to keep you from actually seeing it before you are ready \u2014 which might, San suspects, be the one genuinely kind thing this place has done.", en: ['Something Sent to Keep You From Looking Too Soon', 'A Guardian of the Last Unlooked-At Thing', 'The Warning That Arrives Already Turning to Stone'], loot: ['A Warning, Delivered Mid-Petrification', 'Proof Something Here Is Actually Trying to Help', 'The Last Thing Sent Before the Center Itself'], xp: 11700, g: 7020, dg: 'impossible' },
+    { n: 'The Eye That Started All of It', lv: 850, elem: 'none', d: "Not a gorgon. Not a basilisk, not anymore. Just the original gaze itself, the first look that ever turned something to stone, still watching, still waiting for something worth actually looking at.", en: ['The First Gaze, Still Watching', 'Something Older Than Every Gorgon Here Combined', 'The Original Stillness, Patient as Ever'], loot: ['An Ending, If You Are Brave Enough to Actually Look', 'Proof the First Gaze Was Never Really About Cruelty', 'The Last Thing This World Ever Needed Anyone to See'], xp: 11900, g: 7140, dg: 'impossible' },
+    // === WORLD 9: THE WORLD THAT WATCHES FROM ABOVE (Lv 860-950) ===
+    // Throughline: three different reasons something rules the sky. Wyverns are raw
+    // aerial predation — hunting because that is simply what they do. Harpies are
+    // punishment and pursuit — sent after someone, relentless, personal. Griffins are
+    // guardianship — watching over something they consider worth watching over.
+    // Names use wyvern/harpy/griffin directly (now correctly tagged 'flying' — see the
+    // archetype extension above), so no further name-check hooks are needed this time.
+    { n: 'Where the Sky Keeps Its Own Watch', lv: 860, elem: 'none', d: "Nothing moves on the ground here without something above it noticing first. The sky is not empty in this world. It was never actually empty. It was just patient about being seen.", en: ['A Wyvern, Circling Without Hurry', 'Something That Watches Before It Ever Descends', 'The First Shape You Notice Is Never the Only One'], loot: ['A Feather, Too Large to Belong to Anything Ordinary', 'Proof the Sky Was Watching the Whole Time', 'Something Dropped From Very High Up'], xp: 12100, g: 7260, dg: 'impossible' },
+    { n: 'The Wyvern\u2019s Own Hunting Ground', lv: 870, elem: 'none', d: "No nest here bothers hiding itself. There is nothing to hide from \u2014 whatever hunts on this ground has never once needed to worry about being the hunted instead.", en: ['A Wyvern, Confident About It', 'Something That Has Never Lost a Chase', 'The Sky\u2019s Own Uncontested Predator'], loot: ['Talons Sharpened From Genuine Overuse', 'Proof This Ground Has Never Changed Hands', 'A Kill Left Deliberately in the Open'], xp: 12300, g: 7380, dg: 'impossible' },
+    { n: 'Sent Specifically for You', lv: 880, elem: 'none', d: "The harpies here do not hunt at random. Every single one of them was sent after something specific, someone specific, some old unpaid debt neither the sender nor the sent-for ever quite let go of.", en: ['A Harpy, Personally Assigned', 'Something That Was Told Exactly Who to Find', 'The Pursuit That Was Never Actually Random'], loot: ['A Name, Written on Whatever Sent Her', 'Proof This Was Never Impersonal', 'A Debt Somebody Refused to Let Die Quietly'], xp: 12500, g: 7500, dg: 'impossible' },
+    { n: 'What the Griffins Have Sworn to Guard', lv: 890, elem: 'none', d: "Nobody currently living remembers what is actually being protected here. The griffins were never told to stop. So they have not.", en: ['A Griffin, Still Faithfully at Post', 'Something Guarding an Oath Nobody Remembers Making', 'The Guardian That Outlasted Its Own Assignment'], loot: ['An Oath, Kept Long Past Its Own Expiration', 'Proof Loyalty Can Outlive Its Own Reason', 'Something Still Being Protected for No Remembered Cause'], xp: 12700, g: 7620, dg: 'impossible' },
+    { n: 'The Higher Hunting Grounds', lv: 900, elem: 'none', d: "Climb high enough and the wyverns here stop being the only real threat \u2014 the air itself thins into something that punishes anyone who was not actually built to belong this far up.", en: ['A Wyvern Adapted to the Thinning Air', 'Something That Hunts Where Few Things Can Follow', 'The Sky\u2019s Cruelest, Highest Territory'], loot: ['Air, Bottled Before It Could Thin', 'Proof Altitude Is Its Own Kind of Weapon', 'Something Built for Heights Nothing Else Survives'], xp: 12900, g: 7740, dg: 'impossible' },
+    { n: 'The Pursuit That Does Not End', lv: 910, elem: 'none', d: "It is not that the harpies here are faster. It is that they simply do not stop, and eventually, against anything that eventually has to rest, that turns out to matter more than speed ever did.", en: ['A Harpy That Has Never Once Stopped Chasing', 'Something Relentless Rather Than Merely Fast', 'The Pursuit That Outlasts Every Attempt to Outrun It'], loot: ['Proof Persistence Beats Speed Eventually', 'A Trail Worn Down by Endless Pursuit', 'Something That Finally Stopped Running'], xp: 13100, g: 7860, dg: 'impossible' },
+    { n: 'The Old Vow, Still Standing Watch', lv: 920, elem: 'none', d: "This is where the original oath was actually sworn, back before the thing it protected even mattered anymore. The griffins here remember the swearing. They have simply stopped needing to remember why.", en: ['A Griffin Who Remembers the Original Oath', 'Something Standing Watch Over the Vow Itself', 'The Guardian of a Promise Nobody Else Recalls'], loot: ['The Original Vow, Word for Word', 'Proof Some Promises Outlive Their Own Point', 'Something Kept Purely Out of Habit by Now'], xp: 13300, g: 7980, dg: 'impossible' },
+    { n: 'Where All Three Skies Overlap', lv: 930, elem: 'none', d: "Wyverns hunting, harpies pursuing, griffins guarding \u2014 all three, together, in the same stretch of sky, each one entirely uninterested in the other two, all pursuing completely different reasons to be up here at all.", en: ['A Wyvern, a Harpy, and a Griffin, All Ignoring Each Other', 'Something That Hunts While Something Else Pursues', 'The Overlap Where Three Different Skies Meet'], loot: ['Proof the Sky Has Room for More Than One Purpose', 'Three Different Reasons to Rule the Same Air', 'Something Caught Between All Three at Once'], xp: 13500, g: 8100, dg: 'impossible' },
+    { n: 'The Last Clear Air', lv: 940, elem: 'none', d: "Whatever watches from the very top of this world is close now \u2014 close enough that even the wyverns fly lower here, close enough that the griffins stop patrolling and simply wait.", en: ['Something Sent Down From the Very Top', 'A Guardian of the Last Clear Air', 'The Watcher\u2019s Own Herald'], loot: ['A Feather From Something Far Larger Than a Wyvern', 'Proof the Top of This World Already Knows You Are Coming', 'Something That Was Never Meant to Fly This Low'], xp: 13700, g: 8220, dg: 'impossible' },
+    { n: 'What Watches Everything Else', lv: 950, elem: 'none', d: "The very top of it, finally \u2014 not a wyvern, not a harpy, not a griffin, exactly. Just the original watching itself, old enough to have taught all three of them what it means to rule a sky.", en: ['The First Watcher, Older Than Every Wing Below It', 'Something That Taught Every Sky-Ruler Here How to Watch', 'The Original Height, Still Holding Its Post'], loot: ['A Vantage Point, Finally Earned', 'Proof the Watching Was Never Actually Hostile', 'The Last Thing This Sky Was Ever Guarding'], xp: 13900, g: 8340, dg: 'impossible' },
+    // === WORLD 10: THE WORLD WHERE WISHES TAKE THEIR OWN SHAPE (Lv 960-1050) ===
+    // Handled with real care rather than the shallow "wish backfires" trope — djinn
+    // here are not inherently malicious. Most of what goes wrong traces back to human
+    // carelessness in how a wish was worded, or to djinn who were bound against their
+    // will by exploitative old-world pacts long before the party arrived, and have had
+    // centuries to grow resentful of that binding specifically, not of people in
+    // general. Names use djinn/genie/ifrit (now correctly tagged 'elemental').
+    { n: 'Where Wanting Finally Gets Answered', lv: 960, elem: 'none', d: "Nothing here refuses a request. That is the entire danger of the place \u2014 every wish gets answered exactly as worded, which turns out to matter enormously, since almost nobody actually says what they mean the first time.", en: ['A Djinn, Bored of Literal Requests', 'Something That Grants Exactly What Was Asked', 'The Answer Nobody Actually Wanted, Technically Correct'], loot: ['A Wish, Worded Carelessly', 'Proof Meaning and Wording Are Not the Same Thing', 'Something Granted Exactly as Requested'], xp: 14100, g: 8460, dg: 'impossible' },
+    { n: 'The Binding Nobody Asked If It Wanted', lv: 970, elem: 'none', d: "The old pact here was never a fair one. Whoever wrote the original binding did not ask what the djinn actually wanted, only what they could be made to do. Centuries later, that specific unfairness has not faded at all.", en: ['A Genie, Still Bound Against an Old Unfairness', 'Something Held to a Pact It Never Actually Agreed To', 'The Binding That Was Never Really Consensual'], loot: ['A Contract, Signed by Only One Side', 'Proof the Binding Was the Actual Injustice Here', 'Chains That Were Never a Fair Trade'], xp: 14300, g: 8580, dg: 'impossible' },
+    { n: 'What Carelessness Actually Costs', lv: 980, elem: 'none', d: "Every ruin here traces back to the same mistake, made by different people in different centuries \u2014 someone wished for something enormous without once considering what enormous things actually require to hold.", en: ['A Djinn Cleaning Up After Someone Else\u2019s Carelessness', 'Something That Warned Them and Was Ignored Anyway', 'The Wish That Was Granted Faster Than It Was Thought Through'], loot: ['A Warning, Given and Ignored', 'Proof the Djinn Tried to Explain First', 'Something Enormous, Granted Without Enough Thought'], xp: 14500, g: 8700, dg: 'impossible' },
+    { n: 'Centuries of Resenting the Lamp', lv: 990, elem: 'none', d: "Not every djinn here is dangerous out of malice. Some of them are simply, understandably furious \u2014 bound for longer than most civilizations have lasted, and nobody currently alive is actually responsible for that, which does not make the fury any less real.", en: ['An Ifrit, Furious for Entirely Fair Reasons', 'Something That Has Earned Its Own Resentment', 'The Anger That Outlasted Whoever Actually Caused It'], loot: ['A Lamp, Deliberately Left Unpolished', 'Proof Some Anger Is Simply Justified', 'Something That Has Every Right to Be Furious'], xp: 14700, g: 8820, dg: 'impossible' },
+    { n: 'The Ones Who Made Their Peace With It', lv: 1000, elem: 'none', d: "Not every djinn stayed angry. Some of them, somewhere along the way, found something like purpose in the binding itself \u2014 not forgiveness exactly, just a decision that fury was not a place worth living permanently.", en: ['A Djinn Who Chose Peace Over Endless Fury', 'Something That Found Purpose Inside an Unfair Situation', 'The Genie Who Simply Stopped Being Angry, Eventually'], loot: ['Proof Peace Is a Choice, Not Just an Absence of Anger', 'A Purpose, Found Somewhere Inside an Old Injustice', 'Something Given Freely Despite Having No Real Reason To'], xp: 14900, g: 8940, dg: 'impossible' },
+    { n: 'Old Enough to Have Stopped Counting', lv: 1010, elem: 'none', d: "The djinn out here are simply tired \u2014 not angry, not at peace, just old past the point where either of those states feels worth maintaining. They grant what is asked because it is easier than explaining why they would rather not.", en: ['A Djinn Too Old to Bother Refusing Anymore', 'Something Weary Rather Than Hostile', 'The Ifrit That Stopped Keeping Track of the Years'], loot: ['A Weariness Older Than Most Recorded History', 'Proof Exhaustion Can Look Like Compliance', 'Something Granted Simply Because Refusing Took More Effort'], xp: 15100, g: 9060, dg: 'impossible' },
+    { n: 'Say Exactly What You Mean', lv: 1020, elem: 'none', d: "The wording matters more here than anywhere else in this world. Every djinn out here has clearly had centuries of practice finding the technically-correct interpretation furthest from whatever was actually intended.", en: ['A Djinn Who Takes Wording Extremely Seriously', 'Something That Rewards Precision and Punishes Assumption', 'The Genie Who Has Heard Every Careless Wish Before'], loot: ['A Wish, Reworded More Carefully the Second Time', 'Proof Precision Actually Matters Here', 'Something Granted Correctly, for Once'], xp: 15300, g: 9180, dg: 'impossible' },
+    { n: 'Where Bound and Unbound Both Remain', lv: 1030, elem: 'none', d: "Some of the djinn here are still held by old pacts. Some freed themselves centuries ago and simply never left. Telling the two apart from a distance is nearly impossible, and neither group seems particularly interested in making it easier.", en: ['A Djinn, Bound', 'A Djinn, Free and Staying Anyway', 'Something That Prefers You Not Know Which Is Which'], loot: ['Proof Freedom and Captivity Can Look Identical From Outside', 'A Choice, Made Long After the Binding Ended', 'Something That Stayed for Reasons of Its Own'], xp: 15500, g: 9300, dg: 'impossible' },
+    { n: 'The Weight of Every Careless Wish', lv: 1040, elem: 'none', d: "Whatever is at the center of this world is close now \u2014 close enough that every djinn out here seems to already know exactly what you are going to ask before you finish asking it, and seems, for once, genuinely reluctant to grant it.", en: ['Something Sent to Ask If You Are Actually Sure', 'A Djinn Trying Gently to Talk You Out of This', 'The Last Warning Before the Center Itself'], loot: ['A Question, Asked Out of Genuine Concern', 'Proof Even This World Wants You to Think First', 'Something That Was Hoping You Would Turn Back'], xp: 15700, g: 9420, dg: 'impossible' },
+    { n: 'The First Wish Ever Granted', lv: 1050, elem: 'none', d: "Not a djinn exactly, not anymore \u2014 the origin of the granting itself, old enough to remember the very first wish anyone ever made of it, and honest enough, after all this time, to admit it still does not know if that first answer was actually kind.", en: ['The First Granting, Still Uncertain if It Was Kind', 'Something Older Than the Concept of Asking', 'The Origin That Still Second-Guesses Its Very First Answer'], loot: ['A Wish, If You Are Finally Ready to Word It Carefully', 'Proof Even the Beginning Had Doubts', 'The Last Thing This World Was Ever Waiting to Grant'], xp: 15900, g: 9540, dg: 'impossible' },
     // === VOYAGE: SEA EXPLORATION ZONES ===
     // Not part of World 6's own progression sequence — reachable only through the
     // Voyage screen's Explore action, not normal zone navigation. Fills the third
@@ -1799,6 +1871,35 @@ const G = {
     { n: 'The Taotie, Still Hungry', zone: 'The Debt Finally Come Due', hp: 3850000, mhp: 3850000, atk: 7100, def: 4250, xp: 1520000, g: 1085000,
       mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 962500,
       desc: "All mouth, the old warning said, and it was not exaggerating. It does not attack out of hatred and it does not defend out of fear \u2014 it simply keeps consuming, the way it always has, the way whatever this world used to be apparently never taught it to stop. Merfolk and orc lines both stand this line today, for once on the same side of an old border, because there is nothing about this particular hunger that discriminates." },
+    // World 7's climax — deliberately not a fourth creature type layered on top of
+    // vampire/werewolf/mummy. It's the accumulated weight of every ending this whole
+    // world has ever refused, together, which is why it carries no single archetype
+    // of its own (elem: 'none', name matches none of the vampire/wolf/mummy keywords)
+    // — it isn't undead or beast, it's the refusal itself, given a shape.
+    { n: 'What Should Have Ended Long Ago', zone: 'What Should Have Been Let Go', hp: 4100000, mhp: 4100000, atk: 7400, def: 4400, xp: 1650000, g: 1150000,
+      mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 1025000,
+      desc: "Not a vampire. Not a wolf, not wrapped in anything. Just every ending this world has ever talked itself out of, standing in one place, still finding new reasons to refuse the same door every single one of its creatures has been circling for centuries. It does not want anything specific anymore. Wanting stopped mattering a long time before you arrived. It simply has not stopped yet, and does not currently intend to." },
+    // World 8's climax — same principle as World 7's: the concept itself, not a
+    // fourth creature layered on top. Not a gorgon, not a basilisk specifically —
+    // the original gaze that both of those things eventually learned from, still
+    // watching, still waiting for something it considers worth actually looking at.
+    { n: 'The First Thing That Ever Looked Back', zone: 'The Eye That Started All of It', hp: 4350000, mhp: 4350000, atk: 7650, def: 4550, xp: 1780000, g: 1220000,
+      mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 1087500,
+      desc: "Every gorgon in this world learned the gaze from something. Every basilisk\u2019s patience traces back to the same original stillness. This is that origin, finally, undisguised \u2014 not cruel, not even hungry, just endlessly, patiently curious about what happens when something finally proves interesting enough to actually watch all the way through." },
+    // World 9's climax — same principle as the last two worlds' finales: the concept
+    // itself, not a fourth creature layered onto wyvern/harpy/griffin. Not any one of
+    // the three, exactly — the original height and the original watching, old enough
+    // to have taught every sky-ruler in this world what it actually means to rule one.
+    { n: 'The Original Height, Watching Still', zone: 'What Watches Everything Else', hp: 4600000, mhp: 4600000, atk: 7900, def: 4700, xp: 1910000, g: 1290000,
+      mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 1150000,
+      desc: "Not a wyvern hunting, not a harpy sent after anyone, not a griffin honoring some half-remembered vow. Just the sky itself, in the oldest sense this world has ever used that word \u2014 something that was watching long before anything below it learned to look up and notice." },
+    // World 10's climax — same principle as every world's finale so far: the concept
+    // itself, not a fourth kind of djinn. Not bound, not free, not furious, not at
+    // peace — just the very first granting, honest enough after countless centuries
+    // to still be uncertain whether that original answer was ever actually kind.
+    { n: 'The First Wish, Still Being Answered', zone: 'The First Wish Ever Granted', hp: 4850000, mhp: 4850000, atk: 8150, def: 4850, xp: 2040000, g: 1360000,
+      mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 1212500,
+      desc: "It does not ask what you want. It already knows \u2014 it has heard every wish anyone has ever made, worded carelessly or carefully, granted kindly or not. It simply wants, after everything, to finally get one right. Whether that is possible is the only question it has never managed to answer." },
     // The Endless Thinning's own boss — every zone boss above it is a fixed stat
     // block, calibrated once and left to eventually fall behind the same way regular
     // monsters used to. This one carries no hp/atk/def/xp/g of its own at all:
@@ -7316,6 +7417,140 @@ function generateEnemyStats(zoneLevel, templateKey, elem) {
 
 // Enemy type registry for dynamic lookup
 const ENEMY_REGISTRY = {
+  // World 10: The World Where Wishes Take Their Own Shape (Lv960-1050). Templates
+  // reflect emotional register more than combat role here — furious/resentful djinn
+  // lean elite (dangerous, deliberate), bound/weary ones lean tank (steady, enduring),
+  // literal-wording types lean striker (quick, precise).
+  'A Djinn, Bored of Literal Requests': { zoneLv: 960, template: 'striker', elem: 'none' },
+  'Something That Grants Exactly What Was Asked': { zoneLv: 960, template: 'elite', elem: 'none' },
+  'The Answer Nobody Actually Wanted, Technically Correct': { zoneLv: 960, template: 'striker', elem: 'none' },
+  'A Genie, Still Bound Against an Old Unfairness': { zoneLv: 970, template: 'tank', elem: 'none' },
+  'Something Held to a Pact It Never Actually Agreed To': { zoneLv: 970, template: 'tank', elem: 'none' },
+  'The Binding That Was Never Really Consensual': { zoneLv: 970, template: 'brute', elem: 'none' },
+  'A Djinn Cleaning Up After Someone Else\u2019s Carelessness': { zoneLv: 980, template: 'tank', elem: 'none' },
+  'Something That Warned Them and Was Ignored Anyway': { zoneLv: 980, template: 'elite', elem: 'none' },
+  'The Wish That Was Granted Faster Than It Was Thought Through': { zoneLv: 980, template: 'brute', elem: 'none' },
+  'An Ifrit, Furious for Entirely Fair Reasons': { zoneLv: 990, template: 'elite', elem: 'none' },
+  'Something That Has Earned Its Own Resentment': { zoneLv: 990, template: 'elite', elem: 'none' },
+  'The Anger That Outlasted Whoever Actually Caused It': { zoneLv: 990, template: 'striker', elem: 'none' },
+  'A Djinn Who Chose Peace Over Endless Fury': { zoneLv: 1000, template: 'tank', elem: 'none' },
+  'Something That Found Purpose Inside an Unfair Situation': { zoneLv: 1000, template: 'tank', elem: 'none' },
+  'The Genie Who Simply Stopped Being Angry, Eventually': { zoneLv: 1000, template: 'striker', elem: 'none' },
+  'A Djinn Too Old to Bother Refusing Anymore': { zoneLv: 1010, template: 'tank', elem: 'none' },
+  'Something Weary Rather Than Hostile': { zoneLv: 1010, template: 'brute', elem: 'none' },
+  'The Ifrit That Stopped Keeping Track of the Years': { zoneLv: 1010, template: 'tank', elem: 'none' },
+  'A Djinn Who Takes Wording Extremely Seriously': { zoneLv: 1020, template: 'striker', elem: 'none' },
+  'Something That Rewards Precision and Punishes Assumption': { zoneLv: 1020, template: 'elite', elem: 'none' },
+  'The Genie Who Has Heard Every Careless Wish Before': { zoneLv: 1020, template: 'striker', elem: 'none' },
+  'A Djinn, Bound': { zoneLv: 1030, template: 'tank', elem: 'none' },
+  'A Djinn, Free and Staying Anyway': { zoneLv: 1030, template: 'elite', elem: 'none' },
+  'Something That Prefers You Not Know Which Is Which': { zoneLv: 1030, template: 'striker', elem: 'none' },
+  'Something Sent to Ask If You Are Actually Sure': { zoneLv: 1040, template: 'elite', elem: 'none' },
+  'A Djinn Trying Gently to Talk You Out of This': { zoneLv: 1040, template: 'tank', elem: 'none' },
+  'The Last Warning Before the Center Itself': { zoneLv: 1040, template: 'striker', elem: 'none' },
+  'The First Granting, Still Uncertain if It Was Kind': { zoneLv: 1050, template: 'elite', elem: 'none' },
+  'Something Older Than the Concept of Asking': { zoneLv: 1050, template: 'tank', elem: 'none' },
+  'The Origin That Still Second-Guesses Its Very First Answer': { zoneLv: 1050, template: 'brute', elem: 'none' },
+  // World 9: The World That Watches From Above (Lv860-950). Wyverns lean striker
+  // (fast, aggressive predation); harpies lean elite (personal, relentless pursuit);
+  // griffins lean tank (steady, dutiful guardianship).
+  'A Wyvern, Circling Without Hurry': { zoneLv: 860, template: 'striker', elem: 'none' },
+  'Something That Watches Before It Ever Descends': { zoneLv: 860, template: 'elite', elem: 'none' },
+  'The First Shape You Notice Is Never the Only One': { zoneLv: 860, template: 'striker', elem: 'none' },
+  'A Wyvern, Confident About It': { zoneLv: 870, template: 'striker', elem: 'none' },
+  'Something That Has Never Lost a Chase': { zoneLv: 870, template: 'striker', elem: 'none' },
+  'The Sky\u2019s Own Uncontested Predator': { zoneLv: 870, template: 'elite', elem: 'none' },
+  'A Harpy, Personally Assigned': { zoneLv: 880, template: 'elite', elem: 'none' },
+  'Something That Was Told Exactly Who to Find': { zoneLv: 880, template: 'striker', elem: 'none' },
+  'The Pursuit That Was Never Actually Random': { zoneLv: 880, template: 'elite', elem: 'none' },
+  'A Griffin, Still Faithfully at Post': { zoneLv: 890, template: 'tank', elem: 'none' },
+  'Something Guarding an Oath Nobody Remembers Making': { zoneLv: 890, template: 'tank', elem: 'none' },
+  'The Guardian That Outlasted Its Own Assignment': { zoneLv: 890, template: 'brute', elem: 'none' },
+  'A Wyvern Adapted to the Thinning Air': { zoneLv: 900, template: 'striker', elem: 'none' },
+  'Something That Hunts Where Few Things Can Follow': { zoneLv: 900, template: 'elite', elem: 'none' },
+  'The Sky\u2019s Cruelest, Highest Territory': { zoneLv: 900, template: 'elite', elem: 'none' },
+  'A Harpy That Has Never Once Stopped Chasing': { zoneLv: 910, template: 'striker', elem: 'none' },
+  'Something Relentless Rather Than Merely Fast': { zoneLv: 910, template: 'elite', elem: 'none' },
+  'The Pursuit That Outlasts Every Attempt to Outrun It': { zoneLv: 910, template: 'elite', elem: 'none' },
+  'A Griffin Who Remembers the Original Oath': { zoneLv: 920, template: 'tank', elem: 'none' },
+  'Something Standing Watch Over the Vow Itself': { zoneLv: 920, template: 'brute', elem: 'none' },
+  'The Guardian of a Promise Nobody Else Recalls': { zoneLv: 920, template: 'tank', elem: 'none' },
+  'A Wyvern, a Harpy, and a Griffin, All Ignoring Each Other': { zoneLv: 930, template: 'elite', elem: 'none' },
+  'Something That Hunts While Something Else Pursues': { zoneLv: 930, template: 'striker', elem: 'none' },
+  'The Overlap Where Three Different Skies Meet': { zoneLv: 930, template: 'tank', elem: 'none' },
+  'Something Sent Down From the Very Top': { zoneLv: 940, template: 'elite', elem: 'none' },
+  'A Guardian of the Last Clear Air': { zoneLv: 940, template: 'tank', elem: 'none' },
+  'The Watcher\u2019s Own Herald': { zoneLv: 940, template: 'striker', elem: 'none' },
+  'The First Watcher, Older Than Every Wing Below It': { zoneLv: 950, template: 'elite', elem: 'none' },
+  'Something That Taught Every Sky-Ruler Here How to Watch': { zoneLv: 950, template: 'tank', elem: 'none' },
+  'The Original Height, Still Holding Its Post': { zoneLv: 950, template: 'brute', elem: 'none' },
+  // World 8: The World That Learned Not to Look (Lv760-850). Basilisk/serpent-types
+  // lean striker/tank (patient, dangerous, unhurried); Gorgon/gaze-types lean elite
+  // (deliberate, precise); stone/petrified-types lean tank/brute (slow, heavy, inert).
+  'Something That Waits to Be Seen': { zoneLv: 760, template: 'elite', elem: 'none' },
+  'A Watcher That Prefers Not to Be Watched Back': { zoneLv: 760, template: 'tank', elem: 'none' },
+  'Whatever Stares Back First': { zoneLv: 760, template: 'elite', elem: 'none' },
+  'A Basilisk, Old Enough to Be Patient': { zoneLv: 770, template: 'tank', elem: 'none' },
+  'Something Coiled and Entirely Unhurried': { zoneLv: 770, template: 'striker', elem: 'none' },
+  'The Serpent That Already Knows How This Ends': { zoneLv: 770, template: 'elite', elem: 'none' },
+  'A Gorgon, Unhurried About It': { zoneLv: 780, template: 'elite', elem: 'none' },
+  'Something With an Unblinking Stare': { zoneLv: 780, template: 'tank', elem: 'none' },
+  'The Gaze That Does Not Miss': { zoneLv: 780, template: 'elite', elem: 'none' },
+  'Something Stone-Touched but Still Moving': { zoneLv: 790, template: 'brute', elem: 'none' },
+  'A Guardian That Looked Once and Regretted It Slowly': { zoneLv: 790, template: 'tank', elem: 'none' },
+  'The Curious Ones, Preserved Mid-Curiosity': { zoneLv: 790, template: 'brute', elem: 'none' },
+  'The Nest\u2019s Own Eldest Basilisk': { zoneLv: 800, template: 'tank', elem: 'none' },
+  'Something That Has Never Been Successfully Hunted': { zoneLv: 800, template: 'elite', elem: 'none' },
+  'A Serpent That Stopped Counting Its Own Age': { zoneLv: 800, template: 'striker', elem: 'none' },
+  'A Gorgon Who Curates Her Own Gallery': { zoneLv: 810, template: 'elite', elem: 'none' },
+  'Something That Arranges Rather Than Simply Kills': { zoneLv: 810, template: 'tank', elem: 'none' },
+  'The Unblinking Thing That Calls This Art': { zoneLv: 810, template: 'elite', elem: 'none' },
+  'Something Stone That Still Half-Remembers': { zoneLv: 820, template: 'brute', elem: 'none' },
+  'A Guardian Caught Between Memory and Silence': { zoneLv: 820, template: 'tank', elem: 'none' },
+  'The Petrified Thing That Almost Speaks': { zoneLv: 820, template: 'brute', elem: 'none' },
+  'A Basilisk and a Gorgon, Working the Same Ground': { zoneLv: 830, template: 'elite', elem: 'none' },
+  'Something That Benefits From Neither Side Winning': { zoneLv: 830, template: 'tank', elem: 'none' },
+  'The Border Where Two Different Stillnesses Meet': { zoneLv: 830, template: 'brute', elem: 'none' },
+  'Something Sent to Keep You From Looking Too Soon': { zoneLv: 840, template: 'elite', elem: 'none' },
+  'A Guardian of the Last Unlooked-At Thing': { zoneLv: 840, template: 'tank', elem: 'none' },
+  'The Warning That Arrives Already Turning to Stone': { zoneLv: 840, template: 'brute', elem: 'none' },
+  'The First Gaze, Still Watching': { zoneLv: 850, template: 'elite', elem: 'none' },
+  'Something Older Than Every Gorgon Here Combined': { zoneLv: 850, template: 'tank', elem: 'none' },
+  'The Original Stillness, Patient as Ever': { zoneLv: 850, template: 'brute', elem: 'none' },
+  // World 7: The World That Kept What It Should Have Let Go (Lv660-750). Templates
+  // assigned by archetype flavor — hounds/wolves lean striker (fast/aggressive),
+  // vampires lean elite (dangerous, deliberate), mummies/wrapped-types lean tank/brute
+  // (slow, durable, guarding something).
+  'Something Still Waiting to Be Over': { zoneLv: 660, template: 'elite', elem: 'none' },
+  'A Guard Who Never Stood Down': { zoneLv: 660, template: 'tank', elem: 'none' },
+  'Whatever This Place Refuses to Become': { zoneLv: 660, template: 'striker', elem: 'none' },
+  'A Hound Wearing Someone\u2019s Old Face': { zoneLv: 670, template: 'striker', elem: 'none' },
+  'Something Caught Between Two Selves': { zoneLv: 670, template: 'elite', elem: 'none' },
+  'The Wolf That Never Finished Becoming': { zoneLv: 670, template: 'striker', elem: 'none' },
+  'A Nosferatu, Freshly Refused': { zoneLv: 680, template: 'elite', elem: 'none' },
+  'Something Bloodless and Still Standing': { zoneLv: 680, template: 'tank', elem: 'none' },
+  'The Undying, Mid-Argument With Its Own Grave': { zoneLv: 680, template: 'elite', elem: 'none' },
+  'A Remnant, Carefully Wrapped': { zoneLv: 690, template: 'tank', elem: 'none' },
+  'Something Embalmed Against Its Own Wishes': { zoneLv: 690, template: 'brute', elem: 'none' },
+  'The Husk That Insists It Remembers Everything': { zoneLv: 690, template: 'tank', elem: 'none' },
+  'Something Bloodless, Still Hungry Anyway': { zoneLv: 700, template: 'striker', elem: 'none' },
+  'A Vampire Past the Point of Wanting Anything Specific': { zoneLv: 700, template: 'elite', elem: 'none' },
+  'The Undying Thing That Forgot Why': { zoneLv: 700, template: 'elite', elem: 'none' },
+  'A Hound That Will Not Stop Moving': { zoneLv: 710, template: 'striker', elem: 'none' },
+  'Something Running From Its Own Stillness': { zoneLv: 710, template: 'striker', elem: 'none' },
+  'The Pack That Forgot How to Rest': { zoneLv: 710, template: 'elite', elem: 'none' },
+  'A Husk Guarding Something Long Since Irrelevant': { zoneLv: 720, template: 'tank', elem: 'none' },
+  'Something Preserved for No Remaining Reason': { zoneLv: 720, template: 'brute', elem: 'none' },
+  'The Wrapped Thing That Outlasted Its Own Purpose': { zoneLv: 720, template: 'tank', elem: 'none' },
+  'Something Undying and Something Unwolfed, Working Together': { zoneLv: 730, template: 'elite', elem: 'none' },
+  'A Wrapped Remnant Standing Guard Over Both': { zoneLv: 730, template: 'tank', elem: 'none' },
+  'The Alliance That Refuses Every Ending': { zoneLv: 730, template: 'elite', elem: 'none' },
+  'Something That Answers to the Center': { zoneLv: 740, template: 'elite', elem: 'none' },
+  'A Guardian of the Last Refusal': { zoneLv: 740, template: 'tank', elem: 'none' },
+  'The Thing That Was Sent Ahead to Warn You': { zoneLv: 740, template: 'striker', elem: 'none' },
+  'The Weight of Every Postponed Ending': { zoneLv: 750, template: 'tank', elem: 'none' },
+  'Something That Remembers Refusing All of Them': { zoneLv: 750, template: 'elite', elem: 'none' },
+  'A Guardian Older Than Its Own Refusal': { zoneLv: 750, template: 'brute', elem: 'none' },
   // Voyage sea exploration zone enemies — same lesson as the earlier registry audit:
   // writing a zone's en: array doesn't register the enemies automatically. Adding
   // these immediately rather than letting them become another round of 0-HP spawns.
@@ -10813,7 +11048,21 @@ function buyGuildItem(index) {
 // risked destabilizing the existing per-companion growth-ability system.
 const AILMENT_TYPES = {
   disease: { n: 'Rotting Plague', atkMult: 0.75, defMult: 0.85, dmgPerTurn: 4, icon: '🤢' },
-  curse:   { n: 'Withering Curse', atkMult: 0.80, defMult: 0.75, dmgPerTurn: 0, icon: '💀' }
+  curse:   { n: 'Withering Curse', atkMult: 0.80, defMult: 0.75, dmgPerTurn: 0, icon: '💀' },
+  // Vampire-specific, mechanically distinct from disease rather than reusing it —
+  // "something taking a little of your strength" rather than "rotting," so the
+  // numbers land gentler. Deliberately NOT permanent level/stat loss — this game's
+  // wellness and progression systems have consistently avoided ever punishing the
+  // player retroactively, and true level drain would be the one real exception to
+  // that if it existed. Cured the same way as any other ailment.
+  drain:   { n: 'Vampiric Drain', atkMult: 0.85, defMult: 0.90, dmgPerTurn: 3, icon: '🩸' },
+  // Gorgon/Medusa/Basilisk-flavored. Real D&D-style petrification is a genuine
+  // game-over state (turned to stone, removed from play) — that would be the one
+  // actual game-over mechanic anywhere in this whole game, so it's deliberately
+  // NOT implemented that way. Kept inside the exact same ailment framework as the
+  // other three, just pushed to be the harshest across every stat, so it still reads
+  // as the most dangerous of the four without ever actually ending the fight.
+  petrification: { n: 'Creeping Petrification', atkMult: 0.65, defMult: 0.70, dmgPerTurn: 5, icon: '🗿' }
 };
 const AILMENT_INFLICT_CHANCE = 0.12;
 const ELIZ_CLEANSING_UNLOCK = 40;
@@ -11224,7 +11473,10 @@ function inflictAilment(type) {
   if (G.p.ailments.some(a => a.type === type)) return; // no stacking the same ailment
   const def = AILMENT_TYPES[type];
   G.p.ailments.push({ type, n: def.n });
-  lg((type === 'disease' ? '🤢' : '💀') + ' You have contracted ' + def.n + '! ATK and DEF weakened until cured \u2014 rest alone will not fix this.');
+  // Pulls the icon from AILMENT_TYPES directly rather than a hardcoded disease/else
+  // ternary — that pattern would've needed patching again for every new ailment type
+  // added (drain being the first case where it actually would have shown wrong).
+  lg(def.icon + ' You have contracted ' + def.n + '! ATK and DEF weakened until cured \u2014 rest alone will not fix this.');
 }
 
 function cureAilments(silent) {
@@ -16905,7 +17157,16 @@ function doEnemyAttack(enemy) {
   if (target === G.p) {
     showPlayerDamage(finalDamage, attackResult.isCrit);
     if (Math.random() < AILMENT_INFLICT_CHANCE) {
-      if (getEnemyArchetype(enemy.n) === 'undead') inflictAilment('disease');
+      // Vampires are tagged 'undead' too now (for Turn Undead to correctly apply to
+      // them), but they should inflict their own drain effect, not generic disease —
+      // checked by name first, specifically, before falling through to the broader
+      // undead check so mummies/liches/skeletons/etc. keep inflicting disease as before.
+      if (/vampire|nosferatu|bloodless|undying/.test(enemy.n.toLowerCase())) inflictAilment('drain');
+      // Gorgon/Medusa/Basilisk-type — gaze/stone-flavored, checked ahead of the
+      // 'serpent' archetype (which already exists for basilisk-family enemies) since
+      // this is about the gaze attack specifically, not the archetype in general.
+      else if (/gorgon|gaze|unblinking|stone-touched|petrif|turned to stone|stares back/.test(enemy.n.toLowerCase())) inflictAilment('petrification');
+      else if (getEnemyArchetype(enemy.n) === 'undead') inflictAilment('disease');
       else if (enemy.elem === 'void') inflictAilment('curse');
     }
   }
@@ -21776,13 +22037,13 @@ function getEnemyArchetype(name) {
   if (n === 'the last vigil') return 'construct'; // a guardian in every sense but name
   if (/wolf|hound|dog|\brat\b/.test(n)) return 'beast';
   if (/dragon|drake|wyrm/.test(n)) return 'dragon';
-  if (/skeleton|zombie|bone|undead|lich|revenant|wraith|phantom|specter|ghost|echo|shade|remnant|husk|ember|recruit|rustbound/.test(n)) return 'undead';
+  if (/skeleton|zombie|bone|undead|lich|revenant|wraith|phantom|specter|ghost|echo|shade|remnant|husk|ember|recruit|rustbound|vampire|nosferatu|bloodless|undying|mummy|embalmed|preserved|wrapped/.test(n)) return 'undead';
   if (/golem|construct|automaton|titan|guardian|sentinel/.test(n)) return 'construct';
   if (/spider|arachnid/.test(n)) return 'arachnid';
   if (/serpent|snake|basilisk|undertow|riptide|tidereaver|drowned/.test(n)) return 'serpent';
-  if (/bat\b|wisp|drifter|fairy|mote/.test(n)) return 'flying';
+  if (/bat\b|wisp|drifter|fairy|mote|wyvern|harpy|griffin/.test(n)) return 'flying';
   if (/goblin|knight|guard\b|warden|king|lord|tyrant|foreman|keeper|collector|enforcer|peddler|looter|scavenger|watcher|mourner|auditor|sailor|highwayman|thug|bandit|captain|scout|wayfinder|ledgerbound|sovereign|archon|incarnate/.test(n)) return 'knight';
-  if (/imp|slime|elemental|beast|horror|demon|hollow|stalker|weaver|leviathan|kraken|behemoth|root|bramble|sprite|elder|heart|sunreach|verdant/.test(n)) return 'elemental';
+  if (/imp|slime|elemental|beast|horror|demon|hollow|stalker|weaver|leviathan|kraken|behemoth|root|bramble|sprite|elder|heart|sunreach|verdant|djinn|genie|ifrit/.test(n)) return 'elemental';
   if (/planarch|devourer|astral|nexus|void|reality|fragment|rift|dimensional|chronomancer|arbiter|architect|fracture|current|vessel|corrosion|deepfray|breaker|eater|acolyte|zealot|weight|habit|\bfear\b|last shadow|familiar|agitator|walker|unbound|tired|splinter|unmended|relapse|question|unity|vanished|first break/.test(n)) return 'eye';
   return 'default';
 }
@@ -21849,7 +22110,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.153';
+const BUILD_ID = '2026-08-17.157';
 // =========================
 
 
