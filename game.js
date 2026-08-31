@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (URGENT FIX: 117 enemy names across the whole game spawned dead (0 HP) \u2014 full registry audit, all now fixed)';
+const APP_VERSION = '2026-08-17 (Cafe: meal backlogging (past 7 days) added \u2014 was never carried over from Daybreak Quest; new items: Koukakis yogurt, Goldilocks Polvoron)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -250,6 +250,9 @@ const G = {
     { n: 'KW Liang', t: 'Quick Hands', r: 'Scout', hp: 70, mhp: 70, atk: 9, def: 4, spd: 9, on: false, ul: 999, recruitGated: true, d: 'A personal shopper turned survivor turned something else entirely. Quick, sharp, and finally committed to something worth the trouble of showing up for. He still carries the Bunnies with him, quietly, even when he is laughing. Snowball, small and quick, never strays far.', b: '+15% Crit chance \u00b7 Snowball (18% dodge chance)', col: '#0d9488', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 9, def: 4, spd: 9 }, eq: { weapon: { n: "Quick Hands' Edge", slot: 'weapon', forCompanion: 'KW Liang', r: 'rare', ilvl: 28, atk: 24, spd: 10, d: "Twin blades for Liang. +24 ATK, +10 SPD" }, armor: { n: "Scavenger's Wrap", slot: 'armor', forCompanion: 'KW Liang', r: 'rare', ilvl: 28, def: 16, spd: 8, d: "Light armor for Liang. +16 DEF, +8 SPD" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Mimi', t: 'Dreamwalker', r: 'Divination Mage', hp: 55, mhp: 55, atk: 11, def: 3, spd: 7, on: false, ul: 999, recruitGated: true, d: 'She already knew you would ask before you finished asking. That is not a figure of speech with Mimi \u2014 the Dreamsight sees the shape of a fight before it happens, and she has learned to trust it completely.', b: '+15% Crit chance', col: '#a855f7', affinityBonuses: [], gear: null, base: { mhp: 55, atk: 11, def: 3, spd: 7 }, eq: { weapon: { n: 'Dreamsight Focus', slot: 'weapon', forCompanion: 'Mimi', r: 'rare', ilvl: 28, atk: 26, def: 4, d: "Focus for Mimi. +26 ATK, +4 DEF" }, armor: { n: "Dreamwalker's Shawl", slot: 'armor', forCompanion: 'Mimi', r: 'rare', ilvl: 28, def: 14, spd: 6, d: "Light robes for Mimi. +14 DEF, +6 SPD" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Brada Shah', t: 'Steady Hand', r: 'Artillery Support', hp: 90, mhp: 90, atk: 13, def: 7, spd: 3, on: false, ul: 999, recruitGated: true, d: "Mimi's partner, and steady in every sense of the word \u2014 ballistas, siege lines, anything that rewards patience over speed. Somewhere between reloading and firing he picked up an instrument built into the same frame, and never really put either half of it down. Slow to move, impossible to rush, and just as devastating with a held note as a lined-up shot.", b: '+15% Attack damage \u00b7 +6% Healing (party)', col: '#78716c', affinityBonuses: [], gear: null, base: { mhp: 90, atk: 13, def: 7, spd: 3 }, eq: { weapon: { n: "Steady Hand's Resonant Ballista", slot: 'weapon', forCompanion: 'Brada Shah', r: 'rare', ilvl: 28, atk: 30, def: 10, d: "A round-bodied instrument with a ballista mechanism built into the frame \u2014 the strings double as the draw-cords. +30 ATK, +10 DEF" }, armor: { n: 'Siege-Line Plating', slot: 'armor', forCompanion: 'Brada Shah', r: 'rare', ilvl: 28, def: 22, d: "Heavy plating for Brada. +22 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
+    // Deliberately low ATK relative to the rest of the roster — he fights with actual
+    // kitchen equipment, not a real weapon, and the numbers should read that way.
+    { n: 'Gino', t: 'Kitchen Helper', r: 'Support', hp: 85, mhp: 85, atk: 8, def: 6, spd: 4, on: false, ul: 999, recruitGated: true, d: "Not the sharpest tool in the drawer, by his own cheerful admission, but genuinely excellent with a pan and entirely unbothered by being underestimated for it. Covers the Cafe whenever Joel and Zaki are both somehow busy, and covers a Guild War fielding slot the exact same easy way \u2014 not because he is built for it, but because somebody has to and he is willing.", b: '+2% Gold (party)', col: '#a16207', affinityBonuses: [], gear: null, base: { mhp: 85, atk: 8, def: 6, spd: 4 }, eq: { weapon: { n: 'Well-Worn Wok', slot: 'weapon', forCompanion: 'Gino', r: 'uncommon', ilvl: 28, atk: 16, def: 4, d: "Not built for combat. Neither was Gino, technically. +16 ATK, +4 DEF" }, armor: { n: 'Reinforced Kitchen Apron', slot: 'armor', forCompanion: 'Gino', r: 'uncommon', ilvl: 28, def: 14, d: "Padded against splatters and, apparently, everything else too. +14 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Dr. AA', t: 'Steady Hands', r: 'Healer', hp: 70, mhp: 70, atk: 5, def: 6, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Calm under pressure in the specific way only someone who has already seen the worst of it can be. Keeps a ghost story ready for the ride there, and a steady hand ready for whatever happens once you arrive.', b: '+20% Healing potency', col: '#0284c7', affinityBonuses: [], gear: null, base: { mhp: 70, atk: 5, def: 6, spd: 5 }, eq: { weapon: { n: 'Old-World Medical Kit', slot: 'weapon', forCompanion: 'Dr. AA', r: 'rare', ilvl: 28, atk: 14, def: 10, d: "Field kit for Dr. AA. +14 ATK, +10 DEF" }, armor: { n: "Physician's Coat", slot: 'armor', forCompanion: 'Dr. AA', r: 'rare', ilvl: 28, def: 18, atk: 4, d: "Coat for Dr. AA. +18 DEF, +4 ATK" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Sister Wren', t: 'True Devotion', r: 'Healer', hp: 68, mhp: 68, atk: 4, def: 8, spd: 5, on: false, ul: 999, recruitGated: true, d: 'Spent a long time devoted to something that was never real. Knows real when she finally gets to stand next to it \u2014 and stands between the party and whatever comes next, calling on the Temple\u2019s grace when it is needed.', b: '+10% Defense (party) \u00b7 Intercession (DEF buff) \u00b7 Temple\u2019s Grace (cure chance)', col: '#f0abfc', affinityBonuses: [], gear: null, base: { mhp: 68, atk: 4, def: 8, spd: 5 }, eq: { weapon: { n: 'Temple-Blessed Censer', slot: 'weapon', forCompanion: 'Sister Wren', r: 'rare', ilvl: 28, atk: 12, def: 12, d: "Censer for Sister Wren. +12 ATK, +12 DEF" }, armor: { n: 'Vestments of Intercession', slot: 'armor', forCompanion: 'Sister Wren', r: 'rare', ilvl: 28, def: 20, d: "Sacred vestments for Sister Wren. +20 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
     { n: 'Ser Aldric', t: 'The Other Kind of Found', r: 'Knight', hp: 110, mhp: 110, atk: 7, def: 9, spd: 3, on: false, ul: 999, recruitGated: true, d: 'Spent a long time being found by things. Guild work feels like the other version of that \u2014 chosen instead of caught. Holds a line like it is a personal promise, because to him, it is.', b: '+15% Defense', col: '#57534e', affinityBonuses: [], gear: null, base: { mhp: 110, atk: 7, def: 9, spd: 3 }, eq: { weapon: { n: "The Other Kind of Found's Blade", slot: 'weapon', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, atk: 20, def: 14, d: "Sword for Ser Aldric. +20 ATK, +14 DEF" }, armor: { n: "Knight's Unbroken Plate", slot: 'armor', forCompanion: 'Ser Aldric', r: 'rare', ilvl: 28, def: 26, d: "Heavy plate for Ser Aldric. +26 DEF" }, head: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null } },
@@ -271,7 +274,13 @@ const G = {
     // which didn't match established comic canon: Brada isn't shown accompanying
     // Mimi in her own chapters, so the party screen shouldn't assume they're always
     // a package deal either.
-    { members: ['Mimi', 'Brada Shah'], name: 'Steady & Sight', desc: 'Read each other without needing to look. +12% ATK, +10% Crit chance.', bonus: { atkPct: 0.12, critPct: 0.10 }, icon: '🎯🔮' }
+    { members: ['Mimi', 'Brada Shah'], name: 'Steady & Sight', desc: 'Read each other without needing to look. +12% ATK, +10% Crit chance.', bonus: { atkPct: 0.12, critPct: 0.10 }, icon: '🎯🔮' },
+    // Same reasoning as Mimi/Brada above — Senedra and Zaki were also previously
+    // forced together, which meant taking Senedra always meant taking Zaki too,
+    // crowding out KW Liang (a second scout-archetype member) from ever being a real
+    // alternative. Optional now, not required — reflects them actually being
+    // siblings, without making that the only way either of them gets picked.
+    { members: ['Senedra', 'Zaki'], name: 'Same Blood, Same Fight', desc: 'Neither of them fights like they are alone, because neither of them ever really has been. +10% ATK, +8% Crit chance.', bonus: { atkPct: 0.10, critPct: 0.08 }, icon: '🏹⚔️' }
   ],
 
   affinityUnlocks: {
@@ -746,6 +755,16 @@ const G = {
     { n: 'The Relic Nobody Should Reach For', lv: 630, elem: 'none', d: "It would be so easy to take. That is, San understands slowly, exactly the point of it being here at all — a temptation left deliberately in reach, watched closely by something that has judged exactly this choice before and is fully prepared to judge it again.", en: ['A Hoard-Ward', 'Something Testing Whoever Reaches', 'A Taotie Sentinel, Watching Closely'], loot: ['A Relic, Deliberately Left Reachable', 'Proof the Test Was Real', 'Something That Chose Not to Take It'], xp: 7300, g: 4380, dg: 'impossible' },
     { n: 'When the Old Guardians Wake in Force', lv: 640, elem: 'none', d: "Not provoked — timed. Whatever kept these guardians dormant has finally run its course, and the whole drowned border wakes at once, bronze eyes opening in water that has waited a very long time to be taken seriously again.", en: ['A Taotie Broodguard', 'Something Fully Awake Now', 'A Reckoning, Approaching'], loot: ['A Broodguard\u2019s Cast-Off Plate', 'Proof the Waiting Is Over', 'Bronze Still Warm From Waking'], xp: 7600, g: 4560, dg: 'impossible' },
     { n: 'The Debt Finally Come Due', lv: 650, elem: 'none', d: "The last stretch before the reckoning itself \u2014 merfolk and orcs both, for once, standing the same line instead of opposite ones, because whatever is about to surface does not particularly care which side of the old border anyone was standing on.", en: ['The Reckoning\u2019s Own Vanguard', 'Something That Remembers Every Debt', 'A Guardian Given One Last Purpose'], loot: ['Proof Both Sides Finally Stood Together', 'A Debt About to Be Called', 'The Last Warning Before the Reckoning'], xp: 7900, g: 4740, dg: 'impossible' },
+    // === VOYAGE: SEA EXPLORATION ZONES ===
+    // Not part of World 6's own progression sequence — reachable only through the
+    // Voyage screen's Explore action, not normal zone navigation. Fills the third
+    // pillar of the original "trading, exploring, sea monsters" pitch; trading and
+    // sea-monster travel encounters already existed, real explorable zones didn't.
+    { n: 'The Reef That Swallowed a Fleet', lv: 560, elem: 'none', d: "Hull after hull, stacked across decades of bad weather and worse luck, coral growing over cannon and cargo alike until the wreck and the reef stopped being two different things.", en: ['Something Nesting in the Wreckage', 'A Reef-Warden, Territorial', 'The Fleet, Still Restless'], loot: ['A Cargo Manifest, Waterlogged Beyond Reading', 'Coral-Grown Ship\u2019s Bell', 'Something Salvageable, Barely'], xp: 6100, g: 3660, dg: 'impossible' },
+    { n: 'An Island With No Name on Any Chart', lv: 580, elem: 'none', d: "Parco insists he has charted this exact spot before, several times, under several different names. The island disagrees with all of them and offers no name of its own.", en: ['Something the Island Grew', 'A Guardian With No Chart Entry', 'Whatever Actually Lives Here'], loot: ['A Fruit No Chart Has Ever Named', 'Proof This Place Resists Mapping', 'Soil That Doesn\u2019t Match Any Known Coast'], xp: 6500, g: 3900, dg: 'impossible' },
+    { n: 'The Becalmed Waters', lv: 600, elem: 'none', d: "No wind. No current. Not even the ordinary stillness of a calm day \u2014 something here has simply decided the sea should stop moving, and the sea, for reasons nobody aboard can explain, has agreed.", en: ['Something That Stilled the Water', 'A Presence, Patient and Unmoving', 'The Calm, Given Teeth'], loot: ['Water That Won\u2019t Ripple, Bottled', 'Proof Stillness Can Be a Weapon', 'Something That Waited Here a Long Time'], xp: 6900, g: 4140, dg: 'impossible' },
+    { n: 'A Lighthouse That Still Burns', lv: 620, elem: 'none', d: "No keeper. No ship has serviced it in longer than anyone aboard can guess. And yet the light turns, steady, every night, warning ships away from rocks that have not seen a wreck in just as long.", en: ['Whatever Tends the Light', 'A Warden With No One Left to Report To', 'The Light\u2019s Own Guardian'], loot: ['Lamp Oil That Never Seems to Run Low', 'A Keeper\u2019s Log, Still Being Written', 'Proof Someone \u2014 Something \u2014 Still Tends It'], xp: 7300, g: 4380, dg: 'impossible' },
+    { n: 'Where the Old Maps End', lv: 650, elem: 'none', d: "Every chart Parco owns simply stops here, the edge of the page left blank rather than guessed at. Whatever comes after the blank space, no one has apparently returned to describe.", en: ['Something Past the Edge of the Map', 'A Guardian of Uncharted Water', 'Whatever the Old Cartographers Refused to Name'], loot: ['A Chart, Deliberately Left Unfinished', 'Proof the Blank Space Was a Choice, Not an Oversight', 'Something From Past Where the Maps End'], xp: 7900, g: 4740, dg: 'impossible' },
   ],
 
   // Zone hazards: environmental dangers that trigger during combat
@@ -1292,6 +1311,21 @@ const G = {
         { n: 'Centuries-Worn Spectacles', slot: 'head', forCompanion: 'Renn Evergreen', q: 1, r: 'rare', price: 650, ilvl: 28, atk: 8, def: 8, hp: 10, d: "Spectacles for Renn. +8 ATK, +8 DEF, +10 HP" }
       ],
       unlocked: false, zone: 'The Breaking', zoneLv: 30, visitCount: 0 },
+    // Foundation piece for the Voyage spinoff — sells the raw materials needed for
+    // each ship-construction stage. Actual stage progress and completion happen
+    // through a dedicated Ship screen, not this trader menu directly; buying
+    // materials here is just the acquisition step.
+    { n: 'Bren', t: 'trader', title: 'The Shipwright', icon: '⚓', col: '#0369a1', zone: 'The Water That Remembers Why', zoneLv: 560,
+      d: "Set up shop the moment the water settled enough to trust it, on the theory that a drowned world still has a coastline, and a coastline still needs somebody who knows what to do with one. \"Everyone else here is fighting the water,\" she says. \"I'd rather just build something that gets along with it.\"",
+      stock: [
+        { n: 'Weathered Driftwood', t: 'mat', q: 1, r: 'uncommon', price: 45, d: 'Salvaged, not harvested. Bren insists this matters. She is probably right.' },
+        { n: 'Ballast Stone', t: 'mat', q: 1, r: 'uncommon', price: 60, d: 'Heavy for a reason. A ship needs to want to stay upright.' },
+        { n: 'Waxed Sailcloth', t: 'mat', q: 1, r: 'rare', price: 80, d: 'Treated against weather that has not been kind to anything else out here either.' },
+        { n: 'Rope, Properly Coiled', t: 'mat', q: 1, r: 'uncommon', price: 35, d: '"Properly" is doing a lot of work in that name. Bren checks every coil herself.' },
+        { n: 'Salvaged Iron Fittings', t: 'mat', q: 1, r: 'rare', price: 95, d: 'Pulled from something that did not survive its own voyage. Put to better use here.' },
+        { n: 'Pitch and Tar', t: 'mat', q: 1, r: 'uncommon', price: 55, d: 'Unglamorous. Absolutely necessary. Bren has strong opinions about people who skip this step.' }
+      ],
+      unlocked: false, zone: 'The Water That Remembers Why', zoneLv: 560, visitCount: 0 },
     { n: 'Wahyu', t: 'trader', title: 'The Printmaker', icon: '👕', col: '#0e7490', zone: 'The Static Fields', zoneLv: 41,
       d: "Joel's other dorm-mate — used to run a little side business printing custom tees back in the old world. Here, that same eye for making something one-of-a-kind shows up as armor built with extra room worked into the seams. He calls them customs. You call them a very good reason to keep a spare rune around.",
       stock: [
@@ -5717,6 +5751,159 @@ storyJournal: {
           { speaker: 'Narrator', text: 'Kai stirs faintly in his sleep, one small hand finding San\u2019s without waking, entirely unaware of the enormous, quiet thing he has already become to everyone who loves him. Not a chosen one. Not a prophecy fulfilled. Just theirs \u2014 and, it turns out, something the world itself has been waiting a very long time to have back.' },
         ]
       }
+,{
+        id: 'journal_172',
+        title: 'A Reason to Build Something New',
+        chapter: 172,
+        unlockType: 'level',
+        unlockAt: 560,
+        icon: '⚓',
+        summary: 'Ferris mentions, almost in passing, that the ledger has a gap the guild has never actually been able to close \u2014 anything on the water. San decides that gap is worth closing properly.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It is not a crisis. That is almost the point of it \u2014 Ferris mentions it the way he mentions most things, flatly, between two other entries in his ledger, like it has been sitting there a while waiting for someone to actually notice it.' },
+          { speaker: 'Ferris', text: '"There is a whole column here I have never once been able to fill in," Ferris says, turning the ledger around so San can see it. "Anything on the water. A request comes in \u2014 someone stranded, something needed across a crossing we cannot make \u2014 and I write \u2018unable\u2019 next to it. Every time. It bothers me more than it should."' },
+          { speaker: 'San', text: '"How many times has that happened?" you ask, already suspecting you will not like the answer.' },
+          { speaker: 'Ferris', text: '"More than I would like," Ferris admits. "The guild helps who it can reach. The water has simply never been reachable."' },
+          { speaker: 'Narrator', text: 'You think, unexpectedly, of Aldric \u2014 of a rescue the guild did not hesitate over, back when hesitating was not even a question worth asking. This does not feel different. It just feels like a door nobody has gotten around to building yet.' },
+          { speaker: 'Joel', text: '"We have gold enough. We have people enough," Joel says, when you bring it to him that evening, already turning the idea over like he has been waiting for a reason to. "What we do not have is a ship."' },
+          { speaker: 'San', text: '"Then we build one," you say, and it comes out easier than you expected, like the decision had mostly already been made somewhere underneath the asking.' },
+          { speaker: 'Narrator', text: 'Word reaches Bren the Shipwright before San even finishes walking to the coast to find her. She looks entirely unsurprised to see her.' },
+          { speaker: 'Bren', text: '"Took you all long enough," Bren says, already reaching for her tools. "Let\u2019s build something worth all that gold you\u2019ve got sitting around doing nothing."' },
+        ]
+      }
+,{
+        id: 'journal_173',
+        title: 'Ready to Sail',
+        chapter: 173,
+        unlockType: 'level',
+        unlockAt: 565,
+        icon: '⛵',
+        summary: 'The ship is finished. Actually finished. Nobody quite knows what to do with how ordinary that feels, given how enormous the decision underneath it was.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It does not feel like a momentous morning. That is, San thinks, watching the hull catch the light for the first time, probably exactly how it should feel \u2014 not a legend beginning, just a tool finally finished, ready to actually be used for what it was built for.' },
+          { speaker: 'Bren', text: '"She\u2019ll hold," Bren says, running one hand along the rail with the particular pride of someone who does not often let herself show it. "I do not build things that do not hold."' },
+          { speaker: 'Narrator', text: 'The Hall turns out for it anyway, whether it is momentous or not \u2014 Elian asking a dozen questions about how fast it can go, Renn quietly cataloguing every joint and fitting like he intends to write a full account of it later, Ser Aldric simply standing at the dock with his arms crossed, watching, the way he watches anything he has decided matters.' },
+          { speaker: 'Joel', text: '"First voyage," Joel says, standing beside San at the rail, voice quiet enough that it is really just for her. "Where do we even start?"' },
+          { speaker: 'San', text: '"Wherever Ferris\u2019s ledger has the most \u2018unable\u2019 written next to it," you say, and find you mean it entirely.' },
+          { speaker: 'Narrator', text: 'The ship pulls away from the coast slow and steady, the drowned world shrinking behind it, open water ahead in every direction the map does not already have an answer for.' },
+        ]
+      }
+,{
+        id: 'journal_174',
+        title: 'The First Port',
+        chapter: 174,
+        unlockType: 'level',
+        unlockAt: 570,
+        icon: '🦁',
+        summary: 'Singapore, or something that answers to the name. Familiar in a way that catches San entirely off guard, for reasons she cannot immediately place.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The port announces itself before the ship even finishes docking \u2014 low colonial rooftops, a harbor busier than anything San has seen since the Breaking, the particular smell of a trading city that has been trading for a very long time.' },
+          { speaker: 'San', text: 'You go still at the rail, watching it, something tightening in your chest that you do not immediately have a name for.' },
+          { speaker: 'Joel', text: '"San?" Joel is watching you now, not the port. "What is it?"' },
+          { speaker: 'San', text: '"I do not know," you say, honestly, which is somehow worse than knowing. "It looks like \u2014 it looks like somewhere I might have actually been. Before. Back home."' },
+          { speaker: 'Narrator', text: 'It should not be possible. San knows, distantly, that it should not be possible, and stands at the rail anyway, looking at a skyline that feels like memory even though nothing about this world should be able to hold one.' },
+          { speaker: 'Narrator', text: 'The dock crew that greets the ship are strangers, every one of them \u2014 nobody San recognizes, nobody who recognizes her. The familiarity is in the shape of the place, not the people in it. That distinction does not make it feel any less strange.' },
+          { speaker: 'Joel', text: '"We should ask someone," Joel says, careful, watching San work through something he can see but not quite reach himself. "Whatever this place actually is."' },
+        ]
+      }
+,{
+        id: 'journal_175',
+        title: 'Echoes, Not Answers',
+        chapter: 175,
+        unlockType: 'level',
+        unlockAt: 575,
+        icon: '🗺️',
+        summary: 'Parco Molo has an answer, if San is willing to hear it \u2014 and it is not the one she was quietly hoping for.',
+        scenes: [
+          { speaker: 'Narrator', text: 'They find him at a chart-seller\u2019s stall, already deep in an argument about a coastline he insists is drawn wrong. He looks up before San says a word, like he was already expecting the question.' },
+          { speaker: 'Parco', text: '"You are looking at it like you know it," Parco says, not a question. "Everyone does, the first time. I did too, once, a very long time ago."' },
+          { speaker: 'San', text: '"Is it real?" you ask, and hate how much you need the answer to be yes. "Is this actually \u2014 is this the world I came from?"' },
+          { speaker: 'Parco', text: '"No," Parco says, gently, and there is real kindness in how plainly he says it, like he has had to say this exact thing to someone else before and learned not to soften it into something crueler. "It is not that world. It is an echo of it \u2014 an old version, from long before whatever year you are actually from. The people you knew are not here. They were never here. This place only remembers what your world once looked like, the way water remembers a shape after whatever made it is gone."' },
+          { speaker: 'San', text: '"Then who are you?" you ask, quieter now. "If none of this is real \u2014"' },
+          { speaker: 'Parco', text: '"I did not say it was not real," Parco corrects, gentle but firm. "I said it was not your world. I am real. Bapoleon is real. Whatever peace we have made with being echoes of people your old world once wrote down \u2014 that took time. I will not pretend it did not."' },
+          { speaker: 'Narrator', text: 'San thinks of the creek, unbidden \u2014 of water that remembered being clean, of a connection that turned out to run deeper than anyone realized at the time. This does not feel so different, in the end. A world remembering itself. A different kind of water, carrying a different kind of memory.' },
+          { speaker: 'Joel', text: '"So we cannot reach anyone," Joel says, working it through out loud, watching San carefully. "Not really. Not the people we actually lost."' },
+          { speaker: 'Parco', text: '"No," Parco says again, plain, not unkind. "But you can still do good here. The ledger gap you came to close \u2014 that is still real. The people who need you here are still real, whatever they are echoes of. That has not stopped mattering just because it is not the reunion you wanted."' },
+          { speaker: 'San', text: 'You stand with that for a long moment, the noise of an unfamiliar-familiar port moving on around you, and find, slowly, that you can actually hold it \u2014 not the answer you came looking for, but not nothing, either.' },
+          { speaker: 'San', text: '"Then let\u2019s get to work," you say, finally, and mean it.' },
+        ]
+      }
+,{
+        id: 'journal_176',
+        title: 'The First Real Request',
+        chapter: 176,
+        unlockType: 'level',
+        unlockAt: 580,
+        icon: '📜',
+        summary: 'Ferris finally has something other than \u2018unable\u2019 to write next to a request \u2014 a small port, cut off by storm damage, running short on everything that actually matters.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It comes through the way most real requests do \u2014 not urgent-sounding at first, a trader mentioning it almost as an aside, a small port south of Bangkok that took storm damage bad enough to lose its own supply route and has not managed to fix it since.' },
+          { speaker: 'Ferris', text: '"Medicine, mostly," Ferris says, reading off the report with the particular focus he gives anything that finally belongs in the \u2018able\u2019 column. "Food, some. Nothing dramatic. Just \u2014 nobody has been able to reach them in weeks."' },
+          { speaker: 'San', text: '"Then we reach them," you say, and it is somehow the easiest decision the guild has made in a long time.' },
+          { speaker: 'Narrator', text: 'Loading the hold with Zheng He directing the effort is a genuinely different experience than loading it alone \u2014 crates settled with real intention, weight distributed like it matters, because apparently it does.' },
+          { speaker: 'Zheng He', text: '"Medicine on top," Zheng He says, without needing to be asked, already rearranging half of what San packed first. "Grain can survive a rough crossing. This cannot."' },
+          { speaker: 'Narrator', text: 'Sinbad watches the loading from the dock, uncharacteristically quiet, until San notices and asks what he is thinking.' },
+          { speaker: 'Sinbad', text: '"Nothing," Sinbad says, too quickly, and then, relenting: "There have been ships on that stretch lately. Not the honest kind. I have not said anything because I did not want to be the reason you did not go."' },
+          { speaker: 'Joel', text: '"But you are saying something now," Joel says, watching him carefully.' },
+          { speaker: 'Sinbad', text: '"Because you are going either way," Sinbad says, simply. "I would rather you go informed."' },
+        ]
+      }
+,{
+        id: 'journal_177',
+        title: 'Colors on the Horizon',
+        chapter: 177,
+        unlockType: 'level',
+        unlockAt: 585,
+        icon: '🏴',
+        summary: 'Sinbad\u2019s warning turns out to be exactly right. A second ship, flying colors nobody aboard wants to see, closes the distance faster than the hold\u2019s cargo can afford to lose time to.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The sail appears on the horizon exactly where Sinbad said it might, dark canvas against a clear sky, closing distance with a confidence that has nothing to do with honest trade.' },
+          { speaker: 'Joel', text: '"Pirates," Joel says, flat, already moving toward the rail. "Real ones. Not an echo of anything \u2014 this feels current."' },
+          { speaker: 'San', text: '"Can we outrun them?" you ask, already knowing the cargo weight is working against that answer before anyone says it out loud.' },
+          { speaker: 'Sinbad', text: '"Not loaded like this," Sinbad admits, grim. "I did say I would rather you go informed. I did not say informed would make it easy."' },
+          { speaker: 'Narrator', text: 'The other ship gains steadily, close enough now that shapes are visible on deck, close enough that whatever happens next is going to happen soon.' },
+          { speaker: 'San', text: 'You look to Bapoleon, standing at the map table like he has been waiting his entire recruited life for exactly this moment.' },
+          { speaker: 'Bapoleon', text: '"Finally," Bapoleon says, already sketching something rapid across his own chart. "A genuine tactical problem. Give me one minute and this stops being their advantage."' },
+        ]
+      }
+,{
+        id: 'journal_178',
+        title: 'Bapoleon\u2019s Actual Use',
+        chapter: 178,
+        unlockType: 'level',
+        unlockAt: 590,
+        icon: '🎖️',
+        summary: 'A campaign, Bapoleon insisted once, is just a problem with enough moving pieces to be worth taking seriously. He finally gets to prove it.',
+        scenes: [
+          { speaker: 'Bapoleon', text: '"They expect a straight chase," Bapoleon says, fast, certain, drawing a line across the chart that curves hard against the wind. "A heavier ship does not need to outrun anything. It needs to make the terrain work against the lighter one instead."' },
+          { speaker: 'Narrator', text: 'Parco is already at the wheel before Bapoleon finishes the sentence, reading the correction like he has been waiting his whole life to actually use it.' },
+          { speaker: 'Parco', text: '"There is a shoal here," Parco says, tapping the chart without looking up. "Shallow enough to slow anything not built to know it is there. I know it is there."' },
+          { speaker: 'Narrator', text: 'The ship cuts hard against the wind, exactly where Bapoleon marked it, and the pursuing sail \u2014 faster, lighter, built for exactly this kind of chase \u2014 follows the turn without knowing what it is actually following it into.' },
+          { speaker: 'Narrator', text: 'The shoal does its work quietly. The pursuing ship shudders, slows, loses the ground it spent the whole chase gaining, and by the time its crew works out what happened, the distance has already opened back up.' },
+          { speaker: 'Joel', text: '"That was \u2014" Joel starts, and does not quite finish, watching the other ship shrink behind them.' },
+          { speaker: 'Bapoleon', text: '"That was strategy," Bapoleon says, already rolling the chart back up, entirely unbothered, like the outcome was never actually in question. "I did mention I had fought worse."' },
+          { speaker: 'San', text: 'You find yourself laughing, half out of relief, half because he is insufferable in exactly the way that turns out to actually be useful. "Thank you," you manage. "Genuinely."' },
+          { speaker: 'Bapoleon', text: '"Do not thank me," Bapoleon says, though he looks pleased despite himself. "Thank the shoal. I only knew where to put you."' },
+        ]
+      }
+,{
+        id: 'journal_179',
+        title: 'What the Ledger Says Now',
+        chapter: 179,
+        unlockType: 'level',
+        unlockAt: 595,
+        icon: '⚓',
+        summary: 'The medicine arrives. The port keeps what it needed to keep. Ferris gets to write a word he has apparently been waiting a long time to write.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The port is smaller than San expected, and gladder to see the ship than any port has any right to be over a delivery of medicine and grain \u2014 but three weeks cut off from everything changes what counts as enormous.' },
+          { speaker: 'Narrator', text: 'An old woman at the dock takes San\u2019s hand in both of hers, says something in a dialect none of the crew fully catches, and does not let go for a long moment. Some things do not need translating.' },
+          { speaker: 'Joel', text: '"This is what we came here to do," Joel says, quiet, watching the unloading. "Not the water. Not the mirror of it. This."' },
+          { speaker: 'San', text: '"Both, maybe," you say. "I do not think we have to pick just one reason to keep coming back."' },
+          { speaker: 'Narrator', text: 'Back at the Hall, Ferris takes the report without much ceremony, the way he takes most things, and finds the line in his ledger he has apparently been carrying for a long time.' },
+          { speaker: 'Ferris', text: '"Able," Ferris says, writing it plainly, like the word costs him nothing at all to say, even though San can tell, watching him, that it costs him something rather large. "First one. Will not be the last, I expect."' },
+          { speaker: 'Narrator', text: 'He is right. Within the week, two more requests come in \u2014 different ports, different needs, the same gap the guild can now actually close. The ledger, San thinks, is going to look very different by the end of the year.' },
+        ]
+      }
     ]
   },
 
@@ -5865,6 +6052,19 @@ storyJournal: {
   // permanent guild-wide bonuses, reinforcing "the guild profits together" rather than
   // everything routing through one person's pocket.
   guildTreasury: { gold: 0, lifetimeContributed: 0, milestonesUnlocked: [] },
+  // === VOYAGE: THE SHIP ===
+  // Foundation for the Voyage spinoff — ship construction, gated behind reaching
+  // World 6 (Lv560), since that's where the party first meets merfolk and the sea
+  // stops being just backdrop. Crew, the actual voyage loop, time-gating, sea zones,
+  // and storyline are all deliberately NOT part of this build — staged incrementally,
+  // same as every other large feature this session (Guild Hall, Infirmary, etc.).
+  ship: { built: false, tier: 0, stage: 0, materials: {} },
+  voyage: { level: 1, xp: 0, currentPort: 'singapore', cargo: {}, visitedPorts: ['singapore'], crew: [] }, // separate progression track from character level, gates ship tiers
+  // Real-world time-gating — actual sailing (Trade/Sail/Explore) is only reachable
+  // during a fixed 4-hour window each day, echoing the monsoon-season realism idea
+  // from the original design brief. Ship construction and Crew management stay
+  // always accessible — those are dock-side prep, not sailing itself, so gating
+  // them too would just be busywork friction with no thematic payoff.
   templeRep: 0, // lifetime temple reputation, mirrors guildRep pattern
   templeTrial: { tier: 1, currentHp: null, lastAttemptDay: -1 }, // Brother Corin's repeatable Trials, Lv200+
   templeHunt: { active: false, currentBossName: null },
@@ -5914,6 +6114,8 @@ storyJournal: {
   cafeSettings: { carbLimit: 30, vegDayCarbLimit: 50, slackDayCarbLimit: 80, periodSweetBiteBonus: 20 },
   slackDays: [], // array of 'YYYY-MM-DD' strings, explicitly toggled per date
   cafeCategory: null, // UI navigation only, not persisted
+  cafeChef: null, // UI navigation only, not persisted
+  cafeLogDate: null, // null = today; set to a 'YYYY-MM-DD' string to backlog a past day
   // === HOUSEHOLD BILLS (Guild Treasury) ===
   // Ported from the Daybreak Quest tracker's bill structure — folded into the Guild
   // Treasury per request, rather than a standalone tracker. Paying a bill contributes
@@ -6707,6 +6909,10 @@ const COMPANION_GEAR_ROLES = {
   'Dr. AA': { weaponType: 'mace', weaponLabel: 'Mace', armorType: 'robe', armorLabel: 'Robes' },
   'Sister Wren': { weaponType: 'mace', weaponLabel: 'Mace', armorType: 'robe', armorLabel: 'Robes' },
   'KW Liang': { weaponType: 'dagger', weaponLabel: 'Dagger', armorType: 'light', armorLabel: 'Light Armor' },
+  // Cooking equipment rather than a real weapon — mace is the closest existing
+  // category mechanically (blunt, not fast, not fancy), which fits "hitting someone
+  // with a pot" better than any bladed type would.
+  Gino: { weaponType: 'mace', weaponLabel: 'Cookware', armorType: 'light', armorLabel: 'Apron & Padding' },
   Iris: { weaponType: 'bow', weaponLabel: 'Bow', armorType: 'light', armorLabel: 'Light Armor' },
   'Renn Evergreen': { weaponType: 'staff', weaponLabel: 'Staff', armorType: 'robe', armorLabel: 'Robes' }
 };
@@ -7110,6 +7316,35 @@ function generateEnemyStats(zoneLevel, templateKey, elem) {
 
 // Enemy type registry for dynamic lookup
 const ENEMY_REGISTRY = {
+  // Voyage sea exploration zone enemies — same lesson as the earlier registry audit:
+  // writing a zone's en: array doesn't register the enemies automatically. Adding
+  // these immediately rather than letting them become another round of 0-HP spawns.
+  'Something Nesting in the Wreckage': { zoneLv: 560, template: 'brute', elem: 'none' },
+  'A Reef-Warden, Territorial': { zoneLv: 560, template: 'tank', elem: 'none' },
+  'The Fleet, Still Restless': { zoneLv: 560, template: 'striker', elem: 'none' },
+  'Something the Island Grew': { zoneLv: 580, template: 'brute', elem: 'none' },
+  'A Guardian With No Chart Entry': { zoneLv: 580, template: 'tank', elem: 'none' },
+  'Whatever Actually Lives Here': { zoneLv: 580, template: 'elite', elem: 'none' },
+  'Something That Stilled the Water': { zoneLv: 600, template: 'tank', elem: 'void' },
+  'A Presence, Patient and Unmoving': { zoneLv: 600, template: 'brute', elem: 'void' },
+  'The Calm, Given Teeth': { zoneLv: 600, template: 'striker', elem: 'void' },
+  'Whatever Tends the Light': { zoneLv: 620, template: 'elite', elem: 'none' },
+  'A Warden With No One Left to Report To': { zoneLv: 620, template: 'tank', elem: 'none' },
+  'The Light\u2019s Own Guardian': { zoneLv: 620, template: 'striker', elem: 'none' },
+  'Something Past the Edge of the Map': { zoneLv: 650, template: 'elite', elem: 'void' },
+  'A Guardian of Uncharted Water': { zoneLv: 650, template: 'tank', elem: 'none' },
+  'Whatever the Old Cartographers Refused to Name': { zoneLv: 650, template: 'brute', elem: 'void' },
+  // Voyage sea monster roster — merged directly in so getDynamicEnemyStats() picks
+  // these up through the exact same lookup path as every other enemy, no special
+  // casing needed. See VOYAGE_SEA_MONSTERS above for the source/reasoning comment.
+  'The Serpent That Outgrew Its Own Legend': { zoneLv: 560, template: 'striker', elem: 'none' },
+  'The Grip That Doesn\u2019t Let Go': { zoneLv: 650, template: 'tank', elem: 'none' },
+  'A Ship That Already Sank': { zoneLv: 590, template: 'brute', elem: 'void' },
+  'The Black Sail, Still Flying': { zoneLv: 570, template: 'elite', elem: 'none' },
+  'The Old Weight Beneath Everything': { zoneLv: 640, template: 'tank', elem: 'none' },
+  'Voices That Know Your Name': { zoneLv: 600, template: 'striker', elem: 'void' },
+  'An Island That Was Never An Island': { zoneLv: 610, template: 'tank', elem: 'none' },
+  'The Patrol That Never Reports Back': { zoneLv: 580, template: 'elite', elem: 'none' },
   // The following were referenced in zone en: arrays but never actually registered
   // here or in the Lv1-20 hardcoded list below — meaning they spawned with hp:0/mhp:0
   // (dead on arrival) in combat. Found via a full audit cross-referencing every zone's
@@ -10093,6 +10328,8 @@ function getPartyMemberUnlockHint(p) {
   if (req.type === 'journal') return 'Requires reaching a specific point in the story.';
   if (req.type === 'trader_visits') return 'Visit their trader stall ' + req.visits + '+ times, at Level 100 or higher.';
   if (req.type === 'kindling') return 'Requires progressing the Kindling Network storyline.';
+  if (req.type === 'voyage_port') return 'Sail to that port at least once.';
+  if (req.type === 'guild_member') return 'Recruits automatically alongside ' + getGuildMemberDef(req.memberId).npcName + '.';
   return 'Not yet unlocked.';
 }
 
@@ -13562,6 +13799,28 @@ const GUILD_MEMBERS = [
       'Jovie: "I learned herbalism the hard way, alone, with no one to ask. I would rather nobody else here ever has to learn it that way."',
       'Jovie: "Dr. AA and I disagree about inventory placement constantly. We have never once disagreed about whether the kit gets refilled."'
     ] },
+  // No narrative chapter by design — he simply arrives alongside Jovie, since they
+  // crossed over together, and the Cafe already had a gap: nobody covering it when
+  // Joel isn't around. Not a swappable party member, Guild War only, same shape as
+  // most of the roster. Fights with actual kitchen equipment rather than a proper
+  // weapon, which is exactly why his numbers stay modest — he's a cook first.
+  { id: 'gino', npcName: 'Gino', role: 'Kitchen Helper', icon: '🍳',
+    bountyArchetype: 'Utility',
+    hallSpot: 'the Cafe counter, whenever Zaki and Joel are both somehow busy at once',
+    recruitReq: { type: 'guild_member', memberId: 'jovie' },
+    fieldBuff: { goldPct: 0.02 },
+    gatherMats: ['Herb Bundle'],
+    hubBanter: [
+      'Gino: "Joel taught me the stir-fry first. Said if I could get that right, everything else would follow. He was mostly right."',
+      'Gino: "I am not the smart one. I know this about myself. I am, however, extremely good with a wok, and that counts for something around here."',
+      'Gino: "Back at SK*, I covered Joel\u2019s shifts more times than either of us ever reported properly. Feels right that I am still doing it, honestly."'
+    ],
+    recruitLine: "Gino turns up at the Cafe the same week as Jovie, looking faintly lost until he spots a stove. \"Oh, good,\" he says, visibly relaxing. \"A kitchen. I know what to do with a kitchen.\"",
+    barks: [
+      'Gino: "This is a pot! I am hitting you with a pot! I did not expect to be doing this today either!"',
+      'Gino: "Joel would have a plan right now. I do not have a plan. I have a wok. We will make do."',
+      'Gino: "I am better at feeding people than fighting them. Today, unfortunately, I am doing both."'
+    ] },
   { id: 'zul', npcName: 'Zul', role: 'Courier', icon: '🚗',
     bountyArchetype: 'Utility',
     hallSpot: 'the doorway, half in and half out, keys already in hand',
@@ -13581,6 +13840,84 @@ const GUILD_MEMBERS = [
       'Zul: "Kewangan?" \u2014 still the only real question he ever asks, and it still means exactly what it always meant.',
       'Zul: "Fastest road is rarely the safest one. I know both anyway."',
       'Zul: "Nobody thanks the driver. I have made my peace with that."'
+    ] },
+  // === VOYAGE CREW: historical/mythological figures met at specific ports, echoes
+  // of an earlier era rather than anyone reachable in the present-day old world.
+  // Original comedic takes on public-domain historical and folkloric figures — not
+  // parodies of anyone's copyrighted character. voyageBonus applies only while
+  // assigned to a Voyage crew slot (see G.voyage.crew), separate from fieldBuff,
+  // which stays Guild War-specific for every member including these four.
+  { id: 'bapoleon', npcName: 'Bapoleon Nonaparte', role: 'Ship\u2019s Strategist', icon: '🎖️',
+    bountyArchetype: 'Support',
+    hallSpot: 'hunched over a map table nobody asked him to commandeer',
+    recruitReq: { type: 'voyage_port', portId: 'malacca' },
+    fieldBuff: { atkPct: 0.03 },
+    voyageBonus: { type: 'combat', value: 0.15 },
+    gatherMats: ['Iron Ore'],
+    hubBanter: [
+      'Bapoleon: "Every crossing is a campaign. I have simply been saying this longer than anyone wants to hear it."',
+      'Bapoleon: "Do not ask about the winter crossing. I have told you. Do not ask."',
+      'Bapoleon: "Strategy is not complicated. Everyone else is simply doing it wrong."'
+    ],
+    recruitLine: "He is already redrawing the strait\u2019s approach when San finds him. \"Finally,\" Bapoleon says, not looking up. \"Someone competent enough to actually use my plans.\"",
+    barks: [
+      'Bapoleon: "This was, of course, exactly my strategy."',
+      'Bapoleon: "A tactical retreat. I insist on the word tactical."',
+      'Bapoleon: "I have fought worse. I have not always won worse. But I have fought it."'
+    ] },
+  { id: 'parco', npcName: 'Parco Molo', role: 'Navigator', icon: '🗺️',
+    bountyArchetype: 'Utility',
+    hallSpot: 'anywhere a map can be unrolled, which is to say everywhere',
+    recruitReq: { type: 'voyage_port', portId: 'palembang' },
+    fieldBuff: { xpPct: 0.03 },
+    voyageBonus: { type: 'travel', value: 0.20 },
+    gatherMats: ['Herb Bundle'],
+    hubBanter: [
+      'Parco: "I have already charted these waters. Several times. In several different lives, if you believe the stories."',
+      'Parco: "A shortcut exists. It always exists. Whether I remember it correctly is a separate question."',
+      'Parco: "Nobody believed my last set of stories either. History proved them right eventually. Mostly."'
+    ],
+    recruitLine: "\"You are lost,\" Parco says, with total confidence, before San has said a single word about where they are going. \"Fortunately, I am not.\"",
+    barks: [
+      'Parco: "This route is faster. Trust me. I have been everywhere, several times."',
+      'Parco: "I once described these waters to someone who wrote it all down wrong. I have been correcting the record ever since."',
+      'Parco: "The sea does not lie to me. People, sometimes. Not the sea."'
+    ] },
+  { id: 'zhenghe', npcName: 'Zheng He', role: 'Quartermaster', icon: '📜',
+    bountyArchetype: 'Support',
+    hallSpot: 'quietly reorganizing the hold better than anyone asked him to',
+    recruitReq: { type: 'voyage_port', portId: 'manila' },
+    fieldBuff: { goldPct: 0.03 },
+    voyageBonus: { type: 'trade', value: 0.15 },
+    gatherMats: ['Gem Dust'],
+    hubBanter: [
+      'Zheng He: "I have commanded larger fleets than this. I do not say it to boast. I say it because the hold could genuinely be organized better."',
+      'Zheng He: "Bapoleon calls everything a crisis. I have seen an actual crisis. This is a Tuesday."',
+      'Zheng He: "A well-run ship is quiet. Listen to how quiet this one has become since I arrived."'
+    ],
+    recruitLine: "He inspects the hold before he even agrees to anything, nods once, and says, \"It will do. For now. Give me a season and it will do properly.\"",
+    barks: [
+      'Zheng He: "Cargo secured. Ledger balanced. Nothing here required raising my voice."',
+      'Zheng He: "I have negotiated with emperors. This port merchant will not be difficult."',
+      'Zheng He: "Every voyage I ever led came home. I intend to keep that record intact."'
+    ] },
+  { id: 'sinbad', npcName: 'Sinbad', role: 'Storyteller', icon: '🌊',
+    bountyArchetype: 'DPS',
+    hallSpot: 'wherever a crowd has gathered to hear something impossible',
+    recruitReq: { type: 'voyage_port', portId: 'hanoi' },
+    fieldBuff: { critPct: 0.03 },
+    voyageBonus: { type: 'loot', value: 0.20 },
+    gatherMats: ['Herb Bundle', 'Iron Ore'],
+    hubBanter: [
+      'Sinbad: "I have survived seven things that should not have been survivable. Nobody believes the count. I have stopped correcting them."',
+      'Sinbad: "The sea owes me nothing further. I have already collected more than my share of impossible."',
+      'Sinbad: "Every story I tell is true. The details simply improve with retelling. That is not the same as lying."'
+    ],
+    recruitLine: "\"Another voyage,\" Sinbad says, already grinning, already halfway to a story about the last one. \"I was wondering when someone would finally ask.\"",
+    barks: [
+      'Sinbad: "I have seen worse than this. I have a story about it, if anyone is willing to sit still."',
+      'Sinbad: "Luck is just a story that has not finished happening to you yet."',
+      'Sinbad: "Whatever that was, I am adding it to the list. The list is getting quite long."'
     ] }
 ];
 
@@ -13756,6 +14093,10 @@ function checkGuildRecruitment() {
       if (G.storyJournal.read.includes('journal_101')) recruitGuildMember(def.id);
     } else if (def.recruitReq.type === 'journal') {
       if (G.storyJournal.read.includes(def.recruitReq.journalId)) recruitGuildMember(def.id);
+    } else if (def.recruitReq.type === 'voyage_port') {
+      if (G.voyage.visitedPorts.includes(def.recruitReq.portId)) recruitGuildMember(def.id);
+    } else if (def.recruitReq.type === 'guild_member') {
+      if (isGuildMemberRecruited(def.recruitReq.memberId)) recruitGuildMember(def.id);
     }
   }
 }
@@ -13779,6 +14120,337 @@ function isGuildMemberOnBountyDispatch(id) {
 // Assigning someone to a Duty occupies the same slot Idle Gathering/Guild War/Bounty
 // Dispatch already share, so it's a genuine tradeoff: a member on Scout Duty can't
 // also gather materials or be fielded that day, same as being on a dispatch.
+// === VOYAGE: SHIP CONSTRUCTION ===
+// Four stages, each requiring specific materials plus gold, escalating toward a
+// completed ship. Materials are new and sea-specific — sold directly by the
+// Shipwright for now (the simplest path to a fully functional first build); a
+// dedicated gathering source can layer on top later without changing this structure.
+// === VOYAGE: TRADE GOODS ===
+// Ported from the prototype, prices rescaled roughly 8x to sit consistently with the
+// ship material economy already established (35-95G per unit) rather than the
+// prototype's much smaller numbers. Relative value ordering preserved — rice is
+// still cheap, ivory and contraband still expensive — just brought into this game's
+// actual scale.
+const VOYAGE_GOODS = {
+  rice: { name: 'Rice', icon: '🍚', basePrice: 80, weight: 1, volatility: 0.3 },
+  spices: { name: 'Spices', icon: '🌶️', basePrice: 360, weight: 1, volatility: 0.5 },
+  silk: { name: 'Silk', icon: '🧣', basePrice: 680, weight: 1, volatility: 0.4 },
+  timber: { name: 'Timber', icon: '🪵', basePrice: 220, weight: 2, volatility: 0.3 },
+  pearls: { name: 'Pearls', icon: '🦪', basePrice: 1040, weight: 1, volatility: 0.6 },
+  rum: { name: 'Rum', icon: '🍾', basePrice: 300, weight: 1, volatility: 0.4 },
+  tea: { name: 'Tea', icon: '🍵', basePrice: 380, weight: 1, volatility: 0.3 },
+  coffee: { name: 'Coffee', icon: '☕', basePrice: 460, weight: 1, volatility: 0.4 },
+  nutmeg: { name: 'Nutmeg', icon: '🥜', basePrice: 600, weight: 1, volatility: 0.45 },
+  textiles: { name: 'Textiles', icon: '🧵', basePrice: 420, weight: 1, volatility: 0.35 },
+  silver: { name: 'Silver', icon: '🥈', basePrice: 1280, weight: 2, volatility: 0.5 },
+  fruits: { name: 'Tropical Fruits', icon: '🥭', basePrice: 180, weight: 2, volatility: 0.6 },
+  pepper: { name: 'Black Pepper', icon: '⚫', basePrice: 520, weight: 1, volatility: 0.4 },
+  ivory: { name: 'Ivory', icon: '🦷', basePrice: 2080, weight: 2, volatility: 0.6 },
+  porcelain: { name: 'Porcelain', icon: '🏺', basePrice: 880, weight: 1, volatility: 0.35 },
+  antiquities: { name: 'Antiquities', icon: '🏛️', basePrice: 1440, weight: 1, volatility: 0.5 },
+  artifacts: { name: 'Sacred Artifacts', icon: '✨', basePrice: 1760, weight: 1, volatility: 0.55 },
+  contraband: { name: 'Contraband', icon: '💀', basePrice: 2000, weight: 1, volatility: 0.8 }
+};
+
+// === VOYAGE: PORTS ===
+// Real Southeast Asian trading ports, deliberately named for their historical/colonial
+// era identities (Batavia, not Jakarta) rather than modern names — these are echoes of
+// an earlier old-world era mirrored into Aethon's seas, not the actual present-day
+// cities. The party cannot reach anyone currently living back home through these;
+// whoever they meet here is history, not family.
+const VOYAGE_PORTS = [
+  { id: 'singapore', name: 'Singapore', icon: '🦁', desc: 'The Lion City, echoed from an era when it was still mostly a free port and a promise. A mirror of a place, not the place itself.',
+    specialties: ['spices', 'silk', 'tea'], distances: { malacca: 1, batavia: 3, manila: 4, bangkok: 2, hanoi: 3, palembang: 2 }, danger: 1 },
+  { id: 'malacca', name: 'Malacca', icon: '🏰', desc: 'The old straits port, exactly as it was when every ship in these waters had to pass through it or around it.',
+    specialties: ['spices', 'pepper', 'antiquities'], distances: { singapore: 1, batavia: 3, manila: 5, bangkok: 3, hanoi: 4, palembang: 3 }, danger: 2 },
+  { id: 'batavia', name: 'Batavia', icon: '🌺', desc: 'A colonial capital, frozen at a specific moment that never actually moved forward here the way it did back home.',
+    specialties: ['coffee', 'nutmeg', 'textiles'], distances: { singapore: 3, malacca: 3, manila: 4, bangkok: 4, hanoi: 5, palembang: 2 }, danger: 2 },
+  { id: 'manila', name: 'Manila', icon: '🏝️', desc: 'Pearl of the Orient, in an era before it was ever called anything else. Familiar in a way that catches in the throat.',
+    specialties: ['pearls', 'fruits', 'silver'], distances: { singapore: 4, malacca: 5, batavia: 4, bangkok: 3, hanoi: 2, palembang: 5 }, danger: 3 },
+  { id: 'bangkok', name: 'Bangkok', icon: '🛕', desc: 'Venice of the East, canals and temples exactly as old records describe them, none of it changed since.',
+    specialties: ['rice', 'timber', 'artifacts'], distances: { singapore: 2, malacca: 3, batavia: 4, manila: 3, hanoi: 2, palembang: 3 }, danger: 2 },
+  { id: 'hanoi', name: 'Hanoi', icon: '🐉', desc: 'A northern trading post that remembers dynasties the old world itself has mostly forgotten the names of.',
+    specialties: ['tea', 'silk', 'porcelain'], distances: { singapore: 3, malacca: 4, batavia: 5, manila: 2, bangkok: 2, palembang: 4 }, danger: 2 },
+  { id: 'palembang', name: 'Palembang', icon: '⛰️', desc: 'Ancient even by this world\u2019s standards \u2014 a Srivijayan port from centuries before any of the others existed at all.',
+    specialties: ['pepper', 'ivory', 'timber'], distances: { singapore: 2, malacca: 3, batavia: 2, manila: 5, bangkok: 3, hanoi: 4 }, danger: 3 }
+];
+
+// === VOYAGE: SHIP TIERS ===
+// Restructured from a single 4-stage build into 3 progressively stronger tiers, each
+// gated behind a Voyager Level threshold (see G.voyage below) rather than just
+// character level — the ship you can build reflects how much actual sailing you've
+// done, not how strong San is on land. Tier 1's stages are unchanged from the original
+// build; tiers 2-3 are new, using two new higher-grade materials each on top of the
+// original six.
+const SHIP_TIERS = [
+  { name: 'The First Crossing', requiredVoyagerLevel: 1, cargoCapacity: 40, stages: [
+    { name: 'The Hull', desc: 'A ship starts as a shape in the water, nothing more. Get that shape right and everything after it gets easier.',
+      materials: { 'Weathered Driftwood': 12, 'Ballast Stone': 8 }, gold: 8000 },
+    { name: 'The Rigging', desc: 'Rope and canvas, more of both than seems reasonable, all of it needing to hold under weather nobody can promise will be kind.',
+      materials: { 'Waxed Sailcloth': 10, 'Rope, Properly Coiled': 14 }, gold: 12000 },
+    { name: 'The Fittings', desc: 'Iron where iron needs to be, a cabin worth calling one, storage enough to actually carry something worth carrying.',
+      materials: { 'Salvaged Iron Fittings': 10, 'Pitch and Tar': 8 }, gold: 16000 },
+    { name: 'Ready to Sail', desc: 'The last of it \u2014 not a single new material, just the work of making sure everything already built actually holds together.',
+      materials: { 'Weathered Driftwood': 6, 'Rope, Properly Coiled': 6 }, gold: 20000 }
+  ]},
+  { name: 'The Longer Reach', requiredVoyagerLevel: 5, cargoCapacity: 80, stages: [
+    { name: 'A Deeper Hull', desc: 'Bren doesn\u2019t rebuild from nothing \u2014 she reinforces what\u2019s already proven itself, deep enough to carry real weight.',
+      materials: { 'Reinforced Ship\u2019s Timber': 14, 'Ballast Stone': 12 }, gold: 45000 },
+    { name: 'Storm Rigging', desc: 'Canvas that doesn\u2019t just survive weather \u2014 sails built to actually use it.',
+      materials: { 'Storm-Treated Canvas': 12, 'Rope, Properly Coiled': 18 }, gold: 60000 },
+    { name: 'A Proper Hold', desc: 'More cargo, more crew, more reasons to stay out longer than the first ship ever could.',
+      materials: { 'Salvaged Iron Fittings': 16, 'Reinforced Ship\u2019s Timber': 8 }, gold: 75000 },
+    { name: 'Trial by Water', desc: 'Every reinforcement gets tested at once, out past sight of any port, before Bren calls it finished.',
+      materials: { 'Storm-Treated Canvas': 6, 'Pitch and Tar': 12 }, gold: 90000 }
+  ]},
+  { name: 'The Whole Horizon', requiredVoyagerLevel: 10, cargoCapacity: 150, stages: [
+    { name: 'Deep-Forged Frame', desc: 'The last ship Bren will ever need to build for you, she says \u2014 and means it as the highest compliment she has.',
+      materials: { 'Deep-Forged Ironwork': 16, 'Reinforced Ship\u2019s Timber': 20 }, gold: 180000 },
+    { name: 'Blessed Rigging', desc: 'Sister Wren\u2019s doing, this part \u2014 a working laid into the sailcloth itself, quiet and permanent.',
+      materials: { 'Blessed Ballast': 10, 'Storm-Treated Canvas': 16 }, gold: 220000 },
+    { name: 'The Full Hold', desc: 'Room for everything this crew has ever needed to carry, and then some.',
+      materials: { 'Deep-Forged Ironwork': 12, 'Blessed Ballast': 10 }, gold: 260000 },
+    { name: 'Nothing Left Untested', desc: 'The last trial. Bren stops calling it a ship at this point and starts calling it yours.',
+      materials: { 'Deep-Forged Ironwork': 8, 'Blessed Ballast': 8 }, gold: 300000 }
+  ]}
+];
+const SHIP_MATERIAL_PRICES = {
+  'Weathered Driftwood': 45, 'Ballast Stone': 60, 'Waxed Sailcloth': 80,
+  'Rope, Properly Coiled': 35, 'Salvaged Iron Fittings': 95, 'Pitch and Tar': 55,
+  'Reinforced Ship\u2019s Timber': 160, 'Storm-Treated Canvas': 220,
+  'Deep-Forged Ironwork': 420, 'Blessed Ballast': 480
+};
+
+// === VOYAGE: VOYAGER LEVEL ===
+// Separate progression track from San's own character level — tracks actual sailing
+// (trading, exploring, sea combat) once the Voyage loop itself is built. Gates ship
+// tier upgrades. Curve and grant hooks are ready now so the sailing loop has
+// somewhere real to feed XP into once it exists.
+function voyagerXpNeeded(level) {
+  return 500 + (level - 1) * 250;
+}
+function grantVoyagerXP(amount) {
+  G.voyage.xp += amount;
+  let leveledUp = false;
+  while (G.voyage.xp >= voyagerXpNeeded(G.voyage.level)) {
+    G.voyage.xp -= voyagerXpNeeded(G.voyage.level);
+    G.voyage.level++;
+    leveledUp = true;
+  }
+  if (leveledUp) {
+    lg('\u2693 Voyager Level ' + G.voyage.level + '! ' + (SHIP_TIERS.find(t => t.requiredVoyagerLevel === G.voyage.level) ? 'A stronger ship is now within reach at Bren\u2019s yard.' : ''));
+  }
+}
+
+function isShipUnlocked() {
+  return G.p.lvl >= 560;
+}
+
+// === VOYAGE: TRADING ===
+// Classic buy-low-sell-high loop: a port's specialty goods are cheap to buy there and
+// bad to sell there (it's the local stuff), and the reverse for anything imported.
+// Deliberately simple/static pricing for this first pass — no live daily fluctuation
+// yet, even though VOYAGE_GOODS already carries a volatility field ready for that once
+// the rest of the loop (actual sailing sessions, time-gating) exists to hang it off of.
+function getPortGoodPrice(portId, goodId, mode) {
+  const port = VOYAGE_PORTS.find(p => p.id === portId);
+  const good = VOYAGE_GOODS[goodId];
+  if (!port || !good) return 0;
+  const isSpecialty = port.specialties.includes(goodId);
+  if (mode === 'buy') return Math.round(good.basePrice * (isSpecialty ? 0.6 : 1.2));
+  return Math.round(good.basePrice * (isSpecialty ? 0.7 : 1.4));
+}
+function getCargoTotal() {
+  return Object.values(G.voyage.cargo).reduce((sum, q) => sum + q, 0);
+}
+function buyVoyageGood(goodId, qty) {
+  if (!isVoyageWindowOpen()) return;
+  const good = VOYAGE_GOODS[goodId];
+  const tier = getShipTier();
+  const capacity = tier ? tier.cargoCapacity : 0;
+  const currentWeight = getCargoWeight();
+  const roomLeft = Math.floor((capacity - currentWeight) / good.weight);
+  const actualQty = Math.min(qty, roomLeft);
+  if (actualQty <= 0) { lg('\u2693 The hold is full \u2014 ' + currentWeight + ' / ' + capacity + ' capacity. Sell something first, or upgrade the ship.'); return; }
+  const price = getPortGoodPrice(G.voyage.currentPort, goodId, 'buy');
+  const cost = price * actualQty;
+  if (G.p.gold < cost) { lg('\u2693 Not enough gold for that much ' + good.name + '.'); return; }
+  G.p.gold -= cost;
+  G.voyage.cargo[goodId] = (G.voyage.cargo[goodId] || 0) + actualQty;
+  lg('\u2693 Bought ' + actualQty + '\u00d7 ' + good.name + ' for ' + cost.toLocaleString() + 'G.' + (actualQty < qty ? ' (hold space limited it to ' + actualQty + ')' : ''));
+  render();
+}
+function getCargoWeight() {
+  return Object.entries(G.voyage.cargo).reduce((sum, [goodId, qty]) => sum + (VOYAGE_GOODS[goodId] ? VOYAGE_GOODS[goodId].weight * qty : 0), 0);
+}
+function sellVoyageGood(goodId, qty) {
+  if (!isVoyageWindowOpen()) return;
+  const have = G.voyage.cargo[goodId] || 0;
+  const actualQty = Math.min(qty, have);
+  if (actualQty <= 0) { lg('\u2693 None of that in the hold to sell.'); return; }
+  const price = getPortGoodPrice(G.voyage.currentPort, goodId, 'sell');
+  // Trade-bonus crew (Zheng He) apply here — a real reason to actually crew the ship
+  // rather than just leaving those 8 slots empty.
+  const earned = Math.round(price * actualQty * (1 + getCrewBonus('trade')));
+  G.p.gold += earned;
+  G.voyage.cargo[goodId] -= actualQty;
+  if (G.voyage.cargo[goodId] <= 0) delete G.voyage.cargo[goodId];
+  lg('\u2693 Sold ' + actualQty + '\u00d7 ' + VOYAGE_GOODS[goodId].name + ' for ' + earned.toLocaleString() + 'G.');
+  grantVoyagerXP(Math.round(earned / 50)); // trading itself feeds Voyager XP, not just combat
+  render();
+}
+// Small dedicated list of which sea monster names can appear as a travel encounter —
+// kept separate from ENEMY_REGISTRY (which is purely a stat-resolution table) so this
+// stays easy to read/extend on its own.
+// Maps each explorable sea zone's display name to its actual index in G.zones —
+// confirmed by direct count (117 zones precede "The Reef That Swallowed a Fleet",
+// putting these 5 at indices 117-121) rather than assumed, since a wrong index here
+// would silently drop the player into an unrelated zone.
+// Fixed 6-10 PM local-device-time window, 4 hours daily — no server exists here to
+// anchor this to, so it has to run off whatever clock the device itself reports.
+// Length stays fixed and predictable rather than randomized; the countdown below is
+// what actually prevents a missed window from feeling like an unexplained lockout.
+const VOYAGE_WINDOW_START_HOUR = 18;
+const VOYAGE_WINDOW_END_HOUR = 22;
+function isVoyageWindowOpen() {
+  const hour = new Date().getHours();
+  return hour >= VOYAGE_WINDOW_START_HOUR && hour < VOYAGE_WINDOW_END_HOUR;
+}
+function getVoyageWindowCountdown() {
+  const now = new Date();
+  const target = new Date(now);
+  if (isVoyageWindowOpen()) {
+    target.setHours(VOYAGE_WINDOW_END_HOUR, 0, 0, 0);
+  } else {
+    target.setHours(VOYAGE_WINDOW_START_HOUR, 0, 0, 0);
+    if (target <= now) target.setDate(target.getDate() + 1); // already past today's start — next one is tomorrow
+  }
+  const diffMs = target - now;
+  const h = Math.floor(diffMs / 3600000);
+  const m = Math.floor((diffMs % 3600000) / 60000);
+  return h + 'h ' + m + 'm';
+}
+const VOYAGE_EXPLORE_ZONES = [
+  { name: 'The Reef That Swallowed a Fleet', idx: 117 },
+  { name: 'An Island With No Name on Any Chart', idx: 118 },
+  { name: 'The Becalmed Waters', idx: 119 },
+  { name: 'A Lighthouse That Still Burns', idx: 120 },
+  { name: 'Where the Old Maps End', idx: 121 }
+];
+const VOYAGE_ENCOUNTER_POOL = [
+  'The Serpent That Outgrew Its Own Legend', 'The Black Sail, Still Flying',
+  'The Patrol That Never Reports Back', 'A Ship That Already Sank',
+  'Voices That Know Your Name', 'An Island That Was Never An Island',
+  'The Old Weight Beneath Everything', 'The Grip That Doesn\u2019t Let Go'
+];
+function startSeaEncounter(danger) {
+  // Weighted toward the player's current level so early Voyagers don't run into the
+  // toughest (Lv650) monster on their very first crossing — same reasoning as most
+  // other level-gated content in the game.
+  const eligible = VOYAGE_ENCOUNTER_POOL.filter(name => ENEMY_REGISTRY[name].zoneLv <= G.p.lvl + 40);
+  const pool = eligible.length > 0 ? eligible : VOYAGE_ENCOUNTER_POOL;
+  const name = pool[Math.floor(Math.random() * pool.length)];
+  const reg = ENEMY_REGISTRY[name];
+  const stats = generateEnemyStats(reg.zoneLv, reg.template, reg.elem);
+  // Combat-bonus crew (Bapoleon) soften the encounter directly rather than buffing
+  // the player's own stats — reads as "the crew helped brace for this" rather than
+  // San suddenly hitting harder because someone else is aboard.
+  const combatBonus = getCrewBonus('combat');
+  if (combatBonus > 0) { stats.atk = Math.round(stats.atk * (1 - combatBonus)); stats.def = Math.round(stats.def * (1 - combatBonus)); }
+  G.cbt.on = true;
+  G.cbt.turn = 0;
+  G.cbt.en = [{ n: name, ...stats, id: 0, elem: reg.elem }];
+  G.state = 'combat';
+  G.currentBoss = null;
+  G.cbt.autoCombat = isAutoCombatPreferred();
+  lg('\u2693 Something surfaces alongside the ship: ' + name + '.');
+  render();
+}
+function sailToPort(portId) {
+  if (!isVoyageWindowOpen()) return;
+  const currentPort = VOYAGE_PORTS.find(p => p.id === G.voyage.currentPort);
+  if (!currentPort || !currentPort.distances[portId]) return;
+  const destPort = VOYAGE_PORTS.find(p => p.id === portId);
+  const distance = currentPort.distances[portId];
+  G.voyage.currentPort = portId;
+  if (!G.voyage.visitedPorts.includes(portId)) G.voyage.visitedPorts.push(portId);
+  grantVoyagerXP(10 * distance); // longer crossings are worth more
+  // Encounter chance scales with both the destination's danger rating and how far the
+  // crossing was — a short hop between calm ports is much safer than a long one
+  // through dangerous water. Travel-bonus crew (Parco) reduce this directly.
+  const encounterChance = Math.min(0.5, destPort.danger * 0.08 * distance) * (1 - getCrewBonus('travel'));
+  if (Math.random() < encounterChance) {
+    startSeaEncounter(destPort.danger);
+    return;
+  }
+  lg('\u2693 Made port at ' + destPort.name + '.');
+  checkGuildRecruitment();
+  render();
+}
+function getShipTier() {
+  return SHIP_TIERS[G.ship.tier] || null;
+}
+function getShipStageInfo() {
+  const tier = getShipTier();
+  return tier ? (tier.stages[G.ship.stage] || null) : null;
+}
+function isNextShipTierAvailable() {
+  const nextTier = SHIP_TIERS[G.ship.tier + 1];
+  return !!nextTier && G.voyage.level >= nextTier.requiredVoyagerLevel;
+}
+function startNextShipTier() {
+  if (!isNextShipTierAvailable()) return;
+  G.ship.tier++;
+  G.ship.stage = 0;
+  G.ship.materials = {};
+  G.ship.built = false;
+  lg('\u2693 Bren starts work on ' + getShipTier().name + '.');
+  render();
+}
+function contributeShipMaterial(matName, qty) {
+  const stageInfo = getShipStageInfo();
+  if (!stageInfo || !stageInfo.materials[matName]) return;
+  const have = G.ship.materials[matName] || 0;
+  const need = stageInfo.materials[matName];
+  const invIdx = G.p.inv.findIndex(it => it.n === matName);
+  const invHave = invIdx >= 0 ? G.p.inv[invIdx].q : 0;
+  const actualQty = Math.min(qty, need - have, invHave);
+  if (actualQty <= 0) {
+    if (invHave === 0) lg('\u2693 None of that in your inventory yet \u2014 buy some from Bren first.');
+    else lg('\u2693 Already have enough ' + matName + ' for this stage.');
+    return;
+  }
+  // Draws from inventory (what was already bought from Bren) rather than re-charging
+  // gold directly — buying and contributing are two separate steps, matching how
+  // every other material-based system in the game already works.
+  G.p.inv[invIdx].q -= actualQty;
+  if (G.p.inv[invIdx].q <= 0) G.p.inv.splice(invIdx, 1);
+  G.ship.materials[matName] = have + actualQty;
+  lg('\u2693 ' + actualQty + '\u00d7 ' + matName + ' brought aboard.');
+  render();
+}
+function isShipStageMaterialsComplete() {
+  const stageInfo = getShipStageInfo();
+  if (!stageInfo) return false;
+  return Object.entries(stageInfo.materials).every(([mat, need]) => (G.ship.materials[mat] || 0) >= need);
+}
+function completeShipStage() {
+  const stageInfo = getShipStageInfo();
+  const tier = getShipTier();
+  if (!stageInfo || !tier || !isShipStageMaterialsComplete()) return;
+  if (G.p.gold < stageInfo.gold) { lg('\u2693 Not enough gold to finish ' + stageInfo.name + ' (' + stageInfo.gold + 'G needed).'); return; }
+  G.p.gold -= stageInfo.gold;
+  G.ship.materials = {};
+  G.ship.stage++;
+  if (G.ship.stage >= tier.stages.length) {
+    G.ship.built = true;
+    lg('\u2693 ' + tier.name + ' is finished. Properly, actually finished \u2014 ready for the water.');
+  } else {
+    lg('\u2693 ' + stageInfo.name + ' complete. On to ' + tier.stages[G.ship.stage].name + '.');
+  }
+  render();
+}
+
 const GUILD_DUTY_TYPES = {
   scout: { name: 'Scout Duty', icon: '🔭', desc: 'Daily chance at a bonus material.' },
   defense: { name: 'Defense Duty', icon: '🛡️', desc: 'Small daily Guild Rep.' },
@@ -13790,8 +14462,49 @@ function isGuildMemberOnDuty(id) {
   return !!G.guildDuties[id];
 }
 
+// === VOYAGE CREW ===
+// Same mutual-exclusivity tradeoff as every other Guild Member commitment — crewing
+// the ship costs a member's availability for Duty, Bounty Dispatch, and Guild War
+// fielding, same as any of those cost each other. 8 slots total, matching the larger
+// Pirates-of-the-Caribbean-scale crew size discussed, separate from San/Joel who are
+// always aboard as fixed officers and never take a slot.
+const VOYAGE_CREW_SLOTS = 8;
+function isGuildMemberOnVoyageCrew(id) {
+  return G.voyage.crew.includes(id);
+}
+function canAssignVoyageCrew(id) {
+  return isGuildMemberRecruited(id) && G.voyage.crew.length < VOYAGE_CREW_SLOTS &&
+    !G.guildWar.fielded.includes(id) && !isGuildMemberOnBountyDispatch(id) &&
+    !isGuildMemberOnDuty(id) && !isGuildMemberOnVoyageCrew(id);
+}
+function assignVoyageCrew(id) {
+  if (!canAssignVoyageCrew(id)) { lg('\u2693 That member isn\u2019t free to crew right now.'); return; }
+  G.voyage.crew.push(id);
+  const def = getGuildMemberDef(id);
+  lg('\u2693 ' + def.npcName + ' joins the crew.');
+  render();
+}
+function unassignVoyageCrew(id) {
+  const idx = G.voyage.crew.indexOf(id);
+  if (idx < 0) return;
+  const def = getGuildMemberDef(id);
+  G.voyage.crew.splice(idx, 1);
+  lg('\u2693 ' + def.npcName + ' steps back from crew duty.');
+  render();
+}
+// Sums voyageBonus values (by type) across whoever is actually crewing right now —
+// same "compute live, never store" pattern as getGuildWarFieldBonus().
+function getCrewBonus(type) {
+  let bonus = 0;
+  for (let id of G.voyage.crew) {
+    const def = getGuildMemberDef(id);
+    if (def && def.voyageBonus && def.voyageBonus.type === type) bonus += def.voyageBonus.value;
+  }
+  return bonus;
+}
+
 function canAssignGuildDuty(id) {
-  return isGuildMemberRecruited(id) && !G.guildWar.fielded.includes(id) && !isGuildMemberOnBountyDispatch(id) && !isGuildMemberOnDuty(id);
+  return isGuildMemberRecruited(id) && !G.guildWar.fielded.includes(id) && !isGuildMemberOnBountyDispatch(id) && !isGuildMemberOnDuty(id) && !isGuildMemberOnVoyageCrew(id);
 }
 
 function assignGuildDuty(id, dutyType) {
@@ -19966,13 +20679,17 @@ function triggerLevelUpAnimation(newLevel) {
 // San, Joel, and Aisyah are the fixed trio — never appear in the swappable pool, can
 // never be benched. Soel is a familiar and doesn't take a slot at all. Everyone else
 // competes for ACTIVE_PARTY_SLOTS spots, unlocked either by level (the original four)
-// or by Guild recruitment (the six added later). Mimi and Brada were previously a
-// forced linked pair here — removed to match established comic canon, where Brada
-// isn't shown accompanying Mimi in her own chapters. They can now be selected
-// independently; partySynergies rewards fielding them together instead of requiring it.
+// or by Guild recruitment (the six added later). Mimi/Brada and Senedra/Zaki were
+// previously forced linked pairs here — both removed. Mimi/Brada didn't match
+// established comic canon; Senedra/Zaki forced KW Liang out of ever being a real
+// alternative to Senedra specifically, since taking one scout-archetype member always
+// meant taking a second whether wanted or not. All four can now be selected
+// independently; partySynergies rewards fielding actual pairs together instead of
+// requiring it, and each scout gets to be a genuine, distinct choice rather than
+// coming bundled.
 const ACTIVE_PARTY_SLOTS = 4;
 const SWAPPABLE_PARTY_POOL = ['Mezstorm', 'Eliz', 'Senedra', 'Zaki', 'KW Liang', 'Mimi', 'Brada Shah', 'Dr. AA', 'Sister Wren', 'Ser Aldric', 'Iris', 'Renn Evergreen'];
-const LINKED_PARTY_PAIRS = [['Senedra', 'Zaki']];
+const LINKED_PARTY_PAIRS = [];
 // Maps a swappable party member's name to the Guild Member id that gates their
 // availability, for the six who are recruit-gated rather than level-gated.
 const PARTY_MEMBER_GUILD_GATE = {
@@ -20063,6 +20780,7 @@ const COMPANION_LEVEL_GROWTH = {
   'Ser Aldric':  { mhp: 11, atk: 1, def: 2, spd: 0 }, // The Other Kind of Found — even tankier than Joel, slower
   'Iris':        { mhp: 7,  atk: 2, def: 0, spd: 1 }, // Held Her Own — fast, offense-leaning scout, same shape as Senedra
   'Renn Evergreen': { mhp: 8, atk: 1, def: 1, spd: 0, mmp: 5 }, // Alchemist-Archivist — support/utility caster, real MP pool
+  Gino: { mhp: 8, atk: 1, def: 1, spd: 0 }, // Kitchen Helper — cooking equipment, not a real weapon, kept deliberately low-ATK
 };
 
 // Original starting stats (before any growth) and unlock level per companion — used only
@@ -21131,7 +21849,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.142';
+const BUILD_ID = '2026-08-17.153';
 // =========================
 
 
@@ -21247,6 +21965,8 @@ function saveGame() {
     guildWarBestStreak: G.guildWar.bestStreak || 0,
     guildRosterRecruited: G.guildRoster.recruited || [],
     guildTreasury: G.guildTreasury,
+    ship: G.ship,
+    voyage: G.voyage,
     guildWarAccords: G.guildWarAccords,
     guildWarAccordLastPayoutDay: G.guildWarAccordLastPayoutDay,
     guildMemberRequests: G.guildMemberRequests,
@@ -21593,6 +22313,8 @@ function loadGame() {
     G.guildWar.bestStreak = data.guildWarBestStreak || 0;
     G.guildRoster.recruited = data.guildRosterRecruited || [];
     if (data.guildTreasury) G.guildTreasury = data.guildTreasury;
+    if (data.ship) G.ship = data.ship;
+    if (data.voyage) G.voyage = data.voyage;
     if (data.guildWarAccords) G.guildWarAccords = data.guildWarAccords;
     if (data.guildWarAccordLastPayoutDay !== undefined) G.guildWarAccordLastPayoutDay = data.guildWarAccordLastPayoutDay;
     if (data.guildMemberRequests) G.guildMemberRequests = data.guildMemberRequests;
@@ -22834,6 +23556,9 @@ function render(){
   else if(G.state=='guild_hall_tour')h+=rGuildHallTour();
   else if(G.state=='relationships')h+=rRelationships();
   else if(G.state=='session_log')h+=rSessionLog();
+  else if(G.state=='ship')h+=rShip();
+  else if(G.state=='voyage')h+=rVoyage();
+  else if(G.state=='voyage_crew')h+=rVoyageCrew();
   else if(G.state=='guild_bounty_missions')h+=rGuildBountyMissions();
   else if(G.state=='stronghold')h+=rStrongholds();
   else if(G.state=='guild_boss')h+=rGuildBoss();
@@ -22904,6 +23629,9 @@ function attachEvents() {
     else if(a=='guild_hall_tour')setS('guild_hall_tour');
     else if(a=='relationships')setS('relationships');
     else if(a=='session_log')setS('session_log');
+    else if(a=='ship')setS('ship');
+    else if(a=='voyage')setS('voyage');
+    else if(a=='voyage_crew')setS('voyage_crew');
     else if(a=='guild_bounty_missions')setS('guild_bounty_missions');
     else if(a=='stronghold')setS('stronghold');
     else if(a=='guild_boss')setS('guild_boss');
@@ -26182,6 +26910,8 @@ function buyGuildCafeDrink(drinkId) {
 
 const CAFE_FOOD_DATABASE = [
   { n: '1 Egg', cat: 'Egg & Dairy', fat: 5.0, protein: 6.0, carbs: 0.4, icon: '🥚' },
+  { n: 'Koukakis Yogurt, 0% fat (150g)', cat: 'Egg & Dairy', fat: 0.0, protein: 15.0, carbs: 6.0, icon: '🥛' },
+  { n: 'Koukakis Yogurt, full fat (150g)', cat: 'Egg & Dairy', fat: 9.0, protein: 7.0, carbs: 5.5, icon: '🥛' },
   { n: '3 Eggs', cat: 'Egg & Dairy', fat: 15.0, protein: 18.0, carbs: 1.2, icon: '🥚' },
   { n: 'Butter (10ml pkt)', cat: 'Egg & Dairy', fat: 8.0, protein: 0.0, carbs: 0.0, icon: '🧈' },
   { n: 'Butter (30ml)', cat: 'Egg & Dairy', fat: 25.0, protein: 0.0, carbs: 0.0, icon: '🧈' },
@@ -26199,15 +26929,15 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Whole Chicken \'Isi\' (mixed cuts, 100g)', cat: 'Poultry', fat: 10.0, protein: 24.0, carbs: 0.0, icon: '🍗' },
   { n: 'Duck Breast, skin-on (100g)', cat: 'Poultry', fat: 28.0, protein: 18.0, carbs: 0.0, icon: '🦆' },
   { n: 'Duck Breast, skinless (100g)', cat: 'Poultry', fat: 5.0, protein: 23.0, carbs: 0.0, icon: '🦆' },
-  { n: 'Pork Belly (100g)', cat: 'Pork', fat: 35.0, protein: 17.0, carbs: 0.0, icon: '🥓' },
-  { n: 'Sio Bak / Roast Pork (100g)', cat: 'Pork', fat: 30.0, protein: 18.0, carbs: 0.5, icon: '🥓' },
-  { n: 'Char Siew (2 slices)', cat: 'Pork', fat: 8.0, protein: 12.0, carbs: 4.0, icon: '🥓' },
-  { n: 'Pig Trotters / Lor (100g)', cat: 'Pork', fat: 20.0, protein: 20.0, carbs: 1.0, icon: '🥓' },
-  { n: 'Lup Cheong / Chinese Sausage (1pc)', cat: 'Pork', fat: 11.0, protein: 6.0, carbs: 3.0, icon: '🌭' },
-  { n: 'Bacon (2 rashers, grilled)', cat: 'Pork', fat: 8.0, protein: 10.0, carbs: 0.2, icon: '🥓' },
-  { n: 'Bacon (4 rashers, grilled)', cat: 'Pork', fat: 16.0, protein: 20.0, carbs: 0.4, icon: '🥓' },
-  { n: 'Pork Loin (lean, 100g)', cat: 'Pork', fat: 7.0, protein: 26.0, carbs: 0.0, icon: '🥩' },
-  { n: 'Minced Pork (100g)', cat: 'Pork', fat: 21.0, protein: 17.0, carbs: 0.0, icon: '🥩' },
+  { n: 'Pork Belly (100g)', cat: 'Pork', chef: 'Joel', fat: 35.0, protein: 17.0, carbs: 0.0, icon: '🥓' },
+  { n: 'Sio Bak / Roast Pork (100g)', cat: 'Pork', chef: 'Joel', fat: 30.0, protein: 18.0, carbs: 0.5, icon: '🥓' },
+  { n: 'Char Siew (2 slices)', cat: 'Pork', chef: 'Joel', fat: 8.0, protein: 12.0, carbs: 4.0, icon: '🥓' },
+  { n: 'Pig Trotters / Lor (100g)', cat: 'Pork', chef: 'Joel', fat: 20.0, protein: 20.0, carbs: 1.0, icon: '🥓' },
+  { n: 'Lup Cheong / Chinese Sausage (1pc)', cat: 'Pork', chef: 'Joel', fat: 11.0, protein: 6.0, carbs: 3.0, icon: '🌭' },
+  { n: 'Bacon (2 rashers, grilled)', cat: 'Pork', chef: 'Joel', fat: 8.0, protein: 10.0, carbs: 0.2, icon: '🥓' },
+  { n: 'Bacon (4 rashers, grilled)', cat: 'Pork', chef: 'Joel', fat: 16.0, protein: 20.0, carbs: 0.4, icon: '🥓' },
+  { n: 'Pork Loin (lean, 100g)', cat: 'Pork', chef: 'Joel', fat: 7.0, protein: 26.0, carbs: 0.0, icon: '🥩' },
+  { n: 'Minced Pork (100g)', cat: 'Pork', chef: 'Joel', fat: 21.0, protein: 17.0, carbs: 0.0, icon: '🥩' },
   { n: 'Tenggiri / Mackerel (100g)', cat: 'Seafood & Fish', fat: 12.0, protein: 24.0, carbs: 0.0, icon: '🐟' },
   { n: 'Ikan Bilis / Anchovies, Pusu (20g)', cat: 'Seafood & Fish', fat: 2.0, protein: 9.0, carbs: 0.0, icon: '🐟' },
   { n: 'Sardines, ½ Can in Olive Oil', cat: 'Seafood & Fish', fat: 9.0, protein: 12.0, carbs: 0.0, icon: '🐟' },
@@ -26465,21 +27195,21 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Turmeric Chicken / Ayam Kunyit (1 serving)', cat: 'Thai Dishes', fat: 14.0, protein: 28.0, carbs: 3.0, icon: '🟡' },
   { n: 'Satay, chicken (4 skewers, no sauce)', cat: 'Thai Dishes', fat: 8.0, protein: 22.0, carbs: 1.0, icon: '🍢' },
   { n: 'Satay, chicken (4 skewers + peanut sauce)', cat: 'Thai Dishes', fat: 14.0, protein: 22.0, carbs: 8.0, icon: '🍢' },
-  { n: 'Ambuyat (1 serving sago, no sides)', cat: 'Bruneian / Malay', fat: 0.2, protein: 0.3, carbs: 28.0, icon: '⚠️' },
-  { n: 'Ikan Bakar / BBQ Fish (1 fillet)', cat: 'Bruneian / Malay', fat: 8.0, protein: 28.0, carbs: 2.0, icon: '🐟' },
-  { n: 'Nasi Lemak — rice & sambal only (skip rice)', cat: 'Bruneian / Malay', fat: 12.0, protein: 8.0, carbs: 4.0, icon: '⚠️' },
-  { n: 'Nasi Lemak sides only (egg, ikan bilis, sambal)', cat: 'Bruneian / Malay', fat: 10.0, protein: 10.0, carbs: 3.0, icon: '🍳' },
-  { n: 'Chicken Curry, Malay style (no rice)', cat: 'Bruneian / Malay', fat: 18.0, protein: 26.0, carbs: 6.0, icon: '🍛' },
-  { n: 'Fish Curry, Malay style (no rice)', cat: 'Bruneian / Malay', fat: 12.0, protein: 24.0, carbs: 5.0, icon: '🐟' },
-  { n: 'Sayur Lodeh (mixed veg in coconut milk)', cat: 'Bruneian / Malay', fat: 10.0, protein: 4.0, carbs: 8.0, icon: '🥥' },
-  { n: 'Gulai Ikan / Fish in Coconut Curry (no rice)', cat: 'Bruneian / Malay', fat: 14.0, protein: 22.0, carbs: 6.0, icon: '🐟' },
-  { n: 'Sambal Goreng (1 serving, no rice)', cat: 'Bruneian / Malay', fat: 12.0, protein: 14.0, carbs: 5.0, icon: '🌶️' },
-  { n: 'Roti Canai (1 piece, no curry dip)', cat: 'Bruneian / Malay', fat: 8.0, protein: 4.0, carbs: 24.0, icon: '⚠️' },
-  { n: 'Laksa, soup only (no noodles)', cat: 'Bruneian / Malay', fat: 14.0, protein: 18.0, carbs: 6.0, icon: '🍲' },
-  { n: 'Sup Ayam / Clear Chicken Soup (1 bowl)', cat: 'Bruneian / Malay', fat: 6.0, protein: 24.0, carbs: 3.0, icon: '🥣' },
-  { n: 'Sup Tulang / Bone Broth Soup (1 bowl)', cat: 'Bruneian / Malay', fat: 8.0, protein: 18.0, carbs: 2.0, icon: '🥣' },
-  { n: 'Pari Bakar / Grilled Stingray (1 serving)', cat: 'Bruneian / Malay', fat: 6.0, protein: 22.0, carbs: 2.0, icon: '🐟' },
-  { n: 'Begedil / Potato Fritters (1 piece)', cat: 'Bruneian / Malay', fat: 5.0, protein: 2.0, carbs: 10.0, icon: '⚠️' },
+  { n: 'Ambuyat (1 serving sago, no sides)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 0.2, protein: 0.3, carbs: 28.0, icon: '⚠️' },
+  { n: 'Ikan Bakar / BBQ Fish (1 fillet)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 8.0, protein: 28.0, carbs: 2.0, icon: '🐟' },
+  { n: 'Nasi Lemak — rice & sambal only (skip rice)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 12.0, protein: 8.0, carbs: 4.0, icon: '⚠️' },
+  { n: 'Nasi Lemak sides only (egg, ikan bilis, sambal)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 10.0, protein: 10.0, carbs: 3.0, icon: '🍳' },
+  { n: 'Chicken Curry, Malay style (no rice)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 18.0, protein: 26.0, carbs: 6.0, icon: '🍛' },
+  { n: 'Fish Curry, Malay style (no rice)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 12.0, protein: 24.0, carbs: 5.0, icon: '🐟' },
+  { n: 'Sayur Lodeh (mixed veg in coconut milk)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 10.0, protein: 4.0, carbs: 8.0, icon: '🥥' },
+  { n: 'Gulai Ikan / Fish in Coconut Curry (no rice)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 14.0, protein: 22.0, carbs: 6.0, icon: '🐟' },
+  { n: 'Sambal Goreng (1 serving, no rice)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 12.0, protein: 14.0, carbs: 5.0, icon: '🌶️' },
+  { n: 'Roti Canai (1 piece, no curry dip)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 8.0, protein: 4.0, carbs: 24.0, icon: '⚠️' },
+  { n: 'Laksa, soup only (no noodles)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 14.0, protein: 18.0, carbs: 6.0, icon: '🍲' },
+  { n: 'Sup Ayam / Clear Chicken Soup (1 bowl)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 6.0, protein: 24.0, carbs: 3.0, icon: '🥣' },
+  { n: 'Sup Tulang / Bone Broth Soup (1 bowl)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 8.0, protein: 18.0, carbs: 2.0, icon: '🥣' },
+  { n: 'Pari Bakar / Grilled Stingray (1 serving)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 6.0, protein: 22.0, carbs: 2.0, icon: '🐟' },
+  { n: 'Begedil / Potato Fritters (1 piece)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 5.0, protein: 2.0, carbs: 10.0, icon: '⚠️' },
   { n: 'Gado-Gado (no lontong, light peanut sauce)', cat: 'Indonesian', fat: 12.0, protein: 10.0, carbs: 10.0, icon: '🥗' },
   { n: 'Bakso Soup / Meatball Soup (no noodles)', cat: 'Indonesian', fat: 8.0, protein: 18.0, carbs: 4.0, icon: '🥣' },
   { n: 'Opor Ayam / Chicken in Coconut Milk (no rice)', cat: 'Indonesian', fat: 20.0, protein: 26.0, carbs: 5.0, icon: '🍛' },
@@ -26508,44 +27238,46 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Curry Chicken, Indian-style, no rice (bowl)', cat: 'Indian', fat: 16.0, protein: 25.0, carbs: 8.0, icon: '🍛' },
   { n: 'Chana Masala / Chole, no rice (bowl)', cat: 'Indian', fat: 12.0, protein: 10.0, carbs: 30.0, icon: '🍛' },
   { n: 'Masala Fish / Fish Curry, Indian-style, no rice (bowl)', cat: 'Indian', fat: 14.0, protein: 22.0, carbs: 8.0, icon: '🐟' },
-  { n: 'Har Gow / Shrimp Dumplings (3pc)', cat: 'Dimsum', fat: 4.0, protein: 9.0, carbs: 8.0, icon: '🥟' },
-  { n: 'Siu Mai / Pork & Shrimp Dumplings (3pc)', cat: 'Dimsum', fat: 10.0, protein: 11.0, carbs: 6.0, icon: '🥟' },
-  { n: 'Vegetarian Siu Mai, mock prawn/cuttlefish (3pc)', cat: 'Dimsum', fat: 6.0, protein: 7.0, carbs: 7.0, icon: '🥟' },
-  { n: 'Char Siu Bao / BBQ Pork Bun, steamed (1pc)', cat: 'Dimsum', fat: 6.0, protein: 8.0, carbs: 28.0, icon: '🥟' },
-  { n: 'Char Siu Sou / BBQ Pork Pastry, baked (1pc)', cat: 'Dimsum', fat: 12.0, protein: 6.0, carbs: 20.0, icon: '🥐' },
-  { n: 'Chee Cheong Fun / Rice Noodle Rolls, plain (3pc)', cat: 'Dimsum', fat: 2.0, protein: 3.0, carbs: 22.0, icon: '🍥' },
-  { n: 'Egg Tart / Dan Tat (1pc)', cat: 'Dimsum', fat: 9.0, protein: 3.0, carbs: 18.0, icon: '🥧' },
-  { n: 'Turnip Cake / Lo Bak Go, pan-fried (2 slices)', cat: 'Dimsum', fat: 8.0, protein: 3.0, carbs: 14.0, icon: '🍘' },
-  { n: 'Spring Roll / Chun Guen (2pc)', cat: 'Dimsum', fat: 9.0, protein: 4.0, carbs: 15.0, icon: '🌯' },
-  { n: 'Lo Mai Gai / Sticky Rice in Lotus Leaf (1pc)', cat: 'Dimsum', fat: 9.0, protein: 12.0, carbs: 45.0, icon: '🍙' },
-  { n: 'Custard Bun / Nai Wong Bao, steamed (1pc)', cat: 'Dimsum', fat: 7.0, protein: 4.0, carbs: 26.0, icon: '🥮' },
-  { n: 'Phoenix Claws / Braised Chicken Feet (100g)', cat: 'Dimsum', fat: 8.0, protein: 14.0, carbs: 5.0, icon: '🍗' },
-  { n: 'Steamed Pork Ribs, black bean sauce (100g)', cat: 'Dimsum', fat: 14.0, protein: 16.0, carbs: 3.0, icon: '🍖' },
-  { n: 'Plain Congee / Rice Porridge (1 bowl)', cat: 'Dimsum', fat: 1.0, protein: 4.0, carbs: 30.0, icon: '🥣' },
-  { n: 'Wu Gok / Deep-fried Taro Dumpling (1pc)', cat: 'Dimsum', fat: 10.0, protein: 3.0, carbs: 16.0, icon: '🥟' },
-  { n: 'Curry Puff, chicken (1pc)', cat: 'Dimsum', fat: 8.0, protein: 2.0, carbs: 14.0, icon: '🥐' },
-  { n: 'Satay, chicken or beef, no sauce (3 sticks)', cat: 'Street Food', fat: 6.0, protein: 15.0, carbs: 4.0, icon: '🍢' },
-  { n: 'Cucur Sayur / Vegetable Fritter (1pc)', cat: 'Street Food', fat: 9.0, protein: 4.0, carbs: 28.0, icon: '🥠' },
-  { n: 'Tauhu Sumbat / Stuffed Tofu (1pc)', cat: 'Street Food', fat: 15.0, protein: 10.0, carbs: 20.0, icon: '🧈' },
-  { n: 'Satay Peanut Sauce (2 tbsp)', cat: 'Street Food', fat: 8.0, protein: 3.0, carbs: 6.0, icon: '🥜' },
-  { n: 'Roti Canai / Prata, plain (1pc)', cat: 'Street Food', fat: 8.0, protein: 4.0, carbs: 30.0, icon: '🫓' },
-  { n: 'Nasi Lemak, rice+egg+anchovies+sambal (1 plate)', cat: 'Street Food', fat: 15.0, protein: 6.0, carbs: 45.0, icon: '🍚' },
-  { n: 'Curry Laksa, with noodles (1 bowl)', cat: 'Street Food', fat: 20.0, protein: 15.0, carbs: 35.0, icon: '🍜' },
-  { n: 'Pad Thai (1 plate)', cat: 'Street Food', fat: 12.0, protein: 15.0, carbs: 45.0, icon: '🍜' },
-  { n: 'Banh Mi sandwich (1 whole)', cat: 'Street Food', fat: 14.0, protein: 18.0, carbs: 40.0, icon: '🥖' },
-  { n: 'Pisang Goreng / Fried Banana (2pc)', cat: 'Street Food', fat: 8.0, protein: 2.0, carbs: 30.0, icon: '🍌' },
-  { n: 'Popiah / Fresh Spring Roll (1pc)', cat: 'Street Food', fat: 4.0, protein: 5.0, carbs: 20.0, icon: '🌯' },
-  { n: 'Otak-Otak / Grilled Fish Cake (2pc)', cat: 'Street Food', fat: 6.0, protein: 8.0, carbs: 4.0, icon: '🐟' },
-  { n: 'Kaya Toast with butter (2 slices)', cat: 'Street Food', fat: 12.0, protein: 5.0, carbs: 30.0, icon: '🍞' },
-  { n: 'Murtabak, chicken (1 slice)', cat: 'Street Food', fat: 14.0, protein: 12.0, carbs: 25.0, icon: '🥟' },
-  { n: 'Mee Goreng / Fried Noodles (1 plate)', cat: 'Street Food', fat: 14.0, protein: 12.0, carbs: 50.0, icon: '🍜' },
-  { n: 'Cendol dessert (1 bowl)', cat: 'Street Food', fat: 8.0, protein: 2.0, carbs: 35.0, icon: '🍧' },
-  { n: 'Fish Ball Skewers (5pc)', cat: 'Street Food', fat: 2.0, protein: 10.0, carbs: 8.0, icon: '🍢' },
-  { n: 'Kuih, assorted sweet (2pc)', cat: 'Street Food', fat: 4.0, protein: 1.0, carbs: 22.0, icon: '🍡' },
-  { n: 'Hainanese Chicken Rice, chicken only, no rice (1 serve)', cat: 'Street Food', fat: 14.0, protein: 26.0, carbs: 2.0, icon: '🍗' },
-  { n: 'Bakso / Meatball Soup (1 bowl)', cat: 'Street Food', fat: 8.0, protein: 14.0, carbs: 10.0, icon: '🍲' },
-  { n: 'Halo-Halo dessert (1 cup)', cat: 'Street Food', fat: 6.0, protein: 3.0, carbs: 40.0, icon: '🍨' },
-  { n: 'Banh Xeo / Savory Crepe (1pc)', cat: 'Street Food', fat: 12.0, protein: 10.0, carbs: 20.0, icon: '🥞' }
+  { n: 'Har Gow / Shrimp Dumplings (3pc)', cat: 'Dimsum', chef: 'Zaki', fat: 4.0, protein: 9.0, carbs: 8.0, icon: '🥟' },
+  { n: 'Siu Mai / Pork & Shrimp Dumplings (3pc)', cat: 'Dimsum', chef: 'Zaki', fat: 10.0, protein: 11.0, carbs: 6.0, icon: '🥟' },
+  { n: 'Vegetarian Siu Mai, mock prawn/cuttlefish (3pc)', cat: 'Dimsum', chef: 'Zaki', fat: 6.0, protein: 7.0, carbs: 7.0, icon: '🥟' },
+  { n: 'Char Siu Bao / BBQ Pork Bun, steamed (1pc)', cat: 'Dimsum', chef: 'Zaki', fat: 6.0, protein: 8.0, carbs: 28.0, icon: '🥟' },
+  { n: 'Char Siu Sou / BBQ Pork Pastry, baked (1pc)', cat: 'Dimsum', chef: 'Zaki', fat: 12.0, protein: 6.0, carbs: 20.0, icon: '🥐' },
+  { n: 'Chee Cheong Fun / Rice Noodle Rolls, plain (3pc)', cat: 'Dimsum', chef: 'Zaki', fat: 2.0, protein: 3.0, carbs: 22.0, icon: '🍥' },
+  { n: 'Egg Tart / Dan Tat (1pc)', cat: 'Dimsum', chef: 'Zaki', fat: 9.0, protein: 3.0, carbs: 18.0, icon: '🥧' },
+  { n: 'Turnip Cake / Lo Bak Go, pan-fried (2 slices)', cat: 'Dimsum', chef: 'Zaki', fat: 8.0, protein: 3.0, carbs: 14.0, icon: '🍘' },
+  { n: 'Spring Roll / Chun Guen (2pc)', cat: 'Dimsum', chef: 'Zaki', fat: 9.0, protein: 4.0, carbs: 15.0, icon: '🌯' },
+  { n: 'Lo Mai Gai / Sticky Rice in Lotus Leaf (1pc)', cat: 'Dimsum', chef: 'Zaki', fat: 9.0, protein: 12.0, carbs: 45.0, icon: '🍙' },
+  { n: 'Custard Bun / Nai Wong Bao, steamed (1pc)', cat: 'Dimsum', chef: 'Zaki', fat: 7.0, protein: 4.0, carbs: 26.0, icon: '🥮' },
+  { n: 'Phoenix Claws / Braised Chicken Feet (100g)', cat: 'Dimsum', chef: 'Zaki', fat: 8.0, protein: 14.0, carbs: 5.0, icon: '🍗' },
+  { n: 'Steamed Pork Ribs, black bean sauce (100g)', cat: 'Dimsum', chef: 'Zaki', fat: 14.0, protein: 16.0, carbs: 3.0, icon: '🍖' },
+  { n: 'Plain Congee / Rice Porridge (1 bowl)', cat: 'Dimsum', chef: 'Zaki', fat: 1.0, protein: 4.0, carbs: 30.0, icon: '🥣' },
+  { n: 'Wu Gok / Deep-fried Taro Dumpling (1pc)', cat: 'Dimsum', chef: 'Zaki', fat: 10.0, protein: 3.0, carbs: 16.0, icon: '🥟' },
+  { n: 'Curry Puff, chicken (1pc)', cat: 'Dimsum', chef: 'Zaki', fat: 8.0, protein: 2.0, carbs: 14.0, icon: '🥐' },
+  { n: 'Satay, chicken or beef, no sauce (3 sticks)', cat: 'Street Food', chef: 'Zaki', fat: 6.0, protein: 15.0, carbs: 4.0, icon: '🍢' },
+  { n: 'Cucur Sayur / Vegetable Fritter (1pc)', cat: 'Street Food', chef: 'Zaki', fat: 9.0, protein: 4.0, carbs: 28.0, icon: '🥠' },
+  { n: 'Tauhu Sumbat / Stuffed Tofu (1pc)', cat: 'Street Food', chef: 'Zaki', fat: 15.0, protein: 10.0, carbs: 20.0, icon: '🧈' },
+  { n: 'Satay Peanut Sauce (2 tbsp)', cat: 'Street Food', chef: 'Zaki', fat: 8.0, protein: 3.0, carbs: 6.0, icon: '🥜' },
+  { n: 'Roti Canai / Prata, plain (1pc)', cat: 'Street Food', chef: 'Zaki', fat: 8.0, protein: 4.0, carbs: 30.0, icon: '🫓' },
+  { n: 'Nasi Lemak, rice+egg+anchovies+sambal (1 plate)', cat: 'Street Food', chef: 'Zaki', fat: 15.0, protein: 6.0, carbs: 45.0, icon: '🍚' },
+  { n: 'Curry Laksa, with noodles (1 bowl)', cat: 'Street Food', chef: 'Zaki', fat: 20.0, protein: 15.0, carbs: 35.0, icon: '🍜' },
+  { n: 'Pad Thai (1 plate)', cat: 'Street Food', chef: 'Zaki', fat: 12.0, protein: 15.0, carbs: 45.0, icon: '🍜' },
+  { n: 'Banh Mi sandwich (1 whole)', cat: 'Street Food', chef: 'Zaki', fat: 14.0, protein: 18.0, carbs: 40.0, icon: '🥖' },
+  { n: 'Pisang Goreng / Fried Banana (2pc)', cat: 'Street Food', chef: 'Zaki', fat: 8.0, protein: 2.0, carbs: 30.0, icon: '🍌' },
+  { n: 'Popiah / Fresh Spring Roll (1pc)', cat: 'Street Food', chef: 'Zaki', fat: 4.0, protein: 5.0, carbs: 20.0, icon: '🌯' },
+  { n: 'Otak-Otak / Grilled Fish Cake (2pc)', cat: 'Street Food', chef: 'Zaki', fat: 6.0, protein: 8.0, carbs: 4.0, icon: '🐟' },
+  { n: 'Kaya Toast with butter (2 slices)', cat: 'Street Food', chef: 'Zaki', fat: 12.0, protein: 5.0, carbs: 30.0, icon: '🍞' },
+  { n: 'Murtabak, chicken (1 slice)', cat: 'Street Food', chef: 'Zaki', fat: 14.0, protein: 12.0, carbs: 25.0, icon: '🥟' },
+  { n: 'Mee Goreng / Fried Noodles (1 plate)', cat: 'Street Food', chef: 'Zaki', fat: 14.0, protein: 12.0, carbs: 50.0, icon: '🍜' },
+  { n: 'Cendol dessert (1 bowl)', cat: 'Street Food', chef: 'Zaki', fat: 8.0, protein: 2.0, carbs: 35.0, icon: '🍧' },
+  { n: 'Fish Ball Skewers (5pc)', cat: 'Street Food', chef: 'Zaki', fat: 2.0, protein: 10.0, carbs: 8.0, icon: '🍢' },
+  { n: 'Kuih, assorted sweet (2pc)', cat: 'Street Food', chef: 'Zaki', fat: 4.0, protein: 1.0, carbs: 22.0, icon: '🍡' },
+  { n: 'Hainanese Chicken Rice, chicken only, no rice (1 serve)', cat: 'Street Food', chef: 'Zaki', fat: 14.0, protein: 26.0, carbs: 2.0, icon: '🍗' },
+  { n: 'Bakso / Meatball Soup (1 bowl)', cat: 'Street Food', chef: 'Zaki', fat: 8.0, protein: 14.0, carbs: 10.0, icon: '🍲' },
+  { n: 'Halo-Halo dessert (1 cup)', cat: 'Street Food', chef: 'Joel', fat: 6.0, protein: 3.0, carbs: 40.0, icon: '🍨' },
+  { n: 'Goldilocks Polvoron, assorted (1pc)', cat: 'Street Food', chef: 'Joel', fat: 6.0, protein: 1.0, carbs: 12.0, icon: '🍬' },
+  { n: 'Goldilocks Polvoron, matcha/choc (1pc)', cat: 'Street Food', chef: 'Joel', fat: 6.5, protein: 1.0, carbs: 13.0, icon: '🍬' },
+  { n: 'Banh Xeo / Savory Crepe (1pc)', cat: 'Street Food', chef: 'Zaki', fat: 12.0, protein: 10.0, carbs: 20.0, icon: '🥞' }
 ];
 
 // === MEALS ===
@@ -26582,19 +27314,33 @@ function getDailyMacroTotals(dateKey) {
 function logMealFromDatabase(foodIdx) {
   const food = CAFE_FOOD_DATABASE[foodIdx];
   if (!food) return;
-  const dk = todayKey();
+  const dk = G.cafeLogDate || todayKey();
   if (!G.mealLog[dk]) G.mealLog[dk] = [];
   const timeLabel = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   G.mealLog[dk].push({ food: food.n, cat: food.cat, fat: food.fat, protein: food.protein, carbs: food.carbs, time: timeLabel });
   const totals = getDailyMacroTotals(dk);
-  lg(food.icon + ' ' + food.n + ' logged \u2014 ' + totals.carbs.toFixed(1) + 'g carbs today (limit ' + todaysCarbLimit() + 'g), ' + totals.protein.toFixed(1) + 'g protein, ' + totals.fat.toFixed(1) + 'g fat.');
+  const dayLabel = dk === todayKey() ? 'today' : 'on ' + dk;
+  lg(food.icon + ' ' + food.n + ' logged ' + dayLabel + ' \u2014 ' + totals.carbs.toFixed(1) + 'g carbs (limit ' + todaysCarbLimit() + 'g), ' + totals.protein.toFixed(1) + 'g protein, ' + totals.fat.toFixed(1) + 'g fat.');
   render();
 }
 function removeMealEntry(index) {
-  const dk = todayKey();
+  const dk = G.cafeLogDate || todayKey();
   if (!G.mealLog[dk] || !G.mealLog[dk][index]) return;
   G.mealLog[dk].splice(index, 1);
   render();
+}
+// Backlogging — the original Daybreak Quest tracker had this and it never actually
+// carried over when the food database was ported into the Guild Cafe. Limited to the
+// past 7 days rather than unlimited, matching "I forgot to log something recently"
+// rather than open-ended historical editing.
+function getCafeBacklogDates() {
+  const dates = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    dates.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'));
+  }
+  return dates;
 }
 
 // Flavor-only collectibles, no stat effect \u2014 same spirit as keepsake items elsewhere.
@@ -26877,22 +27623,35 @@ function rGuildCafe() {
   // Quest tracker's own food database. Slack Days are explicitly opt-in per date, never
   // automatic — same "guilt-free, planned, not a failure state" framing the original
   // app used deliberately.
-  const macros = getDailyMacroTotals();
+  const logDate = G.cafeLogDate || todayKey();
+  const isBacklogging = logDate !== todayKey();
+  const macros = getDailyMacroTotals(logDate);
   const carbLimit = todaysCarbLimit();
   const overLimit = macros.carbs > carbLimit;
-  h += '<div class="panel-title" style="margin:14px 0 8px;">Today\u2019s Macros</div>';
-  h += '<div class="panel' + (isSlackDayToday() ? ' panel-gold' : '') + '" style="margin-bottom:10px;">';
+
+  // Backlogging — pick a day within the last week to log a meal you forgot earlier,
+  // rather than only ever being able to log against "right now."
+  h += '<div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;padding-bottom:2px;">';
+  for (let d of getCafeBacklogDates()) {
+    const label = d === todayKey() ? 'Today' : new Date(d + 'T00:00:00').toLocaleDateString([], { weekday: 'short', day: 'numeric' });
+    h += '<button onclick="G.cafeLogDate=' + (d === todayKey() ? 'null' : "'" + d + "'") + ';render();" class="' + (d === logDate ? 'abtn' : 'btn-outline-ghost') + '" style="margin:0;padding:5px 10px;font-size:11px;white-space:nowrap;">' + label + '</button>';
+  }
+  h += '</div>';
+  if (isBacklogging) h += '<div class="btn-hint" style="margin-bottom:8px;color:var(--gold);">Logging for ' + logDate + ', not today.</div>';
+
+  h += '<div class="panel-title" style="margin:14px 0 8px;">' + (isBacklogging ? 'That Day\u2019s' : 'Today\u2019s') + ' Macros</div>';
+  h += '<div class="panel' + (!isBacklogging && isSlackDayToday() ? ' panel-gold' : '') + '" style="margin-bottom:10px;">';
   h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
   h += '<div style="font-weight:700;font-size:16px;' + (overLimit ? 'color:#e88;' : '') + '">' + macros.carbs.toFixed(1) + 'g <span style="font-size:11px;color:var(--text-dim);font-weight:400;">/ ' + carbLimit + 'g carbs</span></div>';
-  h += isSlackDayToday()
+  h += (!isBacklogging) ? (isSlackDayToday()
     ? '<button onclick="toggleSlackDay()" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;color:var(--gold);">\ud83c\udf70 Slack Day \u2014 on</button>'
-    : '<button onclick="toggleSlackDay()" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;">Turn on Slack Day</button>';
+    : '<button onclick="toggleSlackDay()" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;">Turn on Slack Day</button>') : '';
   h += '</div>';
   h += '<div class="btn-hint">' + macros.protein.toFixed(1) + 'g protein \u00b7 ' + macros.fat.toFixed(1) + 'g fat</div>';
-  if (isSlackDayToday()) h += '<div class="btn-hint" style="margin-top:4px;color:var(--gold);">A planned, guilt-free higher-carb day \u2014 back to normal tomorrow.</div>';
+  if (!isBacklogging && isSlackDayToday()) h += '<div class="btn-hint" style="margin-top:4px;color:var(--gold);">A planned, guilt-free higher-carb day \u2014 back to normal tomorrow.</div>';
   h += '</div>';
 
-  const todaysMeals = G.mealLog[todayKey()] || [];
+  const todaysMeals = G.mealLog[logDate] || [];
   if (todaysMeals.length > 0) {
     for (let i = 0; i < todaysMeals.length; i++) {
       const meal = todaysMeals[i];
@@ -26904,12 +27663,17 @@ function rGuildCafe() {
     }
   }
 
-  // Category browser — 365 items is too many for a flat list, so pick a category first
+  // Chef-based browser — Zaki (Bruneian/Malay/fusion/simple Chinese, halal only),
+  // Joel (Filipino, stir-fry, any pork — covered by Gino when Joel's away, same menu
+  // either way rather than a separate duplicate bucket), and Pantry for everything
+  // else (generic ingredients/keto staples that don't belong to either chef's
+  // specific repertoire — eggs, herbs, seafood, and the like).
+  const cafeChef = G.cafeChef;
   const cafeCat = G.cafeCategory;
-  if (cafeCat) {
-    h += '<button onclick="G.cafeCategory=null;render();" class="btn-outline-ghost" style="width:100%;margin:10px 0;">\u2190 All Categories</button>';
+  if (cafeChef && cafeCat) {
+    h += '<button onclick="G.cafeCategory=null;render();" class="btn-outline-ghost" style="width:100%;margin:10px 0;">\u2190 ' + cafeChef + '\u2019s Menu</button>';
     h += '<div class="panel-title" style="margin-bottom:8px;">' + cafeCat + '</div>';
-    const items = CAFE_FOOD_DATABASE.map((f, i) => ({ f, i })).filter(x => x.f.cat === cafeCat);
+    const items = CAFE_FOOD_DATABASE.map((f, i) => ({ f, i })).filter(x => x.f.cat === cafeCat && (cafeChef === 'Pantry' ? !x.f.chef : x.f.chef === cafeChef));
     for (let { f, i } of items) {
       h += '<div class="panel" style="margin-bottom:6px;cursor:pointer;" onclick="logMealFromDatabase(' + i + ')">';
       h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
@@ -26917,14 +27681,21 @@ function rGuildCafe() {
       h += '<span style="font-size:11px;color:var(--accent-light);">Log</span>';
       h += '</div></div>';
     }
-  } else {
-    h += '<div class="panel-title" style="margin:14px 0 8px;">Log a Meal</div>';
-    const categories = [...new Set(CAFE_FOOD_DATABASE.map(f => f.cat))];
+  } else if (cafeChef) {
+    h += '<button onclick="G.cafeChef=null;render();" class="btn-outline-ghost" style="width:100%;margin:10px 0;">\u2190 All Chefs</button>';
+    h += '<div class="panel-title" style="margin-bottom:8px;">' + cafeChef + '\u2019s Menu</div>';
+    const items = cafeChef === 'Pantry' ? CAFE_FOOD_DATABASE.filter(f => !f.chef) : CAFE_FOOD_DATABASE.filter(f => f.chef === cafeChef);
+    const categories = [...new Set(items.map(f => f.cat))];
     h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">';
     for (let cat of categories) {
       h += '<button onclick="G.cafeCategory=\'' + cat + '\';render();" class="btn-outline-ghost" style="margin:0;font-size:11.5px;padding:10px 6px;">' + cat + '</button>';
     }
     h += '</div>';
+  } else {
+    h += '<div class="panel-title" style="margin:14px 0 8px;">Log a Meal</div>';
+    h += '<button onclick="G.cafeChef=\'Zaki\';render();" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;text-align:left;">\ud83d\udc68\u200d\ud83c\udf73 Zaki\u2019s Kitchen<div class="btn-hint">Bruneian & Malay, western fusion, simple Chinese \u2014 halal</div></button>';
+    h += '<button onclick="G.cafeChef=\'Joel\';render();" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;text-align:left;">\ud83d\udc68\u200d\ud83c\udf73 Joel\u2019s Kitchen<div class="btn-hint">Filipino, simple stir-fry, any pork \u2014 Gino covers this menu when Joel\u2019s away</div></button>';
+    h += '<button onclick="G.cafeChef=\'Pantry\';render();" class="btn-outline-ghost" style="width:100%;margin-bottom:16px;text-align:left;">\ud83e\uddfa Pantry<div class="btn-hint">Everything else \u2014 shared ingredients, not tied to either chef specifically</div></button>';
   }
 
   h += '<div class="panel-title" style="margin:14px 0 8px;">Sit With Someone</div>';
@@ -27042,6 +27813,203 @@ function rGuildDuties() {
       h += '</div>';
     }
     h += '</div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function rShip() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">⚓ The Ship</div>';
+
+  if (!isShipUnlocked()) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🔒 Reach Lv560 to start this \u2014 the coastline at the edge of the drowned world is where Bren the Shipwright sets up shop.</div></div>';
+    h += '</div>';
+    return h;
+  }
+
+  // Voyager Level panel — always visible once unlocked, since it's the gate for every
+  // ship tier beyond the first.
+  const nextTierForXp = SHIP_TIERS.find(t => t.requiredVoyagerLevel > G.voyage.level);
+  h += '<div class="panel" style="margin-bottom:14px;">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+  h += '<div class="panel-title" style="margin:0;">\u26f5 Voyager Level ' + G.voyage.level + '</div>';
+  h += '<div class="btn-hint">' + G.voyage.xp + ' / ' + voyagerXpNeeded(G.voyage.level) + ' XP</div>';
+  h += '</div>';
+  if (G.ship.built) h += '<div class="btn-hint" style="margin-top:6px;">' + (isVoyageWindowOpen() ? '\u2693 Sailing window open now \u2014 closes in ' + getVoyageWindowCountdown() : '\ud83c\udf19 Next sailing window in ' + getVoyageWindowCountdown()) + '</div>';
+  if (nextTierForXp) h += '<div class="btn-hint" style="margin-top:6px;">' + nextTierForXp.name + ' unlocks at Voyager Lv' + nextTierForXp.requiredVoyagerLevel + '.</div>';
+  h += '</div>';
+
+  const tier = getShipTier();
+  if (G.ship.built) {
+    h += '<div class="panel panel-gold" style="text-align:center;margin-bottom:14px;">';
+    h += '<div class="panel-title" style="color:var(--gold);">' + tier.name + ' is finished.</div>';
+    h += '<div class="btn-hint">Properly, actually finished \u2014 hull, rigging, fittings, all of it. Whatever comes next, she can carry it.</div>';
+    h += '</div>';
+
+    const nextTier = SHIP_TIERS[G.ship.tier + 1];
+    if (nextTier) {
+      const available = isNextShipTierAvailable();
+      h += '<div class="panel' + (available ? ' panel-gold' : '') + '" style="text-align:center;">';
+      h += '<div class="panel-title">' + (available ? '\u2728 ' : '\ud83d\udd12 ') + nextTier.name + '</div>';
+      h += '<div class="btn-hint" style="margin-bottom:10px;">' + (available ? 'Bren can start on the next hull whenever you\u2019re ready.' : 'Unlocks at Voyager Lv' + nextTier.requiredVoyagerLevel + ' \u2014 currently Lv' + G.voyage.level + '.') + '</div>';
+      if (available) h += '<button onclick="startNextShipTier()" class="abtn">Begin ' + nextTier.name + '</button>';
+      h += '</div>';
+    } else {
+      h += '<div class="btn-hint" style="text-align:center;">The strongest ship Bren knows how to build. Nothing further to upgrade to.</div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  const stageInfo = getShipStageInfo();
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">' + tier.name + ' \u2014 Stage ' + (G.ship.stage + 1) + ' of ' + tier.stages.length + ' \u2014 built at Bren\'s yard, one stage at a time.</div>';
+
+  h += '<div class="panel" style="margin-bottom:14px;">';
+  h += '<div class="panel-title" style="margin-bottom:6px;">' + stageInfo.name + '</div>';
+  h += '<div class="btn-hint" style="margin-bottom:10px;">' + stageInfo.desc + '</div>';
+
+  for (let mat in stageInfo.materials) {
+    const need = stageInfo.materials[mat];
+    const have = G.ship.materials[mat] || 0;
+    const invHave = (G.p.inv.find(it => it.n === mat) || {}).q || 0;
+    const done = have >= need;
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
+    h += '<div style="font-size:12.5px;' + (done ? 'color:var(--gold);' : '') + '">' + (done ? '\u2705' : '\u2699\ufe0f') + ' ' + mat + ' \u2014 ' + have + ' / ' + need + '</div>';
+    if (!done) h += '<button onclick="contributeShipMaterial(\'' + mat + '\',' + Math.min(need - have, invHave) + ')" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;" ' + (invHave === 0 ? 'disabled' : '') + '>Use ' + Math.min(need - have, invHave) + ' from Inventory</button>';
+    h += '</div>';
+  }
+  h += '<div class="btn-hint" style="margin-top:8px;">Buy any of the raw materials from Bren at her stall if you need more.</div>';
+
+  const materialsReady = isShipStageMaterialsComplete();
+  h += '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">';
+  h += '<div class="btn-hint">Final cost: ' + stageInfo.gold.toLocaleString() + 'G</div>';
+  h += '<button onclick="completeShipStage()" class="abtn" style="margin:0;" ' + (materialsReady ? '' : 'disabled') + '>Complete Stage</button>';
+  h += '</div>';
+  h += '</div>';
+
+  h += '</div>';
+  return h;
+}
+
+function rVoyageCrew() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">⛵ Crew</div>';
+
+  if (!G.ship.built) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">\ud83d\udd12 The ship isn\u2019t finished yet \u2014 Bren\u2019s still got work to do at the yard.</div></div>';
+    h += '</div>';
+    return h;
+  }
+
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">' + G.voyage.crew.length + ' / ' + VOYAGE_CREW_SLOTS + ' crew slots filled \u2014 same tradeoff as Duty and Bounty Dispatch: crewing costs a member\u2019s availability elsewhere.</div>';
+
+  if (G.voyage.crew.length > 0) {
+    h += '<div class="panel-title" style="margin-bottom:8px;">Currently Crewing</div>';
+    for (let id of G.voyage.crew) {
+      const def = getGuildMemberDef(id);
+      if (!def) continue;
+      h += '<div class="panel panel-gold" style="margin-bottom:6px;">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+      h += '<div><div style="font-weight:700;font-size:13px;">' + def.icon + ' ' + def.npcName + '</div><div class="btn-hint">' + def.role + (def.voyageBonus ? ' \u2014 +' + Math.round(def.voyageBonus.value * 100) + '% ' + def.voyageBonus.type : '') + '</div></div>';
+      h += '<button onclick="unassignVoyageCrew(\'' + id + '\')" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;">Stand Down</button>';
+      h += '</div></div>';
+    }
+  }
+
+  h += '<div class="panel-title" style="margin:14px 0 8px;">Available</div>';
+  const available = GUILD_MEMBERS.filter(def => isGuildMemberRecruited(def.id) && !isGuildMemberOnVoyageCrew(def.id));
+  if (available.length === 0) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">No recruited members currently free to crew.</div></div>';
+  }
+  for (let def of available) {
+    const canAssign = canAssignVoyageCrew(def.id);
+    h += '<div class="panel" style="margin-bottom:6px;' + (canAssign ? '' : 'opacity:0.5;') + '">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    h += '<div><div style="font-weight:700;font-size:13px;">' + def.icon + ' ' + def.npcName + '</div><div class="btn-hint">' + def.role + (def.voyageBonus ? ' \u2014 +' + Math.round(def.voyageBonus.value * 100) + '% ' + def.voyageBonus.type : ' \u2014 no Voyage specialty, but still a set of hands') + '</div></div>';
+    h += canAssign
+      ? '<button onclick="assignVoyageCrew(\'' + def.id + '\')" class="abtn" style="margin:0;padding:4px 10px;font-size:11px;">Crew Up</button>'
+      : '<span style="font-size:10.5px;color:var(--text-dim);">not free</span>';
+    h += '</div></div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function rVoyage() {
+  let h = '<div class="content">';
+  h += '<div class="st" style="text-align:center;">⚓ Voyage</div>';
+
+  if (!G.ship.built) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">\ud83d\udd12 The ship isn\u2019t finished yet \u2014 Bren\u2019s still got work to do at the yard.</div></div>';
+    h += '<button onclick="setS(\'ship\')" class="abtn" style="width:100%;margin-top:10px;">Go to the Ship</button>';
+    h += '</div>';
+    return h;
+  }
+
+  // Real-world sailing window — Trade/Sail/Explore only, not Ship or Crew, which stay
+  // reachable anytime as dock-side prep rather than the voyage itself.
+  if (!isVoyageWindowOpen()) {
+    h += '<div class="panel" style="text-align:center;"><div class="panel-title">\ud83c\udf19 The water isn\u2019t safe to sail right now.</div><div class="btn-hint" style="margin-top:6px;">Next window opens in ' + getVoyageWindowCountdown() + '.</div></div>';
+    h += '</div>';
+    return h;
+  }
+
+  const port = VOYAGE_PORTS.find(p => p.id === G.voyage.currentPort);
+  const tier = getShipTier();
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:10px;color:var(--gold);">\u2693 Sailing window open \u2014 closes in ' + getVoyageWindowCountdown() + '</div>';
+  h += '<div class="panel panel-gold" style="margin-bottom:14px;">';
+  h += '<div class="panel-title" style="color:var(--gold);">' + port.icon + ' ' + port.name + '</div>';
+  h += '<div class="btn-hint">' + port.desc + '</div>';
+  h += '</div>';
+
+  const cargoTotal = getCargoTotal();
+  const cargoWeight = getCargoWeight();
+  const capacity = tier.cargoCapacity;
+  h += '<div class="panel" style="margin-bottom:14px;">';
+  h += '<div class="panel-title" style="margin-bottom:6px;">Cargo Hold \u2014 ' + cargoWeight + ' / ' + capacity + '</div>';
+  if (cargoTotal === 0) {
+    h += '<div class="btn-hint">Empty.</div>';
+  } else {
+    for (let goodId in G.voyage.cargo) {
+      const good = VOYAGE_GOODS[goodId];
+      const qty = G.voyage.cargo[goodId];
+      const sellPrice = getPortGoodPrice(port.id, goodId, 'sell');
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
+      h += '<div style="font-size:12.5px;">' + good.icon + ' ' + good.name + ' \u00d7' + qty + '</div>';
+      h += '<button onclick="sellVoyageGood(\'' + goodId + '\',' + qty + ')" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;">Sell all @ ' + sellPrice + 'G</button>';
+      h += '</div>';
+    }
+  }
+  h += '</div>';
+
+  h += '<div class="panel-title" style="margin-bottom:8px;">Trade Here</div>';
+  for (let goodId in VOYAGE_GOODS) {
+    const good = VOYAGE_GOODS[goodId];
+    const isSpecialty = port.specialties.includes(goodId);
+    const buyPrice = getPortGoodPrice(port.id, goodId, 'buy');
+    h += '<div class="panel' + (isSpecialty ? ' panel-gold' : '') + '" style="margin-bottom:6px;">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+    h += '<div style="font-size:12.5px;">' + good.icon + ' ' + good.name + (isSpecialty ? ' <span style="color:var(--gold);font-size:10px;">local</span>' : '') + '</div>';
+    h += '<button onclick="buyVoyageGood(\'' + goodId + '\',1)" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;" ' + (G.p.gold < buyPrice ? 'disabled' : '') + '>Buy @ ' + buyPrice + 'G</button>';
+    h += '</div></div>';
+  }
+
+  h += '<div class="panel-title" style="margin:14px 0 8px;">Sail To</div>';
+  for (let destId in port.distances) {
+    const dest = VOYAGE_PORTS.find(p => p.id === destId);
+    h += '<button onclick="sailToPort(\'' + destId + '\')" class="btn-outline-ghost" style="width:100%;margin-bottom:6px;text-align:left;">' + dest.icon + ' ' + dest.name + ' <span style="float:right;color:var(--text-dim);font-size:11px;">' + port.distances[destId] + (port.distances[destId] === 1 ? ' day' : ' days') + '</span></button>';
+  }
+
+  // Explore — the third pillar of the original pitch (trading, exploring, sea
+  // monsters). Reuses the exact same zone/combat system every land zone already uses;
+  // these 5 just live outside World 6's normal progression sequence, reachable only
+  // from here rather than the standard zone-navigation screen.
+  h += '<div class="panel-title" style="margin:14px 0 8px;">Explore the Surrounding Waters</div>';
+  for (let { name, idx } of VOYAGE_EXPLORE_ZONES) {
+    h += '<button onclick="sc(' + idx + ')" class="btn-outline-ghost" style="width:100%;margin-bottom:6px;text-align:left;">\ud83e\udded ' + name + '</button>';
   }
 
   h += '</div>';
@@ -27656,6 +28624,7 @@ const MENU_SECTION_COLORS = {
   '🐉 Legendary Hunts': '#ef4444',
   '📋 Quick Work': '#3b82f6',
   '🏰 Guild & Stronghold': '#f59e0b',
+  '⚓ Voyage': '#0369a1',
   '🧙 Character': '#7c3aed',
   '🎒 Manage': '#38bdf8',
   '📖 Progress': '#f0abfc',
@@ -27699,6 +28668,14 @@ function rMenu(){
       {i:'👥',l:'Active Party',a:'party_selection'},
       {i:'🗼',l:'Stronghold',a:'stronghold'},
     ]},
+    // Its own dedicated section rather than a single card buried in Guild & Stronghold
+    // — Voyage is growing into a real standalone system (ship, trading, crew,
+    // eventually its own chapters), so it gets room to grow the same way every other
+    // major system already has. Whole section only shows once actually unlocked.
+    ...(isShipUnlocked() ? [{ title: '⚓ Voyage', items: [
+      {i:'⚓',l:'The Ship',a:'ship'},
+      ...(G.ship.built ? [{i:'🗺️',l:'Voyage',a:'voyage'}, {i:'⛵',l:'Crew',a:'voyage_crew'}] : []),
+    ]}] : []),
     { title: '🧙 Character', items: [
       {i:'✨',l:'Skills',a:'skills'},
       {i:'🌳',l:'Skill Trees',a:'skilltree'},
