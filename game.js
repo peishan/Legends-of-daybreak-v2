@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (New: World 10 \u2014 The World Where Wishes Take Their Own Shape (Lv960-1050), djinn treated with real nuance)';
+const APP_VERSION = '2026-08-17 (Cafe: one-off custom meal entry added \u2014 was never carried over from Daybreak Quest; new items: Jackfruit, Sarawak dabai, dark chocolate, Filipino Adidas chicken feet)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -827,6 +827,42 @@ const G = {
     { n: 'Where Bound and Unbound Both Remain', lv: 1030, elem: 'none', d: "Some of the djinn here are still held by old pacts. Some freed themselves centuries ago and simply never left. Telling the two apart from a distance is nearly impossible, and neither group seems particularly interested in making it easier.", en: ['A Djinn, Bound', 'A Djinn, Free and Staying Anyway', 'Something That Prefers You Not Know Which Is Which'], loot: ['Proof Freedom and Captivity Can Look Identical From Outside', 'A Choice, Made Long After the Binding Ended', 'Something That Stayed for Reasons of Its Own'], xp: 15500, g: 9300, dg: 'impossible' },
     { n: 'The Weight of Every Careless Wish', lv: 1040, elem: 'none', d: "Whatever is at the center of this world is close now \u2014 close enough that every djinn out here seems to already know exactly what you are going to ask before you finish asking it, and seems, for once, genuinely reluctant to grant it.", en: ['Something Sent to Ask If You Are Actually Sure', 'A Djinn Trying Gently to Talk You Out of This', 'The Last Warning Before the Center Itself'], loot: ['A Question, Asked Out of Genuine Concern', 'Proof Even This World Wants You to Think First', 'Something That Was Hoping You Would Turn Back'], xp: 15700, g: 9420, dg: 'impossible' },
     { n: 'The First Wish Ever Granted', lv: 1050, elem: 'none', d: "Not a djinn exactly, not anymore \u2014 the origin of the granting itself, old enough to remember the very first wish anyone ever made of it, and honest enough, after all this time, to admit it still does not know if that first answer was actually kind.", en: ['The First Granting, Still Uncertain if It Was Kind', 'Something Older Than the Concept of Asking', 'The Origin That Still Second-Guesses Its Very First Answer'], loot: ['A Wish, If You Are Finally Ready to Word It Carefully', 'Proof Even the Beginning Had Doubts', 'The Last Thing This World Was Ever Waiting to Grant'], xp: 15900, g: 9540, dg: 'impossible' },
+    // === WORLD 11: THE WORLD THAT CAME BEFORE THE REST (Lv 1060-1150) ===
+    // Throughline: giants as the first things — older than the gods any of Aethon's
+    // other worlds have referenced, here from before anyone built anything properly,
+    // let alone before anyone thought to ask permission for the building. Names use
+    // giant directly (now correctly tagged 'elemental', matching the primordial
+    // nature-force association giants carry across most traditions — frost, stone,
+    // mountain).
+    { n: 'Where the First Things Still Remember Being First', lv: 1060, elem: 'none', d: "Everything here is built at a scale that predates the idea of building politely \u2014 doorways too large for anyone this world has met since, floors that assume a stride nobody currently walking could manage.", en: ['A Giant, Simply Larger Than the Question of Why', 'Something That Was Here Before Scale Was a Consideration', 'The First Thing That Ever Needed This Much Room'], loot: ['A Doorframe, Sized for Something Enormous', 'Proof This World Was Built Before Modesty Existed', 'A Footprint Older Than Most Recorded History'], xp: 16100, g: 9660, dg: 'impossible' },
+    { n: 'The Mountains That Used to Move', lv: 1070, elem: 'none', d: "The peaks out here were not always mountains. Something enormous simply stopped moving, a very long time ago, and the world grew comfortable calling the result a mountain rather than admitting what it actually was.", en: ['A Frost Giant, Mistaken for a Mountain Range', 'Something That Stopped Moving So Long Ago Nobody Noticed', 'The Peak That Used to Have a Name'], loot: ['Frost That Predates the Concept of Seasons', 'Proof a Mountain Can Have Once Had a Heartbeat', 'Something Too Large to Have Ever Been Just Stone'], xp: 16300, g: 9780, dg: 'impossible' },
+    { n: 'What the Stone Giants Actually Built', lv: 1080, elem: 'none', d: "Before there were roads, before there were maps to put roads on, something out here was already laying foundations \u2014 crude by later standards, but first, and being first apparently matters more here than being good.", en: ['A Stone Giant, Still Laying the Original Foundations', 'Something Building Toward a Plan Nobody Else Remembers', 'The First Architect, Long Before the Word Existed'], loot: ['A Foundation Stone, Laid Before Architecture Had a Name', 'Proof the First Builders Were Not Actually Careful Ones', 'Something Half-Built and Simply Left That Way'], xp: 16500, g: 9900, dg: 'impossible' },
+    { n: 'Before Anyone Asked Permission', lv: 1090, elem: 'none', d: "Every structure here was raised without once considering whether it should be. That is not malice \u2014 the concept of asking first simply had not been invented yet when these particular giants got started.", en: ['A Giant Who Never Learned to Ask First', 'Something That Built Because Building Was Simply What It Did', 'The Reason Permission Became a Concept at All'], loot: ['Proof Permission Is a Newer Idea Than Building Itself', 'Something Raised Without a Single Question Asked', 'A Structure That Predates the Word "Should"'], xp: 16700, g: 10020, dg: 'impossible' },
+    { n: 'The Fire That Predates Cooking It', lv: 1100, elem: 'none', d: "Long before fire meant a hearth, or a meal, or anything gentle, it meant this \u2014 something enormous and burning, indifferent to warmth as a concept, using flame the way later things would eventually learn to use tools.", en: ['A Fire Giant, Older Than the Idea of a Hearth', 'Something That Used Flame Before Flame Meant Comfort', 'The Original Fire, Never Once Domesticated'], loot: ['Flame That Has Never Once Been Tamed', 'Proof Fire Was a Weapon Long Before It Was a Kindness', 'Something Burning That Predates the Concept of Warmth'], xp: 16900, g: 10140, dg: 'impossible' },
+    { n: 'Roots Older Than the Word Forest', lv: 1110, elem: 'none', d: "Whatever grew here first was not a forest, not exactly \u2014 forests came later, smaller, tidier. This was something enormous that simply happened to be made of wood, before wood had settled into being anything as modest as a tree.", en: ['A Giant, Grown Rather Than Born', 'Something Rooted Deeper Than Any Later Forest Managed', 'The First Growing Thing, Before Growth Had Rules'], loot: ['Bark Older Than the Concept of a Season', 'Proof Growth Once Had No Limits at All', 'A Root System That Predates Every Forest After It'], xp: 17100, g: 10260, dg: 'impossible' },
+    { n: 'The Sky Before It Learned Restraint', lv: 1120, elem: 'none', d: "Even the storms here are original ones \u2014 not the practiced, patterned weather every other world has settled into, but something enormous and unrehearsed, throwing thunder around like it had not yet learned there was a gentler way to be weather.", en: ['A Storm Giant, Unpracticed and Enormous', 'Something That Predates Weather Having Rules', 'The First Thunder, Before It Learned to Warn First'], loot: ['Thunder That Never Learned to Give Warning', 'Proof the Sky Was Once Entirely Unrehearsed', 'Something Struck Before Lightning Had a Pattern'], xp: 17300, g: 10380, dg: 'impossible' },
+    { n: 'Where Every First Thing Gathers', lv: 1130, elem: 'none', d: "Frost and fire and stone and storm, all together now, none of them competing \u2014 they were never actually rivals, just different first things that happened to arrive around the same enormous, unrecorded moment.", en: ['A Frost Giant and a Fire Giant, Entirely at Ease Together', 'Something Stone-Built Standing Beside Something Storm-Born', 'The Gathering of Every First Thing at Once'], loot: ['Proof the First Things Were Never Actually Rivals', 'Four Different Origins, Sharing the Same Ground', 'Something Caught Among All Four at Once'], xp: 17500, g: 10500, dg: 'impossible' },
+    { n: 'The Last Thing Built Before Everything Else', lv: 1140, elem: 'none', d: "Whatever is at the center of this world is close now \u2014 the last, largest thing raised before the giants apparently decided building was finished, and everything since has simply been refinement of an idea they got right the first time.", en: ['Something Sent Ahead by the Last of the First Things', 'A Guardian of the Final Original Structure', 'The Herald of Whatever Finished the Building'], loot: ['A Blueprint, Finished Before Blueprints Had a Name', 'Proof the Giants Knew Exactly When to Stop', 'Something That Was Never Meant to Be Refined Further'], xp: 17700, g: 10620, dg: 'impossible' },
+    { n: 'The First Thing, Before It Had a Name', lv: 1150, elem: 'none', d: "The center of it, finally \u2014 not a frost giant or a fire giant or a stone giant, not anymore. Just the original size itself, old enough to remember when the whole idea of being enormous did not need a reason.", en: ['The Original Scale, Before It Needed a Reason', 'Something Older Than Every Giant Here Combined', 'The First Thing That Was Ever This Large'], loot: ['A Beginning, Finally Within Reach', 'Proof the First Thing Never Actually Needed a Purpose', 'The Last Foundation This World Was Ever Built On'], xp: 17900, g: 10740, dg: 'impossible' },
+    // === WORLD 12: THE WORLD STILL TRYING TO ASCEND (Lv 1160-1250) ===
+    // Throughline: xiuxing (\u4fee\u884c) — spiritual cultivation, and what happens when it
+    // is pursued patiently versus rushed, stolen, or interrupted. Draws on the broader
+    // Chinese folkloric tradition (huli jing, jiangshi, yaoguai, egui, wangliang/shui
+    // gui), not any specific tale — same relationship to the wider mythology that
+    // World 9 had to Greek myth generally, not one particular story. Genuine variety
+    // of outcome throughout, matching this game's consistent refusal to treat any
+    // archetype as purely evil. Names use huli/fox (beast), jiangshi/gui (undead),
+    // yaoguai/wangliang (elemental) — all three archetypes extended above.
+    { n: 'Where Cultivation Still Continues', lv: 1160, elem: 'none', d: "Every path here climbs toward something \u2014 not a place exactly, more a state, patiently pursued by things that have been pursuing it for far longer than any human lifetime would allow.", en: ['A Huli Jing, Still Patiently Cultivating', 'Something That Has Been Climbing for Centuries', 'The Path That Never Actually Ends, Only Deepens'], loot: ['A Fox\u2019s Tail, Not Yet Fully Grown Into Its Ninth', 'Proof Patience Is the Entire Point of the Practice', 'Something Earned Slowly, the Only Way It Actually Counts'], xp: 18100, g: 10860, dg: 'impossible' },
+    { n: 'The Shortcut That Was Never Worth It', lv: 1170, elem: 'none', d: "Not every fox spirit out here chose the patient road. Some of them found faster ways \u2014 deception, borrowed life force, corners cut that should never have been cuttable \u2014 and every single one of them is still paying for it.", en: ['A Huli Jing Who Took the Faster, Crueler Road', 'Something That Borrowed Power It Never Actually Earned', 'The Shortcut, Still Extracting Its Overdue Cost'], loot: ['A Debt That Cultivation the Honest Way Would Have Avoided', 'Proof Shortcuts Always Collect Eventually', 'Something Stolen That Was Never Actually Freely Given'], xp: 18300, g: 10980, dg: 'impossible' },
+    { n: 'Death, Interrupted Mid-Passage', lv: 1180, elem: 'none', d: "Whatever moves here does not walk so much as hop, rigid, upright, sustained by breath that was never actually its own to keep taking. Not malicious, exactly \u2014 just caught, permanently, at the exact wrong moment to have been caught.", en: ['A Jiangshi, Still Held at the Wrong Moment', 'Something Sustained by Breath It Was Never Owed', 'The Passage That Got Interrupted and Never Resumed'], loot: ['A Talisman, Placed Too Late to Actually Help', 'Proof Even Death Has a Proper Order to Follow', 'Something Held in a Moment That Should Have Passed Already'], xp: 18500, g: 11100, dg: 'impossible' },
+    { n: 'What Hunger Looks Like When It Never Resolves', lv: 1190, elem: 'none', d: "The hungry ones here are not hungry for food, and never were. It is longing, mostly \u2014 for a name remembered, a debt repaid, a goodbye that never actually happened \u2014 stretched out across far longer than any longing should reasonably have to last.", en: ['An Egui, Still Waiting for Something Specific', 'Something Hungry for a Reason That Was Never About Food', 'The Longing That Simply Never Got to Resolve'], loot: ['A Name, Finally Spoken Aloud for the First Time in Ages', 'Proof Some Hunger Was Never Physical to Begin With', 'Something Given That Should Have Been Given Long Ago'], xp: 18700, g: 11220, dg: 'impossible' },
+    { n: 'Objects That Learned to Want Something', lv: 1200, elem: 'none', d: "Nothing here started out as anything more than ordinary \u2014 a broom, a jar, a stretch of forest \u2014 until enough time and enough attention accumulated into something that could actually want, without anyone ever teaching it how to want responsibly.", en: ['A Yaoguai, Newly Sentient and Entirely Untaught', 'Something That Gained Power Faster Than It Gained Guidance', 'The Ordinary Thing That Forgot How to Stay Ordinary'], loot: ['An Object, Still Half-Convinced It Is Still Just an Object', 'Proof Power Without Guidance Rarely Goes Well', 'Something That Learned to Want Before It Learned Restraint'], xp: 18900, g: 11340, dg: 'impossible' },
+    { n: 'Older Than the Practice of Cultivating', lv: 1210, elem: 'none', d: "The spirits out here predate the entire framework everything else in this world is chasing \u2014 mountain and water spirits who were never trying to ascend toward anything, because they were already, from the very start, exactly what they were meant to be.", en: ['A Wangliang, Untroubled by the Whole Concept of Ascension', 'Something From Before Cultivation Was Even a Practice', 'The Mountain Spirit That Never Once Felt Incomplete'], loot: ['Proof Not Everything Here Is Actually Striving for More', 'Something Content in a World Full of Climbing', 'A Stillness That Predates the Entire Idea of Ascending'], xp: 19100, g: 11460, dg: 'impossible' },
+    { n: 'Where the Water Remembers Its Own Dead', lv: 1220, elem: 'none', d: "The rivers here carry more than water. Every drowning this place has ever witnessed left something behind, patient in the current, waiting the specific, unhurried way only water actually knows how to wait.", en: ['A Shui Gui, Patient in the Slow Current', 'Something the River Simply Never Let Go Of', 'The Drowning That Never Quite Finished Happening'], loot: ['Water That Remembers Every Name It Has Ever Taken', 'Proof Rivers Keep Better Records Than Anyone Expects', 'Something Pulled Gently Down and Simply Never Released'], xp: 19300, g: 11580, dg: 'impossible' },
+    { n: 'Every Kind of Wanting, Gathered Together', lv: 1230, elem: 'none', d: "Patient fox spirits and impatient ones, interrupted dead and hungry ghosts, newly sentient things and ancient untroubled ones \u2014 all of it here at once, every possible relationship to wanting more, none of them actually in competition.", en: ['A Huli Jing and a Jiangshi, Entirely Indifferent to Each Other', 'Something Yaoguai Standing Near Something Egui', 'The Gathering of Every Way This World Has Learned to Want'], loot: ['Proof Wanting Takes More Forms Than Anyone Expects', 'Every Kind of Longing, Represented in One Place', 'Something Caught Among All of It at Once'], xp: 19500, g: 11700, dg: 'impossible' },
+    { n: 'The Last Step Before Ascension', lv: 1240, elem: 'none', d: "Whatever is at the peak of this world is close now \u2014 close enough that even the most patient huli jing out here seem nervous, close enough that the whole practice of cultivating suddenly feels smaller than whatever is actually waiting at the top.", en: ['Something Sent Down to Test Your Own Patience', 'A Guardian of the Final Ascent', 'The Last Trial Before Whatever Waits at the Peak'], loot: ['A Test, Passed the Patient Way Rather Than the Fast One', 'Proof the Peak Rewards Cultivation, Not Shortcuts', 'Something That Was Never Meant to Be Rushed Toward'], xp: 19700, g: 11820, dg: 'impossible' },
+    { n: 'What Ascension Actually Looks Like', lv: 1250, elem: 'none', d: "The peak of it, finally \u2014 not a fox spirit, not a ghost, not anything still in the middle of becoming. Just the practice itself, completed, patient, old enough to remember every shortcut it ever watched someone else regret taking.", en: ['The Completed Cultivation, Patient to the End', 'Something Older Than Every Shortcut It Has Ever Watched Fail', 'The Peak That Was Always Reachable, Just Never Quickly'], loot: ['An Ascension, Finally Earned Rather Than Stolen', 'Proof Patience Was Always Going to Be the Actual Answer', 'The Last Thing This World Was Ever Climbing Toward'], xp: 19900, g: 11940, dg: 'impossible' },
     // === VOYAGE: SEA EXPLORATION ZONES ===
     // Not part of World 6's own progression sequence — reachable only through the
     // Voyage screen's Explore action, not normal zone navigation. Fills the third
@@ -1900,6 +1936,20 @@ const G = {
     { n: 'The First Wish, Still Being Answered', zone: 'The First Wish Ever Granted', hp: 4850000, mhp: 4850000, atk: 8150, def: 4850, xp: 2040000, g: 1360000,
       mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 1212500,
       desc: "It does not ask what you want. It already knows \u2014 it has heard every wish anyone has ever made, worded carelessly or carefully, granted kindly or not. It simply wants, after everything, to finally get one right. Whether that is possible is the only question it has never managed to answer." },
+    // World 11's climax — same principle as every world's finale this run: the
+    // concept itself, not a fifth kind of giant. Not frost, not stone, not fire, not
+    // storm — just the original scale, old enough to remember when being enormous
+    // did not require justifying.
+    { n: 'The Size Before It Had a Reason', zone: 'The First Thing, Before It Had a Name', hp: 5100000, mhp: 5100000, atk: 8400, def: 5000, xp: 2170000, g: 1430000,
+      mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 1275000,
+      desc: "Every giant this world has ever produced learned scale from something. This is that something, unadorned \u2014 not frost, not fire, not stone, not storm, just the plain, original fact of being enormous, from an age before anyone thought to ask what enormous things were actually for." },
+    // World 12's climax — same principle as every world's finale this run: the
+    // concept itself, not a sixth creature layered onto huli jing/jiangshi/yaoguai/
+    // egui/wangliang. Cultivation itself, completed, patient — the actual answer
+    // this whole world has been circling, not another spirit type to fight past it.
+    { n: 'What Patience Alone Actually Earns', zone: 'What Ascension Actually Looks Like', hp: 5350000, mhp: 5350000, atk: 8650, def: 5150, xp: 2300000, g: 1500000,
+      mechanic: 'phase', phases: 4, currentPhase: 1, phaseHp: 1337500,
+      desc: "It does not fight the way anything else in this world fights \u2014 no hunger, no interrupted passage, no borrowed power. Just centuries of patience, finally complete, entirely unbothered by whether you understand yet that the whole point was never the fighting at all." },
     // The Endless Thinning's own boss — every zone boss above it is a fixed stat
     // block, calibrated once and left to eventually fall behind the same way regular
     // monsters used to. This one carries no hp/atk/def/xp/g of its own at all:
@@ -6005,6 +6055,116 @@ storyJournal: {
           { speaker: 'Narrator', text: 'He is right. Within the week, two more requests come in \u2014 different ports, different needs, the same gap the guild can now actually close. The ledger, San thinks, is going to look very different by the end of the year.' },
         ]
       }
+,{
+        id: 'journal_180',
+        title: 'Something in the Lantern Light',
+        chapter: 180,
+        unlockType: 'level',
+        unlockAt: 600,
+        icon: '🏮',
+        summary: 'Palembang is the oldest port they have ever docked at, and the oldest ports, it turns out, keep the most company. Sinbad is the only one who takes the sightings seriously right away.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Palembang settles strangely at night \u2014 lanterns that flicker without wind to account for it, a cold patch along the water\u2019s edge that has nothing to do with the season, dockhands who go quiet whenever the subject comes up directly.' },
+          { speaker: 'Narrator', text: 'Most of the crew treats it as nothing. Old ports get old stories, Zheng He says, practical as ever, and does not think much further about it.' },
+          { speaker: 'Sinbad', text: '"I would not dismiss it so quickly," Sinbad says, quieter than his usual register. "I have learned the difference between an old story and something actually still here. This does not feel like the first kind."' },
+          { speaker: 'San', text: '"You think something is actually haunting the port?" you ask, not entirely sure yet whether you are humoring him.' },
+          { speaker: 'Sinbad', text: '"I think," Sinbad says, carefully, "that a port this old has had a very long time to accumulate things it never properly let go of. That is not the same as a ghost story. It is closer to an unpaid debt."' },
+          { speaker: 'Narrator', text: 'That night, San hears it herself \u2014 not a sound exactly, more a presence at the edge of the water, patient and unhurried, watching the ship without any apparent intention of doing anything about it yet.' },
+        ]
+      }
+,{
+        id: 'journal_181',
+        title: 'What Actually Followed the Ship',
+        chapter: 181,
+        unlockType: 'level',
+        unlockAt: 605,
+        icon: '💧',
+        summary: 'Whatever is in the water here finally shows itself \u2014 and it is not remotely what anyone was braced for.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It surfaces the way still water surfaces \u2014 without a splash, without warning, simply present where a moment ago there had been nothing at all. San\u2019s first instinct is fear. Her second, watching it more carefully, is something closer to recognition.' },
+          { speaker: 'San', text: '"It is not attacking," you say, quiet, holding a hand out to keep Joel from reaching for his weapon. "Look at it. It is just watching us."' },
+          { speaker: 'Narrator', text: 'It is a shape more than a face, made of the same water it rests in, old in a way that has nothing to do with a normal lifespan. When it finally speaks, it is less a voice than a ripple that happens to carry meaning.' },
+          { speaker: 'Shui Gui', text: '"You are not the ones," it says, and the disappointment in it is unmistakable, entirely undisguised. "I keep hoping. I know better by now. I still hope anyway."' },
+          { speaker: 'Joel', text: '"The ones who what?" Joel asks, carefully, no longer reaching for anything.' },
+          { speaker: 'Shui Gui', text: '"Who never came back for what they owed this port," it says. "I have waited a very long time. Waiting is easier in water. It does not tire you the way it tires the living."' },
+          { speaker: 'San', text: '"What was owed?" you ask, gently. "Maybe we can actually help."' },
+          { speaker: 'Shui Gui', text: 'It considers this for a long moment, current shifting slightly, something that might be surprise moving through it. "Nobody has asked me that directly in longer than I can properly count."' },
+        ]
+      }
+,{
+        id: 'journal_182',
+        title: 'An Old Debt, Finally Settled',
+        chapter: 182,
+        unlockType: 'level',
+        unlockAt: 610,
+        icon: '🌊',
+        summary: 'The debt turns out to be smaller, and sadder, than anyone expected. San and the crew settle it the only way that was ever actually going to work \u2014 by simply remembering properly.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It is not gold the spirit wants, or blood, or anything a story would normally demand. It is a name \u2014 a trader who drowned crossing this exact stretch of water centuries ago, promised a proper remembrance by a crew that sailed on without ever looking back.', },
+          { speaker: 'Shui Gui', text: '"His name was Wen," it says, and saying it seems to cost something, the way old grief always costs something even when it is finally being spent correctly. "Nobody has spoken it in this port since the week he drowned. I did not want gold. I wanted somebody to say his name again."' },
+          { speaker: 'San', text: 'You say it. Simply, plainly, out loud, the way it apparently should have been said a very long time ago. "Wen."' },
+          { speaker: 'Narrator', text: 'Something in the water eases, visibly, a tension the whole port seems to have been quietly carrying finally allowed to actually release.' },
+          { speaker: 'Shui Gui', text: '"Thank you," it says, and there is real relief in it now, unmistakable. "That is genuinely all this ever needed to be. I do not know why nobody else in all this time simply asked."', },
+          { speaker: 'Sinbad', text: '"Most people are afraid to ask," Sinbad says, quiet, watching the water settle. "I have learned that the impossible things usually just want to be heard properly. That is rarer than people think."' },
+          { speaker: 'Narrator', text: 'The lanterns do not flicker again after that night. The cold patch by the water fades within the week. Palembang, San notices, feels different after \u2014 not lighter exactly, just properly, finally, at rest.' },
+          { speaker: 'Joel', text: '"Do you think there are more like him?" Joel asks, later, watching the harbor. "Other old debts, at other ports, still waiting?"' },
+          { speaker: 'San', text: '"Probably," you say. "I think that might just be part of what these waters actually are now. Echoes, waiting to finally be heard properly." You look out at the harbor a moment longer. "I do not mind that. I think I would rather know."' },
+        ]
+      }
+,{
+        id: 'journal_183',
+        title: 'Someone Keeps Rearranging Everything',
+        chapter: 183,
+        unlockType: 'level',
+        unlockAt: 615,
+        icon: '🫖',
+        summary: 'Bangkok\u2019s market stalls keep turning up rearranged overnight \u2014 nothing stolen, nothing broken, just moved. Bapoleon takes this far more seriously than the situation strictly warrants.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It starts small \u2014 a merchant\u2019s crates stacked in an entirely different order than she left them, a coil of rope retied into a knot nobody on the crew recognizes, a single teacup relocated to the exact center of an otherwise empty table.' },
+          { speaker: 'Narrator', text: 'Nothing is ever missing. That is, somehow, the strangest part. Whatever is doing this does not seem to want anything at all, except perhaps for someone to notice that it happened.' },
+          { speaker: 'Bapoleon', text: '"A campaign of deliberate disruption," Bapoleon announces, entirely too pleased about it, already sketching a map of the market\u2019s stalls with little arrows indicating suspected movement patterns. "Someone is testing this port\u2019s defenses. I intend to find out who."' },
+          { speaker: 'Zheng He', text: '"Or," Zheng He says, mildly, "nothing is missing because nothing is actually being stolen. You are preparing a military response to a teacup, Bapoleon."' },
+          { speaker: 'Bapoleon', text: '"A teacup today," Bapoleon says, darkly. "Who is to say what tomorrow brings."' },
+          { speaker: 'San', text: 'You watch him stalk off toward the market with his diagram, entirely serious, and decide it is probably worth following just to see how this actually resolves.' },
+        ]
+      }
+,{
+        id: 'journal_184',
+        title: 'Caught, Sort Of',
+        chapter: 184,
+        unlockType: 'level',
+        unlockAt: 620,
+        icon: '✨',
+        summary: 'The culprit turns out to be exactly as threatening as Zheng He predicted, and Bapoleon takes the reveal with as much dignity as he can currently manage.',
+        scenes: [
+          { speaker: 'Narrator', text: 'They catch it mid-act, past midnight, crouched at the market\u2019s central table \u2014 a small, animate teapot, spout twitching with what can only be described as delighted mischief, carefully repositioning a spoon by exactly one inch.' },
+          { speaker: 'Bapoleon', text: '"Halt," Bapoleon says, with the full weight of a man who has spent two days preparing for something considerably larger than this. The teapot does not halt. It looks at him, tilts curiously, and moves the spoon back the other way.' },
+          { speaker: 'San', text: 'You crouch down to its level, careful, gentle. "Hello," you say. "You have had this whole market a little worried."' },
+          { speaker: 'Narrator', text: 'The teapot\u2019s lid clatters once, twice, in what you slowly realize is something like nervous laughter. It does not run. It seems, if anything, pleased to finally be spoken to directly.' },
+          { speaker: 'Yaoguai', text: '"So long," it manages, voice thin and rattling like steam escaping a spout. "So long since anyone looked at me and saw \u2014 me. Just a shelf. Just dust. Then, one day, I could move things. Nobody asked why. I did not either."' },
+          { speaker: 'Joel', text: '"You just wanted someone to notice," Joel says, quiet, understanding arriving faster than the rest of them.' },
+          { speaker: 'Yaoguai', text: '"Yes," it says, simple, almost shy about it now that it is actually said aloud. "I did not know how else to ask."' },
+          { speaker: 'Bapoleon', text: 'Bapoleon lowers his diagram slowly, staring at the small, delighted teapot that has apparently been his opposing army this entire time. "I have," he says, with real effort, "perhaps overestimated the scale of this particular threat."' },
+        ]
+      }
+,{
+        id: 'journal_185',
+        title: 'A Very Small, Very Old Friend',
+        chapter: 185,
+        unlockType: 'level',
+        unlockAt: 625,
+        icon: '🍵',
+        summary: 'The market gets its quiet back. The teapot gets something it apparently wanted far more than the rearranging ever actually was.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It does not take much, in the end \u2014 San simply starts talking to it. About the ship, about the ports, about nothing in particular, the way you might talk to anyone who had spent a very long time with nobody talking to them at all.' },
+          { speaker: 'Narrator', text: 'The teapot listens with its whole small, rattling attention, spout tilting toward whoever is speaking, clearly delighted just to be included.' },
+          { speaker: 'Sinbad', text: '"Another one," Sinbad says, watching with real warmth. "Different shape than the water spirit. Same actual want, underneath it. Someone to simply notice they exist."' },
+          { speaker: 'Bapoleon', text: '"I still maintain my response was tactically sound," Bapoleon says, though he is, San notices, gently topping off the teapot with fresh water anyway, entirely unprompted.' },
+          { speaker: 'Narrator', text: 'The market does not get rearranged again after that night \u2014 not because the teapot stopped being able to, but because it no longer needed to ask that particular way. It simply sits on the crew\u2019s own shelf now, content, occasionally rattling its lid when it wants attention, which is considerably easier for everyone involved.' },
+          { speaker: 'San', text: '"We are apparently collecting old, lonely things now," you say to Joel, watching the teapot settle happily into its new spot.' },
+          { speaker: 'Joel', text: '"We were always going to," Joel says, easy, like it was never really a question. "It is sort of what we do."' },
+        ]
+      }
     ]
   },
 
@@ -7417,6 +7577,74 @@ function generateEnemyStats(zoneLevel, templateKey, elem) {
 
 // Enemy type registry for dynamic lookup
 const ENEMY_REGISTRY = {
+  // World 12: The World Still Trying to Ascend (Lv1160-1250). Templates reflect the
+  // cultivation throughline — patient huli jing lean elite (deliberate, refined);
+  // shortcut-takers lean striker (fast, desperate); jiangshi/egui lean tank/brute
+  // (heavy, sustained by something stolen); wangliang/shui gui lean tank (ancient,
+  // unhurried).
+  'A Huli Jing, Still Patiently Cultivating': { zoneLv: 1160, template: 'elite', elem: 'none' },
+  'Something That Has Been Climbing for Centuries': { zoneLv: 1160, template: 'tank', elem: 'none' },
+  'The Path That Never Actually Ends, Only Deepens': { zoneLv: 1160, template: 'elite', elem: 'none' },
+  'A Huli Jing Who Took the Faster, Crueler Road': { zoneLv: 1170, template: 'striker', elem: 'none' },
+  'Something That Borrowed Power It Never Actually Earned': { zoneLv: 1170, template: 'elite', elem: 'none' },
+  'The Shortcut, Still Extracting Its Overdue Cost': { zoneLv: 1170, template: 'striker', elem: 'none' },
+  'A Jiangshi, Still Held at the Wrong Moment': { zoneLv: 1180, template: 'tank', elem: 'none' },
+  'Something Sustained by Breath It Was Never Owed': { zoneLv: 1180, template: 'brute', elem: 'none' },
+  'The Passage That Got Interrupted and Never Resumed': { zoneLv: 1180, template: 'tank', elem: 'none' },
+  'An Egui, Still Waiting for Something Specific': { zoneLv: 1190, template: 'elite', elem: 'none' },
+  'Something Hungry for a Reason That Was Never About Food': { zoneLv: 1190, template: 'brute', elem: 'none' },
+  'The Longing That Simply Never Got to Resolve': { zoneLv: 1190, template: 'tank', elem: 'none' },
+  'A Yaoguai, Newly Sentient and Entirely Untaught': { zoneLv: 1200, template: 'striker', elem: 'none' },
+  'Something That Gained Power Faster Than It Gained Guidance': { zoneLv: 1200, template: 'elite', elem: 'none' },
+  'The Ordinary Thing That Forgot How to Stay Ordinary': { zoneLv: 1200, template: 'brute', elem: 'none' },
+  'A Wangliang, Untroubled by the Whole Concept of Ascension': { zoneLv: 1210, template: 'tank', elem: 'none' },
+  'Something From Before Cultivation Was Even a Practice': { zoneLv: 1210, template: 'tank', elem: 'none' },
+  'The Mountain Spirit That Never Once Felt Incomplete': { zoneLv: 1210, template: 'brute', elem: 'none' },
+  'A Shui Gui, Patient in the Slow Current': { zoneLv: 1220, template: 'elite', elem: 'none' },
+  'Something the River Simply Never Let Go Of': { zoneLv: 1220, template: 'tank', elem: 'none' },
+  'The Drowning That Never Quite Finished Happening': { zoneLv: 1220, template: 'striker', elem: 'none' },
+  'A Huli Jing and a Jiangshi, Entirely Indifferent to Each Other': { zoneLv: 1230, template: 'elite', elem: 'none' },
+  'Something Yaoguai Standing Near Something Egui': { zoneLv: 1230, template: 'tank', elem: 'none' },
+  'The Gathering of Every Way This World Has Learned to Want': { zoneLv: 1230, template: 'brute', elem: 'none' },
+  'Something Sent Down to Test Your Own Patience': { zoneLv: 1240, template: 'elite', elem: 'none' },
+  'A Guardian of the Final Ascent': { zoneLv: 1240, template: 'tank', elem: 'none' },
+  'The Last Trial Before Whatever Waits at the Peak': { zoneLv: 1240, template: 'striker', elem: 'none' },
+  'The Completed Cultivation, Patient to the End': { zoneLv: 1250, template: 'elite', elem: 'none' },
+  'Something Older Than Every Shortcut It Has Ever Watched Fail': { zoneLv: 1250, template: 'tank', elem: 'none' },
+  'The Peak That Was Always Reachable, Just Never Quickly': { zoneLv: 1250, template: 'brute', elem: 'none' },
+  // World 11: The World That Came Before the Rest (Lv1060-1150). Templates lean heavy
+  // across the board — giants are the least "clever" archetype so far, mostly brute/
+  // tank, with elite reserved for the more deliberate ones (architects, storm-callers).
+  'A Giant, Simply Larger Than the Question of Why': { zoneLv: 1060, template: 'brute', elem: 'none' },
+  'Something That Was Here Before Scale Was a Consideration': { zoneLv: 1060, template: 'tank', elem: 'none' },
+  'The First Thing That Ever Needed This Much Room': { zoneLv: 1060, template: 'brute', elem: 'none' },
+  'A Frost Giant, Mistaken for a Mountain Range': { zoneLv: 1070, template: 'tank', elem: 'none' },
+  'Something That Stopped Moving So Long Ago Nobody Noticed': { zoneLv: 1070, template: 'tank', elem: 'none' },
+  'The Peak That Used to Have a Name': { zoneLv: 1070, template: 'brute', elem: 'none' },
+  'A Stone Giant, Still Laying the Original Foundations': { zoneLv: 1080, template: 'tank', elem: 'none' },
+  'Something Building Toward a Plan Nobody Else Remembers': { zoneLv: 1080, template: 'elite', elem: 'none' },
+  'The First Architect, Long Before the Word Existed': { zoneLv: 1080, template: 'elite', elem: 'none' },
+  'A Giant Who Never Learned to Ask First': { zoneLv: 1090, template: 'brute', elem: 'none' },
+  'Something That Built Because Building Was Simply What It Did': { zoneLv: 1090, template: 'tank', elem: 'none' },
+  'The Reason Permission Became a Concept at All': { zoneLv: 1090, template: 'brute', elem: 'none' },
+  'A Fire Giant, Older Than the Idea of a Hearth': { zoneLv: 1100, template: 'striker', elem: 'none' },
+  'Something That Used Flame Before Flame Meant Comfort': { zoneLv: 1100, template: 'elite', elem: 'none' },
+  'The Original Fire, Never Once Domesticated': { zoneLv: 1100, template: 'striker', elem: 'none' },
+  'A Giant, Grown Rather Than Born': { zoneLv: 1110, template: 'brute', elem: 'none' },
+  'Something Rooted Deeper Than Any Later Forest Managed': { zoneLv: 1110, template: 'tank', elem: 'none' },
+  'The First Growing Thing, Before Growth Had Rules': { zoneLv: 1110, template: 'brute', elem: 'none' },
+  'A Storm Giant, Unpracticed and Enormous': { zoneLv: 1120, template: 'striker', elem: 'none' },
+  'Something That Predates Weather Having Rules': { zoneLv: 1120, template: 'elite', elem: 'none' },
+  'The First Thunder, Before It Learned to Warn First': { zoneLv: 1120, template: 'striker', elem: 'none' },
+  'A Frost Giant and a Fire Giant, Entirely at Ease Together': { zoneLv: 1130, template: 'elite', elem: 'none' },
+  'Something Stone-Built Standing Beside Something Storm-Born': { zoneLv: 1130, template: 'tank', elem: 'none' },
+  'The Gathering of Every First Thing at Once': { zoneLv: 1130, template: 'brute', elem: 'none' },
+  'Something Sent Ahead by the Last of the First Things': { zoneLv: 1140, template: 'elite', elem: 'none' },
+  'A Guardian of the Final Original Structure': { zoneLv: 1140, template: 'tank', elem: 'none' },
+  'The Herald of Whatever Finished the Building': { zoneLv: 1140, template: 'striker', elem: 'none' },
+  'The Original Scale, Before It Needed a Reason': { zoneLv: 1150, template: 'elite', elem: 'none' },
+  'Something Older Than Every Giant Here Combined': { zoneLv: 1150, template: 'tank', elem: 'none' },
+  'The First Thing That Was Ever This Large': { zoneLv: 1150, template: 'brute', elem: 'none' },
   // World 10: The World Where Wishes Take Their Own Shape (Lv960-1050). Templates
   // reflect emotional register more than combat role here — furious/resentful djinn
   // lean elite (dangerous, deliberate), bound/weary ones lean tank (steady, enduring),
@@ -22035,15 +22263,15 @@ function getEnemyArchetype(name) {
   if (/the veilshaper|the unmade|what alone becomes|before it wears through|what was almost enough|the line neither could hold alone/.test(n)) return 'eye'; // the Fraying's own embodiments — reality unraveling, same family as void/rift/fracture
   if (n === 'frost queen') return 'knight'; // royal authority
   if (n === 'the last vigil') return 'construct'; // a guardian in every sense but name
-  if (/wolf|hound|dog|\brat\b/.test(n)) return 'beast';
+  if (/wolf|hound|dog|\brat\b|huli|fox/.test(n)) return 'beast';
   if (/dragon|drake|wyrm/.test(n)) return 'dragon';
-  if (/skeleton|zombie|bone|undead|lich|revenant|wraith|phantom|specter|ghost|echo|shade|remnant|husk|ember|recruit|rustbound|vampire|nosferatu|bloodless|undying|mummy|embalmed|preserved|wrapped/.test(n)) return 'undead';
+  if (/skeleton|zombie|bone|undead|lich|revenant|wraith|phantom|specter|ghost|echo|shade|remnant|husk|ember|recruit|rustbound|vampire|nosferatu|bloodless|undying|mummy|embalmed|preserved|wrapped|jiangshi|egui|gui\b/.test(n)) return 'undead';
   if (/golem|construct|automaton|titan|guardian|sentinel/.test(n)) return 'construct';
   if (/spider|arachnid/.test(n)) return 'arachnid';
   if (/serpent|snake|basilisk|undertow|riptide|tidereaver|drowned/.test(n)) return 'serpent';
   if (/bat\b|wisp|drifter|fairy|mote|wyvern|harpy|griffin/.test(n)) return 'flying';
   if (/goblin|knight|guard\b|warden|king|lord|tyrant|foreman|keeper|collector|enforcer|peddler|looter|scavenger|watcher|mourner|auditor|sailor|highwayman|thug|bandit|captain|scout|wayfinder|ledgerbound|sovereign|archon|incarnate/.test(n)) return 'knight';
-  if (/imp|slime|elemental|beast|horror|demon|hollow|stalker|weaver|leviathan|kraken|behemoth|root|bramble|sprite|elder|heart|sunreach|verdant|djinn|genie|ifrit/.test(n)) return 'elemental';
+  if (/imp|slime|elemental|beast|horror|demon|hollow|stalker|weaver|leviathan|kraken|behemoth|root|bramble|sprite|elder|heart|sunreach|verdant|djinn|genie|ifrit|giant|yaoguai|wangliang|shui gui/.test(n)) return 'elemental';
   if (/planarch|devourer|astral|nexus|void|reality|fragment|rift|dimensional|chronomancer|arbiter|architect|fracture|current|vessel|corrosion|deepfray|breaker|eater|acolyte|zealot|weight|habit|\bfear\b|last shadow|familiar|agitator|walker|unbound|tired|splinter|unmended|relapse|question|unity|vanished|first break/.test(n)) return 'eye';
   return 'default';
 }
@@ -22110,7 +22338,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.157';
+const BUILD_ID = '2026-08-17.162';
 // =========================
 
 
@@ -27186,6 +27414,7 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Chicken Breast (skinless, 100g)', cat: 'Poultry', fat: 3.0, protein: 31.0, carbs: 0.0, icon: '🍗' },
   { n: 'Chicken Wing (1 piece)', cat: 'Poultry', fat: 7.0, protein: 9.0, carbs: 0.0, icon: '🍗' },
   { n: 'Chicken Feet (100g)', cat: 'Poultry', fat: 15.0, protein: 19.0, carbs: 0.2, icon: '🍗' },
+  { n: 'Adidas / Grilled Chicken Feet (100g)', cat: 'Street Food', chef: 'Joel', fat: 12.0, protein: 18.0, carbs: 3.0, icon: '🍗' },
   { n: 'Chicken Liver (100g)', cat: 'Poultry', fat: 5.0, protein: 25.0, carbs: 1.0, icon: '🍗' },
   { n: 'Whole Chicken \'Isi\' (mixed cuts, 100g)', cat: 'Poultry', fat: 10.0, protein: 24.0, carbs: 0.0, icon: '🍗' },
   { n: 'Duck Breast, skin-on (100g)', cat: 'Poultry', fat: 28.0, protein: 18.0, carbs: 0.0, icon: '🦆' },
@@ -27255,6 +27484,7 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Capsicum / Bell Pepper (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.3, protein: 1.0, carbs: 4.5, icon: '🫑' },
   { n: 'Mixed Veg (100g)', cat: 'Keto Veg (Low Carb)', fat: 0.3, protein: 2.0, carbs: 5.0, icon: '🥗' },
   { n: 'Pumpkin (100g)', cat: 'Higher-Carb Veg', fat: 0.1, protein: 1.0, carbs: 6.0, icon: '🎃' },
+  { n: 'Jackfruit (1 piece/aril)', cat: 'Higher-Carb Veg', fat: 0.1, protein: 0.3, carbs: 4.5, icon: '🍈' },
   { n: 'Pumpkin (1 cup, ~245g)', cat: 'Higher-Carb Veg', fat: 0.3, protein: 2.5, carbs: 14.5, icon: '🎃' },
   { n: 'Carrot (100g)', cat: 'Higher-Carb Veg', fat: 0.2, protein: 0.9, carbs: 8.0, icon: '🥕' },
   { n: 'Carrot (50g)', cat: 'Higher-Carb Veg', fat: 0.1, protein: 0.5, carbs: 4.0, icon: '🥕' },
@@ -27320,6 +27550,8 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Canned Mushrooms, drained (100g)', cat: 'Mushrooms & Fungus', fat: 0.2, protein: 2.0, carbs: 2.5, icon: '🍄' },
   { n: 'Mixed Mushrooms stir-fried (100g)', cat: 'Mushrooms & Fungus', fat: 3.0, protein: 3.0, carbs: 3.5, icon: '🍄' },
   { n: 'Coconut Oil, Virgin (1 tbsp)', cat: 'Fats & Extras', fat: 14.0, protein: 0.0, carbs: 0.0, icon: '🥥' },
+  { n: 'Sarawak Wild Olives / Kembayau / Dabai, flesh only (10pc)', cat: 'Fats & Extras', chef: 'Zaki', fat: 9.0, protein: 1.0, carbs: 3.0, icon: '🫒' },
+  { n: 'Dark Chocolate, generic (1 square, ~10g)', cat: 'Fats & Extras', fat: 4.3, protein: 0.6, carbs: 4.0, icon: '🍫' },
   { n: 'Coconut Oil, Refined (1 tbsp)', cat: 'Fats & Extras', fat: 14.0, protein: 0.0, carbs: 0.0, icon: '🥥' },
   { n: 'MCT Oil / Fractionated Coconut (1 tbsp)', cat: 'Fats & Extras', fat: 14.0, protein: 0.0, carbs: 0.0, icon: '🥥' },
   { n: 'Coconut Cream (2 tbsp)', cat: 'Fats & Extras', fat: 9.0, protein: 0.9, carbs: 1.6, icon: '🥥' },
@@ -27582,6 +27814,31 @@ function logMealFromDatabase(foodIdx) {
   const totals = getDailyMacroTotals(dk);
   const dayLabel = dk === todayKey() ? 'today' : 'on ' + dk;
   lg(food.icon + ' ' + food.n + ' logged ' + dayLabel + ' \u2014 ' + totals.carbs.toFixed(1) + 'g carbs (limit ' + todaysCarbLimit() + 'g), ' + totals.protein.toFixed(1) + 'g protein, ' + totals.fat.toFixed(1) + 'g fat.');
+  render();
+}
+// One-off custom entry — for anything not in the 365+ item database. Never saved to
+// CAFE_FOOD_DATABASE itself (that's meant to stay a curated, reusable list); this just
+// logs a single ad-hoc meal entry directly, same shape as a database log, using
+// whatever values are typed into the form. Present in the original Daybreak Quest
+// tracker; never carried over when the food database was ported into the Guild Cafe.
+function logOneOffMeal() {
+  const nameEl = document.getElementById('oneOffName');
+  const fatEl = document.getElementById('oneOffFat');
+  const proteinEl = document.getElementById('oneOffProtein');
+  const carbsEl = document.getElementById('oneOffCarbs');
+  if (!nameEl || !nameEl.value.trim()) { lg('\ud83c\udf7d\ufe0f Give it a name first.'); return; }
+  const name = nameEl.value.trim();
+  const fat = parseFloat(fatEl.value) || 0;
+  const protein = parseFloat(proteinEl.value) || 0;
+  const carbs = parseFloat(carbsEl.value) || 0;
+  const dk = G.cafeLogDate || todayKey();
+  if (!G.mealLog[dk]) G.mealLog[dk] = [];
+  const timeLabel = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  G.mealLog[dk].push({ food: name, cat: 'One-Off', fat, protein, carbs, time: timeLabel });
+  const totals = getDailyMacroTotals(dk);
+  const dayLabel = dk === todayKey() ? 'today' : 'on ' + dk;
+  lg('\ud83c\udf7d\ufe0f ' + name + ' logged ' + dayLabel + ' \u2014 ' + totals.carbs.toFixed(1) + 'g carbs (limit ' + todaysCarbLimit() + 'g), ' + totals.protein.toFixed(1) + 'g protein, ' + totals.fat.toFixed(1) + 'g fat.');
+  G.cafeOneOff = false;
   render();
 }
 function removeMealEntry(index) {
@@ -27952,11 +28209,25 @@ function rGuildCafe() {
       h += '<button onclick="G.cafeCategory=\'' + cat + '\';render();" class="btn-outline-ghost" style="margin:0;font-size:11.5px;padding:10px 6px;">' + cat + '</button>';
     }
     h += '</div>';
+  } else if (G.cafeOneOff) {
+    h += '<button onclick="G.cafeOneOff=false;render();" class="btn-outline-ghost" style="width:100%;margin:10px 0;">\u2190 Back</button>';
+    h += '<div class="panel-title" style="margin-bottom:8px;">Log Something Else</div>';
+    h += '<div class="btn-hint" style="margin-bottom:10px;">For anything not in the menu \u2014 logged once, not saved to the database.</div>';
+    h += '<div class="panel" style="margin-bottom:10px;">';
+    h += '<div style="margin-bottom:8px;"><label class="btn-hint">Name</label><input id="oneOffName" type="text" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);" placeholder="What did you eat?"></div>';
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">';
+    h += '<div><label class="btn-hint">Fat (g)</label><input id="oneOffFat" type="number" step="0.1" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);" placeholder="0"></div>';
+    h += '<div><label class="btn-hint">Protein (g)</label><input id="oneOffProtein" type="number" step="0.1" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);" placeholder="0"></div>';
+    h += '<div><label class="btn-hint">Carbs (g)</label><input id="oneOffCarbs" type="number" step="0.1" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);" placeholder="0"></div>';
+    h += '</div>';
+    h += '</div>';
+    h += '<button onclick="logOneOffMeal()" class="abtn" style="width:100%;margin-bottom:16px;">Log It</button>';
   } else {
     h += '<div class="panel-title" style="margin:14px 0 8px;">Log a Meal</div>';
     h += '<button onclick="G.cafeChef=\'Zaki\';render();" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;text-align:left;">\ud83d\udc68\u200d\ud83c\udf73 Zaki\u2019s Kitchen<div class="btn-hint">Bruneian & Malay, western fusion, simple Chinese \u2014 halal</div></button>';
     h += '<button onclick="G.cafeChef=\'Joel\';render();" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;text-align:left;">\ud83d\udc68\u200d\ud83c\udf73 Joel\u2019s Kitchen<div class="btn-hint">Filipino, simple stir-fry, any pork \u2014 Gino covers this menu when Joel\u2019s away</div></button>';
-    h += '<button onclick="G.cafeChef=\'Pantry\';render();" class="btn-outline-ghost" style="width:100%;margin-bottom:16px;text-align:left;">\ud83e\uddfa Pantry<div class="btn-hint">Everything else \u2014 shared ingredients, not tied to either chef specifically</div></button>';
+    h += '<button onclick="G.cafeChef=\'Pantry\';render();" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;text-align:left;">\ud83e\uddfa Pantry<div class="btn-hint">Everything else \u2014 shared ingredients, not tied to either chef specifically</div></button>';
+    h += '<button onclick="G.cafeOneOff=true;render();" class="btn-outline-ghost" style="width:100%;margin-bottom:16px;text-align:left;">\u270f\ufe0f Log Something Else<div class="btn-hint">Not on the menu \u2014 enter your own values, just this once</div></button>';
   }
 
   h += '<div class="panel-title" style="margin:14px 0 8px;">Sit With Someone</div>';
