@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (New: Auto-Equip Best button on Inventory (badge shows upgrade count), plus immediate log alert when a strict upgrade drops)';
+const APP_VERSION = '2026-08-17 (New: Mez/Eliz Library-gated abilities \u2014 Farther Reach (Static Field chains to a 2nd enemy) and Steadier Ground (party DEF buff), same proven proc pattern as their existing abilities)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -462,7 +462,12 @@ const G = {
         { level: 3, name: 'Inferno Touch', desc: 'Fireball cost -5 MP. Burn chance +20%.', effects: { fireballCostReduction: 5, burnChanceBonus: 0.20 } },
         { level: 5, name: 'Wildfire', desc: 'Fire spells have 25% chance to chain to adjacent enemy.', effects: { wildfireChance: 0.25, wildfireDmg: 0.5 } },
         { level: 8, name: 'Phoenix Rising', desc: 'When HP drops below 20%, auto-cast Meteor Swarm once per combat.', effects: { phoenixRising: true, phoenixHpThreshold: 0.20 } },
-        { level: 50, name: 'Phoenix Ascendant', desc: 'Phoenix Rising can trigger twice per combat instead of once. Each trigger wreathes San in embers: 30% damage reduction for 2 turns.', effects: { phoenixExtraTrigger: true, phoenixShieldReduction: 0.30, phoenixShieldTurns: 2 } }
+        { level: 50, name: 'Phoenix Ascendant', desc: 'Phoenix Rising can trigger twice per combat instead of once. Each trigger wreathes San in embers: 30% damage reduction for 2 turns.', effects: { phoenixExtraTrigger: true, phoenixShieldReduction: 0.30, phoenixShieldTurns: 2 } },
+        // Library-gated — unlocked by completing san_trace_flame, not by level (see
+        // canUnlockTier()). Extends phoenixHpThreshold, a confirmed, already-wired
+        // effect (read at the Phoenix Rising trigger check in combat), rather than
+        // introducing a new untested mechanic.
+        { level: 500, libraryUnlock: 'san_trace_flame', name: 'The Deeper Flame', desc: 'Phoenix Rising\u2019s trigger window widens further \u2014 it now fires as soon as HP drops below 30%, not just 20%.', effects: { phoenixHpThreshold: 0.10 } }
       ]
     },
     cryomancer: {
@@ -474,7 +479,10 @@ const G = {
         { level: 3, name: 'Frozen Core', desc: 'Frost Shield duration +2 turns. +3 DEF while active.', effects: { frostShieldDuration: 2, frostShieldDefBonus: 3 } },
         { level: 5, name: 'Absolute Zero', desc: 'Ice spells have 30% chance to freeze enemy (skip 2 turns).', effects: { freezeChance: 0.30, freezeTurns: 2 } },
         { level: 8, name: 'Glacial Aegis', desc: 'When hit, 20% chance to auto-cast Frost Shield (free, once per 3 turns).', effects: { glacialAegisChance: 0.20, glacialAegisCooldown: 3 } },
-        { level: 50, name: 'Eternal Winter', desc: 'San\'s attacks deal 25% bonus damage to frozen enemies \u2014 the cold does not just stop them, it makes them brittle.', effects: { shatterDmgBonus: 0.25 } }
+        { level: 50, name: 'Eternal Winter', desc: 'San\'s attacks deal 25% bonus damage to frozen enemies \u2014 the cold does not just stop them, it makes them brittle.', effects: { shatterDmgBonus: 0.25 } },
+        // Library-gated — unlocked by completing san_trace_frost. Extends freezeChance,
+        // the same confirmed, wired effect Absolute Zero already established.
+        { level: 500, libraryUnlock: 'san_trace_frost', name: 'The Deeper Frost', desc: 'Ice spells now have a 45% chance to freeze an enemy, not just 30% \u2014 the cold reaches further than it used to.', effects: { freezeChance: 0.15 } }
       ]
     },
     stormcaller: {
@@ -486,7 +494,11 @@ const G = {
         { level: 3, name: 'Static Charge', desc: 'Lightning Strike cost -8 MP. Shock duration +1 turn.', effects: { lightningCostReduction: 8, shockDurationBonus: 1 } },
         { level: 5, name: 'Chain Lightning', desc: 'Lightning spells hit 2 enemies (50% dmg to second).', effects: { chainLightning: true, chainLightningDmg: 0.5 } },
         { level: 8, name: 'Thunderlord', desc: 'Crit chance +15%. Crits with lightning refund 50% MP.', effects: { thunderlordCritBonus: 0.15, thunderlordMpRefund: 0.5 } },
-        { level: 50, name: 'Godspeed', desc: 'Lightning spells have a 25% chance not to end your turn \u2014 the same spell fires again immediately, free.', effects: { godspeedChance: 0.25 } }
+        { level: 50, name: 'Godspeed', desc: 'Lightning spells have a 25% chance not to end your turn \u2014 the same spell fires again immediately, free.', effects: { godspeedChance: 0.25 } },
+        // Library-gated — unlocked by completing san_trace_storm. Extends
+        // thunderlordCritBonus, the same confirmed, wired effect Thunderlord already
+        // established.
+        { level: 500, libraryUnlock: 'san_trace_storm', name: 'The Deeper Storm', desc: 'Crit chance from Thunderlord rises to 25% total, not just 15% \u2014 lightning finds its mark more often than it used to.', effects: { thunderlordCritBonus: 0.10 } }
       ]
     }
   },
@@ -6534,7 +6546,14 @@ storyJournal: {
       san: { usedDilemmaIds: [], pendingOutcome: null, breakthroughs: 0, activeDilemmaId: null },
       mezstorm: { usedDilemmaIds: [], pendingOutcome: null, breakthroughs: 0, activeDilemmaId: null },
       eliz: { usedDilemmaIds: [], pendingOutcome: null, breakthroughs: 0, activeDilemmaId: null }
-    }
+    },
+    // Research Actions — a separate, concrete mechanic from the dilemma threads above.
+    // Dilemmas are narrative choices with an uncertain flavor outcome; these are
+    // chosen projects with a known, specific reward (a skill tree tier, eventually
+    // companion spells) once the cost and duration are paid. Each researcher can have
+    // one active action at a time, same one-at-a-time pattern as their dilemma thread.
+    completedActions: [], // array of action ids
+    activeActions: { san: null, mezstorm: null, eliz: null } // { actionId, resolveDay } or null
   },
   activeDilemma: null, // { discipleId, dilemmaId } — which prompt is currently on screen awaiting a response
   logScreenFilter: 'all', // which category tab is active on the dedicated Combat Log screen
@@ -7232,6 +7251,23 @@ function equipItem(invIndex) {
   render();
 }
 
+// For the grouped Inventory display — when duplicate equipment gets collapsed into a
+// single card with a quantity badge, the Equip button can no longer point at one fixed
+// inventory index (that index would go stale the instant any earlier item in the array
+// gets spliced by something else). Instead this re-finds a fresh matching index by
+// name at the moment of the actual click, then hands off to the existing equipItem()
+// for the real equip/unequip mechanics. socketFree is passed through from the grouping
+// key itself, so this only ever matches the exact same pristine, unmodified duplicates
+// that were grouped together in the first place — never a socketed item sharing a name.
+function equipItemByName(name, forCompanion, socketFree) {
+  const idx = G.p.inv.findIndex(it =>
+    it.n === name &&
+    (it.forCompanion || '') === (forCompanion || '') &&
+    (!socketFree || !it.sockets || !it.sockets.some(s => s))
+  );
+  if (idx >= 0) equipItem(idx);
+}
+
 function unequipItem(slot) {
   const item = G.p.eq[slot];
   if (!item) return;
@@ -7518,6 +7554,82 @@ function unequipPartyGearSlot(memberName, slot) {
   render();
 }
 
+// Companion equivalent of autoEquipStrongest() below — same reasoning, same care
+// around G.p.inv being spliced mid-pass. Only considers items explicitly fitted for
+// this member (forCompanion matches exactly, or 'any'), matching the same restriction
+// equipPartyGearSlot() already enforces. Returns the count actually equipped, since
+// the "auto-equip everyone" caller needs to aggregate a total across all companions
+// rather than logging once per member.
+function autoEquipStrongestForMember(memberName, silent) {
+  const member = G.party.find(p => p.n === memberName);
+  if (!member || !member.eq) return 0;
+  const singleSlots = ['weapon', 'armor', 'head', 'hands', 'feet', 'amulet'];
+  let equippedCount = 0;
+
+  for (let slotKey of singleSlots) {
+    const currentScore = member.eq[slotKey] ? getEquipScore(member.eq[slotKey]) : -1;
+    let bestIndex = -1;
+    let bestScore = currentScore;
+    for (let i = 0; i < G.p.inv.length; i++) {
+      const item = G.p.inv[i];
+      if (item.slot !== slotKey) continue;
+      if (item.forCompanion !== memberName && item.forCompanion !== 'any') continue;
+      const score = getEquipScore(item);
+      if (score > bestScore) { bestScore = score; bestIndex = i; }
+    }
+    if (bestIndex >= 0) { equipPartyGearSlot(memberName, slotKey, bestIndex); equippedCount++; }
+  }
+
+  let ringChanged = true;
+  while (ringChanged) {
+    ringChanged = false;
+    let bestIdx = -1, bestScore = -1;
+    for (let i = 0; i < G.p.inv.length; i++) {
+      const item = G.p.inv[i];
+      if (item.slot !== 'ring') continue;
+      if (item.forCompanion !== memberName && item.forCompanion !== 'any') continue;
+      const score = getEquipScore(item);
+      if (score > bestScore) { bestScore = score; bestIdx = i; }
+    }
+    if (bestIdx < 0) break;
+    const r1Score = member.eq.ring1 ? getEquipScore(member.eq.ring1) : -1;
+    const r2Score = member.eq.ring2 ? getEquipScore(member.eq.ring2) : -1;
+    const weakerSlot = r1Score <= r2Score ? 'ring1' : 'ring2';
+    const weakerScore = Math.min(r1Score, r2Score);
+    if (bestScore > weakerScore) {
+      const item = G.p.inv[bestIdx];
+      const old = member.eq[weakerSlot];
+      if (old) addI(old);
+      member.eq[weakerSlot] = { ...item };
+      G.p.inv.splice(bestIdx, 1);
+      equippedCount++;
+      ringChanged = true;
+    }
+  }
+
+  if (equippedCount > 0) {
+    recalcPartyMember(member);
+    if (!silent) lg('\u26a1 Auto-equipped ' + equippedCount + ' upgrade' + (equippedCount > 1 ? 's' : '') + ' on ' + member.n + '.');
+  }
+  return equippedCount;
+}
+
+// Runs the above across every currently-unlocked party member in one tap — the
+// companion counterpart to San's own Auto-Equip Best. Only touches members who are
+// actually unlocked/recruited, matching isPartyMemberUnlocked() rather than assuming
+// every entry in G.party is currently available.
+function autoEquipStrongestAllCompanions() {
+  let totalEquipped = 0;
+  let membersUpdated = 0;
+  for (let member of G.party) {
+    if (!isPartyMemberUnlocked(member) || !member.eq) continue;
+    const count = autoEquipStrongestForMember(member.n, true);
+    if (count > 0) { totalEquipped += count; membersUpdated++; }
+  }
+  if (totalEquipped > 0) lg('\u26a1 Auto-equipped ' + totalEquipped + ' upgrade' + (totalEquipped > 1 ? 's' : '') + ' across ' + membersUpdated + ' part' + (membersUpdated > 1 ? 'y members' : 'y member') + '.');
+  else lg('\u26a1 The whole party is already wearing its best gear.');
+  render();
+}
 
 function addLootFromCombat(zoneName) {
   const zone = G.zones.find(z => z.n === zoneName);
@@ -9950,6 +10062,7 @@ function checkDayAdvance() {
   // Resolve any Library Research outcomes whose delay has now passed — same
   // once-per-day-advance pattern as Disciples.
   checkLibraryResearchOutcomes();
+  checkLibraryResearchActionOutcomes();
 
   // Kindling Commissions reset on a new day — bounded, not accumulating.
   G.kindlingCommissions = { linesToday: 0, checksToday: 0, refreshDay: G.gameDay };
@@ -11902,6 +12015,17 @@ function tickElizHealerAbilities() {
     if (!alreadyBlessed && Math.random() < 0.15) {
       G.p.buffs.push({ n: 'Blessed', t: 4, atk: Math.ceil(G.p.lvl * 0.3) });
       lg('🙏 Eliz calls a blessing over the party. ATK increased for a few turns.');
+    }
+  }
+
+  // Steadier Ground — Library-gated, not level-gated. Same proven buff pattern as
+  // Bless above, DEF instead of ATK, tying directly into Eliz's own Library Research
+  // angle: not more power, just more certainty the ground everyone's standing on holds.
+  if (G.libraryResearch.completedActions.includes('eliz_steadier_ground')) {
+    const alreadySteady = G.p.buffs.some(b => b.n === 'Steadier Ground');
+    if (!alreadySteady && Math.random() < 0.15) {
+      G.p.buffs.push({ n: 'Steadier Ground', t: 4, def: Math.ceil(G.p.lvl * 0.3) });
+      lg('🕊️ Eliz steadies the ground under everyone\u2019s feet. DEF increased for a few turns.');
     }
   }
 
@@ -14078,6 +14202,90 @@ const LIBRARY_RESEARCH_DILEMMAS = {
   ]
 };
 
+// === LIBRARY RESEARCH ACTIONS (Season 3) ===
+// A separate mechanic from the dilemma threads above, on purpose. Dilemmas are
+// narrative choices with an uncertain flavor outcome — the point is watching San,
+// Mezstorm, and Eliz actually work through something. Research Actions are the
+// opposite: concrete, chosen projects with a known reward on the other side of a real
+// gold+time cost, existing specifically so Library engagement has something tangible
+// to work toward across the long stretch between now and Season 8-9's actual payoff.
+// First batch ties directly into reviving San's own skill tree, which capped at level
+// 50 a long time ago while the rest of the game kept scaling — these unlock a genuine
+// Tier 5 on each of her three specialization paths.
+const LIBRARY_RESEARCH_ACTIONS = {
+  san_trace_flame: { researcher: 'san', name: 'Trace the Deeper Flame', icon: '🔥',
+    desc: "Pyromancer theory, taken further than San has ever pushed it \u2014 not a new spell exactly, something underneath the ones she already has.",
+    goldCost: 18000, days: 14, unlockSpecTier: { path: 'pyromancer', tierIdx: 4 },
+    completeText: "The theory holds. Renn checks it three times before he actually believes it holds. Something in the way San reaches for fire has changed \u2014 not louder, just deeper." },
+  san_trace_frost: { researcher: 'san', name: 'Trace the Deeper Frost', icon: '❄️',
+    desc: "Cryomancer theory, taken further than San has ever pushed it \u2014 the same careful, patient work as the flame research, aimed at the opposite element.",
+    goldCost: 18000, days: 14, unlockSpecTier: { path: 'cryomancer', tierIdx: 4 },
+    completeText: "It holds, the same way the flame research held \u2014 quiet, confirmed, undeniable. The cold San can reach for now goes further than either of them expected it to." },
+  san_trace_storm: { researcher: 'san', name: 'Trace the Deeper Storm', icon: '⚡',
+    desc: "Stormcaller theory, taken further than San has ever pushed it \u2014 the last of the three original paths, given the same real time this kind of work actually requires.",
+    goldCost: 18000, days: 14, unlockSpecTier: { path: 'stormcaller', tierIdx: 4 },
+    completeText: "It holds. Renn stops checking things three times by now \u2014 he has started trusting San's own instinct about when something is actually finished, not just close." },
+  // Mez and Eliz don't have a skill tree the way San does — companions never used that
+  // system at all. Their existing abilities (Storm Shield/Arc Strike/Static Field for
+  // Mez, Turn Undead/Bless/Sanctuary/Death Ward for Eliz) are automatic, chance-based
+  // combat procs, not a player-selected spellbook — so the reward here is a new
+  // ability in that same proven style, gated by completedActions.includes(id) instead
+  // of a level threshold, checked directly at each ability's trigger point rather than
+  // through unlockSpecTier (which is San-tree-specific).
+  mez_farther_reach: { researcher: 'mezstorm', name: 'How Far Can It Actually Reach', icon: '⛈️',
+    desc: "Mez's own angle on this research \u2014 not theory, not safety, just distance. Can the reach of what she already does go further than it currently goes?",
+    goldCost: 20000, days: 16,
+    completeText: "It reaches further now. Not infinitely \u2014 Renn is careful to write down the actual limit, not just the fact that one was crossed \u2014 but further than it went before, and Mez knows exactly how that feels, since she's spent her whole life reaching for things at a distance." },
+  eliz_steadier_ground: { researcher: 'eliz', name: 'What Steadier Actually Requires', icon: '💚',
+    desc: "Eliz's own angle, characteristically careful \u2014 not more power, just more certainty that the ground everyone else is standing on will actually hold.",
+    goldCost: 20000, days: 16,
+    completeText: "It holds steadier now. Eliz tests it more times than anyone thinks is strictly necessary, the same as she tests everything, and it holds every single time she checks." }
+};
+
+function isLibraryResearchActionUnlocked(actionId) {
+  return isLibraryResearchUnlocked();
+}
+function isLibraryResearchActionAvailable(actionId) {
+  const action = LIBRARY_RESEARCH_ACTIONS[actionId];
+  if (!action) return false;
+  if (G.libraryResearch.completedActions.includes(actionId)) return false;
+  // Skill-tier actions only make sense once San has actually chosen that path —
+  // researching a deeper flame theory means nothing if she specialized in frost.
+  if (action.unlockSpecTier && G.playerSpec.path !== action.unlockSpecTier.path) return false;
+  return true;
+}
+function startLibraryResearchAction(actionId) {
+  const action = LIBRARY_RESEARCH_ACTIONS[actionId];
+  if (!action) return;
+  if (!isLibraryResearchActionAvailable(actionId)) return;
+  const researcher = action.researcher;
+  if (G.libraryResearch.activeActions[researcher]) { lg('📖 ' + researcher + ' is already committed to a research action \u2014 one at a time.'); return; }
+  if (G.p.gold < action.goldCost) { lg('📖 Not enough gold for this \u2014 needs ' + action.goldCost.toLocaleString() + 'G.'); return; }
+  G.p.gold -= action.goldCost;
+  G.libraryResearch.activeActions[researcher] = { actionId, resolveDay: G.gameDay + action.days };
+  lg('📖 Research begun: ' + action.name + '. ' + action.days + ' days, in earnest.');
+  saveGame();
+  render();
+}
+// Checked once per day advance, same pattern as checkLibraryResearchOutcomes().
+function checkLibraryResearchActionOutcomes() {
+  for (let researcher in G.libraryResearch.activeActions) {
+    const active = G.libraryResearch.activeActions[researcher];
+    if (!active) continue;
+    if (G.gameDay < active.resolveDay) continue;
+    const action = LIBRARY_RESEARCH_ACTIONS[active.actionId];
+    if (action) {
+      G.libraryResearch.completedActions.push(active.actionId);
+      lg('📖 Research complete: ' + action.name + '. ' + action.completeText);
+      if (action.unlockSpecTier && G.playerSpec.path === action.unlockSpecTier.path) {
+        unlockSpecTier(action.unlockSpecTier.tierIdx);
+      }
+    }
+    G.libraryResearch.activeActions[researcher] = null;
+  }
+  saveGame();
+}
+
 function isLibraryResearchUnlocked() {
   return G.storyJournal.read.includes('journal_140');
 }
@@ -14212,6 +14420,38 @@ function rLibraryResearch() {
       h += '<button onclick="startLibraryResearchDilemma(\'' + r.key + '\')" class="btn-outline-ghost" style="width:100%;">Begin the Next Line of Research</button>';
     }
     h += '</div>';
+  }
+
+  // Research Actions — separate section from the dilemma threads above. Concrete,
+  // chosen projects with a known reward, rather than a narrative choice with an
+  // uncertain flavor outcome.
+  const availableActions = Object.keys(LIBRARY_RESEARCH_ACTIONS).filter(isLibraryResearchActionAvailable);
+  const anyActiveAction = Object.values(G.libraryResearch.activeActions).some(a => a);
+  if (availableActions.length > 0 || anyActiveAction) {
+    h += '<div class="panel-title" style="margin:20px 0 8px;">\u2696\ufe0f Research Actions</div>';
+    h += '<div class="btn-hint" style="margin-bottom:10px;">Concrete projects, not open dilemmas \u2014 pay the cost, wait it out, get exactly what was promised.</div>';
+    for (let researcher in G.libraryResearch.activeActions) {
+      const active = G.libraryResearch.activeActions[researcher];
+      if (!active) continue;
+      const action = LIBRARY_RESEARCH_ACTIONS[active.actionId];
+      if (!action) continue;
+      const daysLeft = active.resolveDay - G.gameDay;
+      h += '<div class="panel panel-gold" style="margin-bottom:8px;">';
+      h += '<div class="panel-title" style="color:var(--gold);">' + action.icon + ' ' + action.name + '</div>';
+      h += '<div class="btn-hint">' + daysLeft + ' day' + (daysLeft === 1 ? '' : 's') + ' remaining.</div>';
+      h += '</div>';
+    }
+    for (let actionId of availableActions) {
+      const action = LIBRARY_RESEARCH_ACTIONS[actionId];
+      const alreadyBusy = !!G.libraryResearch.activeActions[action.researcher];
+      const canAfford = G.p.gold >= action.goldCost;
+      h += '<div class="panel" style="margin-bottom:8px;' + (alreadyBusy ? 'opacity:0.5;' : '') + '">';
+      h += '<div class="panel-title">' + action.icon + ' ' + action.name + '</div>';
+      h += '<div class="btn-hint" style="margin:4px 0 8px;">' + action.desc + '</div>';
+      h += '<div class="btn-hint" style="margin-bottom:8px;">' + action.goldCost.toLocaleString() + 'G \u00b7 ' + action.days + ' days</div>';
+      h += '<button onclick="startLibraryResearchAction(\'' + actionId + '\')" class="' + (canAfford && !alreadyBusy ? 'abtn' : 'btn-outline-ghost') + '" style="width:100%;" ' + (canAfford && !alreadyBusy ? '' : 'disabled') + '>' + (alreadyBusy ? action.researcher + ' is already busy' : canAfford ? 'Begin Research' : 'Need ' + action.goldCost.toLocaleString() + 'G') + '</button>';
+      h += '</div>';
+    }
   }
 
   h += '</div>';
@@ -17541,6 +17781,25 @@ function doEnemyAttack(enemy) {
       trackBestiary(enemy);
       return; // dead enemy can't still land the attack this function is resolving
     }
+    // Farther Reach — Library-gated, not level-gated. Reuses the exact same damage/log
+    // pattern as Static Field itself, just aimed at a second living enemy, tying
+    // directly into Mez's own Library Research angle: how far reaching can actually go.
+    if (G.libraryResearch.completedActions.includes('mez_farther_reach')) {
+      const otherTargets = G.cbt.en.filter(e => e !== enemy && e.hp > 0);
+      if (otherTargets.length > 0 && Math.random() < 0.5) {
+        const secondTarget = otherTargets[Math.floor(Math.random() * otherTargets.length)];
+        const reachDmg = Math.max(1, Math.floor(staticDmg * 0.6));
+        secondTarget.hp -= reachDmg;
+        showEnemyDamage(secondTarget, reachDmg, false);
+        lg('⚡ It reaches further \u2014 ' + secondTarget.n + ' takes ' + reachDmg + ' too.');
+        if (secondTarget.hp <= 0) {
+          secondTarget.hp = 0;
+          lg('💀 ' + secondTarget.n + ' falls to the same charge, from a distance.');
+          checkBountyKill(secondTarget.n);
+          trackBestiary(secondTarget);
+        }
+      }
+    }
   }
 
   // Joel's Last Stand: if this hit would actually kill San, and Joel is ready, he takes
@@ -19800,7 +20059,15 @@ function canUnlockTier(tierIdx) {
   const tier = path.tiers[tierIdx];
   if (!tier) return false;
   if (G.playerSpec.tiers.includes(tierIdx)) return false;
-  if (G.p.lvl < tier.level) return false;
+  // Library-gated tiers (Tier 5, the ones Research Actions unlock) check completed
+  // research instead of level — set independently of the level field below so a
+  // player can never bypass the research requirement by simply reaching a high
+  // enough level and clicking the normal Unlock button.
+  if (tier.libraryUnlock) {
+    if (!G.libraryResearch.completedActions.includes(tier.libraryUnlock)) return false;
+  } else if (G.p.lvl < tier.level) {
+    return false;
+  }
   if (tierIdx > 0 && !G.playerSpec.tiers.includes(tierIdx - 1)) return false;
   return true;
 }
@@ -22600,7 +22867,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.166';
+const BUILD_ID = '2026-08-17.170';
 // =========================
 
 
@@ -24472,6 +24739,12 @@ if (btnClaimLogin) {
   });
   document.querySelectorAll('.ib-e').forEach(el=>{
     el.addEventListener('click',(e)=>{e.stopPropagation();equipItem(parseInt(el.getAttribute('data-i')));});
+  });
+  document.querySelectorAll('.grouped-equip-btn').forEach(el=>{
+    el.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      equipItemByName(el.getAttribute('data-name'), el.getAttribute('data-companion'), el.getAttribute('data-socketfree')==='1');
+    });
   });
   document.querySelectorAll('.cb:not(.dis)').forEach(el=>{
     el.addEventListener('click',()=>{craft(parseInt(el.getAttribute('data-i')));});
@@ -30517,6 +30790,29 @@ function rCompanionPrestigeBadge(memberName) {
 
 function rParty(){
   let h='<div class="party-view"><h2 class="st">Party</h2>';
+  // Auto-Equip All — companion counterpart to San's own Auto-Equip Best on the
+  // Inventory screen. Computed fresh each render, same reasoning as San's badge:
+  // always accurate to current inventory state rather than a stored notification
+  // that could go stale.
+  let partyUpgradeCount = 0;
+  for (let pm of G.party) {
+    if (!isPartyMemberUnlocked(pm) || !pm.eq) continue;
+    for (let item of G.p.inv) {
+      if (item.slot !== 'weapon' && item.slot !== 'armor' && item.slot !== 'head' && item.slot !== 'hands' && item.slot !== 'feet' && item.slot !== 'ring' && item.slot !== 'amulet') continue;
+      if (item.forCompanion !== pm.n && item.forCompanion !== 'any') continue;
+      if (item.slot === 'ring') {
+        const r1 = pm.eq.ring1 ? getEquipScore(pm.eq.ring1) : -1;
+        const r2 = pm.eq.ring2 ? getEquipScore(pm.eq.ring2) : -1;
+        if (getEquipScore(item) > Math.min(r1, r2)) partyUpgradeCount++;
+      } else {
+        const eq = pm.eq[item.slot];
+        if (!eq || getEquipScore(item) > getEquipScore(eq)) partyUpgradeCount++;
+      }
+    }
+  }
+  if (partyUpgradeCount > 0) {
+    h += '<button onclick="autoEquipStrongestAllCompanions()" class="abtn" style="width:100%;margin-bottom:14px;background:var(--gold);color:#1a1a1a;">\u26a1 Auto-Equip All \u2014 ' + partyUpgradeCount + ' upgrade' + (partyUpgradeCount > 1 ? 's' : '') + ' available</button>';
+  }
   const activeSyns = getActiveSynergies();
   if(activeSyns.length > 0){
     h += '<div style="background:var(--bg-card);border:1px solid var(--accent);border-radius:14px;padding:12px;margin-bottom:16px;">';
@@ -30779,13 +31075,26 @@ function rInv(){
     return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
   });
 
-  // Companion gear section — informational only; equip/unequip happens on the Party screen
+  // Companion gear section — informational only; equip/unequip happens on the Party
+  // screen. Same grouping fix as the Equipment section above — no button interaction
+  // to worry about here since this is display-only, so the grouping is simpler.
   if(companionGearItems.length > 0 && (invTab === 'all' || invTab === 'party')){
-    h+='<div class="its"><h3>🧝 Companion Gear ('+companionGearItems.length+')</h3><div class="ig">';
-    for(let ci of companionGearItems){
+    const companionGroups = {};
+    const companionGroupOrder = [];
+    for (let ci of companionGearItems) {
       const it = ci.item;
+      const hasSockets = it.sockets && it.sockets.some(s => s);
+      const key = it.n + '|' + (it.forCompanion || '') + '|' + (it.ilvl || 0) + '|' + (it.r || '') + (hasSockets ? '|socketed:' + ci.index : '');
+      if (!companionGroups[key]) { companionGroups[key] = { item: it, count: 0 }; companionGroupOrder.push(key); }
+      companionGroups[key].count++;
+    }
+    h+='<div class="its"><h3>🧝 Companion Gear ('+companionGearItems.length+')</h3><div class="ig">';
+    for (let key of companionGroupOrder) {
+      const grp = companionGroups[key];
+      const it = grp.item;
       const rarityColor = it.r ? (it.r==='epic'||it.r==='legendary'?'#a855f7':it.r==='rare'?'#3b82f6':it.r==='uncommon'?'#22c55e':'#9ca3af') : '#9ca3af';
-      h+='<div class="ic">';
+      h+='<div class="ic" style="position:relative;">';
+      if (grp.count > 1) h+='<div style="position:absolute;top:6px;left:6px;font-size:11px;font-weight:700;color:var(--gold);background:var(--bg-card);border-radius:8px;padding:1px 6px;">x'+grp.count+'</div>';
       h+='<div class="ii">'+(EQUIPMENT_SLOTS[it.slot]?.icon || '⚔️')+'</div>';
       h+='<div class="in" style="color:'+rarityColor+';">'+it.n+'</div>';
       h+='<div style="font-size:9px;color:var(--accent-light);margin-top:2px;">For '+it.forCompanion+'</div>';
@@ -30801,14 +31110,32 @@ function rInv(){
     h+='</div></div>';
   }
 
-  // Equipment section
+  // Equipment section — grouped by name/companion/ilvl/rarity so duplicate drops
+  // collapse into one card with a quantity badge instead of one full card per item.
+  // Exact same root cause as the Amad trader screen lag: this used to loop every
+  // single inventory item individually with zero grouping, and each card here is
+  // considerably heavier (comparison arrows, socket rendering, full stat lines) than
+  // the trader's simple sell buttons were — meaning a duplicate-heavy pack made this
+  // screen the worse offender of the two. Socketed items are deliberately excluded
+  // from grouping (see equipItemByName's socketFree check) since a modified item is
+  // meaningfully distinct even when the base name matches.
   if(equipItems.length > 0 && (invTab === 'all' || invTab === 'gear')){
-    h+='<div class="its"><h3>🎒 Equipment ('+equipItems.length+')</h3><div class="ig">';
-    for(let ei of equipItems){
+    const equipGroups = {};
+    const groupOrder = [];
+    for (let ei of equipItems) {
       const it = ei.item;
-      const i = ei.index;
+      const hasSockets = it.sockets && it.sockets.some(s => s);
+      const key = it.n + '|' + (it.forCompanion || '') + '|' + (it.ilvl || 0) + '|' + (it.r || '') + (hasSockets ? '|socketed:' + ei.index : '');
+      if (!equipGroups[key]) { equipGroups[key] = { item: it, count: 0, socketFree: !hasSockets }; groupOrder.push(key); }
+      equipGroups[key].count++;
+    }
+    h+='<div class="its"><h3>🎒 Equipment ('+equipItems.length+')</h3><div class="ig">';
+    for (let key of groupOrder) {
+      const grp = equipGroups[key];
+      const it = grp.item;
       const cmp = getEquipComparison(it);
       h+='<div class="ic" style="position:relative;">';
+      if (grp.count > 1) h+='<div style="position:absolute;top:6px;left:6px;font-size:11px;font-weight:700;color:var(--gold);background:var(--bg-card);border-radius:8px;padding:1px 6px;">x'+grp.count+'</div>';
       if(cmp){
         h+='<div style="position:absolute;top:6px;right:6px;font-size:14px;color:'+cmp.color+';font-weight:700;" title="'+cmp.text+'">'+cmp.arrow+'</div>';
       }
@@ -30830,7 +31157,7 @@ function rInv(){
       if(statLine.length > 0) h+='<div style="font-size:10px;color:var(--text-dim);margin-top:2px;">'+statLine.join(' · ')+'</div>';
       h+='<div class="iq">'+(it.value ? it.value+'G' : '')+'</div>';
       h+='<div class="ia">';
-      h+='<button class="ib ib-e" data-i="'+i+'">Equip</button>';
+      h+='<button class="ib grouped-equip-btn" data-name="'+it.n.replace(/"/g, '&quot;')+'" data-companion="'+(it.forCompanion || '')+'" data-socketfree="'+(grp.socketFree ? '1' : '0')+'">Equip</button>';
       h+='</div></div>';
     }
     h+='</div></div>';
