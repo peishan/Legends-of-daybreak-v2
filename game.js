@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Cafe: one-off custom meal entry added \u2014 was never carried over from Daybreak Quest; new items: Jackfruit, Sarawak dabai, dark chocolate, Filipino Adidas chicken feet)';
+const APP_VERSION = '2026-08-17 (New: Auto-Equip Best button on Inventory (badge shows upgrade count), plus immediate log alert when a strict upgrade drops)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -6165,6 +6165,110 @@ storyJournal: {
           { speaker: 'Joel', text: '"We were always going to," Joel says, easy, like it was never really a question. "It is sort of what we do."' },
         ]
       }
+,{
+        id: 'journal_186',
+        title: 'Several Different Lives',
+        chapter: 186,
+        unlockType: 'level',
+        unlockAt: 630,
+        icon: '🗺️',
+        summary: 'San finally asks Parco what he actually means by it \u2014 the joke he has been making since the day they met, the one that has never quite sounded entirely like a joke.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It comes up sideways, the way real questions usually do \u2014 San helping him sort through a chest of old charts, half of them water-damaged past reading, when she notices the same phrase again, the one he uses every time someone doubts a route.' },
+          { speaker: 'San', text: '"\u2018Several different lives,\u2019" you say, turning a chart over in your hands. "You say that a lot. I have never actually asked what you mean by it."' },
+          { speaker: 'Narrator', text: 'For once, Parco does not answer immediately with a story. He looks at the chart in your hands for a long moment before he speaks.' },
+          { speaker: 'Parco', text: '"Honestly?" he says, and his voice has dropped out of its usual performance entirely. "I am not entirely sure myself. It is easier to say it as a joke than to sit with what it might actually mean."' },
+          { speaker: 'San', text: '"Try anyway," you say, gently. "I would rather know the real version."' },
+          { speaker: 'Parco', text: '"There are maps in that chest older than I should reasonably be able to remember drawing," he says, slow, like he is admitting it to himself as much as to you. "The handwriting is mine. I do not remember drawing all of them."' },
+        ]
+      }
+,{
+        id: 'journal_187',
+        title: 'The Handwriting Isn\u2019t New',
+        chapter: 187,
+        unlockType: 'level',
+        unlockAt: 635,
+        icon: '📜',
+        summary: 'San goes looking properly, and finds far more evidence than either of them was actually prepared for.',
+        scenes: [
+          { speaker: 'Narrator', text: 'San spends two full days going through every chart in the chest, laying them out by age as best she can guess it. What emerges is not one Parco\u2019s worth of work. It is generations of it, all in the same hand, all signed the exact same way.' },
+          { speaker: 'San', text: '"Some of these are centuries old," you say, quiet, when you finally show him the full spread. "The ink, the wear \u2014 they cannot possibly be yours. Not the you standing in front of me."' },
+          { speaker: 'Parco', text: '"And yet," Parco says, looking at his own handwriting on paper older than any single life should allow, "I recognize every single one of them. Not as things I have heard about. As things I remember doing."' },
+          { speaker: 'Joel', text: '"Do you think you are the same Parco, come back again and again?" Joel asks, careful. "Or something that keeps becoming a new Parco, every time, and simply inherits everything the last one knew?"' },
+          { speaker: 'Parco', text: '"I do not know," Parco admits, and there is real vulnerability in it now, entirely unguarded. "I have genuinely never known. I have simply gotten very good at making it sound like a story instead of a question I cannot answer."' },
+          { speaker: 'San', text: 'You think, unbidden, of Ch.175 \u2014 of what Parco told you himself, that first time, about being an echo who had made peace with it, eventually. You wonder now how much of that peace was real, and how much was the same practiced performance.' },
+        ]
+      }
+,{
+        id: 'journal_188',
+        title: 'Whichever Version This Is',
+        chapter: 188,
+        unlockType: 'level',
+        unlockAt: 640,
+        icon: '🧭',
+        summary: 'There is no clean answer waiting at the end of this. San decides that does not actually have to be the problem she was treating it as.',
+        scenes: [
+          { speaker: 'Narrator', text: 'They do not solve it. San is honest with herself about that, eventually \u2014 there is no chart, no old record, no answer waiting at the bottom of the chest that actually settles whether Parco is one impossibly long life or many short ones wearing the same handwriting.' },
+          { speaker: 'San', text: '"I do not think I can actually find you an answer," you tell him, finally, sitting with him at the chart table rather than searching through it. "I am sorry. I wanted to."' },
+          { speaker: 'Parco', text: '"I did not actually expect one," Parco says, and he sounds, for the first time since this started, genuinely at ease rather than performing ease. "I think I mostly needed someone to know it was really a question, and not just a line I use to sound interesting."' },
+          { speaker: 'San', text: '"It is a genuinely good line, though," you say, and he laughs, real laughter this time, not the practiced kind.' },
+          { speaker: 'Parco', text: '"It is," he agrees. "That does not make it not true. Both things, apparently, at once \u2014 same as most things about me, I am slowly starting to suspect."' },
+          { speaker: 'Narrator', text: 'He does not stop telling the story afterward \u2014 "several different lives," said exactly the same way, to exactly the same doubtful reception from strangers at every port. But San notices, now, that when he says it to her specifically, there is something underneath it that was not there before. Not an answer. Just an honesty about not having one.' },
+          { speaker: 'Sinbad', text: '"Welcome to the actual club," Sinbad tells him later, warm, when San mentions it. "Impossible things and no explanation for them. I have been in it for longer than I can properly count either."' },
+        ]
+      }
+,{
+        id: 'journal_189',
+        title: 'The Same Current',
+        chapter: 189,
+        unlockType: 'level',
+        unlockAt: 665,
+        icon: '🌊',
+        summary: 'Soel goes strange at the rail one crossing, the exact particular stillness San has only ever seen her hold once before \u2014 at the creek, the day everything about Kai actually started.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It happens without warning, mid-voyage, calm water on every side \u2014 Soel goes rigid at the rail, ears forward, entirely fixed on something in the water that nobody else aboard can see or hear.' },
+          { speaker: 'San', text: 'You know that stillness. You have seen it exactly once before, and it takes you a moment to place where \u2014 the creek, back home, the day Kai first reached for something none of the rest of you could reach for yet.' },
+          { speaker: 'San', text: '"Soel?" you say, crouching beside her, careful. "What is it? What do you hear?"' },
+          { speaker: 'Narrator', text: 'Soel does not answer, obviously, but she does something almost as clear \u2014 she presses one paw flat against the deck, directly above the water, the exact gesture Kai used the day he told you the creek and the drowned world were the same water, far away, but same.' },
+          { speaker: 'Joel', text: '"You do not think \u2014" Joel starts, and does not finish, because you are already thinking it too.' },
+          { speaker: 'San', text: '"I do not know," you say, honestly. "But I want to actually find out, properly, instead of just wondering."' },
+        ]
+      }
+,{
+        id: 'journal_190',
+        title: 'A Question Worth Asking Properly',
+        chapter: 190,
+        unlockType: 'level',
+        unlockAt: 670,
+        icon: '💧',
+        summary: 'San writes home. The answer that comes back is short, and it is the only answer she actually needed.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The letter takes longer than San would like to actually reach the Hall, and longer still for a reply to make its way back across the water \u2014 but when it does, it is short, and it is in Joel\u2019s hand, describing something Kai did the evening he received San\u2019s question.' },
+          { speaker: 'Narrator', text: 'Kai had gone quiet, the letter says, the way he does, and then walked to the creek without being asked, and pressed his palm flat against the water the exact same way Soel had pressed her paw against the deck, an ocean away.' },
+          { speaker: 'Narrator', text: '"Same," the letter quotes him saying, simply, the one word he apparently offered and refused to elaborate on further, no matter how San\u2019s letter had asked him to.' },
+          { speaker: 'San', text: 'You read it twice, sitting with it at the rail, watching the same water Soel had been so fixed on. "Same," you repeat, quietly, to nobody in particular.' },
+          { speaker: 'Sinbad', text: '"The mirror world," Sinbad says slowly, working through it alongside you. "Not a separate thing your world dreamed up on its own. Just another vein of the same water your son is already connected to."' },
+          { speaker: 'Parco', text: '"That would explain a great deal," Parco says, quieter than usual, and San understands, watching him, exactly what he means by that.' },
+        ]
+      }
+,{
+        id: 'journal_191',
+        title: 'Far Away, But Same',
+        chapter: 191,
+        unlockType: 'level',
+        unlockAt: 675,
+        icon: '🌌',
+        summary: 'It is not a full answer. It is enough of one \u2014 the mirror world, the echoes, Parco\u2019s own recurring nature, all finally sitting inside a shape that actually makes sense.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It does not explain everything. San is careful with herself about that \u2014 there is still no chart at the bottom of Parco\u2019s chest that names exactly what he is, still no full account of how deep this water-network actually runs, or how many other veins of it exist beyond the creek and this mirror sea.' },
+          { speaker: 'San', text: '"But it is not nothing," you say, to Joel, to Parco, to the whole crew gathered loosely at the rail as the sun goes down over water that suddenly feels a great deal less separate from home than it did a season ago. "The water remembers things. It remembered the creek being clean. It apparently remembers this whole sea being an old world, echoes and all."' },
+          { speaker: 'Parco', text: '"And perhaps," Parco says, working through it out loud, "it remembers me the same way \u2014 not as one life or many, exactly, but as something the water simply keeps recalling, the way it recalled the creek. That is not nothing either."' },
+          { speaker: 'Joel', text: '"Does that make it easier?" Joel asks him, careful. "Knowing that much, even without the rest of it?"' },
+          { speaker: 'Parco', text: '"Considerably," Parco admits, and for once he does not turn it into a story. "Being remembered by something is a great deal different from being a mystery even to myself. I did not realize how much that distinction would actually matter until just now."' },
+          { speaker: 'Narrator', text: 'San thinks of Kai, an ocean away, palm flat against a creek that turns out to have never really been separate from any of this \u2014 the same deep current running under her son\u2019s whole world and this borrowed, echoing one both, remembering, patiently, everything it has ever touched.' },
+          { speaker: 'San', text: '"Same water," you say again, quietly, watching the mirror sea catch the last of the light. "Far away. But same."' },
+        ]
+      }
     ]
   },
 
@@ -7141,6 +7245,92 @@ function unequipItem(slot) {
   G.p.mp = Math.min(G.p.mp, G.p.mmp);
 
   render();
+}
+
+// Equips San's single best-scoring item in every slot, pulled from whatever's
+// currently sitting in the inventory versus what's already worn — the point being
+// nobody should have to manually scroll and compare thousands of drops by hand.
+// Single-slot types (weapon/armor/head/hands/feet/amulet) are handled by calling the
+// existing equipItem(), but crucially the inventory index for each candidate is
+// re-scanned fresh immediately before each individual equip call rather than
+// precomputed all at once — equipItem() splices the array, so any index found before
+// an earlier splice in this same loop would silently point at the wrong item by the
+// time it's used. Rings get their own dedicated handling since there are two slots,
+// not one: repeatedly finds the best unequipped ring in the bag and swaps it in for
+// whichever of the two currently-equipped rings is weaker, until no upgrade remains.
+function autoEquipStrongest() {
+  const singleSlots = ['weapon', 'armor', 'head', 'hands', 'feet', 'amulet'];
+  let equippedCount = 0;
+
+  for (let slotKey of singleSlots) {
+    const currentScore = G.p.eq[slotKey] ? getEquipScore(G.p.eq[slotKey]) : -1;
+    let bestIndex = -1;
+    let bestScore = currentScore;
+    for (let i = 0; i < G.p.inv.length; i++) {
+      const item = G.p.inv[i];
+      if (item.slot !== slotKey || item.forCompanion) continue;
+      const score = getEquipScore(item);
+      if (score > bestScore) { bestScore = score; bestIndex = i; }
+    }
+    if (bestIndex >= 0) { equipItem(bestIndex); equippedCount++; }
+  }
+
+  let ringChanged = true;
+  while (ringChanged) {
+    ringChanged = false;
+    let bestIdx = -1, bestScore = -1;
+    for (let i = 0; i < G.p.inv.length; i++) {
+      const item = G.p.inv[i];
+      if (item.slot !== 'ring' || item.forCompanion) continue;
+      const score = getEquipScore(item);
+      if (score > bestScore) { bestScore = score; bestIdx = i; }
+    }
+    if (bestIdx < 0) break;
+    const r1Score = G.p.eq.ring1 ? getEquipScore(G.p.eq.ring1) : -1;
+    const r2Score = G.p.eq.ring2 ? getEquipScore(G.p.eq.ring2) : -1;
+    const weakerSlot = r1Score <= r2Score ? 'ring1' : 'ring2';
+    const weakerScore = Math.min(r1Score, r2Score);
+    if (bestScore > weakerScore) {
+      const item = G.p.inv[bestIdx];
+      const old = G.p.eq[weakerSlot];
+      if (old) addI(old);
+      G.p.eq[weakerSlot] = { ...item };
+      G.p.inv.splice(bestIdx, 1);
+      equippedCount++;
+      ringChanged = true;
+    }
+  }
+
+  recalcMaxHpMp();
+  G.p.hp = Math.min(G.p.hp, G.p.mhp);
+  G.p.mp = Math.min(G.p.mp, G.p.mmp);
+
+  if (equippedCount > 0) lg('\u26a1 Auto-equipped ' + equippedCount + ' upgrade' + (equippedCount > 1 ? 's' : '') + '.');
+  else lg('\u26a1 Already wearing your best gear \u2014 nothing to upgrade.');
+  render();
+}
+
+// Live count for the Inventory screen badge — computed fresh from current state each
+// time rather than tracked as a stored notification, so it can never go stale or
+// desync from what's actually in the bag. Handles rings with the same "compare
+// against the weaker of the two equipped" logic as autoEquipStrongest() itself, rather
+// than the simpler getEquipComparison() ring check (which only ever compares against
+// whichever ring slot would be filled next, and can undercount real upgrades if ring1
+// is weak but ring2 happens to already be strong).
+function getUpgradeCount() {
+  let count = 0;
+  for (let item of G.p.inv) {
+    if (!item.slot || item.forCompanion) continue;
+    if (item.slot === 'ring') {
+      const r1Score = G.p.eq.ring1 ? getEquipScore(G.p.eq.ring1) : -1;
+      const r2Score = G.p.eq.ring2 ? getEquipScore(G.p.eq.ring2) : -1;
+      if (getEquipScore(item) > Math.min(r1Score, r2Score)) count++;
+      continue;
+    }
+    const cmp = getEquipComparison(item);
+    if (cmp && cmp.better) count++;
+  }
+  return count;
 }
 
 // === COMPANION EQUIPMENT: full 8-slot parity with San, role-restricted weapon/armor ===
@@ -9528,23 +9718,65 @@ function sellToAmad(invIndex) {
   render();
 }
 
+// Sells every inventory slot matching a given name + forCompanion in one action — the
+// counterpart to the individual sell list now being grouped by duplicate on the trader
+// screen (see the Amad sell-section rendering above). Iterates and removes matches from
+// the end of the array so earlier indices stay valid as items get spliced out.
+function sellGroupToAmad(name, forCompanion) {
+  const npc = G.npcs.find(n => n.n === 'Amad');
+  if (!npc || !npc.unlocked || npc.t !== 'trader') return;
+  let total = 0;
+  let count = 0;
+  for (let i = G.p.inv.length - 1; i >= 0; i--) {
+    const item = G.p.inv[i];
+    if (item.t === 'revive') continue;
+    if (item.n !== name) continue;
+    if ((item.forCompanion || '') !== (forCompanion || '')) continue;
+    let sellPrice = 0;
+    if (item.value) sellPrice = Math.floor(item.value * 0.5);
+    else if (item.t === 'mat') sellPrice = Math.floor((item.ilvl || 1) * 3 + 2);
+    else if (item.t === 'pot' || item.t === 'food' || item.t === 'drink') sellPrice = Math.floor((item.v || 10) * 0.3);
+    else sellPrice = Math.floor((item.ilvl || 1) * 4);
+    sellPrice = Math.max(1, sellPrice) * (item.q || 1);
+    total += sellPrice;
+    count++;
+    G.p.inv.splice(i, 1);
+  }
+  if (count === 0) return;
+  G.p.gold += total;
+  lg('💰 Sold ' + count + 'x ' + name + ' to Amad for ' + total + 'G!');
+  lg('   "Terima kasih, San \u2014 that clears a good chunk of the pack."');
+  render();
+}
+
 // Returns { index, item, price }[] for gear sitting in the bag that's strictly not worth
 // keeping: equipment (not companion-specific gear — that's its own stash below) that's a
-// Downgrade or Sidegrade versus whatever's already equipped in that slot. Used by the Sell
-// Stash button so a whole run of junk drops can be cleared in one tap.
+// Downgrade or Sidegrade versus whatever's already equipped in that slot, OR a duplicate
+// of another copy already counted earlier in the bag. That second check matters —
+// previously this only ever compared a new item against what's currently equipped, which
+// meant if a slot was never actually equipped in the first place, every duplicate drop
+// looked like a fresh "New slot" upgrade forever and never got flagged, no matter how
+// many identical copies piled up. Now the first copy of any given item is kept (in case
+// it's wanted later), and every copy after that is treated as junk regardless of equip
+// status. Used by the Sell Stash button so a whole run of junk drops can be cleared in
+// one tap.
 function getJunkStashItems() {
   const results = [];
+  const seen = {};
   for (let i = 0; i < G.p.inv.length; i++) {
     const item = G.p.inv[i];
     const isEquip = item.slot && item.slot !== 'mat' && item.slot !== 'pot' && item.slot !== 'revive' && item.t !== 'food' && item.t !== 'drink';
     if (!isEquip) continue;
     if (item.forCompanion) continue; // handled by getJunkCompanionGearItems() instead
-    const cmp = getEquipComparisonForOwner(item);
-    if (!cmp || cmp.better) continue; // keep upgrades and anything that fills an empty slot
     let sellPrice = 0;
     if (item.value) sellPrice = Math.floor(item.value * 0.5);
     else sellPrice = Math.floor((item.ilvl || 1) * 4);
     sellPrice = Math.max(1, sellPrice);
+    const dupeKey = item.n;
+    if (seen[dupeKey]) { results.push({ index: i, item, price: sellPrice }); continue; }
+    const cmp = getEquipComparisonForOwner(item);
+    if (!cmp || cmp.better) { seen[dupeKey] = true; continue; } // keep the first copy of an upgrade/empty-slot fill
+    seen[dupeKey] = true;
     results.push({ index: i, item, price: sellPrice });
   }
   return results;
@@ -9554,18 +9786,25 @@ function getJunkStashItems() {
 // that's a Downgrade or Sidegrade for whichever companion it's flagged for — a separate
 // bucket since these clutter the bag differently (picked up for a specific party member,
 // not the player) and deserve their own clearly-labeled stash rather than being buried
-// in the general equipment pile.
+// in the general equipment pile. Same duplicate-detection fix as getJunkStashItems() —
+// this is the one that actually explains why companion gear like "Windrunner Greaves"
+// was piling up unflagged: most companion slots don't get manually equipped often, so
+// every duplicate compared against an empty slot and looked like a fresh upgrade forever.
 function getJunkCompanionGearItems() {
   const results = [];
+  const seen = {};
   for (let i = 0; i < G.p.inv.length; i++) {
     const item = G.p.inv[i];
     if (!item.slot || !item.forCompanion) continue;
-    const cmp = getEquipComparisonForOwner(item);
-    if (!cmp || cmp.better) continue; // keep upgrades and anything that fills an empty slot
     let sellPrice = 0;
     if (item.value) sellPrice = Math.floor(item.value * 0.5);
     else sellPrice = Math.floor((item.ilvl || 1) * 4);
     sellPrice = Math.max(1, sellPrice);
+    const dupeKey = item.n + '|' + item.forCompanion;
+    if (seen[dupeKey]) { results.push({ index: i, item, price: sellPrice }); continue; }
+    const cmp = getEquipComparisonForOwner(item);
+    if (!cmp || cmp.better) { seen[dupeKey] = true; continue; } // keep the first copy of an upgrade/empty-slot fill
+    seen[dupeKey] = true;
     results.push({ index: i, item, price: sellPrice });
   }
   return results;
@@ -21551,6 +21790,29 @@ addI = function(it) {
   }
 };
 
+// Immediate feedback the moment a strict upgrade actually drops, rather than only
+// ever finding out by navigating to Inventory and checking the badge there. Chained
+// after the AFK-tracking wrapper above rather than editing it, same reasoning: one
+// call site (addI) covers every loot source in the game instead of needing to hook
+// each one individually. Skips forCompanion gear (that's a different comparison
+// entirely) and skips silently during AFK/Grind sessions, since a stream of log
+// messages during unattended play would just be noise nobody's there to read.
+const _originalAddIForUpgradeAlert = addI;
+addI = function(it) {
+  _originalAddIForUpgradeAlert(it);
+  if (!it.slot || it.forCompanion) return;
+  if (G.afkAdventure.active || G.endlessGrind.active) return;
+  let cmp;
+  if (it.slot === 'ring') {
+    const r1Score = G.p.eq.ring1 ? getEquipScore(G.p.eq.ring1) : -1;
+    const r2Score = G.p.eq.ring2 ? getEquipScore(G.p.eq.ring2) : -1;
+    cmp = { better: getEquipScore(it) > Math.min(r1Score, r2Score) };
+  } else {
+    cmp = getEquipComparison(it);
+  }
+  if (cmp && cmp.better) lg('\u26a1 Upgrade! ' + it.n + ' is stronger than what you have equipped \u2014 check Inventory to auto-equip.');
+};
+
 function useI(ix){
   const it=G.p.inv[ix];
   if(!it)return;
@@ -22338,7 +22600,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.162';
+const BUILD_ID = '2026-08-17.166';
 // =========================
 
 
@@ -23675,6 +23937,16 @@ function rNPC() {
               h += '<button id="btn-sell-mats" class="abtn" style="width:100%;margin-bottom:10px;background:var(--danger);">💎 Sell All Materials — ' + mats.length + ' stack' + (mats.length > 1 ? 's' : '') + ' (' + matsTotal + 'G)</button>';
             }
             h += '<div style="display:flex;flex-direction:column;gap:6px;">';
+            // Grouped by name + forCompanion rather than one row per inventory slot —
+            // the old version rendered every single item individually with zero
+            // grouping, so duplicate drops (very common — multiple copies of the same
+            // companion gear, weapon-table items, etc.) piled up as separate rows
+            // forever. That was directly causing both the "stacking up" visual
+            // complaint and the trader screen lag: this loop scaled with raw inventory
+            // count, uncapped, and regenerated the whole HTML string on every render.
+            // Grouping collapses N duplicate rows into 1, which fixes the lag as a
+            // direct consequence — far fewer DOM nodes for a duplicate-heavy pack.
+            const sellGroups = {};
             for (let j = 0; j < G.p.inv.length; j++) {
               const item = G.p.inv[j];
               if (item.t === 'revive') continue;
@@ -23684,10 +23956,19 @@ function rNPC() {
               else if (item.t === 'pot' || item.t === 'food' || item.t === 'drink') sellPrice = Math.floor((item.v || 10) * 0.3);
               else sellPrice = Math.floor((item.ilvl || 1) * 4);
               sellPrice = Math.max(1, sellPrice);
-              const itemIcon = ie(item);
-              h += '<button class="amad-sell" data-index="' + j + '" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-hover);color:var(--text);font-size:11px;font-weight:600;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;">';
-              h += '<span>' + itemIcon + ' ' + item.n + (item.q > 1 ? ' x' + item.q : '') + '</span>';
-              h += '<span style="color:#fbbf24;">' + sellPrice + 'G</span>';
+              const groupKey = item.n + '|' + (item.forCompanion || '');
+              if (!sellGroups[groupKey]) sellGroups[groupKey] = { name: item.n, forCompanion: item.forCompanion || '', icon: ie(item), count: 0, unitPrice: sellPrice, totalQty: 0 };
+              const qty = item.q || 1;
+              sellGroups[groupKey].count += 1; // distinct inventory slots merged
+              sellGroups[groupKey].totalQty += qty; // actual item quantity, for stackable mats/pots
+              sellGroups[groupKey].totalPrice = (sellGroups[groupKey].totalPrice || 0) + sellPrice * qty;
+            }
+            for (let key in sellGroups) {
+              const g = sellGroups[key];
+              const qtyLabel = g.totalQty > 1 ? ' x' + g.totalQty : '';
+              h += '<button class="amad-sell" data-name="' + g.name.replace(/"/g, '&quot;') + '" data-companion="' + g.forCompanion + '" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-hover);color:var(--text);font-size:11px;font-weight:600;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;">';
+              h += '<span>' + g.icon + ' ' + g.name + qtyLabel + '</span>';
+              h += '<span style="color:#fbbf24;">' + g.totalPrice + 'G</span>';
               h += '</button>';
             }
             h += '</div></div>';
@@ -24322,7 +24603,7 @@ if(btnVnAdvance)btnVnAdvance.addEventListener('click',()=>{ advanceJournalVn(); 
   document.querySelectorAll('.amad-sell').forEach(el=>{
     el.addEventListener('click',(e)=>{
       e.stopPropagation();
-      sellToAmad(parseInt(el.getAttribute('data-index')));
+      sellGroupToAmad(el.getAttribute('data-name'), el.getAttribute('data-companion'));
     });
   });
   const btnSellStash=document.getElementById('btn-sell-stash');
@@ -30405,6 +30686,19 @@ function rInv(){
     h += '<button onclick="setInvTab(\'' + t.id + '\')" class="tier-btn' + (sel ? ' sel' : '') + '" style="flex-shrink:0;">' + t.label + '</button>';
   }
   h += '</div>';
+
+  // Auto-Equip Best — the direct answer to "I have to scroll through thousands of
+  // gear not knowing which is strongest." Badge only shows when there's actually
+  // something to upgrade, so it doesn't clutter the screen once the player's already
+  // optimized.
+  if (invTab === 'all' || invTab === 'gear') {
+    const upgradeCount = getUpgradeCount();
+    if (upgradeCount > 0) {
+      h += '<button onclick="autoEquipStrongest()" class="abtn" style="width:100%;margin-bottom:14px;background:var(--gold);color:#1a1a1a;">\u26a1 Auto-Equip Best \u2014 ' + upgradeCount + ' upgrade' + (upgradeCount > 1 ? 's' : '') + ' available</button>';
+    } else {
+      h += '<div style="text-align:center;margin-bottom:14px;"><span class="btn-hint">\u26a1 Already wearing your strongest gear.</span></div>';
+    }
+  }
 
   // Equipment Stats Summary
   if (invTab === 'all' || invTab === 'gear') {
