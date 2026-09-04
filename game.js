@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (New: Mediterranean tip of the day on the Cafe screen \u2014 18 tips, one shown per day, same tip all day, rotates daily)';
+const APP_VERSION = '2026-08-17 (Cafe: fixed "undefined" carb target bug, added Low/Medium/Normal carb tiers (research-grounded), split Other Drinks from Pantry, added menu search, Nescafe Gold + Matcha Latte)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -7082,9 +7082,10 @@ storyJournal: {
   // a day explicitly marked an Active Day — extra carbs for training, not a "cheat
   // day." periodSweetBiteBonus adds extra allowance on a logged period day, on top of
   // whatever target already applies that day.
-  cafeSettings: { carbLimit: 120, activeDayCarbLimit: 160, periodSweetBiteBonus: 20 },
+  cafeSettings: { carbTier: 'medium', activeDayBonus: 40, periodSweetBiteBonus: 20 },
   activeDays: [], // array of 'YYYY-MM-DD' strings, explicitly toggled per date — extra carbs for training days, not a "cheat day"
   cafeCategory: null, // UI navigation only, not persisted
+  cafeSearchQuery: '', // UI navigation only, not persisted
   cafeChef: null, // UI navigation only, not persisted
   cafeLogDate: null, // null = today; set to a 'YYYY-MM-DD' string to backlog a past day
   // === HOUSEHOLD BILLS (Guild Treasury) ===
@@ -14436,7 +14437,31 @@ const RAIDS = [
       { type: 'boss', name: 'What Was Almost Enough' }
     ],
     rw: { xp: 900000, gold: 700000 },
-    desc: "A community that kept growing things through the end of the world, and, deeper still, whatever is actually doing the mending. As close to the source of it as this family has ever gotten — and very little worth reaching this deep comes easily, least of all the parts that never had anything to do with the Vale at all. Beyond the Rootbound Sanctuary, the ground itself starts to thin — every line held here is one more line the Frontier never gets to take." }
+    desc: "A community that kept growing things through the end of the world, and, deeper still, whatever is actually doing the mending. As close to the source of it as this family has ever gotten — and very little worth reaching this deep comes easily, least of all the parts that never had anything to do with the Vale at all. Beyond the Rootbound Sanctuary, the ground itself starts to thin — every line held here is one more line the Frontier never gets to take." },
+  // Raid mode had gone the same distance as the skill tree — last entry unlocked at
+  // Lv80, while the game itself had grown all the way through Worlds 7-12 (Lv660-
+  // 1250) without a single raid acknowledging any of it. This one strings all six of
+  // those worlds' climax bosses together into a single gauntlet, using each world's
+  // own "sent ahead as a warning" elite pairing (a pattern that turned out to already
+  // exist consistently across all six, one zone before each climax) as the guard
+  // between fights.
+  { id: 'where_six_worlds_meet', name: 'Where Six Worlds Finally Meet', unlockLevel: 700, icon: '🌐',
+    stages: [
+      { type: 'elite', zoneLv: 740, enemies: ['Something That Answers to the Center', 'A Guardian of the Last Refusal'] },
+      { type: 'boss', name: 'What Should Have Ended Long Ago' },
+      { type: 'elite', zoneLv: 840, enemies: ['Something Sent to Keep You From Looking Too Soon', 'A Guardian of the Last Unlooked-At Thing'] },
+      { type: 'boss', name: 'The First Thing That Ever Looked Back' },
+      { type: 'elite', zoneLv: 940, enemies: ['Something Sent Down From the Very Top', 'A Guardian of the Last Clear Air'] },
+      { type: 'boss', name: 'The Original Height, Watching Still' },
+      { type: 'elite', zoneLv: 1040, enemies: ['Something Sent to Ask If You Are Actually Sure', 'A Djinn Trying Gently to Talk You Out of This'] },
+      { type: 'boss', name: 'The First Wish, Still Being Answered' },
+      { type: 'elite', zoneLv: 1140, enemies: ['Something Sent Ahead by the Last of the First Things', 'A Guardian of the Final Original Structure'] },
+      { type: 'boss', name: 'The Size Before It Had a Reason' },
+      { type: 'elite', zoneLv: 1240, enemies: ['Something Sent Down to Test Your Own Patience', 'A Guardian of the Final Ascent'] },
+      { type: 'boss', name: 'What Patience Alone Actually Earns' }
+    ],
+    rw: { xp: 18000000, gold: 12000000 },
+    desc: "Six worlds, six endings, none of them actually related until now — vampires and mummies who refused to end, gorgons who learned the gaze from something older, sky-rulers who taught each other to watch, a wish still trying to get one answer right, giants from before scale needed a reason, and a cultivation finally patient enough to complete itself. Faced back to back, for the first time, as one continuous, unforgiving gauntlet." }
 ];
 
 // Raid bosses hit harder than their solo zone-encounter versions — a raid should feel
@@ -23501,7 +23526,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.192';
+const BUILD_ID = '2026-08-17.194';
 // =========================
 
 
@@ -28896,6 +28921,8 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Barley Drink, no sugar (250ml)', cat: 'Drinks', fat: 0.2, sat: 0.0, unsat: 0.2, fiber: 1.0, protein: 0.5, carbs: 8.0, icon: '🌾' },
   { n: 'Nona Botanical Beverage Mix, Ginger with Honey (1 sachet, 8g)', cat: 'Drinks', fat: 0.0, sat: 0.0, unsat: 0.0, fiber: 0, protein: 0.1, carbs: 7.6, icon: '🍯' },
   { n: 'Primadona Coffee, adaptogen blend (1 sachet, 20g)', cat: 'Drinks', fat: 0.7, sat: 0.4, unsat: 0.3, fiber: 0, protein: 1.8, carbs: 13.0, icon: '☕' },
+  { n: 'Nescafe Gold, black (1 tsp, ~2g)', cat: 'Drinks', fat: 0.0, sat: 0.0, unsat: 0.0, fiber: 0, protein: 0.1, carbs: 0.1, icon: '☕' },
+  { n: 'Matcha Latte, regular milk (1 cup, ~240ml)', cat: 'Drinks', fat: 4.0, sat: 2.4, unsat: 1.6, fiber: 0, protein: 5.0, carbs: 22.0, icon: '🍵' },
   { n: 'Whipping Cream, aerosol (2 tbsp ~15g)', cat: 'Fats & Extras', fat: 5.0, sat: 3.1, unsat: 1.9, fiber: 0, protein: 0.3, carbs: 0.8, icon: '🫙' },
   { n: 'Tom Yum Soup, 1 bowl (no noodles)', cat: 'Thai Dishes', fat: 4.0, sat: 1.4, unsat: 2.6, fiber: 1.2, protein: 18.0, carbs: 4.0, icon: '🍲' },
   { n: 'Tom Kha Gai, 1 bowl (coconut chicken soup)', cat: 'Thai Dishes', fat: 18.0, sat: 6.3, unsat: 11.7, fiber: 1.2, protein: 20.0, carbs: 5.0, icon: '🍲' },
@@ -28998,10 +29025,25 @@ const CAFE_FOOD_DATABASE = [
 // pick an actual food item, its real fat/protein/carbs get logged. Replaces the
 // earlier flavor-only random-dish version entirely; that system never actually served
 // the tracking need this was for.
+// Three carb tiers grounded in actual Mediterranean diet research rather than one
+// arbitrary flat number: traditional Mediterranean patterns run 40-50% of calories
+// from carbs (~200g/day at a typical intake); moderate adaptations commonly land
+// around 100-150g; sustainable low-carb Mediterranean plans realistically land near
+// 80g rather than the more extreme 20-60g sometimes cited elsewhere, which multiple
+// sources note is hard to maintain long-term.
+const CARB_TIER_VALUES = { low: 80, medium: 130, normal: 200 };
+const CARB_TIER_LABELS = { low: 'Low Carb', medium: 'Medium Carb', normal: 'Normal / Traditional' };
 function todaysCarbLimit() {
   const dk = todayKey();
-  if (G.activeDays.includes(dk)) return G.cafeSettings.activeDayCarbLimit;
-  return G.cafeSettings.carbLimit;
+  const base = CARB_TIER_VALUES[G.cafeSettings.carbTier] || CARB_TIER_VALUES.medium;
+  const bonus = G.cafeSettings.activeDayBonus || 40;
+  return G.activeDays.includes(dk) ? base + bonus : base;
+}
+function setCarbTier(tier) {
+  if (!CARB_TIER_VALUES[tier]) return;
+  G.cafeSettings.carbTier = tier;
+  lg('\ud83c\udf3f Carb target set to ' + CARB_TIER_LABELS[tier] + ' (' + CARB_TIER_VALUES[tier] + 'g/day).');
+  render();
 }
 function isActiveDayToday() {
   return G.activeDays.includes(todayKey());
@@ -29014,7 +29056,7 @@ function toggleActiveDay() {
     lg('🏋️ Active Day turned off for today.');
   } else {
     G.activeDays.push(dk);
-    lg('🏋️ Active Day on \u2014 carb target raised to ' + G.cafeSettings.activeDayCarbLimit + 'g today, for training. Back to the normal target tomorrow.');
+    lg('🏋️ Active Day on \u2014 carb target raised by ' + (G.cafeSettings.activeDayBonus || 40) + 'g today, for training. Back to the normal target tomorrow.');
   }
   render();
 }
@@ -29409,6 +29451,15 @@ function rGuildCafe() {
   // saturated, emphasize unsaturated" directly.
   h += '<div class="panel-title" style="margin:14px 0 8px;">' + (isBacklogging ? 'That Day\u2019s' : 'Today\u2019s') + ' Nutrition</div>';
   h += '<div class="panel' + (!isBacklogging && isActiveDayToday() ? ' panel-gold' : '') + '" style="margin-bottom:10px;">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">';
+  h += '<div class="btn-hint">Carb target</div>';
+  h += '<div style="display:flex;gap:4px;">';
+  for (let tier of ['low', 'medium', 'normal']) {
+    const active = G.cafeSettings.carbTier === tier;
+    h += '<button onclick="setCarbTier(\'' + tier + '\')" class="' + (active ? 'abtn' : 'btn-outline-ghost') + '" style="margin:0;padding:3px 8px;font-size:10px;">' + CARB_TIER_LABELS[tier].split(' ')[0] + '</button>';
+  }
+  h += '</div>';
+  h += '</div>';
   h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
   h += '<div style="font-weight:700;font-size:16px;color:#4ade80;">' + macros.fiber.toFixed(1) + 'g <span style="font-size:11px;color:var(--text-dim);font-weight:400;">fiber</span></div>';
   h += (!isBacklogging) ? (isActiveDayToday()
@@ -29434,15 +29485,39 @@ function rGuildCafe() {
 
   // Chef-based browser — Zaki (Bruneian/Malay/fusion/simple Chinese, halal only),
   // Joel (Filipino, stir-fry, any pork — covered by Gino when Joel's away, same menu
-  // either way rather than a separate duplicate bucket), and Pantry for everything
-  // else (generic ingredients/keto staples that don't belong to either chef's
-  // specific repertoire — eggs, herbs, seafood, and the like).
+  // either way rather than a separate duplicate bucket), Other Drinks (split out from
+  // Pantry specifically, since drinks are logged often enough to deserve their own
+  // section rather than being buried in the same bucket as every other pantry item),
+  // and Pantry for everything else (generic ingredients/keto staples that don't
+  // belong to either chef's specific repertoire, or to Drinks).
   const cafeChef = G.cafeChef;
   const cafeCat = G.cafeCategory;
-  if (cafeChef && cafeCat) {
+  // Search — works across the whole database regardless of chef/category, since with
+  // 380+ items scrolling through the chef->category hierarchy isn't always the
+  // fastest way to find one specific thing.
+  if (!cafeChef && !G.cafeOneOff) {
+    h += '<div style="display:flex;gap:6px;margin-bottom:12px;">';
+    h += '<input id="cafeSearchInput" type="text" value="' + (G.cafeSearchQuery || '').replace(/"/g, '&quot;') + '" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);" placeholder="Search the menu\u2026" onkeydown="if(event.key===\'Enter\'){G.cafeSearchQuery=document.getElementById(\'cafeSearchInput\').value;render();}">';
+    h += '<button onclick="G.cafeSearchQuery=document.getElementById(\'cafeSearchInput\').value;render();" class="abtn" style="margin:0;padding:8px 14px;">\ud83d\udd0d</button>';
+    if (G.cafeSearchQuery) h += '<button onclick="G.cafeSearchQuery=\'\';render();" class="btn-outline-ghost" style="margin:0;padding:8px 12px;">\u2715</button>';
+    h += '</div>';
+  }
+  if (G.cafeSearchQuery && !cafeChef) {
+    const q = G.cafeSearchQuery.toLowerCase();
+    const results = CAFE_FOOD_DATABASE.map((f, i) => ({ f, i })).filter(x => x.f.n.toLowerCase().includes(q));
+    h += '<div class="panel-title" style="margin-bottom:8px;">' + results.length + ' result' + (results.length === 1 ? '' : 's') + ' for \u201c' + G.cafeSearchQuery + '\u201d</div>';
+    if (results.length === 0) h += '<div class="btn-hint" style="margin-bottom:16px;">Nothing found. Try a shorter search, or use \u270f\ufe0f Log Something Else below.</div>';
+    for (let { f, i } of results) {
+      h += '<div class="panel" style="margin-bottom:6px;cursor:pointer;" onclick="logMealFromDatabase(' + i + ')">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+      h += '<div><div style="font-weight:700;font-size:12.5px;">' + f.icon + ' ' + f.n + '</div><div class="btn-hint">' + f.carbs.toFixed(1) + 'g carbs \u00b7 ' + (f.fiber || 0).toFixed(1) + 'g fiber \u00b7 ' + f.protein.toFixed(1) + 'g protein \u00b7 ' + f.fat.toFixed(1) + 'g fat</div></div>';
+      h += '<span style="font-size:11px;color:var(--accent-light);">Log</span>';
+      h += '</div></div>';
+    }
+  } else if (cafeChef && cafeCat) {
     h += '<button onclick="G.cafeCategory=null;render();" class="btn-outline-ghost" style="width:100%;margin:10px 0;">\u2190 ' + cafeChef + '\u2019s Menu</button>';
     h += '<div class="panel-title" style="margin-bottom:8px;">' + cafeCat + '</div>';
-    const items = CAFE_FOOD_DATABASE.map((f, i) => ({ f, i })).filter(x => x.f.cat === cafeCat && (cafeChef === 'Pantry' ? !x.f.chef : x.f.chef === cafeChef));
+    const items = CAFE_FOOD_DATABASE.map((f, i) => ({ f, i })).filter(x => x.f.cat === cafeCat && (cafeChef === 'Pantry' ? !x.f.chef && x.f.cat !== 'Drinks' : cafeChef === 'Drinks' ? x.f.cat === 'Drinks' : x.f.chef === cafeChef));
     for (let { f, i } of items) {
       h += '<div class="panel" style="margin-bottom:6px;cursor:pointer;" onclick="logMealFromDatabase(' + i + ')">';
       h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
@@ -29453,7 +29528,7 @@ function rGuildCafe() {
   } else if (cafeChef) {
     h += '<button onclick="G.cafeChef=null;render();" class="btn-outline-ghost" style="width:100%;margin:10px 0;">\u2190 All Chefs</button>';
     h += '<div class="panel-title" style="margin-bottom:8px;">' + cafeChef + '\u2019s Menu</div>';
-    const items = cafeChef === 'Pantry' ? CAFE_FOOD_DATABASE.filter(f => !f.chef) : CAFE_FOOD_DATABASE.filter(f => f.chef === cafeChef);
+    const items = cafeChef === 'Pantry' ? CAFE_FOOD_DATABASE.filter(f => !f.chef && f.cat !== 'Drinks') : cafeChef === 'Drinks' ? CAFE_FOOD_DATABASE.filter(f => f.cat === 'Drinks') : CAFE_FOOD_DATABASE.filter(f => f.chef === cafeChef);
     const categories = [...new Set(items.map(f => f.cat))];
     h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">';
     for (let cat of categories) {
@@ -29481,6 +29556,7 @@ function rGuildCafe() {
     h += '<div class="panel-title" style="margin:14px 0 8px;">Log a Meal</div>';
     h += '<button onclick="G.cafeChef=\'Zaki\';render();" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;text-align:left;">\ud83d\udc68\u200d\ud83c\udf73 Zaki\u2019s Kitchen<div class="btn-hint">Bruneian & Malay, western fusion, simple Chinese \u2014 halal</div></button>';
     h += '<button onclick="G.cafeChef=\'Joel\';render();" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;text-align:left;">\ud83d\udc68\u200d\ud83c\udf73 Joel\u2019s Kitchen<div class="btn-hint">Filipino, simple stir-fry, any pork \u2014 Gino covers this menu when Joel\u2019s away</div></button>';
+    h += '<button onclick="G.cafeChef=\'Drinks\';render();" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;text-align:left;">\ud83e\udd64 Other Drinks<div class="btn-hint">Coffee, tea, and everything else logged as a drink</div></button>';
     h += '<button onclick="G.cafeChef=\'Pantry\';render();" class="btn-outline-ghost" style="width:100%;margin-bottom:8px;text-align:left;">\ud83e\uddfa Pantry<div class="btn-hint">Everything else \u2014 shared ingredients, not tied to either chef specifically</div></button>';
     h += '<button onclick="G.cafeOneOff=true;render();" class="btn-outline-ghost" style="width:100%;margin-bottom:16px;text-align:left;">\u270f\ufe0f Log Something Else<div class="btn-hint">Not on the menu \u2014 enter your own values, just this once</div></button>';
   }
