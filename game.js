@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fix: combat/dragon hunt HP bar lag \u2014 the .bf-hp CSS transition was animating the visible bar behind the actual HP number; added transition:none to force instant, accurate fill)';
+const APP_VERSION = '2026-08-17 (Ch.235-237: Farspeaker questline completed \u2014 San actually hears her mother for the first time since the gap opened, the device\u2019s real limits established honestly)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -6872,6 +6872,204 @@ storyJournal: {
           { speaker: 'Parco', text: '"One true thing is how it always actually starts," Parco says, quiet, watching the exchange with real warmth. "I would know. It took me considerably longer than a single conversation to manage even that much."' },
           { speaker: 'Captain Kade', text: '"Do not expect a second one soon," she warns, though there is no real heat left in it. "I am not fixed. I am simply, marginally, less certain that trusting anyone here is automatically a mistake."' },
           { speaker: 'San', text: '"That is enough for now," you say, and mean it, watching the Wraithtide finally pull away \u2014 not an enemy this time, not quite an ally either, just something honestly, carefully, in between.' },
+        ]
+      }
+,{
+        id: 'journal_226',
+        title: 'Something Only She Notices',
+        chapter: 226,
+        unlockType: 'level',
+        unlockAt: 850,
+        icon: '👤',
+        summary: "A presence starts following San specifically \u2014 not the party, not the guild, just her. Nobody else seems able to see it at all.",
+        scenes: [
+          { speaker: 'Narrator', text: 'It is there at the edge of every room for three days straight before San says anything \u2014 a shape, indistinct, always just past where she can properly look at it, gone the moment she turns.' },
+          { speaker: 'San', text: '"Does anyone else see that?" you finally ask, careful not to sound as unsettled as you actually feel.' },
+          { speaker: 'Joel', text: 'He looks where you are looking, genuinely searching. "See what?" he asks, and there is no performance in the confusion at all.' },
+          { speaker: 'Eliz', text: '"Nothing registers on any ward I have," Eliz says, after checking anyway, thorough as ever. "Whatever this is, San, I do not think it is something the rest of us are actually able to see."' },
+          { speaker: 'San', text: '"Then it is mine," you say, slowly, understanding arriving with a familiar, unwelcome weight. "Whatever this is. It is not here for the guild. It is here for me specifically."' },
+        ]
+      }
+,{
+        id: 'journal_227',
+        title: 'The Shape of an Old Fear',
+        chapter: 227,
+        unlockType: 'level',
+        unlockAt: 855,
+        icon: '🖤',
+        summary: "San finally lets it catch her, alone, and finds out exactly what it actually is \u2014 not a monster. Something considerably older and considerably more familiar than that.",
+        scenes: [
+          { speaker: 'Narrator', text: 'She stops running from it on the fourth night, deliberately, standing still in an empty corridor and letting the shape finally close the distance instead of fleeing it again.' },
+          { speaker: 'Narrator', text: 'Up close, it is not monstrous at all \u2014 just a wraith-shape wearing the particular, specific silence of a house she used to live in, the exact quality of quiet that used to mean something was about to cost her.' },
+          { speaker: 'Wraith', text: '"You remember me," it says, and the voice is not cruel, exactly \u2014 just familiar, in the worst way. "Speak back, even once, and see what it costs you. You remember exactly what it cost you."' },
+          { speaker: 'San', text: '"I remember," you say, and your voice shakes more than you would like, but it does not stop. "I remember all of it. That does not mean I am still that afraid of it."' },
+          { speaker: 'Wraith', text: '"Are you certain?" it asks, and for a moment the old fear is so exact, so precisely the shape of every reason she once had to stay silent, that San genuinely does not know the answer.' },
+          { speaker: 'San', text: '"No," you admit, plainly, surprising yourself with how much easier that honesty is than the old silence ever was. "I am not entirely certain. But I said it anyway. That has to count for something."' },
+        ]
+      }
+,{
+        id: 'journal_228',
+        title: 'What Speaking Back Actually Costs Now',
+        chapter: 228,
+        unlockType: 'level',
+        unlockAt: 860,
+        icon: '🕊️',
+        summary: "It does not vanish because San defeats it. It eases because she finally proves, out loud, that the old cost is not the current one.",
+        scenes: [
+          { speaker: 'Narrator', text: 'She does not fight it, in the end \u2014 there is nothing here a blade or a spell would actually resolve. She simply keeps talking, plainly, refusing the old silence one sentence at a time.' },
+          { speaker: 'San', text: '"I speak back now," you tell it, steady. "Regularly. To Aisyah, to Mez, to anyone who needs it. The house that taught you what silence was supposed to cost does not exist anymore. I left it. I am not going back."' },
+          { speaker: 'Wraith', text: 'It says nothing to that, for a long moment \u2014 and then, slowly, the particular quality of its silence starts to shift, thinning, less a threat now than a memory finally being allowed to just be a memory.' },
+          { speaker: 'San', text: '"You do not have to disappear," you tell it, gentler now. "You can just stop being something I have to be afraid of. That is enough."' },
+          { speaker: 'Narrator', text: 'It fades slowly, not violently, the way old fear does when it is finally spoken to directly instead of run from \u2014 and San finds, walking back toward the others, that the corridor feels exactly like an ordinary corridor again, for the first time in days.' },
+          { speaker: 'Joel', text: '"You seem lighter," Joel says, simple, not asking for the whole story, just noticing.' },
+          { speaker: 'San', text: '"I finally told an old fear it was wrong about me," you say, and find, saying it out loud, that it is entirely, plainly true.' },
+        ]
+      }
+,{
+        id: 'journal_229',
+        title: "A Reference in Renn's Own Margins",
+        chapter: 229,
+        unlockType: 'level',
+        unlockAt: 865,
+        icon: '📡',
+        summary: "Deep in the Library's oldest, least-read section, Renn finds a reference to something that should not still exist \u2014 a device once built specifically to speak across the gap.",
+        scenes: [
+          { speaker: 'Renn', text: '"A farspeaker," Renn says, turning the fragile page over with real care. "Built, according to this, specifically to reach across the same gap separating this world from the one you actually came from. I had assumed the concept was purely theoretical."' },
+          { speaker: 'San', text: '"Purely theoretical," you repeat, feeling something cautious and enormous open up at once. "But it is not, is it. You would not be showing me this if it were only theory."' },
+          { speaker: 'Renn', text: '"The reference is specific," Renn admits. "A location. A working that predates most of what I actually understand about this library. I do not know if the device itself has survived intact. I know only that someone, once, believed this was possible."' },
+          { speaker: 'San', text: '"Then I need to see it," you say, already thinking of Kai, of a creek pressed flat against a palm an ocean away, of every letter that has ever had to travel slower than she wanted it to. "Wherever this reference actually points."' },
+        ]
+      }
+,{
+        id: 'journal_230',
+        title: 'What Survived the Centuries',
+        chapter: 230,
+        unlockType: 'level',
+        unlockAt: 870,
+        icon: '🗿',
+        summary: "The device is real, buried, and mostly intact \u2014 mostly. San and Renn spend days simply learning what is actually left to work with.",
+        scenes: [
+          { speaker: 'Narrator', text: 'It takes the better part of a week just to clear the chamber Renn\u2019s reference pointed to \u2014 sealed, forgotten, exactly as old as the page promised, and considerably more intact than either of them actually expected.' },
+          { speaker: 'Renn', text: '"Remarkable," Renn says, running careful hands over a construction unlike anything currently built. "Whoever made this understood something about the gap between worlds that I have spent centuries only theorizing toward."' },
+          { speaker: 'San', text: '"Can it actually work?" you ask, hardly daring to hope out loud.' },
+          { speaker: 'Renn', text: '"I do not know yet," Renn says, honest as always, refusing to oversell it. "Some part of the working is damaged \u2014 recoverable, I believe, but not quickly. I would rather tell you plainly that this will take real time than let you build something larger out of it before it has earned that."' },
+          { speaker: 'San', text: '"Take the time you need," you say, and mean it, thinking of every other thing in this world that turned out better for having actually been done carefully.' },
+        ]
+      }
+,{
+        id: 'journal_231',
+        title: 'One Word, Barely Held',
+        chapter: 231,
+        unlockType: 'level',
+        unlockAt: 875,
+        icon: '✨',
+        summary: "Weeks of careful, patient repair later, the device manages something \u2014 not a conversation. Not yet. But proof, undeniable, that the gap is not actually as absolute as it has always seemed.",
+        scenes: [
+          { speaker: 'Narrator', text: 'The first real attempt produces nothing but static and a headache for everyone standing too close \u2014 the second, slightly less. It takes eleven attempts before anything resembling a signal actually holds for more than an instant.' },
+          { speaker: 'Renn', text: '"There," Renn says, quiet, urgent, adjusting something with visibly shaking hands. "Do you hear that? That is not noise. That is structure."' },
+          { speaker: 'Narrator', text: 'It lasts less than two seconds \u2014 a single word, garbled, barely intelligible, gone before either of them can be fully certain what it actually was. But it was there. Structured. Real.' },
+          { speaker: 'San', text: '"Was that \u2014" you start, and cannot quite finish the question, afraid of what hoping out loud might actually cost if you are wrong.' },
+          { speaker: 'Renn', text: '"I do not know for certain," Renn says, and for once there is no careful hedging in it at all, just plain, open wonder. "But San \u2014 something answered. After everything, after all of it. Something on the other side of that gap actually answered."' },
+          { speaker: 'San', text: 'You do not sleep at all that night, turning the single garbled word over and over, certain of nothing except that the gap, for the very first time, no longer feels quite as absolute as it always has.' },
+        ]
+      }
+,{
+        id: 'journal_232',
+        title: 'The Wraithtide, Waiting',
+        chapter: 232,
+        unlockType: 'level',
+        unlockAt: 880,
+        icon: '⚓',
+        summary: "Kade finds them this time, deliberately, and the fact of that alone tells San something has genuinely shifted since the last parting.",
+        scenes: [
+          { speaker: 'Narrator', text: 'She is waiting at open water when the ship rounds the point, colors unmistakable, and this time there is no damage, no crisis forcing the encounter \u2014 just Kade, patient, having clearly chosen this.' },
+          { speaker: 'Captain Kade', text: '"I did not need rescuing this time," she calls over, dry, before San can even ask. "I want that noted plainly. I came because I chose to, not because anything forced my hand."' },
+          { speaker: 'San', text: '"Noted," you say, careful to keep the surprise out of your voice. "What can we do for you, Captain?"' },
+          { speaker: 'Captain Kade', text: 'She is quiet a moment, and San can see, even at this distance, how much the next words actually cost her. "I need help," she finally says, plain, no deflection at all. "Actually asking for it this time. Not being rescued into accepting it."' },
+        ]
+      }
+,{
+        id: 'journal_233',
+        title: 'Actually Asking',
+        chapter: 233,
+        unlockType: 'level',
+        unlockAt: 885,
+        icon: '🗝️',
+        summary: "She tells them what she actually needs \u2014 not everything, not the whole of herself, but a real, specific thing, freely offered rather than pried loose by circumstance.",
+        scenes: [
+          { speaker: 'Captain Kade', text: '"The storm that stranded me," she says, once they are alongside properly, no urgency forcing the pace this time. "I have chased fragments of understanding it for longer than I have told anyone. I think your Renn might actually know something useful. I think I have simply been too proud to ask directly until now."' },
+          { speaker: 'San', text: '"I can take you to him," you say, careful not to make more of the moment than it currently is, exactly the same restraint she showed San once. "That is not a small thing to ask. I know that."' },
+          { speaker: 'Captain Kade', text: '"No," she agrees, something almost rueful in it. "It is not. I have spent a very long time being the person who does not need anything from anyone. Asking directly does not come easily. I am doing it anyway."' },
+          { speaker: 'Parco', text: '"That is precisely how it is supposed to feel, the first several times," Parco offers, warm, watching from nearby. "It gets marginally easier. Not painless. Marginally easier."' },
+          { speaker: 'Captain Kade', text: '"Marginally," she repeats, almost smiling. "I will take marginally. It is considerably more than I had before."' },
+        ]
+      }
+,{
+        id: 'journal_234',
+        title: 'Less Alone in It',
+        chapter: 234,
+        unlockType: 'level',
+        unlockAt: 890,
+        icon: '🌅',
+        summary: "Renn cannot promise her an answer. He can promise her company in the actual looking, which turns out to be the part she genuinely needed most.",
+        scenes: [
+          { speaker: 'Narrator', text: 'Renn listens to the whole of what little Kade actually knows about her own storm-crossing with the same careful attention he gives every real question, taking nothing about her story for granted.' },
+          { speaker: 'Renn', text: '"I cannot promise you a way home," Renn tells her, honest as always. "I can promise you that you no longer have to be the only person looking for one. That is not nothing, Captain, whatever your instinct tells you about needing to manage this alone."' },
+          { speaker: 'Captain Kade', text: 'She is quiet a long moment, something in her carefully held composure finally, visibly easing. "I have been looking alone for longer than I have let myself actually count," she admits. "I did not realize how much weight that specific word \u2014 alone \u2014 was actually carrying until just now."' },
+          { speaker: 'San', text: '"You do not have to carry it alone anymore," you tell her, gently. "Whatever this becomes. However long it takes."' },
+          { speaker: 'Captain Kade', text: '"I am not offering friendship," she warns, though the old sharpness in it has softened considerably since the parley. "Not yet. Perhaps not ever, fully. But I am willing to let this be less lonely than I have been making it."' },
+          { speaker: 'San', text: '"That is enough," you say again, and this time it feels like considerably more progress than the last time you said it \u2014 not resolution, still, but real, undeniable movement.' },
+        ]
+      }
+,{
+        id: 'journal_235',
+        title: 'More Than One Word',
+        chapter: 235,
+        unlockType: 'level',
+        unlockAt: 895,
+        icon: '📡',
+        summary: "Weeks more of patient, unglamorous repair work. The device finally holds long enough for something San was not prepared for: recognizing the voice.",
+        scenes: [
+          { speaker: 'Narrator', text: 'It is slow, unglamorous work \u2014 Renn recalibrating the same three components a dozen different ways, San holding steady instruments for hours at a stretch, both of them too stubborn to call any single evening a real breakthrough.' },
+          { speaker: 'Renn', text: '"The signal degrades less each attempt," Renn says, careful not to overpromise, exactly as careful as he was with the very first foothold. "That is meaningful. I want you to understand it is meaningful before I tell you what I actually think is happening."' },
+          { speaker: 'San', text: '"Tell me anyway," you say, unable to help the way your voice catches on it.' },
+          { speaker: 'Renn', text: '"I believe the device is not simply reaching across the gap at random," he says. "I believe it is reaching toward something specific. Someone specific. Likely whoever the Vision Machine has shown you most consistently."' },
+          { speaker: 'Narrator', text: 'The next attempt holds for nearly four full seconds \u2014 not words yet, not quite, but a texture to the static that San recognizes before she can even name why, something in the particular rhythm of it landing somewhere old and familiar.' },
+          { speaker: 'San', text: '"That is her," you say, quiet, certain in a way that has nothing to do with proof. "Renn, that is actually her voice. I would know it anywhere."' },
+        ]
+      }
+,{
+        id: 'journal_236',
+        title: 'Hearing Her Hear You',
+        chapter: 236,
+        unlockType: 'level',
+        unlockAt: 900,
+        icon: '💫',
+        summary: "The Vision Machine only ever let San watch. For the first time since the gap opened, her mother actually hears her back.",
+        scenes: [
+          { speaker: 'Narrator', text: 'The connection holds for eleven real seconds this time \u2014 long enough, finally, for actual words to form on both sides of it, garbled at the edges but unmistakably, undeniably a conversation rather than a signal.' },
+          { speaker: 'San', text: '"Mama?" you say, and your voice breaks completely on the single word, all the careful composure of weeks of patient work gone at once. "Mama, can you actually hear me?"' },
+          { speaker: 'Mama', text: '"San?" The voice is thin, disbelieving, cutting in and out around the edges of the static. "San \u2014 is that \u2014 where are you? I have not heard your voice in \u2014" The signal frays, holds, frays again. "I thought \u2014 I did not let myself think \u2014"' },
+          { speaker: 'San', text: '"I am here," you say, plain, the way Mama herself always says the truest things. "I am safe. I am well. I have so much to tell you, and I do not know how long this will actually hold, so I need you to just \u2014 know that first. I am safe."' },
+          { speaker: 'Mama', text: '"Safe," Mama repeats, and even through the static, San can hear exactly how much weight that one word is carrying for her, the same way it carried weight for Kade not long ago. "Good. That is \u2014 San, that is the only thing I actually needed to hear."' },
+          { speaker: 'Narrator', text: 'The signal finally gives out on a word neither of them gets to finish \u2014 gone as suddenly as it came, leaving only ordinary static and a silence that feels, for the first time in longer than San can measure, like it might actually be temporary rather than absolute.' },
+        ]
+      }
+,{
+        id: 'journal_237',
+        title: 'Not Infinite, But Real',
+        chapter: 237,
+        unlockType: 'level',
+        unlockAt: 905,
+        icon: '🕯️',
+        summary: "The Farspeaker does not become an open line. Renn is honest about that from the start \u2014 and San finds she does not actually need it to be, not anymore.",
+        scenes: [
+          { speaker: 'Renn', text: '"I want to be plain with you about what this actually is," Renn says, once San has had a day to simply sit with what happened. "Not an open door. The working draws on something finite \u2014 I do not yet fully understand what, only that it cannot be used carelessly or often."' },
+          { speaker: 'San', text: '"How often?" you ask, already bracing yourself for an answer smaller than you want.' },
+          { speaker: 'Renn', text: '"I do not know precisely," Renn admits, honest as always. "Rarely. Meaningfully, when it happens \u2014 never idly. I would rather tell you that plainly now than let you build something larger out of it before it has earned that."' },
+          { speaker: 'San', text: 'You sit with that, and find, somewhat to your own surprise, that it does not actually disappoint you the way you might have expected. "That is enough," you say, echoing words that have meant several different things this year, and meaning this version of it completely. "I do not need her every day. I needed to know I could reach her at all. I know that now."' },
+          { speaker: 'Renn', text: '"Then I would call this a genuine success," Renn says, something quietly proud in it that he does not often let show. "Not the ending of the gap. Simply proof, undeniable now, that it was never as absolute as it looked."' },
+          { speaker: 'Narrator', text: 'San writes to Kai that evening, the ordinary way, letter and ink and the same patient distance as always \u2014 and finds, for the first time, that the slowness of it does not weigh on her the way it once did. Some gaps, she is learning, do not need to close completely to stop feeling quite so absolute.' },
         ]
       }
     ]
@@ -23526,7 +23724,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.195';
+const BUILD_ID = '2026-08-17.197';
 // =========================
 
 
