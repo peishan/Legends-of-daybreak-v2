@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Ch.220-222: Voyage Arc L \u2014 Bapoleon\u2019s real "winter crossing" finally told, at Malacca where he was recruited, the last port arc closes out the whole sequence)';
+const APP_VERSION = '2026-08-17 (New: Mediterranean tip of the day on the Cafe screen \u2014 18 tips, one shown per day, same tip all day, rotates daily)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -6823,6 +6823,57 @@ storyJournal: {
           { speaker: 'Narrator', text: 'Malacca does not feel like an old wound anymore, San notices, walking the strait later that evening \u2014 just a port, ordinary and busy, the way every place eventually becomes once the story underneath it has finally been told properly.' },
         ]
       }
+,{
+        id: 'journal_223',
+        title: 'The Wraithtide, Overtaken',
+        chapter: 223,
+        unlockType: 'level',
+        unlockAt: 835,
+        icon: '🌊',
+        summary: "San spots the Wraithtide again, but not the way she expects to \u2014 damaged, listing, something enormous and hostile still circling it in open water.",
+        scenes: [
+          { speaker: 'Narrator', text: 'The colors are unmistakable even at a distance, but the ship itself is wrong \u2014 sails torn, listing hard to one side, something vast moving in the water around it that has nothing to do with any crew Kade commands.' },
+          { speaker: 'Parco', text: '"That is not a fight she is winning," Parco says, grim, already reading the shape of it. "Whatever that is in the water, it has her outmatched."' },
+          { speaker: 'San', text: '"We could just sail past," you say, half to test the thought out loud rather than actually mean it. "She would not thank us for interfering."' },
+          { speaker: 'Sinbad', text: '"She might not," Sinbad agrees, watching the same distant struggle. "That does not mean it is the correct choice, though. I do not think you are actually asking permission to leave her, San. I think you already know what you are about to do."' },
+          { speaker: 'San', text: 'You do already know, and saying it out loud simply confirms it. "Turn us toward her," you say. "Whatever this costs, it costs less than watching and doing nothing."' },
+        ]
+      }
+,{
+        id: 'journal_224',
+        title: 'Asking Was Never the Hard Part',
+        chapter: 224,
+        unlockType: 'level',
+        unlockAt: 840,
+        icon: '⚔️',
+        summary: "They drive the threat off together, out of necessity rather than trust. What actually costs Kade something is what comes after \u2014 admitting she needed it at all.",
+        scenes: [
+          { speaker: 'Narrator', text: 'The fighting itself is almost easy, once two crews commit to the same target instead of each other \u2014 Zheng He\u2019s directions and Kade\u2019s own crew falling into an improvised rhythm neither side has any real reason to trust yet, and somehow it works anyway.' },
+          { speaker: 'Narrator', text: 'The thing in the water finally breaks off, driven back by more coordinated force than it apparently expected, and the Wraithtide is left damaged but afloat, genuinely, unmistakably saved.' },
+          { speaker: 'Captain Kade', text: '"You did not have to do that," she says, once it is over, and there is something almost accusatory in how she says it, like the debt itself is the actual injury.' },
+          { speaker: 'San', text: '"I know," you say, simply. "We did it anyway."' },
+          { speaker: 'Captain Kade', text: 'She is quiet a long moment, jaw tight, clearly working through something considerably harder than the fight itself. "I do not know how to actually accept help gracefully," she finally admits. "I have not had reason to practice it."' },
+          { speaker: 'San', text: '"You do not have to be graceful about it," you say, gently. "You just have to actually let it have happened."' },
+        ]
+      }
+,{
+        id: 'journal_225',
+        title: 'The First Crack',
+        chapter: 225,
+        unlockType: 'level',
+        unlockAt: 845,
+        icon: '🗝️',
+        summary: "She does not become an ally. She does not need to, not yet. She simply tells San one true thing, freely, for the first time since they met.",
+        scenes: [
+          { speaker: 'Narrator', text: 'She does not invite them aboard, does not offer the easy friendship the moment might have called for in a simpler story \u2014 but she stays alongside a while longer than strictly necessary, watching San with an expression that has genuinely shifted since the parley.' },
+          { speaker: 'Captain Kade', text: '"I came in through a storm," she says, finally, unprompted, no question asked of her at all. "A real one, from wherever I actually started. It closed behind me before I understood what was actually happening. I have been looking for a way back for longer than I am comfortable admitting."' },
+          { speaker: 'San', text: '"Thank you for telling me," you say, careful not to make more of the moment than it currently is. "I am not going to pretend that fixes anything. I just wanted you to know it mattered, that you said it."' },
+          { speaker: 'Captain Kade', text: '"It is one true thing," she says, almost wry about it. "I am not offering more than that yet. I do not know that I am capable of more than that yet. But it is more than I have told anyone since I arrived."' },
+          { speaker: 'Parco', text: '"One true thing is how it always actually starts," Parco says, quiet, watching the exchange with real warmth. "I would know. It took me considerably longer than a single conversation to manage even that much."' },
+          { speaker: 'Captain Kade', text: '"Do not expect a second one soon," she warns, though there is no real heat left in it. "I am not fixed. I am simply, marginally, less certain that trusting anyone here is automatically a mistake."' },
+          { speaker: 'San', text: '"That is enough for now," you say, and mean it, watching the Wraithtide finally pull away \u2014 not an enemy this time, not quite an ally either, just something honestly, carefully, in between.' },
+        ]
+      }
     ]
   },
 
@@ -7054,7 +7105,7 @@ storyJournal: {
     lastFedDay: -1, lastPlayedDay: -1, lastPettedDay: -1,
     // Real-date tracking, not simple month-rollover — these need genuine "is it
     // actually due yet" math, not just a reset on the 1st regardless of when last given.
-    lastElixirDate: '2026-06-08', intervalMonths: 2, // Renn — deworming replacement
+    lastElixirDate: '2026-08-06', intervalMonths: 2, // Renn — deworming replacement
     lastWardingDate: '2026-07-04', wardingIntervalMonths: 3, // Sister Wren — flea/tick replacement
     lastTamsinDate: '2026-06-06', // Tamsin — vaccination replacement, yearly
     tamsinUpgrades: { hp: 0, atk: 0, def: 0, spd: 0 } // capped, see TAMSIN_UPGRADE_CAP
@@ -9694,6 +9745,38 @@ function isInfirmaryAccessible() {
 function todayKey() {
   const d = new Date();
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+// Mediterranean diet tip of the day — one tip shown consistently for the whole day,
+// rotating to the next one at midnight, rather than changing randomly on every
+// re-render (which would just be noise, not something worth actually reading). Date-
+// seeded via day-of-year so it's fully deterministic: same day always shows the same
+// tip, no stored state needed.
+const MEDITERRANEAN_TIPS = [
+  "Swap butter for olive oil where you can \u2014 same richness, considerably better for LDL.",
+  "Fatty fish (salmon, mackerel, sardines) 2-3x a week is one of the highest-impact swaps in this whole pattern.",
+  "A handful of unsalted nuts a day beats most snack foods for heart health, and it's genuinely satisfying.",
+  "Oats and barley aren't just carbs \u2014 their soluble fiber actively binds cholesterol in the gut.",
+  "Legumes (chickpeas, lentils, beans) are a real protein-and-fiber combo. Worth leaning on a few times a week.",
+  "Non-starchy vegetables at most meals: fill half the plate with them before anything else.",
+  "Save the bigger carb portions for training days \u2014 the body actually uses them better then.",
+  "Whole fruit over fruit juice \u2014 juicing strips the same fiber that makes fruit worth eating in the first place.",
+  "Coconut and palm oil are still saturated fat, even though they're plant-based. Treat them like butter, not olive oil.",
+  "Herbs and spices instead of salt \u2014 most Mediterranean flavor comes from aromatics, not sodium.",
+  "A splash of vinegar or lemon on vegetables does more for flavor than expected, and it costs nothing caloric.",
+  "Fish and legumes more often than red meat \u2014 not never, just not the default.",
+  "Dairy in moderation is a genuine part of this pattern, not something to eliminate \u2014 just not the bulk of a meal.",
+  "Extra virgin olive oil specifically holds onto more of the beneficial compounds than the more refined versions.",
+  "Pairing carbs with vegetables or legumes blunts the blood sugar spike more than eating the carbs alone.",
+  "This is about the overall pattern, not any single meal. One indulgent plate does not undo a week of good choices.",
+  "Nuts and seeds add fiber as well as fat \u2014 worth remembering they're not purely a fat source.",
+  "A Mediterranean plate is usually built vegetables-first, protein-second, starch last \u2014 not the other way around."
+];
+function getTodaysMediterraneanTip() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((now - start) / 86400000);
+  return MEDITERRANEAN_TIPS[dayOfYear % MEDITERRANEAN_TIPS.length];
 }
 
 // Period tracking was removed entirely per an explicit decision — tracked in a
@@ -23418,7 +23501,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.186';
+const BUILD_ID = '2026-08-17.192';
 // =========================
 
 
@@ -28767,10 +28850,25 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Ayam Penyet (no rice)', cat: 'Common Meals', fat: 20.0, sat: 7.0, unsat: 13.0, fiber: 1.5, protein: 35.0, carbs: 8.0, icon: '🍛' },
   { n: 'Meishihui Chive Crispy Biscuit (100g)', cat: 'Common Meals', fat: 24.0, sat: 7.6, unsat: 16.4, fiber: 1.5, protein: 8.1, carbs: 65.6, icon: '🍘' },
   { n: 'Meishihui Chive Crispy Biscuit, 1 packet (~20g)', cat: 'Common Meals', fat: 4.8, sat: 1.5, unsat: 3.3, fiber: 0.3, protein: 1.6, carbs: 13.1, icon: '🍘' },
+  // === BAKERY ===
+  // Bread tracked per slice, since that's how it's actually eaten and logged — not
+  // per 100g like most of the rest of the database. Sandwiches assume a standard
+  // 2-slice build; white and wholemeal versions given separately since the bread
+  // itself meaningfully shifts both the fiber and carb numbers, not just flavor.
+  { n: 'White Bread, 1 slice (~28g)', cat: 'Bakery', fat: 0.9, sat: 0.2, unsat: 0.7, fiber: 0.8, protein: 2.5, carbs: 14.0, icon: '🍞' },
+  { n: 'Wholemeal Bread, 1 slice (~28g)', cat: 'Bakery', fat: 1.0, sat: 0.2, unsat: 0.8, fiber: 2.2, protein: 3.5, carbs: 12.0, icon: '🍞' },
+  { n: 'Low GI Bread, 1 slice (~28g)', cat: 'Bakery', fat: 1.2, sat: 0.2, unsat: 1.0, fiber: 2.8, protein: 4.0, carbs: 11.5, icon: '🍞' },
+  { n: 'Chicken Quiche, small (~100g)', cat: 'Bakery', fat: 18.0, sat: 9.0, unsat: 9.0, fiber: 0.8, protein: 12.0, carbs: 18.0, icon: '🥧' },
+  { n: 'Chicken Sandwich, white bread (2 slices)', cat: 'Bakery', fat: 10.0, sat: 3.0, unsat: 7.0, fiber: 1.6, protein: 18.0, carbs: 28.0, icon: '🥪' },
+  { n: 'Chicken Sandwich, wholemeal bread (2 slices)', cat: 'Bakery', fat: 10.0, sat: 3.0, unsat: 7.0, fiber: 4.4, protein: 19.0, carbs: 24.0, icon: '🥪' },
+  { n: 'Egg Sandwich, white bread (2 slices)', cat: 'Bakery', fat: 16.0, sat: 4.0, unsat: 12.0, fiber: 1.6, protein: 12.0, carbs: 28.0, icon: '🥪' },
+  { n: 'Egg Sandwich, wholemeal bread (2 slices)', cat: 'Bakery', fat: 16.0, sat: 4.0, unsat: 12.0, fiber: 4.4, protein: 13.0, carbs: 24.0, icon: '🥪' },
+  { n: 'Tuna Sandwich, white bread (2 slices)', cat: 'Bakery', fat: 13.0, sat: 2.5, unsat: 10.5, fiber: 1.6, protein: 18.0, carbs: 28.0, icon: '🥪' },
+  { n: 'Tuna Sandwich, wholemeal bread (2 slices)', cat: 'Bakery', fat: 13.0, sat: 2.5, unsat: 10.5, fiber: 4.4, protein: 19.0, carbs: 24.0, icon: '🥪' },
   { n: 'Chicken Rendang (no rice)', cat: 'Common Meals', fat: 18.0, sat: 6.3, unsat: 11.7, fiber: 1.5, protein: 28.0, carbs: 5.0, icon: '🍛' },
   { n: 'Chicken Masala (no sauce, 100g)', cat: 'Common Meals', fat: 8.0, sat: 2.8, unsat: 5.2, fiber: 1.5, protein: 25.0, carbs: 4.0, icon: '🍛' },
   { n: 'Chicken Curry with Potatoes (100g, incl. sauce & potato)', cat: 'Common Meals', fat: 7.0, sat: 2.4, unsat: 4.6, fiber: 1.5, protein: 11.0, carbs: 9.0, icon: '🍛' },
-  { n: 'Breaded Chicken Bites, mini cup (~6-8 pcs)', cat: 'Common Meals', fat: 6.0, sat: 2.1, unsat: 3.9, fiber: 1.5, protein: 7.0, carbs: 8.0, icon: '🍗' },
+  { n: 'Breaded Chicken Bites, mini cup (~6-8 pcs)', cat: 'Common Meals', fat: 9.5, sat: 3.3, unsat: 6.2, fiber: 1.5, protein: 7.0, carbs: 8.0, icon: '🍗' },
   { n: 'Lelapan (no rice, full)', cat: 'Common Meals', fat: 25.0, sat: 8.8, unsat: 16.2, fiber: 1.5, protein: 35.0, carbs: 6.0, icon: '🍱' },
   { n: 'Salty Chicken Soup (bowl)', cat: 'Common Meals', fat: 15.0, sat: 5.2, unsat: 9.8, fiber: 1.5, protein: 35.0, carbs: 3.0, icon: '🥣' },
   { n: '1 Poppadom', cat: 'Common Meals', fat: 3.0, sat: 1.0, unsat: 2.0, fiber: 1.5, protein: 2.0, carbs: 8.0, icon: '🫓' },
@@ -29294,6 +29392,14 @@ function rGuildCafe() {
   }
   h += '</div>';
   if (isBacklogging) h += '<div class="btn-hint" style="margin-bottom:8px;color:var(--gold);">Logging for ' + logDate + ', not today.</div>';
+
+  // Mediterranean diet tip of the day — shown consistently above the nutrition panel,
+  // same rotation every day regardless of backlogging, since it's general guidance
+  // rather than tied to whichever specific date is being logged.
+  h += '<div class="panel" style="margin-bottom:12px;border-left:3px solid var(--accent-light);">';
+  h += '<div class="btn-hint" style="font-weight:700;color:var(--accent-light);margin-bottom:4px;">\ud83e\udd52 Mediterranean Tip</div>';
+  h += '<div class="btn-hint">' + getTodaysMediterraneanTip() + '</div>';
+  h += '</div>';
 
   // Mediterranean-style tracking — fiber leads, since that's the metric your own
   // lipid-panel guidance called out specifically ("key for LDL"), not carbs. Carbs are
