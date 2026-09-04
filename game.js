@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fix: full-game enemy audit \u2014 Lv300 and Lv490 zones had unregistered enemies (0-HP dead-on-spawn), same bug pattern as before, all 182 zones now confirmed clean)';
+const APP_VERSION = '2026-08-17 (Cafe: Meishihui Chive Crispy Biscuit updated with verified label values (was an estimate) + added a 1-packet ~20g portion)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -6456,6 +6456,269 @@ storyJournal: {
           { speaker: 'Narrator', text: 'The Hall, gathered and holding its breath, seems almost thrown by how little ceremony the moment actually asks for. Aisyah, of all people, is the first one to laugh \u2014 short, disbelieving, entirely fond.' },
           { speaker: 'Aisyah', text: '"A long sigh," Aisyah says, shaking her head. "We built up to this for months, and you give us a long sigh."' },
           { speaker: 'Mez', text: '"I have been Mezstorm for a very long time," Mez says, something almost apologetic in it, though not quite. "I do not think I have it in me to make this bigger than it actually feels. It just feels like exhaling something I forgot I had been holding."' },
+        ]
+      }
+,{
+        id: 'journal_202',
+        title: 'Getting Used to a Name Again',
+        chapter: 202,
+        unlockType: 'level',
+        unlockAt: 730,
+        icon: '🌤️',
+        summary: "San expected this part to be simple. It is not simple. It is, however, hers to sit with quietly, rather than something she needs Mez to help her carry.",
+        scenes: [
+          { speaker: 'Narrator', text: 'It is small things, mostly, in the days after \u2014 San catching herself starting to say "Mezstorm" out of a habit years deep, correcting herself mid-word, feeling faintly foolish about it every single time.' },
+          { speaker: 'San', text: '"Mez," you say, out loud, alone, just practicing the shape of it. "Mez. Mez." It does not feel wrong exactly. It feels like a word your mouth has to relearn, the way any word does after long enough away from it.' },
+          { speaker: 'Narrator', text: 'You think of what you told her, back before any of this was decided \u2014 that you had made your peace with Mezstorm, genuinely, and missed Mez too, both at once, honestly. You find, now, that both of those things are still exactly as true as they were then.' },
+          { speaker: 'San', text: 'You do not tell anyone how strange the adjustment actually is. It does not feel like something Mez needs to help carry \u2014 it is yours, quietly, the small cost of a good thing, not a complaint about it.' },
+          { speaker: 'Joel', text: '"You keep almost saying his name," Joel observes, gentle, no judgment in it at all. "Mezstorm\u2019s, I mean."' },
+          { speaker: 'San', text: '"I do," you admit. "I do not think that is actually a problem. I think it just means he was real too. I would rather remember that honestly than pretend the years in between did not happen."' },
+        ]
+      }
+,{
+        id: 'journal_203',
+        title: 'Whether She Was Mez or Mezstorm',
+        chapter: 203,
+        unlockType: 'level',
+        unlockAt: 735,
+        icon: '💛',
+        summary: "San finally says the thing plainly, to Mez directly \u2014 not as reassurance, but as something she has actually known the entire time.",
+        scenes: [
+          { speaker: 'Narrator', text: 'They end up at the same rail Mez always used to watch weather from, quiet, San letting the silence sit for a while before she actually says what she came to say.' },
+          { speaker: 'San', text: '"I keep thinking about something," you say, finally. "The whole time \u2014 before we knew this was possible, while you were deciding, after. There is a version of this where it never happened at all. Where you stayed Mezstorm forever."' },
+          { speaker: 'Mez', text: '"There is," Mez agrees, watching you carefully, waiting to see where this actually goes.' },
+          { speaker: 'San', text: '"I want you to know that version was always going to be fine too," you say, plain, meaning it entirely. "Not a lesser outcome I would have quietly grieved. Genuinely fine. You are my sibling. You were my sibling as Mezstorm, exactly as much as you are now. That was never actually the thing that was ever in question."' },
+          { speaker: 'Mez', text: 'Something in her face shifts, unguarded, in a way it has not been since long before any of this started. "I do not think I let myself fully believe that," she admits, quiet. "Not until just now, hearing you actually say it."' },
+          { speaker: 'San', text: '"Then I am glad I said it," you tell her. "Whether you were Mez or Mezstorm, you were always going to still be my sister. That was the whole deal, the way Aisyah put it. Everything else was just terms."' },
+          { speaker: 'Mez', text: 'She laughs, short and real, wiping at her eyes with the back of one hand, unhurried about it. "That does sound like something Aisyah would say. Practical, to the very last word, and somehow exactly right anyway."' },
+          { speaker: 'Narrator', text: 'Neither of you says anything else for a while. You do not think you need to. Some things, once actually said, do not require repeating to stay true.' },
+        ]
+      }
+,{
+        id: 'journal_204',
+        title: 'What Actually Stayed the Same',
+        chapter: 204,
+        unlockType: 'level',
+        unlockAt: 740,
+        icon: '🍃',
+        summary: "The Hall settles back into its own ordinary rhythm, the way it always eventually does. San finds she does not mind how quickly that happens at all.",
+        scenes: [
+          { speaker: 'Narrator', text: 'Within a season, it stops being a topic anyone brings up carefully \u2014 Mez is simply Mez now, the way Mezstorm was simply Mezstorm before, the Hall absorbing the change with the same practical ease it absorbs most things.' },
+          { speaker: 'Narrator', text: 'She still reads weather the same way, still finds the same quiet corners to watch storms gather from. Some things, San notices, were never actually about which name she answered to.' },
+          { speaker: 'Mez', text: '"I keep waiting to feel like a different person," Mez tells San, one evening, turning a teacup slowly in her hands. "I do not. I feel like myself. I think I have felt like myself the entire time, honestly, wearing two different names for it."' },
+          { speaker: 'San', text: '"Maybe that was always the actual answer," you say, thinking of Parco, of echoes and recurrence and the water that remembers things. "Not one life or many. Just you, continuously, whatever shape it happened to take."' },
+          { speaker: 'Mez', text: '"I can live with that answer," Mez says, and means it, settling into the evening the way she settles into most things now \u2014 unhurried, entirely her own.' },
+          { speaker: 'Narrator', text: 'San thinks, watching her, that this is probably how it was always going to end \u2014 not with fanfare, not with a story\u2019s tidy bow, just an ordinary evening, a sister across the table, and the quiet, permanent fact of family holding steady underneath every single version of it.' },
+        ]
+      }
+,{
+        id: 'journal_205',
+        title: 'Colors San Recognizes Now',
+        chapter: 205,
+        unlockType: 'level',
+        unlockAt: 745,
+        icon: '🏴',
+        summary: "The same dark sail returns \u2014 not by accident this time. Whoever is captaining it has been waiting, learning, and San can tell the difference immediately.",
+        scenes: [
+          { speaker: 'Narrator', text: 'It is the same colors from the shoal chase, unmistakably, closing distance with none of the earlier confusion \u2014 no confident, straight-line pursuit this time, no obvious trap to steer them into.' },
+          { speaker: 'Parco', text: '"They learned the shoal," Parco says, grim, watching the approach. "Whoever that captain is, they went back and studied exactly what beat them. That is not a small thing to do, after a loss like that."' },
+          { speaker: 'San', text: '"Bapoleon\u2019s trick will not work twice," you say, already thinking three moves ahead, the way the ship has slowly taught you to.' },
+          { speaker: 'Bapoleon', text: '"No," Bapoleon agrees, and there is something almost like respect underneath the frustration. "This is no longer a campaign against an amateur. Whoever this is has become a genuine opponent."' },
+          { speaker: 'Zheng He', text: '"Then we treat it as one," Zheng He says, already directing the crew toward positions that have nothing to do with the last engagement at all. "Whatever worked once will not work again. Good. I would rather this be difficult than boring."' },
+          { speaker: 'Narrator', text: 'The other ship does not immediately attack. It simply matches speed, alongside, close enough now that a figure is visible at the helm \u2014 watching, unhurried, in absolutely no rush to make the first move.' },
+        ]
+      }
+,{
+        id: 'journal_206',
+        title: 'Captain Marisol Kade',
+        chapter: 206,
+        unlockType: 'level',
+        unlockAt: 750,
+        icon: '⚓',
+        summary: "For the first time, it is a face and a name instead of a distant sail. San learns exactly why this particular threat never felt like an echo.",
+        scenes: [
+          { speaker: 'Narrator', text: 'She calls the parley herself, close enough to shout across open water without needing a boat between the two ships \u2014 a woman weathered in a way none of the echoes San has met ever quite are, like the years actually happened to her instead of repeating.' },
+          { speaker: 'Captain Kade', text: '"Marisol Kade," she calls over, no preamble. "Captain of the Wraithtide. You beat me once. I do not lose a second time to the same trick twice, so I imagine we are about to find out what actually happens between us."' },
+          { speaker: 'San', text: '"Sinbad said you felt current," you call back. "Not like the rest of this sea. He was not wrong, was he?"' },
+          { speaker: 'Captain Kade', text: 'Something shifts in her expression, brief and unguarded. "No," she admits. "I do not know what the rest of you actually are. I only know I am not from wherever you think this water is an echo of. I found my way in from somewhere else entirely, a long time ago, and I have not found my way back out since."' },
+          { speaker: 'Joel', text: '"You could ask for help," Joel calls, careful, genuinely meaning it. "Instead of taking it by force."' },
+          { speaker: 'Captain Kade', text: '"I could," she agrees, and there is real weight in how plainly she says it. "I have not yet decided that trusting anyone in these waters is worth the risk of being wrong about it again. Piracy, at least, I understand the rules of."' },
+          { speaker: 'San', text: 'You watch her a long moment, weighing something you had not expected to actually feel toward an enemy captain. "Then I suppose we will keep meeting like this," you call, "until you decide otherwise."' },
+          { speaker: 'Captain Kade', text: '"I suppose we will," she agrees, and there is almost, almost, something like relief in how she says it \u2014 gone before it can properly land, replaced by the flat, practiced calm of someone who has been alone in unfamiliar water for longer than she has let herself admit.' },
+        ]
+      }
+,{
+        id: 'journal_207',
+        title: 'Not Finished Yet',
+        chapter: 207,
+        unlockType: 'level',
+        unlockAt: 755,
+        icon: '🌊',
+        summary: "The engagement ends without a real victor. San decides that is not actually a failure \u2014 just an ongoing thing, the way some things stay ongoing.",
+        scenes: [
+          { speaker: 'Narrator', text: 'Neither ship presses the fight after the parley \u2014 the Wraithtide peels away first, unhurried, no chase given or asked for, and San lets her go without a second thought about pursuing.' },
+          { speaker: 'Sinbad', text: '"You let her go," Sinbad observes, watching the other sail shrink toward the horizon, not quite a question.' },
+          { speaker: 'San', text: '"She is not an echo," you say, working through it out loud. "She is actually stranded here, same as \u2014" You stop, thinking of Parco, of the mirror sea, of how many different shapes \u2014being lost in this water\u2014 apparently takes. "I do not think chasing her down actually solves anything either of us needs solved."' },
+          { speaker: 'Bapoleon', text: '"A rival left standing is not the same as a battle lost," Bapoleon says, though he sounds more thoughtful than argumentative about it. "I confess I am curious what she actually becomes, given time."' },
+          { speaker: 'Zheng He', text: '"So am I," Zheng He admits. "An enemy who fights this cleanly is rare enough to actually respect."' },
+          { speaker: 'Narrator', text: 'San watches the empty horizon a while longer after the Wraithtide is fully gone, aware, in a way she cannot quite name yet, that this particular thread is not closed so much as simply set down for now \u2014 waiting, the way most real things in these waters eventually turn out to be.' },
+        ]
+      }
+,{
+        id: 'journal_208',
+        title: 'The Deal That Was Too Good',
+        chapter: 208,
+        unlockType: 'level',
+        unlockAt: 760,
+        icon: '🦊',
+        summary: "Singapore's market keeps handing the crew impossibly good trades \u2014 and every single one of them, San slowly realizes, comes with a catch nobody has actually noticed yet.",
+        scenes: [
+          { speaker: 'Narrator', text: 'It starts as good luck \u2014 a silk merchant undercharging by half, a spice trader throwing in an extra measure for nothing, a porcelain seller practically insisting the crew take a piece home free. San only starts questioning it on the fourth impossibly generous deal in a single afternoon.' },
+          { speaker: 'Zheng He', text: '"No merchant is this generous by accident," Zheng He says, turning a suspiciously discounted bolt of silk over in his hands, genuinely troubled by it. "I have spent my whole life reading trade. This is not generosity. This is a setup."' },
+          { speaker: 'San', text: '"A setup for what, though?" you ask. "Nothing has actually gone wrong yet."' },
+          { speaker: 'Zheng He', text: '"That," Zheng He says, "is precisely what concerns me."' },
+          { speaker: 'Narrator', text: 'That evening, tallying the day\u2019s trades, the pattern finally surfaces \u2014 every single "generous" deal was, item for item, exactly matched by something small and specific quietly missing from the crew\u2019s own stores. Not stolen. Traded, somehow, without anyone actually agreeing to it.' },
+          { speaker: 'San', text: '"Someone is trading with us," you say slowly, working it out, "without actually asking. Taking small things nobody would miss, giving back things that look generous enough that nobody would question it."' },
+        ]
+      }
+,{
+        id: 'journal_209',
+        title: 'A Fox Who Does Not Lose',
+        chapter: 209,
+        unlockType: 'level',
+        unlockAt: 765,
+        icon: '🎋',
+        summary: "The trader behind it all turns out to have a very particular reputation, and Parco, delighted, insists he is exactly the right person to actually deal with her.",
+        scenes: [
+          { speaker: 'Narrator', text: 'She is waiting for them at the same stall the silk came from, entirely unbothered at being caught \u2014 a fox spirit, unmistakably, tails arranged with the particular elegance of someone who has never once needed to hide what she is.' },
+          { speaker: 'Huli Jing', text: '"You noticed faster than most," she says, sounding almost pleased about it. "Fair trades, every one. I take small, I give generous. Nobody has ever actually had cause to complain."' },
+          { speaker: 'San', text: '"You could just ask," you say, echoing, without quite meaning to, something Joel once said to a very different captain.' },
+          { speaker: 'Huli Jing', text: '"Asking is boring," she says, entirely unrepentant. "A good trade should be earned, not simply requested. Prove your crew is clever enough to actually catch me doing it, and I will trade with you honestly from now on. That is the actual game."' },
+          { speaker: 'Parco', text: '"Oh, I like her enormously," Parco says, already delighted, stepping forward before anyone can stop him. "I have not lost a wits match in several different lives. Shall we?"' },
+          { speaker: 'Huli Jing', text: 'She looks him over, genuinely intrigued for the first time. "Several different lives," she repeats. "That is either an enormous exaggeration or the most interesting claim anyone has made at my stall in a very long time. Let us find out which."' },
+        ]
+      }
+,{
+        id: 'journal_210',
+        title: 'Earning the Respect of Something Clever',
+        chapter: 210,
+        unlockType: 'level',
+        unlockAt: 770,
+        icon: '✨',
+        summary: "It is not a fight. It was never going to be a fight. It is, instead, exactly the kind of contest a storyteller and a trickster fox were always going to actually enjoy.",
+        scenes: [
+          { speaker: 'Narrator', text: 'The match is entirely conversation \u2014 Parco tracing every one of her impossible trades back to its exact quiet moment of taking, and she countering with the precise, undeniable fairness of what she gave back for it, both of them clearly enjoying themselves more than either will admit outright.' },
+          { speaker: 'Huli Jing', text: '"The porcelain," Parco says, near the end, triumphant. "You took a single broken button off Eliz\u2019s coat. Nobody would ever have noticed something that small missing."' },
+          { speaker: 'Huli Jing', text: '"I would have noticed," she admits, genuinely impressed now, dropping the performance entirely. "Very well. You caught every single one. That has not happened in longer than I am inclined to actually count."' },
+          { speaker: 'Parco', text: '"Several different lives," Parco says again, grinning, "does occasionally come with advantages."' },
+          { speaker: 'Huli Jing', text: '"Then you have earned it honestly," she says, and there is real warmth under the formality now. "Fair trade, going forward, no more small quiet takings. I do keep my word, whatever else you might have heard about foxes."' },
+          { speaker: 'San', text: '"I did not expect Singapore\u2019s biggest mystery to end in a game of wits," you say, half to yourself, watching Parco practically glow with the win.' },
+          { speaker: 'Sinbad', text: '"Welcome to the actual pattern of these waters," Sinbad says, warm, watching the whole exchange with real fondness. "Nothing here is ever quite the threat it first looks like. Usually it just wants to be properly seen."' },
+        ]
+      }
+,{
+        id: 'journal_211',
+        title: 'The Rigid Shape at the Edge of the Dock',
+        chapter: 211,
+        unlockType: 'level',
+        unlockAt: 775,
+        icon: '🕯️',
+        summary: "Batavia\u2019s dockworkers have stopped working past dusk. Nobody will say exactly why until San actually sees it herself.",
+        scenes: [
+          { speaker: 'Narrator', text: 'The colonial quarter empties early here, every single night, long before the actual curfew bells \u2014 shutters closed, lamps doused, an unspoken agreement among everyone who lives close enough to the water to know better.' },
+          { speaker: 'San', text: '"Nobody will tell us what it actually is," you say, frustrated, after the third dockworker changes the subject rather than answer directly. "Just that it happens near the old warehouse row, and that it is better not seen."' },
+          { speaker: 'Narrator', text: 'She sees it herself that same night \u2014 a shape at the warehouse\u2019s edge, upright, rigid in a way no living posture manages, moving in short, unnatural hops rather than any proper stride.' },
+          { speaker: 'Zheng He', text: '"Jiangshi," Zheng He says, quiet, recognizing it instantly. "Sustained wrong. Held somewhere between the burial it was owed and the one it never actually received."' },
+          { speaker: 'San', text: '"Is it dangerous?" you ask, watching the rigid shape pace the same stretch of dock, over and over, like a habit worn into the ground itself.' },
+          { speaker: 'Zheng He', text: '"Confused, mostly," Zheng He says, careful. "That is not the same as harmless. But I do not think this is simple malice either. Something about this exact stretch of dock is keeping it here."' },
+        ]
+      }
+,{
+        id: 'journal_212',
+        title: 'Held at the Wrong Moment',
+        chapter: 212,
+        unlockType: 'level',
+        unlockAt: 780,
+        icon: '⚓',
+        summary: "The jiangshi was never meant to stay in Batavia at all. Whatever kept it here, San realizes, is exactly the same thing that keeps this whole port frozen in one moment.",
+        scenes: [
+          { speaker: 'Narrator', text: 'It does not attack, up close \u2014 mostly it simply pauses, rigid, watching, as though genuinely trying and failing to remember what it was originally doing at this specific stretch of dock.' },
+          { speaker: 'Jiangshi', text: '"Home," it manages, the word coming out stiff, wrong, like a mouth remembering a shape it has not used in a very long time. "Was meant. To go home. Ship. Did not \u2014 did not wait."' },
+          { speaker: 'San', text: '"You missed your passage home," you say, understanding arriving slow and awful all at once. "You were supposed to be carried back for burial. And the ship left without you."' },
+          { speaker: 'Jiangshi', text: 'It goes very still at that, something in its rigid posture that might, in a living person, have been a nod. "Waiting," it manages. "Still. Waiting for the next one."' },
+          { speaker: 'Narrator', text: 'San thinks of Batavia itself, then \u2014 a colonial capital frozen at a specific moment that never actually moved forward, exactly the way this one lost soul has been frozen at the exact moment its own ship pulled away without it.' },
+          { speaker: 'San', text: '"The whole port is stuck the same way you are," you say, slowly. "I do not think that is a coincidence. I think you might be part of why."' },
+        ]
+      }
+,{
+        id: 'journal_213',
+        title: 'Completing the Passage',
+        chapter: 213,
+        unlockType: 'level',
+        unlockAt: 785,
+        icon: '🌅',
+        summary: "There is no ship left to carry it home the way it was originally promised. San finds there is still a way to actually finish the journey anyway.",
+        scenes: [
+          { speaker: 'Narrator', text: 'Renn, consulted after the fact, is characteristically precise about it \u2014 a passage interrupted does not require the exact original ship, only an honest completion of the promise that ship was meant to keep.' },
+          { speaker: 'Renn', text: '"The specific vessel does not matter," Renn explains, gently. "The promise does. Carry it properly, the whole way, with the actual intention burial requires, and the interruption resolves. It has simply never had anyone willing to actually finish it."' },
+          { speaker: 'Narrator', text: 'They do it properly \u2014 the whole crew, San at the front, carrying what needs carrying the entire distance the original passage was always meant to cover, saying the words it was owed and never received.' },
+          { speaker: 'Jiangshi', text: '"Home," it says again, at the very end, and this time the word comes out easier, less rigid, something in its stiff shape finally, visibly, settling.' },
+          { speaker: 'Narrator', text: 'It does not vanish dramatically. It simply, quietly, stops \u2014 posture easing into something that finally looks like actual rest rather than an interrupted stride frozen mid-step.' },
+          { speaker: 'Zheng He', text: '"Passage completed," Zheng He says, quiet, something like real satisfaction in it. "Late. But completed properly, which matters more than the delay ever did."' },
+          { speaker: 'Narrator', text: 'Batavia, San notices over the following days, does not transform overnight \u2014 but something in it does loosen, gradually, the particular frozen stillness of the place easing the same slow way the jiangshi\u2019s own rigid posture finally did.' },
+          { speaker: 'San', text: '"Another old debt, settled," you say to Sinbad, later, thinking of Palembang, of Wen\u2019s name finally spoken again. "I am starting to think that is simply what these waters actually need, more often than not."' },
+        ]
+      }
+,{
+        id: 'journal_214',
+        title: 'Something Watching From the Hills',
+        chapter: 214,
+        unlockType: 'level',
+        unlockAt: 790,
+        icon: '⛰️',
+        summary: "Hanoi\u2019s outer hills have a presence in them, old and patient, and San approaches it exactly the way she has approached every spirit so far \u2014 assuming it needs her help.",
+        scenes: [
+          { speaker: 'Narrator', text: 'Traders mention it almost as an aside \u2014 something in the hills past the trading post, watching, never once approaching, never once causing any actual harm. San, four spirits into this particular pattern by now, assumes she already knows the shape of what she is about to find.' },
+          { speaker: 'San', text: '"Another old wound," you say to the crew, already bracing for it. "Something interrupted, something waiting to be finished properly. We know how this goes by now."' },
+          { speaker: 'Parco', text: '"Do we, though?" Parco says, thoughtful, not entirely agreeing. "Every one so far has had a wound. That does not mean every single thing out here is required to have one."' },
+          { speaker: 'Narrator', text: 'They find it in a clearing well up into the hills \u2014 a shape more mountain than person, ancient beyond any reasonable estimate, entirely unbothered by their arrival.' },
+          { speaker: 'San', text: '"We are here to help," you say, gently, exactly the opening that has worked every previous time.' },
+          { speaker: 'Wangliang', text: 'It regards her for a long, unhurried moment. "Help with what," it finally says, and there is nothing hostile in the question \u2014 genuine, simple curiosity, like the concept itself is faintly amusing.' },
+        ]
+      }
+,{
+        id: 'journal_215',
+        title: 'Nothing Here Needs Fixing',
+        chapter: 215,
+        unlockType: 'level',
+        unlockAt: 795,
+        icon: '🍃',
+        summary: "For the first time in this whole pattern, San asks what is actually wrong, and the honest answer is: nothing. Nothing at all.",
+        scenes: [
+          { speaker: 'San', text: '"What happened to you?" you ask, expecting the same shape of answer every previous spirit has given \u2014 an interruption, a debt, a passage left unfinished.' },
+          { speaker: 'Wangliang', text: '"Nothing happened to me," it says, simply. "I have simply always been exactly this. Before your cultivation practice existed to strive toward anything. Before this world had a name for what a spirit was even supposed to want."' },
+          { speaker: 'San', text: '"Then why are you watching us?" you ask, genuinely unsure now what question is even left to ask.' },
+          { speaker: 'Wangliang', text: '"Because you are interesting," it says, and there is real warmth underneath the plainness of it. "Not because I need anything resolved. I have watched a great many things pass through these hills. Very few of them ever stop long enough to actually ask a mountain what it wants, rather than assuming it wants something at all."' },
+          { speaker: 'Narrator', text: 'San sits with that for a long moment, feeling, for the first time in this entire pattern, genuinely unmoored \u2014 not because something is wrong, but because nothing is, and she does not quite know what to do with a spirit that does not need her.' },
+          { speaker: 'San', text: '"I do not actually know how to help something that is already whole," you admit, and there is something almost freeing in saying it out loud.' },
+          { speaker: 'Wangliang', text: '"Then do not," it says, simple as ever. "Sit. Stay a while, if you like. That is not nothing, whatever your instinct keeps insisting."' },
+        ]
+      }
+,{
+        id: 'journal_216',
+        title: 'Staying Anyway',
+        chapter: 216,
+        unlockType: 'level',
+        unlockAt: 800,
+        icon: '🌄',
+        summary: "There is no debt to settle here, no passage to complete, no old wound waiting on the other side of the right question. San learns to simply be still instead, and finds that is enough.",
+        scenes: [
+          { speaker: 'Narrator', text: 'They stay the whole afternoon, in the end \u2014 no working to perform, no resolution to reach, just the hillside, the unhurried company of something considerably older than any of them, and the strange, quiet gift of not being needed.' },
+          { speaker: 'Sinbad', text: '"I have chased a great many impossible things across a great many years," Sinbad says, easy, settling into the grass without being asked. "I do not think I have ever once simply sat with one before. This is new, even for me."' },
+          { speaker: 'Wangliang', text: '"Most things that come through here are chasing something," it says, unbothered. "It is rather nice, being visited instead of solved."' },
+          { speaker: 'San', text: '"I think I needed this more than I realized," you admit, quiet, watching the light change slowly over the hills. "Every other stop on this whole journey has been about fixing something. I forgot that was ever optional."' },
+          { speaker: 'Wangliang', text: '"It always was," it says, gentle, ancient, entirely unhurried. "You are welcome back, whenever the fixing gets to be too much. I intend to still be here. I generally am."' },
+          { speaker: 'Narrator', text: 'They leave at dusk, no working completed, no old debt settled, nothing at all resolved in the way every previous stop has demanded \u2014 and San finds, walking back down toward the port, that this might be the lightest she has felt in longer than she can easily account for.' },
         ]
       }
     ]
@@ -23053,7 +23316,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.176';
+const BUILD_ID = '2026-08-17.184';
 // =========================
 
 
@@ -28400,6 +28663,8 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Nescafé (plain)', cat: 'Fats & Extras', fat: 0.0, sat: 0.0, unsat: 0.0, fiber: 0, protein: 0.5, carbs: 1.0, icon: '☕' },
   { n: 'APC / Jersey Coffee', cat: 'Fats & Extras', fat: 2.0, sat: 0.6, unsat: 1.4, fiber: 0, protein: 1.0, carbs: 2.0, icon: '☕' },
   { n: 'Ayam Penyet (no rice)', cat: 'Common Meals', fat: 20.0, sat: 7.0, unsat: 13.0, fiber: 1.5, protein: 35.0, carbs: 8.0, icon: '🍛' },
+  { n: 'Meishihui Chive Crispy Biscuit (100g)', cat: 'Common Meals', fat: 24.0, sat: 7.6, unsat: 16.4, fiber: 1.5, protein: 8.1, carbs: 65.6, icon: '🍘' },
+  { n: 'Meishihui Chive Crispy Biscuit, 1 packet (~20g)', cat: 'Common Meals', fat: 4.8, sat: 1.5, unsat: 3.3, fiber: 0.3, protein: 1.6, carbs: 13.1, icon: '🍘' },
   { n: 'Chicken Rendang (no rice)', cat: 'Common Meals', fat: 18.0, sat: 6.3, unsat: 11.7, fiber: 1.5, protein: 28.0, carbs: 5.0, icon: '🍛' },
   { n: 'Chicken Masala (no sauce, 100g)', cat: 'Common Meals', fat: 8.0, sat: 2.8, unsat: 5.2, fiber: 1.5, protein: 25.0, carbs: 4.0, icon: '🍛' },
   { n: 'Chicken Curry with Potatoes (100g, incl. sauce & potato)', cat: 'Common Meals', fat: 7.0, sat: 2.4, unsat: 4.6, fiber: 1.5, protein: 11.0, carbs: 9.0, icon: '🍛' },
@@ -28429,6 +28694,8 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Teh O Kosong (plain black tea, no sugar)', cat: 'Drinks', fat: 0.0, sat: 0.0, unsat: 0.0, fiber: 0, protein: 0.0, carbs: 0.5, icon: '🍵' },
   { n: 'Teh C Kosong (black tea + evap milk, no sugar)', cat: 'Drinks', fat: 1.5, sat: 0.4, unsat: 1.1, fiber: 0, protein: 1.0, carbs: 2.5, icon: '🍵' },
   { n: 'Barley Drink, no sugar (250ml)', cat: 'Drinks', fat: 0.2, sat: 0.0, unsat: 0.2, fiber: 1.0, protein: 0.5, carbs: 8.0, icon: '🌾' },
+  { n: 'Nona Botanical Beverage Mix, Ginger with Honey (1 sachet, 8g)', cat: 'Drinks', fat: 0.0, sat: 0.0, unsat: 0.0, fiber: 0, protein: 0.1, carbs: 7.6, icon: '🍯' },
+  { n: 'Primadona Coffee, adaptogen blend (1 sachet, 20g)', cat: 'Drinks', fat: 0.7, sat: 0.4, unsat: 0.3, fiber: 0, protein: 1.8, carbs: 13.0, icon: '☕' },
   { n: 'Whipping Cream, aerosol (2 tbsp ~15g)', cat: 'Fats & Extras', fat: 5.0, sat: 3.1, unsat: 1.9, fiber: 0, protein: 0.3, carbs: 0.8, icon: '🫙' },
   { n: 'Tom Yum Soup, 1 bowl (no noodles)', cat: 'Thai Dishes', fat: 4.0, sat: 1.4, unsat: 2.6, fiber: 1.2, protein: 18.0, carbs: 4.0, icon: '🍲' },
   { n: 'Tom Kha Gai, 1 bowl (coconut chicken soup)', cat: 'Thai Dishes', fat: 18.0, sat: 6.3, unsat: 11.7, fiber: 1.2, protein: 20.0, carbs: 5.0, icon: '🍲' },
