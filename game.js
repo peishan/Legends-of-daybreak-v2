@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Cafe: fixed "undefined" carb target bug, added Low/Medium/Normal carb tiers (research-grounded), split Other Drinks from Pantry, added menu search, Nescafe Gold + Matcha Latte)';
+const APP_VERSION = '2026-08-17 (Fix: combat/dragon hunt HP bar lag \u2014 the .bf-hp CSS transition was animating the visible bar behind the actual HP number; added transition:none to force instant, accurate fill)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -23526,7 +23526,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.194';
+const BUILD_ID = '2026-08-17.195';
 // =========================
 
 
@@ -31373,14 +31373,14 @@ function rCbt() {
   h += '<div class="party-strip">';
   h += '<div class="party-avatar" title="San ' + G.p.hp + '/' + G.p.mhp + ' HP · ' + G.p.mp + '/' + G.p.mmp + ' MP · AC ' + playerAC + '">';
   h += '<div class="party-avatar-circle" style="border-color:#7c3aed;">' + portraitImg('san', '#7c3aed30', 'S') + '</div>';
-  h += '<div class="party-avatar-hp"><div class="party-avatar-hp-fill" style="width:' + Math.max(0, (G.p.hp/G.p.mhp)*100) + '%;background:var(--hp);"></div></div>';
+  h += '<div class="party-avatar-hp"><div class="party-avatar-hp-fill" style="width:' + Math.max(0, (G.p.hp/G.p.mhp)*100) + '%;background:var(--hp);transition:none;"></div></div>';
   h += '<div class="party-avatar-stat-text" style="color:var(--hp);">' + G.p.hp + '/' + G.p.mhp + '</div>';
   h += '</div>';
   for (let p of G.party) {
     if (p.on) {
       h += '<div class="party-avatar" title="' + p.n + ' ' + p.hp + '/' + p.mhp + ' HP">';
       h += '<div class="party-avatar-circle" style="border-color:' + p.col + ';">' + portraitImg(portraitFileNameFor(p.n), p.col + '30', p.n[0]) + '</div>';
-      h += '<div class="party-avatar-hp"><div class="party-avatar-hp-fill" style="width:' + Math.max(0, (p.hp/p.mhp)*100) + '%;background:' + (p.hp <= 0 ? 'var(--disabled)' : 'var(--hp)') + ';"></div></div>';
+      h += '<div class="party-avatar-hp"><div class="party-avatar-hp-fill" style="width:' + Math.max(0, (p.hp/p.mhp)*100) + '%;background:' + (p.hp <= 0 ? 'var(--disabled)' : 'var(--hp)') + ';transition:none;"></div></div>';
       h += '<div class="party-avatar-stat-text" style="color:' + (p.hp <= 0 ? 'var(--disabled)' : 'var(--hp)') + ';">' + p.hp + '/' + p.mhp + '</div>';
       h += '</div>';
     }
@@ -31399,7 +31399,13 @@ function rCbt() {
     h += '<div class="ecard ecard-compact ' + (d ? 'dead' : '') + ' ' + s + (isBoss ? ' boss' : '') + '" data-i="' + i + '" style="--e-elem:' + elemVar + ';" title="' + e.n + (isBoss ? ' (Boss)' : '') + '">';
     h += '<div class="eicon eicon-compact"><span class="eicon-medallion compact" style="--arch-color:' + (d ? 'var(--arch-undead)' : ac(e.n)) + ';">' + (d ? enemyIcon('skeleton') : enemyIcon(e.n)) + (isBoss && !d ? '<span class="boss-crown">👑</span>' : '') + '</span></div>';
     h += '<div class="ename ename-compact">' + e.n + '</div>';
-    h += (d ? '<div class="dt">DEAD</div>' : '<div class="hps' + (lowHp ? ' low' : '') + '"><div class="bf bf-hp" style="width:' + (hpPct * 100) + '%"></div></div><div class="hpt">' + e.hp + '/' + e.mhp + '</div>');
+    // Explicit transition:none — the .bf-hp CSS class (defined in styles.css, not
+    // this file) was applying an animated width transition, which meant the visible
+    // bar fill lagged noticeably behind the actual HP number during fast, repeated
+    // hits, especially against very high-HP raid/dragon-tier enemies. The number
+    // itself (e.hp + '/' + e.mhp below) was always accurate; only the bar's fill
+    // animation was lagging, which read as if HP itself was updating slowly.
+    h += (d ? '<div class="dt">DEAD</div>' : '<div class="hps' + (lowHp ? ' low' : '') + '"><div class="bf bf-hp" style="width:' + (hpPct * 100) + '%;transition:none;"></div></div><div class="hpt">' + e.hp + '/' + e.mhp + '</div>');
     h += '</div>';
   }
   h += '</div>';
