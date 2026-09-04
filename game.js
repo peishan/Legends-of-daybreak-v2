@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Cafe: Meishihui Chive Crispy Biscuit updated with verified label values (was an estimate) + added a 1-packet ~20g portion)';
+const APP_VERSION = '2026-08-17 (Ch.220-222: Voyage Arc L \u2014 Bapoleon\u2019s real "winter crossing" finally told, at Malacca where he was recruited, the last port arc closes out the whole sequence)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -6719,6 +6719,108 @@ storyJournal: {
           { speaker: 'San', text: '"I think I needed this more than I realized," you admit, quiet, watching the light change slowly over the hills. "Every other stop on this whole journey has been about fixing something. I forgot that was ever optional."' },
           { speaker: 'Wangliang', text: '"It always was," it says, gentle, ancient, entirely unhurried. "You are welcome back, whenever the fixing gets to be too much. I intend to still be here. I generally am."' },
           { speaker: 'Narrator', text: 'They leave at dusk, no working completed, no old debt settled, nothing at all resolved in the way every previous stop has demanded \u2014 and San finds, walking back down toward the port, that this might be the lightest she has felt in longer than she can easily account for.' },
+        ]
+      }
+,{
+        id: 'journal_217',
+        title: 'Something That Cannot Be Filled',
+        chapter: 217,
+        unlockType: 'level',
+        unlockAt: 805,
+        icon: '🍚',
+        summary: "Food vanishes from Manila\u2019s stalls overnight, entire stockpiles, and none of it ever seems to actually satisfy whatever is taking it.",
+        scenes: [
+          { speaker: 'Narrator', text: 'It is not theft, exactly \u2014 nothing gets sold, nothing gets hoarded. Rice stores simply empty overnight, whole baskets of fruit gone by morning, and the vendors report the same strange detail every single time: nothing left behind, not even scraps, and somehow the hunger never seems to actually stop.' },
+          { speaker: 'San', text: '"That is not normal hunger," you say, turning over an entirely emptied grain sack. "Normal hunger stops. This does not sound like it ever does."' },
+          { speaker: 'Sinbad', text: '"I have heard of this," Sinbad says, quiet, uncharacteristically serious. "A want that grew larger than whatever it was originally about. It happens, sometimes, to grief left too long unattended."' },
+          { speaker: 'Zheng He', text: '"An egui," Zheng He says, confirming it. "Hungry, endlessly, for a reason that stopped being about food a very long time ago."' },
+          { speaker: 'San', text: '"Then feeding it more food will not actually help," you say, working it through. "We need to find out what it originally wanted. Before the wanting turned into this."' },
+        ]
+      }
+,{
+        id: 'journal_218',
+        title: 'What the Throat Was Actually Built For',
+        chapter: 218,
+        unlockType: 'level',
+        unlockAt: 810,
+        icon: '👻',
+        summary: "It cannot actually swallow anything it takes \u2014 the want has grown too large for the throat that has to carry it. San learns what it was originally hungry for, and it was never the food at all.",
+        scenes: [
+          { speaker: 'Narrator', text: 'It is enormous and starving and entirely unable to actually eat \u2014 every bite it takes vanishing before it reaches anywhere the hunger could possibly be soothed, throat too narrow now for a want that has grown so far past its original size.' },
+          { speaker: 'Egui', text: '"Hungry," it manages, the word barely fitting through whatever the throat has become. "Always. Cannot \u2014 cannot remember what for anymore. Just hungry."' },
+          { speaker: 'San', text: '"What did you actually want?" you ask, gently, kneeling close despite how enormous and strange it has become. "Before it turned into this. What were you actually hungry for?"' },
+          { speaker: 'Narrator', text: 'It takes a long time to answer, memory clearly buried under years of undifferentiated want, until finally something small and specific surfaces \u2014 not food at all, but the memory of a particular meal, shared with someone specific, a long time before the hunger ever started.' },
+          { speaker: 'Egui', text: '"My mother\u2019s rice," it finally manages, and the enormous wrongness of it eases slightly, just from being named. "Just that. I only ever wanted that, and then she was gone, and I did not know how to want anything smaller than everything after that."' },
+          { speaker: 'San', text: '"That is a want small enough to actually fit," you say, understanding, finally, exactly what this whole hunger was always covering for.' },
+        ]
+      }
+,{
+        id: 'journal_219',
+        title: 'Small Enough to Actually Swallow',
+        chapter: 219,
+        unlockType: 'level',
+        unlockAt: 815,
+        icon: '🍙',
+        summary: "Not a feast. Not an endless supply. One specific, remembered meal, made properly, offered plainly \u2014 exactly the size of what was actually lost.",
+        scenes: [
+          { speaker: 'Narrator', text: 'Zheng He insists on making it himself, once San relays what little detail the egui could actually recall \u2014 simple rice, prepared plainly, nothing elaborate, exactly the modest size of a want that had simply never been allowed to stay modest.' },
+          { speaker: 'Zheng He', text: '"Grand gestures are not always what grief actually needs," Zheng He says, working carefully. "Sometimes it needs exactly the size of the thing it originally lost. Nothing more."' },
+          { speaker: 'Narrator', text: 'They offer it plainly, no ceremony, and this time \u2014 for the first time \u2014 it actually reaches the throat, actually lands, actually satisfies something the endless hunger never once managed to.' },
+          { speaker: 'Egui', text: '"Oh," it says, and the voice is smaller now, less enormous, something in its shape settling toward a size that finally matches what it originally was. "Oh. That is \u2014 that is what I actually wanted. All this time."' },
+          { speaker: 'San', text: '"You do not have to be enormous anymore," you tell it, gently. "You never actually needed to be. You just needed someone to ask what you were actually hungry for."' },
+          { speaker: 'Narrator', text: 'It fades slowly, peacefully, the enormous wrongness of the hunger finally, properly satisfied \u2014 not because the want was fed endlessly, but because it was finally, correctly, sized back down to what it had always actually been.' },
+          { speaker: 'San', text: '"Another one that just wanted to be properly seen," you say to Sinbad, later, thinking of the pattern that keeps repeating across every single port. "I do not think that is ever going to stop being true out here."' },
+          { speaker: 'Sinbad', text: '"I would be surprised if it ever does," Sinbad agrees, warm. "It rarely stops being true anywhere else either, honestly. These waters just make it considerably harder to ignore."' },
+        ]
+      }
+,{
+        id: 'journal_220',
+        title: 'Something at Malacca',
+        chapter: 220,
+        unlockType: 'level',
+        unlockAt: 820,
+        icon: '🗺️',
+        summary: "The ship returns to Malacca, the exact port Bapoleon was first recruited from, and San notices something in him go quiet in a way it never has anywhere else.",
+        scenes: [
+          { speaker: 'Narrator', text: 'He is unusually still at the rail as the strait comes into view, none of the usual sketching, no diagrams, no muttered tactical asides about the approach. San notices only because his stillness is, for him, so entirely out of character.' },
+          { speaker: 'San', text: '"You are quiet," you say, careful, joining him at the rail. "You are never quiet. Even when you are sleeping I half expect a strategic assessment."' },
+          { speaker: 'Bapoleon', text: '"This is where you found me," Bapoleon says, not quite an answer, watching the old straits with an expression San has genuinely never seen on him before. "Do not ask about the winter crossing. I have told you that before."' },
+          { speaker: 'San', text: '"I am not asking," you say, gently. "I am noticing. Those are not the same thing, and you know it."' },
+          { speaker: 'Narrator', text: 'He is quiet a long moment, hands tight on the rail, and when he finally speaks again, there is none of the usual performance in it at all \u2014 just a tired, honest man looking at the place he was first found.' },
+          { speaker: 'Bapoleon', text: '"Perhaps," he says, slowly, "it is time I actually told someone the real version. I have made a joke of it for so long I am not entirely certain I remember how to say it any other way."' },
+        ]
+      }
+,{
+        id: 'journal_221',
+        title: 'The Winter Crossing',
+        chapter: 221,
+        unlockType: 'level',
+        unlockAt: 825,
+        icon: '❄️',
+        summary: "It was never actually a joke. San finally hears the whole of it, and understands, at last, exactly why he has never once let a plan go uninspected since.",
+        scenes: [
+          { speaker: 'Bapoleon', text: '"I led a crossing once," he says, plain, no embellishment at all. "A real one. People under my actual command, trusting my actual judgment. I was certain \u2014 so entirely certain \u2014 that speed mattered more than caution. I was wrong."' },
+          { speaker: 'Narrator', text: 'He does not dramatize it. If anything, San thinks, he undersells it, the way people do when the real weight of something is still too large to say plainly.' },
+          { speaker: 'Bapoleon', text: '"Weather turned faster than I accounted for," he continues. "I had not planned for it, because I had not thought planning for failure was worth the time. I lost people that winter. Good ones. People who trusted a confidence I had not actually earned yet."' },
+          { speaker: 'San', text: '"That is why you check everything three times now," you say, quiet, understanding arriving slow and complete. "That is why the tactical jokes. It is not vanity. It was never vanity."' },
+          { speaker: 'Bapoleon', text: '"No," he agrees, and there is real relief in finally saying it plainly. "It was never vanity. It was the only way I found to make sure I never made that particular mistake twice. Overprepared is embarrassing. Overprepared is survivable. I chose embarrassing, permanently, the day I buried the ones who were not."' },
+        ]
+      }
+,{
+        id: 'journal_222',
+        title: 'What Carefulness Actually Costs',
+        chapter: 222,
+        unlockType: 'level',
+        unlockAt: 830,
+        icon: '⚓',
+        summary: "San does not try to make it smaller than it was. She simply makes sure he knows, plainly, that the carefulness it built was never something to be embarrassed about at all.",
+        scenes: [
+          { speaker: 'Narrator', text: 'She does not rush to comfort him past what actually happened \u2014 some things do not need to be made smaller to be survivable, they simply need someone willing to actually hold their real size for a while.' },
+          { speaker: 'San', text: '"The shoal, at the pirate chase," you say, finally, thinking back. "That was not luck. That was every single lesson that winter cost you, keeping the rest of us alive."' },
+          { speaker: 'Bapoleon', text: 'He looks at you a long moment, something in his face genuinely unguarded for once. "I had not thought of it that way," he admits. "I have spent so long thinking of the carefulness as the failure\u2019s shadow. I had not considered it might also be its actual use."' },
+          { speaker: 'San', text: '"Both things can be true," you say, echoing, without quite meaning to, the exact shape of what you once told Mez. "The reason does not have to stop hurting for the thing it built to also be genuinely good."' },
+          { speaker: 'Bapoleon', text: '"Several different lives ago, I would have called that sentiment," he says, and there is real warmth under the old deflection now. "Currently, I find I am simply grateful someone finally asked the real question instead of letting the joke stand."' },
+          { speaker: 'Narrator', text: 'Malacca does not feel like an old wound anymore, San notices, walking the strait later that evening \u2014 just a port, ordinary and busy, the way every place eventually becomes once the story underneath it has finally been told properly.' },
         ]
       }
     ]
@@ -23316,7 +23418,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.184';
+const BUILD_ID = '2026-08-17.186';
 // =========================
 
 
