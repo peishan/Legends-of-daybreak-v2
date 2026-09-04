@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Ch.235-237: Farspeaker questline completed \u2014 San actually hears her mother for the first time since the gap opened, the device\u2019s real limits established honestly)';
+const APP_VERSION = '2026-08-17 (Fix: auto-combat crash mid-turn \u2014 4 unguarded completedActions.includes() calls fixed; styles.css: removed the drop-shadow filter from critFlash causing stutter on frequent crits)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -393,7 +393,7 @@ const G = {
   // Discovery is permanent once it happens; the ability itself is usable once per rest.
   growthAbilities: {
     Zaki: { id: 'nervous_courage', n: 'Nervous Courage', unlockAt: 15,
-      d: "When everyone else has fallen and it's just him and San left standing, the boy who checked his pack seventeen times finds he doesn't need to anymore. +6 ATK, +4 DEF for the rest of the fight." },
+      d: "When everyone else has fallen and it's just him and San left standing, the boy who checked his pack seventeen times finds he doesn't need to anymore. A real ATK and DEF boost, scaling with San's own strength, for the rest of the fight." },
     Eliz: { id: 'space_between', n: 'The Space Between', unlockAt: 18,
       d: 'When her own strength gives out, Eliz finds one more reserve — a burst of light that steadies the whole party, once, when she needs it most herself.' },
     Joel: { id: 'last_stand', n: 'Last Stand', unlockAt: 22,
@@ -1225,7 +1225,7 @@ const G = {
     { id: 'temple_eternal', n: 'The Highest Standing', d: 'Reach the highest Temple Rank', icon: '🙏', t: 'temple_rank', need: 10, rw: { xp: 12000, g: 8000 }, done: false, secret: false },
     { id: 'trial_first', n: 'What the Vigil First Demands', d: 'Defeat the first Temple Trial tier', icon: '🕯️', t: 'temple_trial_tier', need: 2, rw: { xp: 5000, g: 3500 }, done: false, secret: false },
     // Stronghold milestones
-    { id: 'all_strongholds', n: 'Every Ground Kept', d: 'Claim all 6 strongholds', icon: '🗼', t: 'stronghold_count', need: 6, rw: { xp: 16000, g: 11000 }, done: false, secret: false },
+    { id: 'all_strongholds', n: 'Every Ground Kept', d: 'Claim all 8 strongholds', icon: '🗼', t: 'stronghold_count', need: 8, rw: { xp: 16000, g: 11000 }, done: false, secret: false },
     { id: 'guild_hall_max', n: 'The Sanctum, Finished', d: 'Max out any single stronghold\'s Guild Hall', icon: '🏛️', t: 'guild_hall_level', need: 5, rw: { xp: 10000, g: 7000 }, done: false, secret: false },
     // Library Research milestones
     { id: 'first_breakthrough', n: 'The Search, Begun', d: 'Earn your first Library Research breakthrough', icon: '🔮', t: 'library_breakthroughs', need: 1, rw: { xp: 3000, g: 2000 }, done: false, secret: false },
@@ -7164,6 +7164,17 @@ storyJournal: {
     { id: 'grove_tavern', name: 'The Root Cellar', type: 'tavern', zone: 'The Unbroken Vale', zoneLv: 56, desc: 'Carved into a root wide enough to walk through. Whatever is on tap tonight grew here, in the dark, without anyone having to ask it to.', unlocked: false, icon: '🍺', cost: 25 },
     { id: 'edge_camp', name: 'The Waking Edge', type: 'camp', zone: 'The Rootbound Sanctuary', zoneLv: 95, desc: 'The last solid ground before the map simply stops. Not dangerous, exactly. Just genuinely unfinished.', unlocked: false, icon: '🌄', cost: 0 },
     { id: 'edge_tavern', name: "The Threshold House", type: 'tavern', zone: 'The Rootbound Sanctuary', zoneLv: 95, desc: 'Built from whatever the roots were willing to spare. Everyone who drinks here is, in some sense, waiting to see what comes next.', unlocked: false, icon: '🍺', cost: 35 },
+    // What actually came next — the map did not stay stopped forever. Placed at World
+    // 7's own opening zone, whose own established flavor text ("every road here leads
+    // somewhere that should have finished a long time ago") pairs directly with this
+    // being the first ground worth actually holding since the Rootbound Sanctuary.
+    { id: 'held_ground_camp', name: 'The Ground That Finally Held', type: 'camp', zone: 'The Place That Never Quite Ended', zoneLv: 660, desc: 'Everything else out here refuses to finish. This patch of ground, once claimed, simply does — and stays finished, night after night.', unlocked: false, icon: '⛺', cost: 0 },
+    { id: 'held_ground_tavern', name: 'The Waiting Room, Answered', type: 'tavern', zone: 'The Place That Never Quite Ended', zoneLv: 660, desc: 'Named for every question this place used to leave hanging. It still asks them. It has simply started actually answering, too.', unlocked: false, icon: '🍺', cost: 60 },
+    // Anchors the higherGround stronghold — closes the gap between heldGround
+    // (Lv660, World 7's opening) and the end of the extended content (Lv1250),
+    // which had no stronghold or rest site presence at all until this one.
+    { id: 'higher_ground_camp', name: 'Ground That No Longer Tests You', type: 'camp', zone: 'The Higher Hunting Grounds', zoneLv: 900, desc: 'The air stops thinning the moment you actually stop needing to prove you belong here.', unlocked: false, icon: '🪽', cost: 0 },
+    { id: 'higher_ground_tavern', name: "The Earned Height", type: 'tavern', zone: 'The Higher Hunting Grounds', zoneLv: 900, desc: 'Built high enough that the wyverns below have stopped considering it a landmark worth circling.', unlocked: false, icon: '🍺', cost: 75 },
     // Phase 3 mana springs
     { id: 'ms_spring3', name: 'Infernal Mana Spring', type: 'mana_spring', zone: 'Infernal Crucible', zoneLv: 23, desc: 'A spring of liquid flame that burns cold. Each sip sears the mind with forbidden knowledge.', unlocked: false, icon: '💧', cost: 20 },
     { id: 'ms_spring4', name: 'Abyssal Mana Spring', type: 'mana_spring', zone: 'Tidal Abyss', zoneLv: 25, desc: 'Dark water that glows with inner light. Drinking it feels like drowning in stars.', unlocked: false, icon: '💧', cost: 25 },
@@ -12854,7 +12865,7 @@ function tickElizHealerAbilities() {
   // Steadier Ground — Library-gated, not level-gated. Same proven buff pattern as
   // Bless above, DEF instead of ATK, tying directly into Eliz's own Library Research
   // angle: not more power, just more certainty the ground everyone's standing on holds.
-  if (G.libraryResearch.completedActions.includes('eliz_steadier_ground')) {
+  if ((G.libraryResearch.completedActions || []).includes('eliz_steadier_ground')) {
     const alreadySteady = G.p.buffs.some(b => b.n === 'Steadier Ground');
     if (!alreadySteady && Math.random() < 0.15) {
       G.p.buffs.push({ n: 'Steadier Ground', t: 4, def: Math.ceil(G.p.lvl * 0.3) });
@@ -13237,6 +13248,77 @@ const STRONGHOLDS = {
     zoneLv: 350,
     siegeEnemies: ['Drafting Remnant', 'Structural Ward', 'Unopened Door', 'Something Guarding It Gently'],
     siegeReward: { xp: 95000, gold: 63000, guildRep: 340 }
+  },
+  // Strongholds had gone the same distance as the skill tree and raid mode — every
+  // existing one topped out by zoneLv 350, while the game had grown all the way
+  // through Worlds 7-12 (zoneLv 660-1250) with nowhere new to claim. Placed at World
+  // 7's own opening zone specifically — its established flavor text ("every road here
+  // leads somewhere that should have finished a long time ago") already gestured at
+  // exactly this kind of unfinished business, and the previous stronghold's own rest-
+  // site description ("waiting to see what comes next") was sitting there as
+  // unintentional foreshadowing the whole time.
+  heldGround: {
+    name: 'The Ground That Finally Held',
+    icon: '⛺',
+    era: 'refusedEnding',
+    restSiteIds: ['held_ground_camp', 'held_ground_tavern'],
+    desc: "Everything else in this stretch of the world refuses to actually finish — battles that never resolve, graves that will not stay filled, changes caught permanently mid-argument with themselves. This patch of ground, once claimed, simply holds. It turns out that was the rarest thing available to build on out here.",
+    stipend: { xp: 9000, gold: 6000 },
+    tasks: [
+      { id: 'st_held_waiting', n: 'What Is Still Waiting to Be Over', d: 'Defeat 3 things Still Waiting to Be Over (found in The Place That Never Quite Ended) before the waiting spreads back into ground already claimed', t: 'kill_specific', target: 'Something Still Waiting to Be Over', c: 0, need: 3, rw: { xp: 13000, g: 8600 }, done: false, refreshDay: -1 },
+      { id: 'st_held_guard', n: 'The Guard Who Never Stood Down', d: 'Defeat 2 Guards Who Never Stood Down (found in The Place That Never Quite Ended) still holding a post no one ever relieved them of', t: 'kill_specific', target: 'A Guard Who Never Stood Down', c: 0, need: 2, rw: { xp: 14000, g: 9300 }, done: false, refreshDay: -1 },
+      { id: 'st_held_refuses', n: 'What This Place Refuses to Become', d: 'Defeat 3 things this place Refuses to Become (found in The Place That Never Quite Ended) before they unmake the ending this ground already earned', t: 'kill_specific', target: 'Whatever This Place Refuses to Become', c: 0, need: 3, rw: { xp: 15200, g: 10100 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_held_hound', n: 'The Hound Wearing an Old Face', d: 'Defeat 2 Hounds Wearing Someone\u2019s Old Face (found in Two Shapes, One Body) before the argument they are mid-way through spills past the borders', t: 'kill_specific', target: 'A Hound Wearing Someone\u2019s Old Face', c: 0, need: 2, rw: { xp: 16600, g: 11000 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_held_between', n: 'Caught Between Two Selves', d: 'Defeat 3 things Caught Between Two Selves (found in Two Shapes, One Body) — neither half ever wins, but they keep trying near ground that finally isn\u2019t theirs to unsettle', t: 'kill_specific', target: 'Something Caught Between Two Selves', c: 0, need: 3, rw: { xp: 18200, g: 12100 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_held_wolf', n: 'The Wolf Still Becoming', d: 'Defeat 2 Wolves That Never Finished Becoming (found in Two Shapes, One Body) before the change finishes somewhere it genuinely should not', t: 'kill_specific', target: 'The Wolf That Never Finished Becoming', c: 0, need: 2, rw: { xp: 19800, g: 13200 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_held_nosferatu', n: 'Freshly Refused', d: 'Defeat 3 Nosferatu, Freshly Refused (found in What Refused the Grave) before the ground gets dug up from beneath a fourth time', t: 'kill_specific', target: 'A Nosferatu, Freshly Refused', c: 0, need: 3, rw: { xp: 21600, g: 14400 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_held_bloodless', n: 'Bloodless and Still Standing', d: 'Defeat 3 things Bloodless and Still Standing (found in What Refused the Grave) that have not yet noticed this ground stopped being theirs to argue with', t: 'kill_specific', target: 'Something Bloodless and Still Standing', c: 0, need: 3, rw: { xp: 23600, g: 15700 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_held_undying', n: 'Mid-Argument With Its Own Grave', d: 'Defeat 4 of the Undying, Mid-Argument With Its Own Grave (found in What Refused the Grave) — the last of them still refusing to lose to ground that already held', t: 'kill_specific', target: 'The Undying, Mid-Argument With Its Own Grave', c: 0, need: 4, rw: { xp: 27000, g: 18000 }, done: false, refreshDay: -1, minGuildLevel: 5 }
+    ],
+    guildHall: [
+      { level: 1, name: 'Ground, Actually Claimed', cost: 550000, desc: 'Free rest and a daily stipend — the first thing in this whole stretch of the world that got to simply finish, and stay finished.' },
+      { level: 2, name: 'A Line That Held', cost: 1600000, mats: { 'A Clock With No Hands': 10, 'An Ending, Postponed Indefinitely': 10 }, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
+      { level: 3, name: 'Fur That Finally Settles', cost: 3800000, mats: { 'A Torn Collar, Still Fastened': 12, 'Fur That Grows Back Wrong': 10 }, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
+      { level: 4, name: 'Soil That Stays Settled', cost: 8000000, mats: { 'Soil That Will Not Stay Settled': 12, 'A Coffin Lid, Pushed From Beneath': 10 }, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
+      { level: 5, name: 'What Held, Permanently', cost: 18000000, mats: { 'Proof the Grave Lost This Round Too': 14, 'Proof Something Here Was Supposed to End': 12, 'Proof Neither Half Ever Wins': 10 }, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
+    ],
+    zoneLv: 660,
+    siegeEnemies: ['Something Still Waiting to Be Over', 'A Hound Wearing Someone\u2019s Old Face', 'A Nosferatu, Freshly Refused', 'The Undying, Mid-Argument With Its Own Grave'],
+    siegeReward: { xp: 320000, gold: 210000, guildRep: 900 }
+  },
+  // Extends stronghold coverage past heldGround's World 7 opening (Lv660) — Lv760-1250
+  // (Worlds 8-12) had no stronghold presence at all until this one. Anchored at The
+  // Higher Hunting Grounds (Lv900, World 9), whose own established flavor is about
+  // altitude punishing anything "not actually built to belong this far up" — claimed
+  // ground here represents having genuinely earned the right to hold that height.
+  higherGround: {
+    name: 'The Height That Finally Belongs to You',
+    icon: '🪽',
+    era: 'watchedSky',
+    restSiteIds: ['higher_ground_camp', 'higher_ground_tavern'],
+    desc: "Everything else this high punishes anyone who was not built for it — thinning air, relentless pursuit, guardians who never stood down. This patch of sky, once claimed, simply stops testing you. It turns out belonging here was always something you could actually earn, not just survive.",
+    stipend: { xp: 15000, gold: 10000 },
+    tasks: [
+      { id: 'st_higher_wyvern', n: 'The Thinning Air, Held', d: 'Defeat 3 Wyverns Adapted to the Thinning Air (found in The Higher Hunting Grounds) before the altitude tests this ground the way it tests everything else', t: 'kill_specific', target: 'A Wyvern Adapted to the Thinning Air', c: 0, need: 3, rw: { xp: 22000, g: 14600 }, done: false, refreshDay: -1 },
+      { id: 'st_higher_hunts', n: 'What Hunts Where Few Follow', d: 'Defeat 2 things That Hunt Where Few Things Can Follow (found in The Higher Hunting Grounds) before they decide this claimed ground is worth following into', t: 'kill_specific', target: 'Something That Hunts Where Few Things Can Follow', c: 0, need: 2, rw: { xp: 23500, g: 15600 }, done: false, refreshDay: -1 },
+      { id: 'st_higher_pursuit', n: 'The Chase That Never Stops', d: 'Defeat 3 Harpies That Have Never Once Stopped Chasing (found in The Pursuit That Does Not End) before their pursuit finds a reason to include this ground too', t: 'kill_specific', target: 'A Harpy That Has Never Once Stopped Chasing', c: 0, need: 3, rw: { xp: 25200, g: 16800 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_higher_relentless', n: 'Relentless, Not Just Fast', d: 'Defeat 2 things Relentless Rather Than Merely Fast (found in The Pursuit That Does Not End) before persistence outlasts even ground that has already held', t: 'kill_specific', target: 'Something Relentless Rather Than Merely Fast', c: 0, need: 2, rw: { xp: 27000, g: 18000 }, done: false, refreshDay: -1, minGuildLevel: 2 },
+      { id: 'st_higher_oath', n: "The Oath Nobody Remembers", d: 'Defeat 3 Griffins Who Remember the Original Oath (found in The Old Vow, Still Standing Watch) before an old vow decides this ground falls under its own forgotten terms', t: 'kill_specific', target: 'A Griffin Who Remembers the Original Oath', c: 0, need: 3, rw: { xp: 29200, g: 19500 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_higher_vow', n: 'Standing Watch Over the Vow', d: 'Defeat 2 things Standing Watch Over the Vow Itself (found in The Old Vow, Still Standing Watch) before that old watch extends to what you have only just claimed', t: 'kill_specific', target: 'Something Standing Watch Over the Vow Itself', c: 0, need: 2, rw: { xp: 31500, g: 21000 }, done: false, refreshDay: -1, minGuildLevel: 3 },
+      { id: 'st_higher_overlap', n: 'Where Three Skies Overlap', d: 'Defeat 3 things where a Wyvern, a Harpy, and a Griffin All Ignore Each Other (found in Where All Three Skies Overlap) before all three decide your claimed ground is worth agreeing on', t: 'kill_specific', target: 'A Wyvern, a Harpy, and a Griffin, All Ignoring Each Other', c: 0, need: 3, rw: { xp: 34500, g: 23000 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_higher_herald', n: "The Watcher's Own Herald", d: 'Defeat 3 things Sent Down From the Very Top (found in The Last Clear Air) before whatever watches from the summit sends something this ground cannot hold against', t: 'kill_specific', target: 'Something Sent Down From the Very Top', c: 0, need: 3, rw: { xp: 38000, g: 25300 }, done: false, refreshDay: -1, minGuildLevel: 4 },
+      { id: 'st_higher_guardian', n: 'A Guardian of the Last Clear Air', d: 'Defeat 4 Guardians of the Last Clear Air (found in The Last Clear Air) — the summit\u2019s own answer to ground it never expected to see claimed', t: 'kill_specific', target: 'A Guardian of the Last Clear Air', c: 0, need: 4, rw: { xp: 43000, g: 28700 }, done: false, refreshDay: -1, minGuildLevel: 5 }
+    ],
+    guildHall: [
+      { level: 1, name: 'A Height, Actually Earned', cost: 900000, desc: 'Free rest and a daily stipend — the first ground this high that got to simply belong to you, instead of just barely tolerating your presence.' },
+      { level: 2, name: 'Air That No Longer Thins', cost: 2600000, mats: { 'Air, Bottled Before It Could Thin': 10, 'Proof Altitude Is Its Own Kind of Weapon': 10 }, desc: '+50% daily stipend, and a third stronghold task becomes available.', stipendMult: 1.5 },
+      { level: 3, name: 'A Chase That Finally Ends', cost: 6200000, mats: { 'Proof Persistence Beats Speed Eventually': 12, 'A Trail Worn Down by Endless Pursuit': 10 }, desc: '+5% XP from every victory, permanently.', xpBonus: 0.05 },
+      { level: 4, name: 'A Vow, Finally Honored', cost: 13000000, mats: { 'The Original Vow, Word for Word': 12, 'Proof Some Promises Outlive Their Own Point': 10 }, desc: '+10% gold from every victory, permanently.', goldBonus: 0.10 },
+      { level: 5, name: 'The Original Height, Held', cost: 29000000, mats: { 'A Vantage Point, Finally Earned': 14, 'Proof the Watching Was Never Actually Hostile': 12, 'A Feather From Something Far Larger Than a Wyvern': 10 }, desc: 'Another +10% XP and +10% gold, plus resting here grants a 3-fight blessing of +10% to all stats.', xpBonus: 0.10, goldBonus: 0.10, blessing: true }
+    ],
+    zoneLv: 900,
+    siegeEnemies: ['A Wyvern Adapted to the Thinning Air', 'A Harpy That Has Never Once Stopped Chasing', 'A Griffin Who Remembers the Original Oath', 'A Guardian of the Last Clear Air'],
+    siegeReward: { xp: 520000, gold: 340000, guildRep: 1400 }
   }
 };
 
@@ -15105,7 +15187,7 @@ function isLibraryResearchActionUnlocked(actionId) {
 function isLibraryResearchActionAvailable(actionId) {
   const action = LIBRARY_RESEARCH_ACTIONS[actionId];
   if (!action) return false;
-  if (G.libraryResearch.completedActions.includes(actionId)) return false;
+  if ((G.libraryResearch.completedActions || []).includes(actionId)) return false;
   // Skill-tier actions only make sense once San has actually chosen that path —
   // researching a deeper flame theory means nothing if she specialized in frost.
   if (action.unlockSpecTier && G.playerSpec.path !== action.unlockSpecTier.path) return false;
@@ -16028,13 +16110,30 @@ const SHIP_TIERS = [
       materials: { 'Deep-Forged Ironwork': 12, 'Blessed Ballast': 10 }, gold: 260000 },
     { name: 'Nothing Left Untested', desc: 'The last trial. Bren stops calling it a ship at this point and starts calling it yours.',
       materials: { 'Deep-Forged Ironwork': 8, 'Blessed Ballast': 8 }, gold: 300000 }
+  ]},
+  // "The last ship Bren will ever need to build for you" still holds true, on purpose
+  // — this tier isn't Bren building something bigger. It's what happens once the
+  // mirror sea itself, understood since Arc F to be the same water-network as Kai's
+  // creek, starts recognizing the ship rather than merely carrying it. Parco's own
+  // centuries of memory across the mirror waters make him the one who actually knows
+  // how to ask for this, not Bren's usual craft.
+  { name: 'The Deep Accord', requiredVoyagerLevel: 15, cargoCapacity: 280, stages: [
+    { name: 'A Hull the Sea Recognizes', desc: 'Not reinforcement this time \u2014 recognition. Parco walks the whole hull himself, murmuring something in a language older than any single one of his lives, and the wood listens.',
+      materials: { 'Deep-Forged Ironwork': 20, 'Tidewoven Silk': 10 }, gold: 420000 },
+    { name: 'Rigging That Remembers the Way Home', desc: 'Sails woven through with something that was never quite thread \u2014 the same current that carries every letter home, folded into the canvas itself.',
+      materials: { 'Tidewoven Silk': 18, 'Star-Bound Rivets': 10 }, gold: 480000 },
+    { name: 'A Hold Deep Enough for Everything Carried So Far', desc: 'Every port, every debt settled, every old grief finally named \u2014 the hold holds all of it now, somehow, without ever once feeling crowded.',
+      materials: { 'Star-Bound Rivets': 14, 'Blessed Ballast': 16 }, gold: 540000 },
+    { name: 'What the Water Itself Approves', desc: 'The last trial is not Bren\u2019s to give. The sea simply stops fighting the hull, all at once, the way it never quite has before \u2014 and Parco, watching, says this is the only verdict that was ever actually going to matter.',
+      materials: { 'Tidewoven Silk': 10, 'Star-Bound Rivets': 10 }, gold: 620000 }
   ]}
 ];
 const SHIP_MATERIAL_PRICES = {
   'Weathered Driftwood': 45, 'Ballast Stone': 60, 'Waxed Sailcloth': 80,
   'Rope, Properly Coiled': 35, 'Salvaged Iron Fittings': 95, 'Pitch and Tar': 55,
   'Reinforced Ship\u2019s Timber': 160, 'Storm-Treated Canvas': 220,
-  'Deep-Forged Ironwork': 420, 'Blessed Ballast': 480
+  'Deep-Forged Ironwork': 420, 'Blessed Ballast': 480,
+  'Tidewoven Silk': 850, 'Star-Bound Rivets': 950
 };
 
 // === VOYAGE: VOYAGER LEVEL ===
@@ -16054,7 +16153,10 @@ function grantVoyagerXP(amount) {
     leveledUp = true;
   }
   if (leveledUp) {
-    lg('\u2693 Voyager Level ' + G.voyage.level + '! ' + (SHIP_TIERS.find(t => t.requiredVoyagerLevel === G.voyage.level) ? 'A stronger ship is now within reach at Bren\u2019s yard.' : ''));
+    const shipMsg = SHIP_TIERS.find(t => t.requiredVoyagerLevel === G.voyage.level) ? 'A stronger ship is now within reach at Bren\u2019s yard.' : '';
+    const masteryMsg = VOYAGER_MASTERY_MILESTONES.find(m => m.level === G.voyage.level);
+    lg('\u2693 Voyager Level ' + G.voyage.level + '! ' + shipMsg);
+    if (masteryMsg) lg('🧭 Voyager Mastery: +5% ' + masteryMsg.type + ' bonus, permanently \u2014 ' + masteryMsg.label + '.');
   }
 }
 
@@ -16107,7 +16209,7 @@ function sellVoyageGood(goodId, qty) {
   const price = getPortGoodPrice(G.voyage.currentPort, goodId, 'sell');
   // Trade-bonus crew (Zheng He) apply here — a real reason to actually crew the ship
   // rather than just leaving those 8 slots empty.
-  const earned = Math.round(price * actualQty * (1 + getCrewBonus('trade')));
+  const earned = Math.round(price * actualQty * (1 + getCrewBonus('trade') + getVoyagerMasteryBonus('trade')));
   G.p.gold += earned;
   G.voyage.cargo[goodId] -= actualQty;
   if (G.voyage.cargo[goodId] <= 0) delete G.voyage.cargo[goodId];
@@ -16171,7 +16273,7 @@ function startSeaEncounter(danger) {
   // Combat-bonus crew (Bapoleon) soften the encounter directly rather than buffing
   // the player's own stats — reads as "the crew helped brace for this" rather than
   // San suddenly hitting harder because someone else is aboard.
-  const combatBonus = getCrewBonus('combat');
+  const combatBonus = getCrewBonus('combat') + getVoyagerMasteryBonus('combat');
   if (combatBonus > 0) { stats.atk = Math.round(stats.atk * (1 - combatBonus)); stats.def = Math.round(stats.def * (1 - combatBonus)); }
   G.cbt.on = true;
   G.cbt.turn = 0;
@@ -16194,7 +16296,7 @@ function sailToPort(portId) {
   // Encounter chance scales with both the destination's danger rating and how far the
   // crossing was — a short hop between calm ports is much safer than a long one
   // through dangerous water. Travel-bonus crew (Parco) reduce this directly.
-  const encounterChance = Math.min(0.5, destPort.danger * 0.08 * distance) * (1 - getCrewBonus('travel'));
+  const encounterChance = Math.min(0.5, destPort.danger * 0.08 * distance) * (1 - getCrewBonus('travel') - getVoyagerMasteryBonus('travel'));
   if (Math.random() < encounterChance) {
     startSeaEncounter(destPort.danger);
     return;
@@ -16315,6 +16417,27 @@ function getCrewBonus(type) {
   for (let id of G.voyage.crew) {
     const def = getGuildMemberDef(id);
     if (def && def.voyageBonus && def.voyageBonus.type === type) bonus += def.voyageBonus.value;
+  }
+  return bonus;
+}
+
+// Voyager Mastery — Voyager Level itself has no ceiling and keeps climbing past VLv10,
+// but "The Whole Horizon" is explicitly Bren's last ship ("the last ship Bren will ever
+// need to build for you," meant as her highest compliment) — a deliberate narrative
+// closing point, not an oversight, so a 4th ship tier would actually contradict
+// established story rather than fix one. This gives continued Voyager Level real
+// purpose instead: the captain herself growing more skilled, not the vessel, stacking
+// on top of whatever crew bonuses are already active.
+const VOYAGER_MASTERY_MILESTONES = [
+  { level: 15, type: 'trade', value: 0.05, label: 'Bren\u2019s old charts, finally fully read' },
+  { level: 20, type: 'travel', value: 0.05, label: 'Every current in these waters, learned by feel' },
+  { level: 25, type: 'combat', value: 0.05, label: 'No longer surprised by anything the sea sends' },
+  { level: 30, type: 'trade', value: 0.05, label: 'The kind of instinct that only comes from actually having been everywhere' }
+];
+function getVoyagerMasteryBonus(type) {
+  let bonus = 0;
+  for (let m of VOYAGER_MASTERY_MILESTONES) {
+    if (G.voyage.level >= m.level && m.type === type) bonus += m.value;
   }
   return bonus;
 }
@@ -18225,7 +18348,12 @@ function doPartyAttack(member, noBonus) {
   
   const target = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
   // member.atk/spd already include equipped gear bonuses via recalcPartyMember()
-  const zakiCourageBonus = (member.n === 'Zaki' && checkZakiCourage()) ? 6 : 0;
+  // Fixed from a flat +6 ATK, which was meaningless once endgame ATK reached the
+  // thousands — now scales with character level the same way Joel's Divine Strength
+  // does just below, preserving the original ~6:4 feel at Zaki's own Lv15 unlock
+  // (Math.ceil(15*0.3)=5, Math.ceil(15*0.2)=3) while staying proportionally
+  // meaningful at any level thereafter.
+  const zakiCourageBonus = (member.n === 'Zaki' && checkZakiCourage()) ? Math.ceil(G.p.lvl * 0.3) : 0;
   const joelDivineStrengthBonus = (member.n === 'Joel' && G.joelDivineStrength > 0) ? Math.ceil(G.p.lvl * (hasCompanionPrestige('Joel', 'champion') ? 0.7 : 0.4)) : 0;
   const effectiveAtk = member.atk + zakiCourageBonus + joelDivineStrengthBonus;
   const effectiveSpd = member.spd;
@@ -18553,7 +18681,7 @@ function doEnemyAttack(enemy) {
   });
   
     let finalDamage = damageResult.total;
-  const zakiCourageDef = (target !== G.p && target.n === 'Zaki' && checkZakiCourage()) ? 4 : 0;
+  const zakiCourageDef = (target !== G.p && target.n === 'Zaki' && checkZakiCourage()) ? Math.ceil(G.p.lvl * 0.2) : 0;
   const targetDef = target === G.p 
     ? ((G.p.eq.armor ? G.p.eq.armor.def : 0) + G.p.buffs.reduce((s, b) => s + (b.def || 0), 0) + getStatBoosterBonus('def')) * getAilmentMult('def')
     : (target.def || 0) + getBlessDef(target) + zakiCourageDef;
@@ -18641,7 +18769,7 @@ function doEnemyAttack(enemy) {
     // Farther Reach — Library-gated, not level-gated. Reuses the exact same damage/log
     // pattern as Static Field itself, just aimed at a second living enemy, tying
     // directly into Mez's own Library Research angle: how far reaching can actually go.
-    if (G.libraryResearch.completedActions.includes('mez_farther_reach')) {
+    if ((G.libraryResearch.completedActions || []).includes('mez_farther_reach')) {
       const otherTargets = G.cbt.en.filter(e => e !== enemy && e.hp > 0);
       if (otherTargets.length > 0 && Math.random() < 0.5) {
         const secondTarget = otherTargets[Math.floor(Math.random() * otherTargets.length)];
@@ -20921,7 +21049,7 @@ function canUnlockTier(tierIdx) {
   // player can never bypass the research requirement by simply reaching a high
   // enough level and clicking the normal Unlock button.
   if (tier.libraryUnlock) {
-    if (!G.libraryResearch.completedActions.includes(tier.libraryUnlock)) return false;
+    if (!(G.libraryResearch.completedActions || []).includes(tier.libraryUnlock)) return false;
   } else if (G.p.lvl < tier.level) {
     return false;
   }
@@ -23724,7 +23852,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.197';
+const BUILD_ID = '2026-08-17.200';
 // =========================
 
 

@@ -562,9 +562,9 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
   opacity: 1;
 }
 @keyframes critFlash {
-  0% { filter: brightness(1) drop-shadow(0 0 0 var(--gold)); transform: scale(1); }
-  20% { filter: brightness(2.5) drop-shadow(0 0 12px var(--gold)); transform: scale(1.08); }
-  100% { filter: brightness(1) drop-shadow(0 0 0 transparent); transform: scale(1); }
+  0% { filter: brightness(1); transform: scale(1); }
+  20% { filter: brightness(2.5); transform: scale(1.08); }
+  100% { filter: brightness(1); transform: scale(1); }
 }
 
 /* ELEMENTAL IMMUNITY INDICATOR */
