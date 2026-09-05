@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fix: auto-combat crash mid-turn \u2014 4 unguarded completedActions.includes() calls fixed; styles.css: removed the drop-shadow filter from critFlash causing stutter on frequent crits)';
+const APP_VERSION = '2026-08-17 (Fix: Mercenary Blitz peak tier no longer lost after one missed day; New: 50/100/200min focus tiers, Guild Magazine (Zaki\u2019s cafe), Tribute to Big Mama Rest/88 Rest + Shi Wei Tian + LOF menus, soymilk/Vitasoy, Kolo Mee/Lao Shu Fen/Thunder Tea Rice)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -10916,10 +10916,13 @@ function checkDayAdvance() {
   // player level, and got punishing fast for anyone doing this repeatable content
   // often. Resetting daily keeps escalation contained to a single day's grinding.
   if (G.mercenary.completed > 0) {
-    // Captured before the reset below wipes it — Mercenary Blitz explicitly uses
-    // yesterday's peak tier, not today's (which would otherwise always read as
-    // freshly reset to 0 the moment Blitz becomes available each morning).
-    G.mercenaryBlitz.yesterdayPeakTier = getMercenaryTier();
+    // Captured before the reset below wipes it, and kept as the running MAX rather
+    // than being overwritten outright — previously this only ever remembered the
+    // single most recent day's peak, so missing Blitz for even one day permanently
+    // lost an earlier high peak the moment a second day passed (yesterday's peak of 0
+    // would overwrite an e.g. 800 from two days ago). Now it persists, unclaimed,
+    // until Blitz actually consumes it, no matter how many days pass in between.
+    G.mercenaryBlitz.yesterdayPeakTier = Math.max(G.mercenaryBlitz.yesterdayPeakTier || 0, getMercenaryTier());
     lg('📋 Mercenary contracts reset for the day \u2014 tier back to 1.');
     G.mercenary.completed = 0;
   }
@@ -21873,6 +21876,10 @@ function blitzMercenary() {
   G.mercenary.completed = Math.max(G.mercenary.completed || 0, reward.tier * MERCENARY_CONTRACTS_PER_TIER);
   G.mercenaryBlitz.lastBlitzDay = G.gameDay;
   G.mercenaryBlitz.lifetimeUses = (G.mercenaryBlitz.lifetimeUses || 0) + 1;
+  // Consumed — reset to 0 now that it's been claimed, rather than leaving it at the
+  // just-claimed value. Otherwise the running-max fix above would let the same peak
+  // be claimed again on a future day where today's own peak happens to be lower.
+  G.mercenaryBlitz.yesterdayPeakTier = 0;
   checkAchievements();
   lg('⚡ Mercenary Blitz: instant contract cleared at Tier ' + (reward.tier + 1) + '. +' + reward.txp.toLocaleString() + ' XP, +' + reward.tg2.toLocaleString() + 'G. Standing restored to Tier ' + (reward.tier + 1) + '.');
   lvlup();
@@ -23852,7 +23859,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.200';
+const BUILD_ID = '2026-08-17.201';
 // =========================
 
 
@@ -27294,7 +27301,7 @@ function rMercenary() {
     const canBlitz = canBlitzMercenary();
     h += '<div class="panel' + (canBlitz ? ' panel-gold' : '') + '" style="text-align:center;">';
     h += '<div class="panel-title" style="' + (canBlitz ? 'color:var(--gold);' : '') + '">⚡ Mercenary Blitz</div>';
-    h += '<div class="btn-hint" style="margin:6px 0;">Instant contract at yesterday\u2019s peak tier (Tier ' + ((G.mercenaryBlitz.yesterdayPeakTier || 0) + 1) + '). Once per day.</div>';
+    h += '<div class="btn-hint" style="margin:6px 0;">Instant contract at your highest unclaimed peak tier (Tier ' + ((G.mercenaryBlitz.yesterdayPeakTier || 0) + 1) + ') \u2014 this no longer expires after one missed day. Once per day.</div>';
     h += '<button onclick="blitzMercenary()" class="' + (canBlitz ? 'abtn' : 'btn-outline-ghost') + '" style="width:100%;" ' + (canBlitz ? '' : 'disabled') + '>' + (canBlitz ? 'Blitz Now' : 'Already used today') + '</button>';
     h += '</div>';
   }
@@ -28974,6 +28981,8 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Bacon (4 rashers, grilled)', cat: 'Pork', chef: 'Joel', fat: 16.0, sat: 5.9, unsat: 10.1, fiber: 0, protein: 20.0, carbs: 0.4, icon: '🥓' },
   { n: 'Pork Loin (lean, 100g)', cat: 'Pork', chef: 'Joel', fat: 7.0, sat: 2.6, unsat: 4.4, fiber: 0, protein: 26.0, carbs: 0.0, icon: '🥩' },
   { n: 'Minced Pork (100g)', cat: 'Pork', chef: 'Joel', fat: 21.0, sat: 7.8, unsat: 13.2, fiber: 0, protein: 17.0, carbs: 0.0, icon: '🥩' },
+  { n: 'Tortang Talong (1 serving)', cat: 'Common Meals', chef: 'Joel', fat: 12.0, sat: 2.8, unsat: 9.2, fiber: 3.0, protein: 7.0, carbs: 9.0, icon: '🍆' },
+  { n: 'Manichai with Eggs, Filipino-style (1 serving)', cat: 'Common Meals', chef: 'Joel', fat: 10.0, sat: 2.5, unsat: 7.5, fiber: 2.5, protein: 9.0, carbs: 14.0, icon: '🍳' },
   { n: 'Tenggiri / Mackerel (100g)', cat: 'Seafood & Fish', fat: 12.0, sat: 2.4, unsat: 9.6, fiber: 0, protein: 24.0, carbs: 0.0, icon: '🐟' },
   { n: 'Ikan Bilis / Anchovies, Pusu (20g)', cat: 'Seafood & Fish', fat: 2.0, sat: 0.4, unsat: 1.6, fiber: 0, protein: 9.0, carbs: 0.0, icon: '🐟' },
   { n: 'Sardines, ½ Can in Olive Oil', cat: 'Seafood & Fish', fat: 9.0, sat: 1.3, unsat: 7.7, fiber: 0, protein: 12.0, carbs: 0.0, icon: '🐟' },
@@ -29206,16 +29215,18 @@ const CAFE_FOOD_DATABASE = [
   // per 100g like most of the rest of the database. Sandwiches assume a standard
   // 2-slice build; white and wholemeal versions given separately since the bread
   // itself meaningfully shifts both the fiber and carb numbers, not just flavor.
-  { n: 'White Bread, 1 slice (~28g)', cat: 'Bakery', fat: 0.9, sat: 0.2, unsat: 0.7, fiber: 0.8, protein: 2.5, carbs: 14.0, icon: '🍞' },
-  { n: 'Wholemeal Bread, 1 slice (~28g)', cat: 'Bakery', fat: 1.0, sat: 0.2, unsat: 0.8, fiber: 2.2, protein: 3.5, carbs: 12.0, icon: '🍞' },
-  { n: 'Low GI Bread, 1 slice (~28g)', cat: 'Bakery', fat: 1.2, sat: 0.2, unsat: 1.0, fiber: 2.8, protein: 4.0, carbs: 11.5, icon: '🍞' },
-  { n: 'Chicken Quiche, small (~100g)', cat: 'Bakery', fat: 18.0, sat: 9.0, unsat: 9.0, fiber: 0.8, protein: 12.0, carbs: 18.0, icon: '🥧' },
-  { n: 'Chicken Sandwich, white bread (2 slices)', cat: 'Bakery', fat: 10.0, sat: 3.0, unsat: 7.0, fiber: 1.6, protein: 18.0, carbs: 28.0, icon: '🥪' },
-  { n: 'Chicken Sandwich, wholemeal bread (2 slices)', cat: 'Bakery', fat: 10.0, sat: 3.0, unsat: 7.0, fiber: 4.4, protein: 19.0, carbs: 24.0, icon: '🥪' },
-  { n: 'Egg Sandwich, white bread (2 slices)', cat: 'Bakery', fat: 16.0, sat: 4.0, unsat: 12.0, fiber: 1.6, protein: 12.0, carbs: 28.0, icon: '🥪' },
-  { n: 'Egg Sandwich, wholemeal bread (2 slices)', cat: 'Bakery', fat: 16.0, sat: 4.0, unsat: 12.0, fiber: 4.4, protein: 13.0, carbs: 24.0, icon: '🥪' },
-  { n: 'Tuna Sandwich, white bread (2 slices)', cat: 'Bakery', fat: 13.0, sat: 2.5, unsat: 10.5, fiber: 1.6, protein: 18.0, carbs: 28.0, icon: '🥪' },
-  { n: 'Tuna Sandwich, wholemeal bread (2 slices)', cat: 'Bakery', fat: 13.0, sat: 2.5, unsat: 10.5, fiber: 4.4, protein: 19.0, carbs: 24.0, icon: '🥪' },
+  { n: 'White Bread, 1 slice (~28g)', cat: 'Tribute to LOF', fat: 0.9, sat: 0.2, unsat: 0.7, fiber: 0.8, protein: 2.5, carbs: 14.0, icon: '🍞' },
+  { n: 'Wholemeal Bread, 1 slice (~28g)', cat: 'Tribute to LOF', fat: 1.0, sat: 0.2, unsat: 0.8, fiber: 2.2, protein: 3.5, carbs: 12.0, icon: '🍞' },
+  { n: 'Low GI Bread, 1 slice (~28g)', cat: 'Tribute to LOF', fat: 1.2, sat: 0.2, unsat: 1.0, fiber: 2.8, protein: 4.0, carbs: 11.5, icon: '🍞' },
+  { n: 'Chicken Quiche, small (~100g)', cat: 'Tribute to LOF', fat: 18.0, sat: 9.0, unsat: 9.0, fiber: 0.8, protein: 12.0, carbs: 18.0, icon: '🥧' },
+  { n: 'Chicken Sandwich, white bread (2 slices)', cat: 'Tribute to LOF', fat: 10.0, sat: 3.0, unsat: 7.0, fiber: 1.6, protein: 18.0, carbs: 28.0, icon: '🥪' },
+  { n: 'Chicken Sandwich, wholemeal bread (2 slices)', cat: 'Tribute to LOF', fat: 10.0, sat: 3.0, unsat: 7.0, fiber: 4.4, protein: 19.0, carbs: 24.0, icon: '🥪' },
+  { n: 'Egg Sandwich, white bread (2 slices)', cat: 'Tribute to LOF', fat: 16.0, sat: 4.0, unsat: 12.0, fiber: 1.6, protein: 12.0, carbs: 28.0, icon: '🥪' },
+  { n: 'Egg Sandwich, wholemeal bread (2 slices)', cat: 'Tribute to LOF', fat: 16.0, sat: 4.0, unsat: 12.0, fiber: 4.4, protein: 13.0, carbs: 24.0, icon: '🥪' },
+  { n: 'Tuna Sandwich, white bread (2 slices)', cat: 'Tribute to LOF', fat: 13.0, sat: 2.5, unsat: 10.5, fiber: 1.6, protein: 18.0, carbs: 28.0, icon: '🥪' },
+  { n: 'Tuna Sandwich, wholemeal bread (2 slices)', cat: 'Tribute to LOF', fat: 13.0, sat: 2.5, unsat: 10.5, fiber: 4.4, protein: 19.0, carbs: 24.0, icon: '🥪' },
+  { n: 'Triple Treat mini bun, 1 of 3 (egg, chicken ham, mayo)', cat: 'Tribute to LOF', fat: 7.0, sat: 1.8, unsat: 5.2, fiber: 0.8, protein: 6.0, carbs: 14.0, icon: '🥐' },
+  { n: 'Bun with Hotdog, small (1 pc)', cat: 'Tribute to LOF', fat: 9.0, sat: 3.0, unsat: 6.0, fiber: 1.0, protein: 7.0, carbs: 22.0, icon: '🌭' },
   { n: 'Chicken Rendang (no rice)', cat: 'Common Meals', fat: 18.0, sat: 6.3, unsat: 11.7, fiber: 1.5, protein: 28.0, carbs: 5.0, icon: '🍛' },
   { n: 'Chicken Masala (no sauce, 100g)', cat: 'Common Meals', fat: 8.0, sat: 2.8, unsat: 5.2, fiber: 1.5, protein: 25.0, carbs: 4.0, icon: '🍛' },
   { n: 'Chicken Curry with Potatoes (100g, incl. sauce & potato)', cat: 'Common Meals', fat: 7.0, sat: 2.4, unsat: 4.6, fiber: 1.5, protein: 11.0, carbs: 9.0, icon: '🍛' },
@@ -29248,6 +29259,9 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Nona Botanical Beverage Mix, Ginger with Honey (1 sachet, 8g)', cat: 'Drinks', fat: 0.0, sat: 0.0, unsat: 0.0, fiber: 0, protein: 0.1, carbs: 7.6, icon: '🍯' },
   { n: 'Primadona Coffee, adaptogen blend (1 sachet, 20g)', cat: 'Drinks', fat: 0.7, sat: 0.4, unsat: 0.3, fiber: 0, protein: 1.8, carbs: 13.0, icon: '☕' },
   { n: 'Nescafe Gold, black (1 tsp, ~2g)', cat: 'Drinks', fat: 0.0, sat: 0.0, unsat: 0.0, fiber: 0, protein: 0.1, carbs: 0.1, icon: '☕' },
+  { n: 'Soymilk, fresh, unsweetened (250ml)', cat: 'Drinks', fat: 4.0, sat: 0.6, unsat: 3.4, fiber: 0.5, protein: 7.0, carbs: 3.0, icon: '🥛' },
+  { n: 'Soymilk, fresh, sweetened (250ml)', cat: 'Drinks', fat: 4.0, sat: 0.6, unsat: 3.4, fiber: 0.5, protein: 7.0, carbs: 12.0, icon: '🥛' },
+  { n: 'Vitasoy, sweetened (250ml)', cat: 'Drinks', fat: 4.0, sat: 1.0, unsat: 3.0, fiber: 0, protein: 7.0, carbs: 17.0, icon: '🥛' },
   { n: 'Matcha Latte, regular milk (1 cup, ~240ml)', cat: 'Drinks', fat: 4.0, sat: 2.4, unsat: 1.6, fiber: 0, protein: 5.0, carbs: 22.0, icon: '🍵' },
   { n: 'Whipping Cream, aerosol (2 tbsp ~15g)', cat: 'Fats & Extras', fat: 5.0, sat: 3.1, unsat: 1.9, fiber: 0, protein: 0.3, carbs: 0.8, icon: '🫙' },
   { n: 'Tom Yum Soup, 1 bowl (no noodles)', cat: 'Thai Dishes', fat: 4.0, sat: 1.4, unsat: 2.6, fiber: 1.2, protein: 18.0, carbs: 4.0, icon: '🍲' },
@@ -29276,6 +29290,25 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Sup Tulang / Bone Broth Soup (1 bowl)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 8.0, sat: 3.2, unsat: 4.8, fiber: 1.5, protein: 18.0, carbs: 2.0, icon: '🥣' },
   { n: 'Pari Bakar / Grilled Stingray (1 serving)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 6.0, sat: 2.4, unsat: 3.6, fiber: 1.5, protein: 22.0, carbs: 2.0, icon: '🐟' },
   { n: 'Begedil / Potato Fritters (1 piece)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 5.0, sat: 2.0, unsat: 3.0, fiber: 1.5, protein: 2.0, carbs: 10.0, icon: '⚠️' },
+  { n: 'Tauhu Telor (1 serving)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 19.0, sat: 4.5, unsat: 14.5, fiber: 1.8, protein: 13.0, carbs: 11.0, icon: '🍳' },
+  // Non-halal, generic Chinese hawker noodles — Zaki cannot cook these (halal
+  // kitchen), so left untagged (Pantry) rather than attributed to either chef.
+  { n: 'Lao Shu Fen, with Minced Pork (1 bowl)', cat: 'Common Meals', fat: 17.0, sat: 6.0, unsat: 11.0, fiber: 4.0, protein: 26.0, carbs: 88.0, icon: '🍜' },
+  { n: 'Lao Shu Fen, with Minced Chicken (1 bowl)', cat: 'Common Meals', fat: 10.0, sat: 2.5, unsat: 7.5, fiber: 4.0, protein: 24.0, carbs: 88.0, icon: '🍜' },
+  { n: 'Kolo Mee, with Minced Pork (1 bowl)', cat: 'Common Meals', fat: 11.0, sat: 4.0, unsat: 7.0, fiber: 2.0, protein: 15.0, carbs: 55.0, icon: '🍜' },
+  { n: 'Kolo Mee, with Minced Chicken (1 bowl)', cat: 'Common Meals', fat: 7.0, sat: 2.0, unsat: 5.0, fiber: 2.0, protein: 14.0, carbs: 55.0, icon: '🍜' },
+  { n: 'Kolo Mee Pok, with Minced Pork (1 bowl)', cat: 'Common Meals', fat: 12.0, sat: 4.3, unsat: 7.7, fiber: 2.0, protein: 16.0, carbs: 56.0, icon: '🍜' },
+  { n: 'Kolo Mee Pok, with Minced Chicken (1 bowl)', cat: 'Common Meals', fat: 8.0, sat: 2.3, unsat: 5.7, fiber: 2.0, protein: 15.0, carbs: 56.0, icon: '🍜' },
+  { n: 'Wonton Noodles, dry, with Char Siu (1 bowl)', cat: 'Common Meals', fat: 12.0, sat: 4.0, unsat: 8.0, fiber: 2.0, protein: 18.0, carbs: 50.0, icon: '🍜' },
+  { n: 'Wonton Noodles Soup, with Pork (1 bowl)', cat: 'Common Meals', fat: 8.0, sat: 3.0, unsat: 5.0, fiber: 1.5, protein: 16.0, carbs: 45.0, icon: '🍜' },
+  // Tribute restaurant names — real Bruneian cafe names, restored per an explicit
+  // decision, since Zaki's halal kitchen cannot cook non-halal Chinese dishes like
+  // these. Untagged (no chef), with the tribute name itself as the category, so each
+  // surfaces as its own selectable section rather than being lost inside Pantry.
+  { n: 'Manichai with Eggs, Chinese-style (1 serving)', cat: 'Tribute to Big Mama Rest / 88 Rest', fat: 14.0, sat: 4.0, unsat: 10.0, fiber: 2.0, protein: 10.0, carbs: 12.0, icon: '🍳' },
+  { n: 'Kolo Mee Red, with Minced Pork (1 bowl)', cat: 'Tribute to Shi Wei Tian', fat: 11.0, sat: 4.0, unsat: 7.0, fiber: 2.0, protein: 16.0, carbs: 56.0, icon: '🍜' },
+  { n: 'Kolo Mee Red, with Minced Chicken (1 bowl)', cat: 'Tribute to Shi Wei Tian', fat: 7.0, sat: 2.0, unsat: 5.0, fiber: 2.0, protein: 15.0, carbs: 56.0, icon: '🍜' },
+  { n: 'Thunder Tea Rice / Leicha (1 serving)', cat: 'Tribute to Shi Wei Tian', fat: 10.0, sat: 1.5, unsat: 8.5, fiber: 6.0, protein: 12.0, carbs: 65.0, icon: '🍵' },
   { n: 'Gado-Gado (no lontong, light peanut sauce)', cat: 'Indonesian', fat: 12.0, sat: 4.8, unsat: 7.2, fiber: 1.5, protein: 10.0, carbs: 10.0, icon: '🥗' },
   { n: 'Bakso Soup / Meatball Soup (no noodles)', cat: 'Indonesian', fat: 8.0, sat: 3.2, unsat: 4.8, fiber: 1.5, protein: 18.0, carbs: 4.0, icon: '🥣' },
   { n: 'Opor Ayam / Chicken in Coconut Milk (no rice)', cat: 'Indonesian', fat: 20.0, sat: 17.0, unsat: 3.0, fiber: 0.5, protein: 26.0, carbs: 5.0, icon: '🍛' },
@@ -29468,7 +29501,8 @@ function getCafeBacklogDates() {
 const GUILD_CAFE_MERCH = [
   { id: 'zaki_notebook', n: "Zaki's Planning Notebook", price: 200, desc: 'Grid-ruled. He is very particular about the grid.' },
   { id: 'zaki_calculator', n: "A Field Calculator", price: 350, desc: 'Zaki insists this has saved more musters than any weapon has.' },
-  { id: 'zaki_checklist', n: "The Pack Checklist, Laminated", price: 150, desc: 'Seventeen items. He has never once needed all seventeen. He has never once dropped below seventeen either.' }
+  { id: 'zaki_checklist', n: "The Pack Checklist, Laminated", price: 150, desc: 'Seventeen items. He has never once needed all seventeen. He has never once dropped below seventeen either.' },
+  { id: 'guild_magazine', n: "Guild Magazine", price: 180, desc: "This month's issue leads with one of Dr. AA's ghost stories \u2014 the one about the healer who kept treating patients three days after the temple recorded her death. He still swears it really happened." }
 ];
 
 function buyGuildCafeMerch(itemId) {
@@ -32616,7 +32650,10 @@ function rFocus(){
       {m:10, xp:40, g:20, label:'Short Burst'},
       {m:15, xp:60, g:30, label:'Deep Work'},
       {m:20, xp:80, g:40, label:'Extended Flow'},
-      {m:25, xp:100, g:50, label:'Full Pomodoro'}
+      {m:25, xp:100, g:50, label:'Full Pomodoro'},
+      {m:50, xp:200, g:100, label:'Away for a While'},
+      {m:100, xp:400, g:200, label:'Long Charge or Nap'},
+      {m:200, xp:800, g:400, label:'Genuinely AFK'}
     ];
     for (let s of sessions) {
       h += '<button class="focus-session-btn" data-min="' + s.m + '" style="padding:14px 18px;border-radius:14px;border:2px solid var(--accent);background:var(--bg-card);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;">';
