@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Fix: Mercenary Blitz peak tier no longer lost after one missed day; New: 50/100/200min focus tiers, Guild Magazine (Zaki\u2019s cafe), Tribute to Big Mama Rest/88 Rest + Shi Wei Tian + LOF menus, soymilk/Vitasoy, Kolo Mee/Lao Shu Fen/Thunder Tea Rice)';
+const APP_VERSION = '2026-08-17 (Corrected: 50/100/200 batch sizes added to Mercenary/Boss Rush/Fraying Frontier/Guild War (not Focus Mode, reverted); Cafe: all non-halal Kolo Mee/Lao Shu Fen/Wonton moved under Tribute to Big Mama Rest/88 Rest, added Wonton-no-noodles soup)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -23859,7 +23859,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.201';
+const BUILD_ID = '2026-08-17.202';
 // =========================
 
 
@@ -27316,6 +27316,10 @@ function rMercenary() {
   for (const n of [5, 10, 25]) {
     h += '<button onclick="startMercenaryBatch(' + n + ')" class="tier-btn" style="flex:1;">Take ' + n + '</button>';
   }
+  h += '</div><div style="display:flex;gap:6px;margin-top:6px;">';
+  for (const n of [50, 100, 200]) {
+    h += '<button onclick="startMercenaryBatch(' + n + ')" class="tier-btn" style="flex:1;">Take ' + n + '</button>';
+  }
   h += '</div>';
   h += '</div>';
 
@@ -27895,6 +27899,10 @@ function rBossRushRoom() {
   for (const n of [5, 10, 25]) {
     h += '<button onclick="continueBossRushBatch(' + n + ')" class="tier-btn" style="flex:1;">Push ' + n + '</button>';
   }
+  h += '</div><div style="display:flex;gap:6px;margin-bottom:10px;">';
+  for (const n of [50, 100, 200]) {
+    h += '<button onclick="continueBossRushBatch(' + n + ')" class="tier-btn" style="flex:1;">Push ' + n + '</button>';
+  }
   h += '</div>';
   h += '<button onclick="retreatBossRush()" class="btn-outline-ghost" style="width:100%;">🏳️ Retreat (keep everything earned)</button>';
 
@@ -27918,6 +27926,10 @@ function rFrayingFrontierRoom() {
   h += '<div class="btn-hint" style="text-align:center;margin:8px 0 6px;">Or push through several at once \u2014 stops on its own the moment a fight is lost, keeping everything earned up to that point.</div>';
   h += '<div style="display:flex;gap:6px;margin-bottom:10px;">';
   for (const n of [5, 10, 25]) {
+    h += '<button onclick="continueFrayingFrontierBatch(' + n + ')" class="tier-btn" style="flex:1;">Push ' + n + '</button>';
+  }
+  h += '</div><div style="display:flex;gap:6px;margin-bottom:10px;">';
+  for (const n of [50, 100, 200]) {
     h += '<button onclick="continueFrayingFrontierBatch(' + n + ')" class="tier-btn" style="flex:1;">Push ' + n + '</button>';
   }
   h += '</div>';
@@ -28098,6 +28110,10 @@ function rGuildWarRoom() {
   h += '<div class="btn-hint" style="text-align:center;margin:8px 0 6px;">Or muster through several at once \u2014 stops on its own the moment a fight is lost, keeping everything earned up to that point.</div>';
   h += '<div style="display:flex;gap:6px;margin-bottom:10px;">';
   for (const n of [5, 10, 25]) {
+    h += '<button onclick="continueGuildWarBatch(' + n + ')" class="tier-btn" style="flex:1;">Muster ' + n + '</button>';
+  }
+  h += '</div><div style="display:flex;gap:6px;margin-bottom:10px;">';
+  for (const n of [50, 100, 200]) {
     h += '<button onclick="continueGuildWarBatch(' + n + ')" class="tier-btn" style="flex:1;">Muster ' + n + '</button>';
   }
   h += '</div>';
@@ -29293,14 +29309,15 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Tauhu Telor (1 serving)', cat: 'Bruneian / Malay', chef: 'Zaki', fat: 19.0, sat: 4.5, unsat: 14.5, fiber: 1.8, protein: 13.0, carbs: 11.0, icon: '🍳' },
   // Non-halal, generic Chinese hawker noodles — Zaki cannot cook these (halal
   // kitchen), so left untagged (Pantry) rather than attributed to either chef.
-  { n: 'Lao Shu Fen, with Minced Pork (1 bowl)', cat: 'Common Meals', fat: 17.0, sat: 6.0, unsat: 11.0, fiber: 4.0, protein: 26.0, carbs: 88.0, icon: '🍜' },
-  { n: 'Lao Shu Fen, with Minced Chicken (1 bowl)', cat: 'Common Meals', fat: 10.0, sat: 2.5, unsat: 7.5, fiber: 4.0, protein: 24.0, carbs: 88.0, icon: '🍜' },
-  { n: 'Kolo Mee, with Minced Pork (1 bowl)', cat: 'Common Meals', fat: 11.0, sat: 4.0, unsat: 7.0, fiber: 2.0, protein: 15.0, carbs: 55.0, icon: '🍜' },
-  { n: 'Kolo Mee, with Minced Chicken (1 bowl)', cat: 'Common Meals', fat: 7.0, sat: 2.0, unsat: 5.0, fiber: 2.0, protein: 14.0, carbs: 55.0, icon: '🍜' },
-  { n: 'Kolo Mee Pok, with Minced Pork (1 bowl)', cat: 'Common Meals', fat: 12.0, sat: 4.3, unsat: 7.7, fiber: 2.0, protein: 16.0, carbs: 56.0, icon: '🍜' },
-  { n: 'Kolo Mee Pok, with Minced Chicken (1 bowl)', cat: 'Common Meals', fat: 8.0, sat: 2.3, unsat: 5.7, fiber: 2.0, protein: 15.0, carbs: 56.0, icon: '🍜' },
-  { n: 'Wonton Noodles, dry, with Char Siu (1 bowl)', cat: 'Common Meals', fat: 12.0, sat: 4.0, unsat: 8.0, fiber: 2.0, protein: 18.0, carbs: 50.0, icon: '🍜' },
-  { n: 'Wonton Noodles Soup, with Pork (1 bowl)', cat: 'Common Meals', fat: 8.0, sat: 3.0, unsat: 5.0, fiber: 1.5, protein: 16.0, carbs: 45.0, icon: '🍜' },
+  { n: 'Lao Shu Fen, with Minced Pork (1 bowl)', cat: 'Tribute to Big Mama Rest / 88 Rest', fat: 17.0, sat: 6.0, unsat: 11.0, fiber: 4.0, protein: 26.0, carbs: 88.0, icon: '🍜' },
+  { n: 'Lao Shu Fen, with Minced Chicken (1 bowl)', cat: 'Tribute to Big Mama Rest / 88 Rest', fat: 10.0, sat: 2.5, unsat: 7.5, fiber: 4.0, protein: 24.0, carbs: 88.0, icon: '🍜' },
+  { n: 'Kolo Mee, with Minced Pork (1 bowl)', cat: 'Tribute to Big Mama Rest / 88 Rest', fat: 11.0, sat: 4.0, unsat: 7.0, fiber: 2.0, protein: 15.0, carbs: 55.0, icon: '🍜' },
+  { n: 'Kolo Mee, with Minced Chicken (1 bowl)', cat: 'Tribute to Big Mama Rest / 88 Rest', fat: 7.0, sat: 2.0, unsat: 5.0, fiber: 2.0, protein: 14.0, carbs: 55.0, icon: '🍜' },
+  { n: 'Kolo Mee Pok, with Minced Pork (1 bowl)', cat: 'Tribute to Big Mama Rest / 88 Rest', fat: 12.0, sat: 4.3, unsat: 7.7, fiber: 2.0, protein: 16.0, carbs: 56.0, icon: '🍜' },
+  { n: 'Kolo Mee Pok, with Minced Chicken (1 bowl)', cat: 'Tribute to Big Mama Rest / 88 Rest', fat: 8.0, sat: 2.3, unsat: 5.7, fiber: 2.0, protein: 15.0, carbs: 56.0, icon: '🍜' },
+  { n: 'Wonton Noodles, dry, with Char Siu (1 bowl)', cat: 'Tribute to Big Mama Rest / 88 Rest', fat: 12.0, sat: 4.0, unsat: 8.0, fiber: 2.0, protein: 18.0, carbs: 50.0, icon: '🍜' },
+  { n: 'Wonton Noodles Soup, with Pork (1 bowl)', cat: 'Tribute to Big Mama Rest / 88 Rest', fat: 8.0, sat: 3.0, unsat: 5.0, fiber: 1.5, protein: 16.0, carbs: 45.0, icon: '🍜' },
+  { n: 'Wonton, no noodles, Soup with Pork (1 bowl)', cat: 'Tribute to Big Mama Rest / 88 Rest', fat: 6.0, sat: 2.0, unsat: 4.0, fiber: 0.5, protein: 14.0, carbs: 8.0, icon: '🥣' },
   // Tribute restaurant names — real Bruneian cafe names, restored per an explicit
   // decision, since Zaki's halal kitchen cannot cook non-halal Chinese dishes like
   // these. Untagged (no chef), with the tribute name itself as the category, so each
@@ -32650,10 +32667,7 @@ function rFocus(){
       {m:10, xp:40, g:20, label:'Short Burst'},
       {m:15, xp:60, g:30, label:'Deep Work'},
       {m:20, xp:80, g:40, label:'Extended Flow'},
-      {m:25, xp:100, g:50, label:'Full Pomodoro'},
-      {m:50, xp:200, g:100, label:'Away for a While'},
-      {m:100, xp:400, g:200, label:'Long Charge or Nap'},
-      {m:200, xp:800, g:400, label:'Genuinely AFK'}
+      {m:25, xp:100, g:50, label:'Full Pomodoro'}
     ];
     for (let s of sessions) {
       h += '<button class="focus-session-btn" data-min="' + s.m + '" style="padding:14px 18px;border-radius:14px;border:2px solid var(--accent);background:var(--bg-card);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;">';
