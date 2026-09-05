@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Corrected: 50/100/200 batch sizes added to Mercenary/Boss Rush/Fraying Frontier/Guild War (not Focus Mode, reverted); Cafe: all non-halal Kolo Mee/Lao Shu Fen/Wonton moved under Tribute to Big Mama Rest/88 Rest, added Wonton-no-noodles soup)';
+const APP_VERSION = '2026-08-17 (New: persistent "Round X/Y" batch counter now visible on every screen, not just the combat screen a Take-batch was started from \u2014 extracted into getActiveBatchBadges(), shown in the global header)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -14264,6 +14264,31 @@ function continueBossRushBatch(n) {
   continueBossRush();
 }
 
+// "Round X of Y" badge data for whichever Take 5/10/25/50/100/200 batch is currently
+// running (Boss Rush, Fraying Frontier, Guild War, Mercenary). batchTotal is the size
+// originally requested; batchRemaining counts down as each fight resolves, so the
+// current round is simply the difference between them — round 1 the instant the
+// batch starts, climbing to round Y right as the last fight in the batch begins.
+// Shared by the combat top strip and the persistent global header (see render()),
+// since a batch keeps running via auto-combat even while the player is on another
+// screen entirely, and previously had no visible progress once you navigated away.
+function getActiveBatchBadges() {
+  const badges = [];
+  const batchModes = [
+    { obj: G.bossRush, label: 'Boss Rush' },
+    { obj: G.frayingFrontier, label: 'Frontier' },
+    { obj: G.guildWar, label: 'Guild War' },
+    { obj: G.mercenary, label: 'Mercenary' }
+  ];
+  for (let bm of batchModes) {
+    if (bm.obj && bm.obj.batchTotal > 1) {
+      const currentRound = bm.obj.batchTotal - bm.obj.batchRemaining;
+      badges.push({ icon: '🔁', text: bm.label + ' ' + currentRound + '/' + bm.obj.batchTotal, full: bm.label + ' \u2014 running round ' + currentRound + ' of ' + bm.obj.batchTotal + ' queued.', color: 'var(--accent-light)' });
+    }
+  }
+  return badges;
+}
+
 function retreatBossRush() {
   lg('🏳️ Retreat — the rush ends at a streak of ' + G.bossRush.streak + '. Everything earned is kept.');
   G.bossRush.active = false;
@@ -23859,7 +23884,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.202';
+const BUILD_ID = '2026-08-17.203';
 // =========================
 
 
@@ -25546,6 +25571,13 @@ function render(){
     h+='<div class="buffs"><span class="bp" style="background:var(--gold);color:#1a1200;">💊 +'+G.statBooster.val+' '+G.statBooster.stat.toUpperCase()+' ('+sbMins+'m)</span></div>';
   }
   if(G.p.ailments.length>0)h+='<div class="buffs">'+G.p.ailments.map(a=>'<span class="bp" style="background:var(--danger);">'+AILMENT_TYPES[a.type].icon+' '+a.n+'</span>').join('')+'</div>';
+  // Persistent batch-round counter — visible on every screen, not just the specific
+  // combat screen a Take 5/10/25/50/100/200 batch was started from, since auto-combat
+  // keeps a batch running in the background while the player navigates elsewhere.
+  const globalBatchBadges = getActiveBatchBadges();
+  if (globalBatchBadges.length > 0) {
+    h += '<div class="buffs">' + globalBatchBadges.map(b => '<span class="bp" style="background:var(--accent-light);color:#000;" title="' + (b.full || '').replace(/"/g, '&quot;') + '">' + b.icon + ' ' + b.text + '</span>').join('') + '</div>';
+  }
   if(G.afkAdventure.active && G.afkAdventure.visible){
     h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;background:rgba(124,58,237,0.15);border-bottom:1px solid var(--accent);font-size:11px;">';
     h+='<span>👁️ Farming ' + G.afkAdventure.zoneIndices.length + ' zone' + (G.afkAdventure.zoneIndices.length > 1 ? 's' : '') + ' \u2014 ' + G.afkAdventure.totalKills + ' kills, +' + G.afkAdventure.totalGold.toLocaleString() + 'G</span>';
@@ -31683,23 +31715,13 @@ function rCbt() {
     const sbMinsLeft = Math.ceil((G.statBooster.expiresAt - Date.now()) / 60000);
     badges.push({ icon: '💊', text: '+' + G.statBooster.val + ' ' + G.statBooster.stat.toUpperCase() + ' \u00b7 ' + sbMinsLeft + 'm', full: 'A supplement is active \u2014 +' + G.statBooster.val + ' ' + G.statBooster.stat.toUpperCase() + ' for the next ' + sbMinsLeft + ' minute' + (sbMinsLeft === 1 ? '' : 's') + '.', color: 'var(--gold)' });
   }
-  // "Round X of Y" — visible progress during an active Take 5/10/25 batch (Boss Rush,
-  // Fraying Frontier, Guild War, Mercenary). batchTotal is the size originally
-  // requested; batchRemaining counts down as each fight resolves, so the current round
-  // is simply the difference between them — round 1 the instant the batch starts,
-  // climbing to round Y right as the last fight in the batch begins.
-  const batchModes = [
-    { obj: G.bossRush, label: 'Boss Rush' },
-    { obj: G.frayingFrontier, label: 'Frontier' },
-    { obj: G.guildWar, label: 'Guild War' },
-    { obj: G.mercenary, label: 'Mercenary' }
-  ];
-  for (let bm of batchModes) {
-    if (bm.obj && bm.obj.batchTotal > 1) {
-      const currentRound = bm.obj.batchTotal - bm.obj.batchRemaining;
-      badges.push({ icon: '🔁', text: 'Round ' + currentRound + '/' + bm.obj.batchTotal, full: bm.label + ' \u2014 running round ' + currentRound + ' of ' + bm.obj.batchTotal + ' queued.', color: 'var(--accent-light)' });
-    }
-  }
+  // "Round X of Y" — visible progress during an active Take 5/10/25/50/100/200 batch
+  // (Boss Rush, Fraying Frontier, Guild War, Mercenary). Extracted into
+  // getActiveBatchBadges() so it can be shown both here (combat top strip) and in the
+  // persistent global header, since a batch keeps running via auto-combat even while
+  // the player navigates to other screens, and previously had no visible progress
+  // once you left the specific combat screen it started from.
+  for (let badge of getActiveBatchBadges()) badges.push(badge);
 
   // === TOP STRIP: auto-combat + potion buttons and status badges share one row ===
   h += '<div class="combat-top-strip">';
