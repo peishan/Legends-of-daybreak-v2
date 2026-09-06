@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Cafe: added plain White Rice (100g + 1 cup) and Kway Teow \u2014 genuinely missing despite dozens of existing dishes saying "no rice" as if meant to be logged separately)';
+const APP_VERSION = '2026-08-17 (New: Guild Member Quests \u2014 8 members (Iris, Renn, Aisy, Sister Wren, Lewis, Jorvin, Mimi, Dr. AA) can depart on multi-day personal quests, bigger payoff than daily contributions, one at a time)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -7231,6 +7231,10 @@ storyJournal: {
   // permanent guild-wide bonuses, reinforcing "the guild profits together" rather than
   // everything routing through one person's pocket.
   guildTreasury: { gold: 0, lifetimeContributed: 0, milestonesUnlocked: [] },
+  // Guild Member Quests — a rarer, bigger-payoff layer on top of the daily
+  // contribution system. Only one active at a time (readability), keyed by member id
+  // once departed: { resolveDay }. Empty object = nobody currently away.
+  guildMemberQuests: {},
   // === VOYAGE: THE SHIP ===
   // Foundation for the Voyage spinoff — ship construction, gated behind reaching
   // World 6 (Lv560), since that's where the party first meets merfolk and the sea
@@ -10907,6 +10911,9 @@ function checkDayAdvance() {
   // once-per-day-advance pattern as Disciples.
   checkLibraryResearchOutcomes();
   checkLibraryResearchActionOutcomes();
+  checkGuildMemberContributions();
+  checkGuildMemberQuestOutcomes();
+  checkGuildMemberQuestStart();
 
   // Kindling Commissions reset on a new day — bounded, not accumulating.
   G.kindlingCommissions = { linesToday: 0, checksToday: 0, refreshDay: G.gameDay };
@@ -11836,6 +11843,126 @@ function respondToDiscipleDilemma(discipleId, dilemmaId, optionIndex) {
 
 // Checked once per real day advance (from checkDayAdvance). Resolves any disciple
 // whose pending outcome has come due, fires the vignette, and checks graduation.
+// Autonomous Guild Member Contributions — the guild treasury previously only grew
+// from San's own bills and trades, meaning the "guild" was really just San's own
+// income with a shared label. This gives the other 21 recruited members (the 4
+// Voyage crew are excluded — they already have their own separate contribution
+// mechanic via crew bonuses) a real, unprompted chance each day to add something on
+// their own, tied to their own established role, with zero clicking required. Modest
+// gold range (200-800) matches BILL_TREASURY_CONTRIBUTION's scale rather than
+// becoming a grind-replacement.
+const GUILD_MEMBER_CONTRIBUTIONS = {
+  mezstorm: "reads a storm three days out for a merchant convoy, free of charge \u2014 they pay the guild anyway, gratefully",
+  eliz: "spends an afternoon treating minor guild injuries without asking who can pay; the ones who can, do",
+  senedra: "tracks down a lost guild shipment through terrain nobody else wanted to try, and keeps none of the finder's fee",
+  zaki: "picks up an extra guard shift without being asked, and hands the pay straight to the treasury before anyone can talk him out of it",
+  mimi: "reads fortunes at the market for a coin a turn; every single client tips generously, somehow",
+  brada: "clears a pest problem for a farmer with one very precise shot \u2014 the farmer insists on paying the guild directly",
+  aisy: "recovers a 'lost' item for a merchant, for a fee neither of them discusses too closely",
+  kw_liang: "scouts a new trade route and sells the map to a caravan master, keeping none of it for herself",
+  sister_wren: "tends the wounded at the temple annex without asking who can pay \u2014 the ones who can, do, generously",
+  ser_aldric: "trains a young guard for free; the guard's family sends payment to the guild instead, over his objections",
+  dudin: "takes an extra patrol shift and splits the hazard pay with the treasury before Wren can even suggest it",
+  jorvin: "fixes a merchant's broken cart wheel roadside, refuses coin, and comes back with something worth just as much",
+  wahyu: "mends and sells a batch of old gear nobody else wanted, banking the coin straight to the treasury",
+  jonathan: "wins a sparring exhibition purse at the local tournament and donates the winnings outright",
+  lewis: "finds a genuinely good deal on surplus supplies, resells half at a modest markup, and banks the profit",
+  dr_aa: "treats an off-the-books injury and insists on splitting whatever he was paid with the treasury",
+  iris: "tracks a bounty for a rival guild's client, collects the finder's fee, and hands it over unasked",
+  renn: "sells a minor potion recipe to a traveling apothecary and banks the proceeds toward further research",
+  jovie: "runs an extra clinic shift; the day's modest fees go straight to the treasury",
+  gino: "sells extra portions from the day's cooking at the market; the small profit goes to the guild",
+  zul: "picks up a paid delivery run on the side and keeps none of the fee for himself"
+};
+function checkGuildMemberContributions() {
+  if (!G.guildJoined) return;
+  const ids = Object.keys(GUILD_MEMBER_CONTRIBUTIONS).filter(id => isGuildMemberRecruited(id) && !G.guildMemberQuests[id]);
+  for (let id of ids) {
+    if (Math.random() < 0.18) {
+      const def = getGuildMemberDef(id);
+      const amount = 200 + Math.floor(Math.random() * 601); // 200-800
+      G.guildTreasury.gold += amount;
+      G.guildTreasury.lifetimeContributed += amount;
+      lg((def ? def.icon + ' ' : '\ud83c\udfe0 ') + (def ? def.npcName : id) + ' ' + GUILD_MEMBER_CONTRIBUTIONS[id] + ' \u2014 +' + amount + 'G to the Guild Treasury.');
+    }
+  }
+  checkGuildTreasuryMilestones();
+}
+
+// Guild Member Quests — a second, rarer layer on top of daily contributions. A
+// member departs for a few real-game days on something genuinely their own, then
+// returns with a bigger, more narratively satisfying payoff. Only one active at a
+// time (readability, and it keeps a departure actually meaning something rather than
+// half the roster being simultaneously "away"). Scoped to 8 members whose established
+// personality supports a real multi-day story, rather than mechanically forcing all
+// 21 — the daily contribution system already covers everyone; this is additive depth
+// for a subset, extensible to more later.
+const GUILD_MEMBER_QUESTS = {
+  iris: { title: 'Tracking Something Worth the Trouble', days: 3,
+    depart: "Iris picks up a trail that every other tracker in the guild has already given up on, and simply does not come back that evening.",
+    resolve: "Iris returns three days later, quiet and satisfied in the way she gets when something finally holds still long enough to actually catch. She does not explain how. She rarely does.",
+    gold: 4000, rep: 80 },
+  renn: { title: 'A Question Worth the Trip', days: 4,
+    depart: "Renn packs exactly what he needs and nothing else, and heads for an archive two days' travel out — a specific question he has apparently been sitting on for a while.",
+    resolve: "Renn returns with a small stack of copied notes and the particular calm of someone who finally got a straight answer to a question that has bothered him for longer than he let on.",
+    gold: 3000, rep: 60 },
+  aisy: { title: 'A Job That Needs Patience First', days: 2,
+    depart: "Aisy mentions, offhand, that she will be unreachable for a couple of days. She does not explain further. Nobody asks her to.",
+    resolve: "Aisy reappears exactly when she said she would, unbothered, coin already accounted for before anyone thinks to ask about it.",
+    gold: 5000, rep: 50 },
+  sister_wren: { title: 'A Village That Needed More Than a Day', days: 3,
+    depart: "Word reaches the guild of an outbreak two villages over. Sister Wren is already packing before anyone finishes explaining the situation.",
+    resolve: "Sister Wren returns tired in the specific way that means it actually worked — the outbreak is contained, and she will not discuss how close it came to not being.",
+    gold: 3500, rep: 100 },
+  lewis: { title: 'A Deal Worth Verifying', days: 2,
+    depart: "Lewis hears about a deal that sounds slightly too good, and decides — against everyone's advice — that this means it is worth checking in person rather than ignoring.",
+    resolve: "Lewis returns with an expression somewhere between vindicated and mildly embarrassed. \"It was real,\" he says, like he still cannot quite believe it himself.",
+    gold: 0, rep: 40, variableGold: [2000, 7000] }, // opportunist — the payoff itself varies, not just the flavor
+  jorvin: { title: 'A Commission Worth Doing Right', days: 4,
+    depart: "Jorvin takes on a commission that will apparently require actually being on-site the whole time, and leaves with a full toolkit and zero complaints about the distance.",
+    resolve: "Jorvin returns with calloused hands and a client's genuine gratitude trailing behind him — the kind of job he clearly would have done for free, if anyone had thought to ask him to.",
+    gold: 4500, rep: 70 },
+  mimi: { title: 'A Reading That Refused to Resolve Quickly', days: 3,
+    depart: "Mimi says a particular reading has been coming back unclear for days, and that she intends to sit with it properly until it actually tells her something.",
+    resolve: "Mimi returns with the reading finally settled, and refuses, entirely on principle, to say what it actually was. \"Some things are only true once,\" she says. \"I would rather not spend it explaining.\"",
+    gold: 3000, rep: 90 },
+  dr_aa: { title: 'A Case Nobody Else Could Handle', days: 3,
+    depart: "A case comes in that has already stumped two other healers. Dr. AA reads the notes once, says nothing, and leaves within the hour.",
+    resolve: "Dr. AA returns having saved the patient, and immediately has a new ghost story to tell about it — though he insists, as always, that this one is completely true.",
+    gold: 4000, rep: 110 }
+};
+function checkGuildMemberQuestStart() {
+  if (!G.guildJoined) return;
+  if (Object.keys(G.guildMemberQuests).length > 0) return; // one at a time
+  const eligible = Object.keys(GUILD_MEMBER_QUESTS).filter(isGuildMemberRecruited);
+  for (let id of eligible) {
+    if (Math.random() < 0.04) {
+      const q = GUILD_MEMBER_QUESTS[id];
+      const def = getGuildMemberDef(id);
+      G.guildMemberQuests[id] = { resolveDay: G.gameDay + q.days };
+      lg((def ? def.icon + ' ' : '') + '📖 ' + q.title + ': ' + q.depart);
+      break; // only one departs per check
+    }
+  }
+}
+function checkGuildMemberQuestOutcomes() {
+  for (let id in G.guildMemberQuests) {
+    const active = G.guildMemberQuests[id];
+    if (G.gameDay < active.resolveDay) continue;
+    const q = GUILD_MEMBER_QUESTS[id];
+    const def = getGuildMemberDef(id);
+    if (q) {
+      const gold = q.variableGold ? q.variableGold[0] + Math.floor(Math.random() * (q.variableGold[1] - q.variableGold[0] + 1)) : q.gold;
+      G.guildTreasury.gold += gold;
+      G.guildTreasury.lifetimeContributed += gold;
+      addGuildRep(q.rep);
+      lg((def ? def.icon + ' ' : '') + '📖 ' + q.resolve + ' \u2014 +' + gold + 'G to the Treasury, +' + q.rep + ' Guild Rep.');
+    }
+    delete G.guildMemberQuests[id];
+  }
+  checkGuildTreasuryMilestones();
+}
+
 function checkDiscipleOutcomes() {
   for (let disciple of G.disciples) {
     if (disciple.graduated || !disciple.pendingOutcome) continue;
@@ -23884,7 +24011,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.205';
+const BUILD_ID = '2026-08-17.207';
 // =========================
 
 
@@ -24000,6 +24127,7 @@ function saveGame() {
     guildWarBestStreak: G.guildWar.bestStreak || 0,
     guildRosterRecruited: G.guildRoster.recruited || [],
     guildTreasury: G.guildTreasury,
+    guildMemberQuests: G.guildMemberQuests,
     ship: G.ship,
     voyage: G.voyage,
     guildWarAccords: G.guildWarAccords,
@@ -24349,6 +24477,7 @@ function loadGame() {
     G.guildWar.bestStreak = data.guildWarBestStreak || 0;
     G.guildRoster.recruited = data.guildRosterRecruited || [];
     if (data.guildTreasury) G.guildTreasury = data.guildTreasury;
+    if (data.guildMemberQuests) G.guildMemberQuests = data.guildMemberQuests;
     if (data.ship) G.ship = data.ship;
     if (data.voyage) G.voyage = data.voyage;
     if (data.guildWarAccords) G.guildWarAccords = data.guildWarAccords;
