@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (New: persistent "Round X/Y" batch counter now visible on every screen, not just the combat screen a Take-batch was started from \u2014 extracted into getActiveBatchBadges(), shown in the global header)';
+const APP_VERSION = '2026-08-17 (Cafe: added plain White Rice (100g + 1 cup) and Kway Teow \u2014 genuinely missing despite dozens of existing dishes saying "no rice" as if meant to be logged separately)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -23884,7 +23884,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.203';
+const BUILD_ID = '2026-08-17.205';
 // =========================
 
 
@@ -29055,6 +29055,8 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Garoupa / Grouper (100g)', cat: 'Seafood & Fish', fat: 1.5, sat: 0.3, unsat: 1.2, fiber: 0, protein: 24.0, carbs: 0.0, icon: '🐟' },
   { n: 'Red Snapper / Ikan Merah (100g)', cat: 'Seafood & Fish', fat: 1.5, sat: 0.3, unsat: 1.2, fiber: 0, protein: 22.0, carbs: 0.0, icon: '🐟' },
   { n: 'Cod (100g)', cat: 'Seafood & Fish', fat: 1.0, sat: 0.2, unsat: 0.8, fiber: 0, protein: 18.0, carbs: 0.0, icon: '🐟' },
+  { n: 'Salad Prawn (1 serving)', cat: 'Seafood & Fish', fat: 16.0, sat: 2.5, unsat: 13.5, fiber: 1.0, protein: 15.0, carbs: 6.0, icon: '🦐' },
+  { n: 'Crispy Seafood Tauhu (1 serving)', cat: 'Seafood & Fish', fat: 22.0, sat: 2.0, unsat: 20.0, fiber: 1.0, protein: 10.0, carbs: 6.0, icon: '🧊' },
   { n: 'Tempeh (50g)', cat: 'Plant Protein', fat: 4.0, sat: 0.6, unsat: 3.4, fiber: 3.0, protein: 10.0, carbs: 4.0, icon: '🟫' },
   { n: 'Tofu / Tau Kwa (100g)', cat: 'Plant Protein', fat: 5.0, sat: 0.8, unsat: 4.2, fiber: 3.0, protein: 10.0, carbs: 1.5, icon: '⬜' },
   { n: 'Egg Tofu (100g)', cat: 'Plant Protein', fat: 3.5, sat: 1.0, unsat: 2.5, fiber: 0.5, protein: 6.0, carbs: 2.0, icon: '⬜' },
@@ -29091,6 +29093,7 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Pumpkin (100g)', cat: 'Higher-Carb Veg', fat: 0.1, sat: 0.0, unsat: 0.1, fiber: 2.5, protein: 1.0, carbs: 6.0, icon: '🎃' },
   { n: 'Jackfruit (1 piece/aril)', cat: 'Higher-Carb Veg', fat: 0.1, sat: 0.0, unsat: 0.1, fiber: 2.5, protein: 0.3, carbs: 4.5, icon: '🍈' },
   { n: 'Oats, dry rolled (40g)', cat: 'Higher-Carb Veg', fat: 2.5, sat: 0.4, unsat: 2.1, fiber: 4.0, protein: 5.0, carbs: 27.0, icon: '🌾' },
+  { n: 'Oats, instant, dry (40g)', cat: 'Higher-Carb Veg', fat: 2.5, sat: 0.4, unsat: 2.1, fiber: 3.0, protein: 4.5, carbs: 28.0, icon: '🌾' },
   { n: 'Barley, cooked (100g)', cat: 'Higher-Carb Veg', fat: 0.4, sat: 0.1, unsat: 0.3, fiber: 3.8, protein: 2.3, carbs: 28.0, icon: '🌾' },
   { n: 'Psyllium Husk (1 tbsp)', cat: 'Higher-Carb Veg', fat: 0.1, sat: 0.0, unsat: 0.1, fiber: 4.5, protein: 0.2, carbs: 4.0, icon: '🌾' },
   { n: 'Pumpkin (1 cup, ~245g)', cat: 'Higher-Carb Veg', fat: 0.3, sat: 0.1, unsat: 0.2, fiber: 2.5, protein: 2.5, carbs: 14.5, icon: '🎃' },
@@ -29124,6 +29127,9 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Beetroot (100g)', cat: 'Higher-Carb Veg', fat: 0.2, sat: 0.0, unsat: 0.2, fiber: 2.5, protein: 1.6, carbs: 8.0, icon: '🟣' },
   { n: 'Konjac Dry Rice, cooked (100g)', cat: 'Higher-Carb Veg', fat: 0.3, sat: 0.1, unsat: 0.2, fiber: 2.5, protein: 1.5, carbs: 13.7, icon: '🍚' },
   { n: 'Konjac Dry Rice, cooked (½ cup ~80g)', cat: 'Higher-Carb Veg', fat: 0.2, sat: 0.0, unsat: 0.2, fiber: 2.5, protein: 1.2, carbs: 11.0, icon: '🍚' },
+  { n: 'White Rice, cooked (100g)', cat: 'Higher-Carb Veg', fat: 0.3, sat: 0.1, unsat: 0.2, fiber: 0.4, protein: 2.7, carbs: 28.0, icon: '🍚' },
+  { n: 'White Rice, cooked (1 cup ~158g)', cat: 'Higher-Carb Veg', fat: 0.5, sat: 0.1, unsat: 0.4, fiber: 0.6, protein: 4.3, carbs: 44.0, icon: '🍚' },
+  { n: 'Kway Teow, plain flat rice noodles, cooked (100g)', cat: 'Higher-Carb Veg', fat: 0.2, sat: 0.0, unsat: 0.2, fiber: 1.0, protein: 1.0, carbs: 25.0, icon: '🍜' },
   { n: 'Mung Beans, boiled (1 cup)', cat: 'Higher-Carb Veg', fat: 0.8, sat: 0.2, unsat: 0.6, fiber: 2.5, protein: 14.0, carbs: 32.0, icon: '🫘' },
   { n: 'Mung Beans, boiled (½ cup)', cat: 'Higher-Carb Veg', fat: 0.4, sat: 0.1, unsat: 0.3, fiber: 2.5, protein: 7.0, carbs: 16.0, icon: '🫘' },
   { n: 'Black Beans, boiled (100g)', cat: 'Higher-Carb Veg', fat: 0.5, sat: 0.1, unsat: 0.4, fiber: 2.5, protein: 8.9, carbs: 14.0, icon: '🫘' },
@@ -29254,6 +29260,7 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Cowhead Butter Pkt (10g)', cat: 'Fats & Extras', fat: 8.0, sat: 5.0, unsat: 3.0, fiber: 0, protein: 0.0, carbs: 0.0, icon: '🧈' },
   { n: 'Golden Churn Butter Pkt', cat: 'Fats & Extras', fat: 8.0, sat: 5.0, unsat: 3.0, fiber: 0, protein: 0.0, carbs: 0.0, icon: '🧈' },
   { n: 'Nescafé (plain)', cat: 'Fats & Extras', fat: 0.0, sat: 0.0, unsat: 0.0, fiber: 0, protein: 0.5, carbs: 1.0, icon: '☕' },
+  { n: 'Margarine, generic (1 tbsp, ~14g)', cat: 'Fats & Extras', fat: 11.0, sat: 4.5, unsat: 6.5, fiber: 0, protein: 0.0, carbs: 0.0, icon: '🧈' },
   { n: 'APC / Jersey Coffee', cat: 'Fats & Extras', fat: 2.0, sat: 0.6, unsat: 1.4, fiber: 0, protein: 1.0, carbs: 2.0, icon: '☕' },
   { n: 'Ayam Penyet (no rice)', cat: 'Common Meals', fat: 20.0, sat: 7.0, unsat: 13.0, fiber: 1.5, protein: 35.0, carbs: 8.0, icon: '🍛' },
   { n: 'Meishihui Chive Crispy Biscuit (100g)', cat: 'Common Meals', fat: 24.0, sat: 7.6, unsat: 16.4, fiber: 1.5, protein: 8.1, carbs: 65.6, icon: '🍘' },
@@ -29275,6 +29282,7 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Tuna Sandwich, wholemeal bread (2 slices)', cat: 'Tribute to LOF', fat: 13.0, sat: 2.5, unsat: 10.5, fiber: 4.4, protein: 19.0, carbs: 24.0, icon: '🥪' },
   { n: 'Triple Treat mini bun, 1 of 3 (egg, chicken ham, mayo)', cat: 'Tribute to LOF', fat: 7.0, sat: 1.8, unsat: 5.2, fiber: 0.8, protein: 6.0, carbs: 14.0, icon: '🥐' },
   { n: 'Bun with Hotdog, small (1 pc)', cat: 'Tribute to LOF', fat: 9.0, sat: 3.0, unsat: 6.0, fiber: 1.0, protein: 7.0, carbs: 22.0, icon: '🌭' },
+  { n: 'Sourdough Bread, thin slice (~28g)', cat: 'Tribute to LOF', fat: 1.0, sat: 0.2, unsat: 0.8, fiber: 0.5, protein: 2.0, carbs: 14.0, icon: '🍞' },
   { n: 'Chicken Rendang (no rice)', cat: 'Common Meals', fat: 18.0, sat: 6.3, unsat: 11.7, fiber: 1.5, protein: 28.0, carbs: 5.0, icon: '🍛' },
   { n: 'Chicken Masala (no sauce, 100g)', cat: 'Common Meals', fat: 8.0, sat: 2.8, unsat: 5.2, fiber: 1.5, protein: 25.0, carbs: 4.0, icon: '🍛' },
   { n: 'Chicken Curry with Potatoes (100g, incl. sauce & potato)', cat: 'Common Meals', fat: 7.0, sat: 2.4, unsat: 4.6, fiber: 1.5, protein: 11.0, carbs: 9.0, icon: '🍛' },
@@ -29402,6 +29410,8 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Plain Congee / Rice Porridge (1 bowl)', cat: 'Dimsum', chef: 'Zaki', fat: 1.0, sat: 0.3, unsat: 0.7, fiber: 0.8, protein: 4.0, carbs: 30.0, icon: '🥣' },
   { n: 'Wu Gok / Deep-fried Taro Dumpling (1pc)', cat: 'Dimsum', chef: 'Zaki', fat: 10.0, sat: 3.0, unsat: 7.0, fiber: 0.8, protein: 3.0, carbs: 16.0, icon: '🥟' },
   { n: 'Curry Puff, chicken (1pc)', cat: 'Dimsum', chef: 'Zaki', fat: 8.0, sat: 2.4, unsat: 5.6, fiber: 0.8, protein: 2.0, carbs: 14.0, icon: '🥐' },
+  { n: 'Chicken Gyoza / Chicken Dumplings (5 pieces)', cat: 'Dimsum', chef: 'Zaki', fat: 7.0, sat: 1.5, unsat: 5.5, fiber: 1.0, protein: 8.0, carbs: 22.0, icon: '🥟' },
+  { n: 'Xiao Long Bao, pork (5 pieces)', cat: 'Tribute to Big Mama Rest / 88 Rest', fat: 10.0, sat: 3.5, unsat: 6.5, fiber: 0.5, protein: 15.0, carbs: 30.0, icon: '🥟' },
   { n: 'Satay, chicken or beef, no sauce (3 sticks)', cat: 'Street Food', chef: 'Zaki', fat: 6.0, sat: 2.1, unsat: 3.9, fiber: 1.5, protein: 15.0, carbs: 4.0, icon: '🍢' },
   { n: 'Cucur Sayur / Vegetable Fritter (1pc)', cat: 'Street Food', chef: 'Zaki', fat: 9.0, sat: 3.1, unsat: 5.9, fiber: 1.5, protein: 4.0, carbs: 28.0, icon: '🥠' },
   { n: 'Tauhu Sumbat / Stuffed Tofu (1pc)', cat: 'Street Food', chef: 'Zaki', fat: 15.0, sat: 5.2, unsat: 9.8, fiber: 1.5, protein: 10.0, carbs: 20.0, icon: '🧈' },
