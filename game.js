@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (New: Guild Member Quests \u2014 8 members (Iris, Renn, Aisy, Sister Wren, Lewis, Jorvin, Mimi, Dr. AA) can depart on multi-day personal quests, bigger payoff than daily contributions, one at a time)';
+const APP_VERSION = '2026-08-17 (Cafe: Indian category expanded and renamed to Indian / Pakistani \u2014 naan, roti, chicken/mutton biryani, pulao, butter chicken, tikka masala, rogan josh, nihari, karahi, kebabs, samosa, pakora \u2014 21 items total)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -24011,7 +24011,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.207';
+const BUILD_ID = '2026-08-17.208';
 // =========================
 
 
@@ -29520,9 +29520,27 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Eggs Boost Breakfast (3 eggs + 10ml butter)', cat: 'Egg & Dairy', fat: 23.0, sat: 14.5, unsat: 8.5, fiber: 0, protein: 18.0, carbs: 1.2, icon: '🍳' },
   { n: 'Turmeric Chicken / Ayam Kunyit (100g)', cat: 'Common Meals', fat: 10.0, sat: 3.5, unsat: 6.5, fiber: 1.5, protein: 26.0, carbs: 2.0, icon: '🍗' },
   { n: 'Curry Chicken, Malay-style, no rice (bowl)', cat: 'Common Meals', fat: 20.0, sat: 7.0, unsat: 13.0, fiber: 1.5, protein: 24.0, carbs: 6.0, icon: '🍛' },
-  { n: 'Curry Chicken, Indian-style, no rice (bowl)', cat: 'Indian', fat: 16.0, sat: 6.1, unsat: 9.9, fiber: 1.5, protein: 25.0, carbs: 8.0, icon: '🍛' },
-  { n: 'Chana Masala / Chole, no rice (bowl)', cat: 'Indian', fat: 12.0, sat: 4.6, unsat: 7.4, fiber: 1.5, protein: 10.0, carbs: 30.0, icon: '🍛' },
-  { n: 'Masala Fish / Fish Curry, Indian-style, no rice (bowl)', cat: 'Indian', fat: 14.0, sat: 5.3, unsat: 8.7, fiber: 1.5, protein: 22.0, carbs: 8.0, icon: '🐟' },
+  { n: 'Curry Chicken, Indian-style, no rice (bowl)', cat: 'Indian / Pakistani', fat: 16.0, sat: 6.1, unsat: 9.9, fiber: 1.5, protein: 25.0, carbs: 8.0, icon: '🍛' },
+  { n: 'Chana Masala / Chole, no rice (bowl)', cat: 'Indian / Pakistani', fat: 12.0, sat: 4.6, unsat: 7.4, fiber: 1.5, protein: 10.0, carbs: 30.0, icon: '🍛' },
+  { n: 'Masala Fish / Fish Curry, Indian-style, no rice (bowl)', cat: 'Indian / Pakistani', fat: 14.0, sat: 5.3, unsat: 8.7, fiber: 1.5, protein: 22.0, carbs: 8.0, icon: '🐟' },
+  { n: 'Naan, plain (1 piece)', cat: 'Indian / Pakistani', fat: 5.0, sat: 1.5, unsat: 3.5, fiber: 2.0, protein: 9.0, carbs: 45.0, icon: '🫓' },
+  { n: 'Naan, garlic (1 piece)', cat: 'Indian / Pakistani', fat: 7.0, sat: 2.5, unsat: 4.5, fiber: 2.0, protein: 9.0, carbs: 46.0, icon: '🫓' },
+  { n: 'Roti / Chapati (1 piece)', cat: 'Indian / Pakistani', fat: 2.5, sat: 0.5, unsat: 2.0, fiber: 2.5, protein: 4.0, carbs: 18.0, icon: '🫓' },
+  { n: 'Chicken Biryani (bowl)', cat: 'Indian / Pakistani', fat: 18.0, sat: 6.0, unsat: 12.0, fiber: 2.0, protein: 25.0, carbs: 60.0, icon: '🍛' },
+  { n: 'Mutton Biryani (bowl)', cat: 'Indian / Pakistani', fat: 24.0, sat: 9.0, unsat: 15.0, fiber: 2.0, protein: 24.0, carbs: 58.0, icon: '🍛' },
+  { n: 'Vegetable Pulao (bowl)', cat: 'Indian / Pakistani', fat: 10.0, sat: 3.0, unsat: 7.0, fiber: 3.0, protein: 8.0, carbs: 55.0, icon: '🍚' },
+  { n: 'Chicken Pulao (bowl)', cat: 'Indian / Pakistani', fat: 13.0, sat: 4.5, unsat: 8.5, fiber: 2.0, protein: 20.0, carbs: 55.0, icon: '🍚' },
+  { n: 'Butter Chicken / Murgh Makhani, no rice (bowl)', cat: 'Indian / Pakistani', fat: 22.0, sat: 10.0, unsat: 12.0, fiber: 1.5, protein: 26.0, carbs: 10.0, icon: '🍛' },
+  { n: 'Chicken Tikka Masala, no rice (bowl)', cat: 'Indian / Pakistani', fat: 18.0, sat: 7.0, unsat: 11.0, fiber: 1.5, protein: 27.0, carbs: 10.0, icon: '🍛' },
+  { n: 'Palak Paneer, no rice (bowl)', cat: 'Indian / Pakistani', fat: 20.0, sat: 9.0, unsat: 11.0, fiber: 3.0, protein: 14.0, carbs: 10.0, icon: '🍛' },
+  { n: 'Dal Makhani, no rice (bowl)', cat: 'Indian / Pakistani', fat: 14.0, sat: 6.0, unsat: 8.0, fiber: 6.0, protein: 12.0, carbs: 25.0, icon: '🍛' },
+  { n: 'Rogan Josh, mutton curry, no rice (bowl)', cat: 'Indian / Pakistani', fat: 22.0, sat: 8.0, unsat: 14.0, fiber: 1.5, protein: 24.0, carbs: 8.0, icon: '🍛' },
+  { n: 'Nihari, beef stew, no rice (bowl)', cat: 'Indian / Pakistani', fat: 20.0, sat: 8.0, unsat: 12.0, fiber: 1.0, protein: 26.0, carbs: 8.0, icon: '🍛' },
+  { n: 'Karahi Chicken, Pakistani-style, no rice (bowl)', cat: 'Indian / Pakistani', fat: 17.0, sat: 6.0, unsat: 11.0, fiber: 1.5, protein: 26.0, carbs: 8.0, icon: '🍛' },
+  { n: 'Seekh Kebab (2 pieces)', cat: 'Indian / Pakistani', fat: 16.0, sat: 6.0, unsat: 10.0, fiber: 0.5, protein: 18.0, carbs: 3.0, icon: '🍢' },
+  { n: 'Chicken Tikka, grilled (1 serving)', cat: 'Indian / Pakistani', fat: 10.0, sat: 3.0, unsat: 7.0, fiber: 0.0, protein: 28.0, carbs: 3.0, icon: '🍢' },
+  { n: 'Samosa (1 piece)', cat: 'Indian / Pakistani', fat: 8.0, sat: 2.5, unsat: 5.5, fiber: 1.5, protein: 3.0, carbs: 18.0, icon: '🥟' },
+  { n: 'Pakora, mixed vegetable (4-5 pieces)', cat: 'Indian / Pakistani', fat: 12.0, sat: 2.0, unsat: 10.0, fiber: 2.0, protein: 4.0, carbs: 20.0, icon: '🥟' },
   { n: 'Har Gow / Shrimp Dumplings (3pc)', cat: 'Dimsum', chef: 'Zaki', fat: 4.0, sat: 1.2, unsat: 2.8, fiber: 0.8, protein: 9.0, carbs: 8.0, icon: '🥟' },
   { n: 'Siu Mai / Pork & Shrimp Dumplings (3pc)', cat: 'Dimsum', chef: 'Zaki', fat: 10.0, sat: 3.0, unsat: 7.0, fiber: 0.8, protein: 11.0, carbs: 6.0, icon: '🥟' },
   { n: 'Vegetarian Siu Mai, mock prawn/cuttlefish (3pc)', cat: 'Dimsum', chef: 'Zaki', fat: 6.0, sat: 1.8, unsat: 4.2, fiber: 0.8, protein: 7.0, carbs: 7.0, icon: '🥟' },
