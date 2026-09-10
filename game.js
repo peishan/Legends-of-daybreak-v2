@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Cafe: Indian category expanded and renamed to Indian / Pakistani \u2014 naan, roti, chicken/mutton biryani, pulao, butter chicken, tikka masala, rogan josh, nihari, karahi, kebabs, samosa, pakora \u2014 21 items total)';
+const APP_VERSION = '2026-08-17 (New: Mezstorm\u2019s portrait switches to female art the moment journal_204 (her reversion) is read \u2014 works in combat, dialogue, and the party screen; Renn and Jovie now show portraits in dialogue too)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -1220,7 +1220,7 @@ const G = {
     { id: 'guild_boss_first', n: 'What the Initiates Face Together', d: 'Defeat the first Guild Boss tier', icon: '💀', t: 'guild_boss_tier', need: 1, rw: { xp: 5000, g: 3500 }, done: false, secret: false },
     { id: 'guild_war_streak', n: 'A Streak Worth Keeping', d: 'Reach a Guild War streak of 5', icon: '⚔️', t: 'guild_war_streak', need: 5, rw: { xp: 4000, g: 2800 }, done: false, secret: false },
     { id: 'bounty_first', n: 'Squad Returns', d: 'Complete a Guild Bounty Mission', icon: '🎖️', t: 'bounty_mission_count', need: 1, rw: { xp: 2000, g: 1500 }, done: false, secret: false },
-    { id: 'full_roster', n: 'Everyone Who Answered', d: 'Recruit the entire Guild War roster', icon: '👥', t: 'guild_roster_full', need: 16, rw: { xp: 18000, g: 12000 }, done: false, secret: false },
+    { id: 'full_roster', n: 'Everyone Who Answered', d: 'Recruit the entire Guild War roster', icon: '👥', t: 'guild_roster_full', need: 25, rw: { xp: 18000, g: 12000 }, done: false, secret: false },
     // Temple milestones
     { id: 'temple_eternal', n: 'The Highest Standing', d: 'Reach the highest Temple Rank', icon: '🙏', t: 'temple_rank', need: 10, rw: { xp: 12000, g: 8000 }, done: false, secret: false },
     { id: 'trial_first', n: 'What the Vigil First Demands', d: 'Defeat the first Temple Trial tier', icon: '🕯️', t: 'temple_trial_tier', need: 2, rw: { xp: 5000, g: 3500 }, done: false, secret: false },
@@ -7289,12 +7289,12 @@ storyJournal: {
   // dish specifically. Logged, not scored — same "no penalty for missing" spirit.
   mealLog: {}, // keyed by 'YYYY-MM-DD' -> array of { food, cat, fat, sat, unsat, fiber, protein, carbs, time }
   // Mediterranean-style macro tracking — replaced the earlier modified-keto system
-  // entirely, per a real diet shift after lipid panel review. carbLimit is a soft
-  // daily target rather than a hard ceiling (carbs are a normal part of eating here,
-  // not something to minimize); activeDayCarbLimit is a deliberately higher target for
-  // a day explicitly marked an Active Day — extra carbs for training, not a "cheat
-  // day." periodSweetBiteBonus adds extra allowance on a logged period day, on top of
-  // whatever target already applies that day.
+  // entirely, per a real diet shift after lipid panel review. carbTier selects a soft
+  // daily target (Low/Medium/Normal, research-grounded, not a hard ceiling — carbs are
+  // a normal part of eating here, not something to minimize); activeDayBonus adds on
+  // top of that tier for a day explicitly marked an Active Day — extra carbs for
+  // training, not a "cheat day." periodSweetBiteBonus adds extra allowance on a logged
+  // period day, on top of whatever target already applies that day.
   cafeSettings: { carbTier: 'medium', activeDayBonus: 40, periodSweetBiteBonus: 20 },
   activeDays: [], // array of 'YYYY-MM-DD' strings, explicitly toggled per date — extra carbs for training days, not a "cheat day"
   cafeCategory: null, // UI navigation only, not persisted
@@ -23890,13 +23890,26 @@ function getSpeakerColor(speaker) {
 // spaces/periods stripped for the filename — 'sister wren.jpg' is fragile to host and
 // link to, 'sisterwren.jpg' isn't.
 function portraitFileNameFor(name) {
+  // Mezstorm's reversion (Ch.192-204) completes the moment journal_204 is read —
+  // her portrait switches to the female art from that point on, permanently. No
+  // separate flag needed: story progress already tracks this exactly.
+  if (name === 'Mezstorm' && (G.storyJournal.read || []).includes('journal_204')) return 'mezstormfemale';
   return name.toLowerCase().replace(/[\s.]/g, '');
 }
+// Story-only speakers (not combat party members, so they never hit the G.party
+// lookup below) who nonetheless have their own portrait art. Add more names here as
+// more art gets supplied — same fallback-safe pattern as everything else art-related,
+// so a missing file just quietly falls back to the letter avatar, never breaks.
+const STORY_SPEAKER_PORTRAITS = {
+  'Renn': '#3b82f630',
+  'Jovie': '#f59e0b30'
+};
 function getSpeakerPortrait(speaker) {
   if (speaker === 'San') return portraitImg('san', '#7c3aed30', 'S');
   if (speaker === 'Narrator') return null;
   const member = G.party.find(p => p.n === speaker);
   if (member) return portraitImg(portraitFileNameFor(speaker), member.col + '30', speaker[0]);
+  if (STORY_SPEAKER_PORTRAITS[speaker]) return portraitImg(portraitFileNameFor(speaker), STORY_SPEAKER_PORTRAITS[speaker], speaker[0]);
   return null;
 }
 
@@ -24011,7 +24024,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.208';
+const BUILD_ID = '2026-08-17.210';
 // =========================
 
 
