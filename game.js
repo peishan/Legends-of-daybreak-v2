@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (New: Mezstorm\u2019s portrait switches to female art the moment journal_204 (her reversion) is read \u2014 works in combat, dialogue, and the party screen; Renn and Jovie now show portraits in dialogue too)';
+const APP_VERSION = '2026-08-17 (Cafe: corrected Miki Prune Extract (was estimated as juice, actual label shows a concentrate) + Marigold Vanilla variant from real labels; added Nestle All Purpose Cream, Basmati/Red/Purple Rice)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -24024,7 +24024,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.210';
+const BUILD_ID = '2026-08-17.213';
 // =========================
 
 
@@ -29151,6 +29151,13 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Tatua Cream (dash ~15ml)', cat: 'Egg & Dairy', fat: 6.0, sat: 3.7, unsat: 2.3, fiber: 0, protein: 0.4, carbs: 0.5, icon: '🫙' },
   { n: 'Sahara Greek Yogurt (100g)', cat: 'Egg & Dairy', fat: 10.0, sat: 3.2, unsat: 6.8, fiber: 0, protein: 6.0, carbs: 4.0, icon: '🍦' },
   { n: 'Chobani Greek Yogurt (100g)', cat: 'Egg & Dairy', fat: 3.0, sat: 1.0, unsat: 2.0, fiber: 0, protein: 10.0, carbs: 4.0, icon: '🍦' },
+  { n: 'Marigold Greek Style Yogurt, high protein (100g)', cat: 'Egg & Dairy', fat: 2.0, sat: 1.3, unsat: 0.7, fiber: 0, protein: 9.5, carbs: 4.0, icon: '🍦' },
+  { n: 'Marigold Greek Style Yogurt, Vanilla, high protein (100g)', cat: 'Egg & Dairy', fat: 1.5, sat: 1.0, unsat: 0.5, fiber: 0.4, protein: 6.3, carbs: 13.7, icon: '🍦' },
+  { n: 'Nestle All Purpose Cream (2 tbsp ~30ml)', cat: 'Fats & Extras', fat: 8.0, sat: 5.0, unsat: 3.0, fiber: 0, protein: 0.8, carbs: 1.2, icon: '🫙' },
+  // Occasional Treats — deliberately its own category rather than folded into Street
+  // Food, so the "this is a treat, not a staple" framing stays visible in the menu
+  // itself, matching how it was actually described when added.
+  { n: 'Cakoi with Kaya, generic (1 serving)', cat: 'Occasional Treats', fat: 12.0, sat: 5.0, unsat: 7.0, fiber: 1.0, protein: 3.5, carbs: 30.0, icon: '🥖' },
   { n: 'Chicken Drumstick (skin on)', cat: 'Poultry', fat: 8.0, sat: 2.4, unsat: 5.6, fiber: 0, protein: 22.0, carbs: 0.0, icon: '🍗' },
   { n: 'Chicken Thigh (skin on, 100g)', cat: 'Poultry', fat: 13.0, sat: 3.9, unsat: 9.1, fiber: 0, protein: 21.0, carbs: 0.0, icon: '🍗' },
   { n: 'Chicken Breast (skinless, 100g)', cat: 'Poultry', fat: 3.0, sat: 0.9, unsat: 2.1, fiber: 0, protein: 31.0, carbs: 0.0, icon: '🍗' },
@@ -29271,6 +29278,9 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Konjac Dry Rice, cooked (½ cup ~80g)', cat: 'Higher-Carb Veg', fat: 0.2, sat: 0.0, unsat: 0.2, fiber: 2.5, protein: 1.2, carbs: 11.0, icon: '🍚' },
   { n: 'White Rice, cooked (100g)', cat: 'Higher-Carb Veg', fat: 0.3, sat: 0.1, unsat: 0.2, fiber: 0.4, protein: 2.7, carbs: 28.0, icon: '🍚' },
   { n: 'White Rice, cooked (1 cup ~158g)', cat: 'Higher-Carb Veg', fat: 0.5, sat: 0.1, unsat: 0.4, fiber: 0.6, protein: 4.3, carbs: 44.0, icon: '🍚' },
+  { n: 'Basmati Rice, cooked (100g)', cat: 'Higher-Carb Veg', fat: 0.3, sat: 0.1, unsat: 0.2, fiber: 0.4, protein: 2.7, carbs: 25.0, icon: '🍚' },
+  { n: 'Red Rice, cooked (100g)', cat: 'Higher-Carb Veg', fat: 0.9, sat: 0.2, unsat: 0.7, fiber: 1.8, protein: 2.5, carbs: 23.0, icon: '🍚' },
+  { n: 'Purple / Black Rice, cooked (100g)', cat: 'Higher-Carb Veg', fat: 0.3, sat: 0.1, unsat: 0.2, fiber: 1.8, protein: 4.0, carbs: 21.2, icon: '🍚' },
   { n: 'Kway Teow, plain flat rice noodles, cooked (100g)', cat: 'Higher-Carb Veg', fat: 0.2, sat: 0.0, unsat: 0.2, fiber: 1.0, protein: 1.0, carbs: 25.0, icon: '🍜' },
   { n: 'Mung Beans, boiled (1 cup)', cat: 'Higher-Carb Veg', fat: 0.8, sat: 0.2, unsat: 0.6, fiber: 2.5, protein: 14.0, carbs: 32.0, icon: '🫘' },
   { n: 'Mung Beans, boiled (½ cup)', cat: 'Higher-Carb Veg', fat: 0.4, sat: 0.1, unsat: 0.3, fiber: 2.5, protein: 7.0, carbs: 16.0, icon: '🫘' },
@@ -29460,6 +29470,7 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Soymilk, fresh, unsweetened (250ml)', cat: 'Drinks', fat: 4.0, sat: 0.6, unsat: 3.4, fiber: 0.5, protein: 7.0, carbs: 3.0, icon: '🥛' },
   { n: 'Soymilk, fresh, sweetened (250ml)', cat: 'Drinks', fat: 4.0, sat: 0.6, unsat: 3.4, fiber: 0.5, protein: 7.0, carbs: 12.0, icon: '🥛' },
   { n: 'Vitasoy, sweetened (250ml)', cat: 'Drinks', fat: 4.0, sat: 1.0, unsat: 3.0, fiber: 0, protein: 7.0, carbs: 17.0, icon: '🥛' },
+  { n: 'Miki Prune Extract (1 serving, 55g)', cat: 'Drinks', fat: 0.0, sat: 0.0, unsat: 0.0, fiber: 1.5, protein: 1.2, carbs: 36.0, icon: '🧃' },
   { n: 'Matcha Latte, regular milk (1 cup, ~240ml)', cat: 'Drinks', fat: 4.0, sat: 2.4, unsat: 1.6, fiber: 0, protein: 5.0, carbs: 22.0, icon: '🍵' },
   { n: 'Whipping Cream, aerosol (2 tbsp ~15g)', cat: 'Fats & Extras', fat: 5.0, sat: 3.1, unsat: 1.9, fiber: 0, protein: 0.3, carbs: 0.8, icon: '🫙' },
   { n: 'Tom Yum Soup, 1 bowl (no noodles)', cat: 'Thai Dishes', fat: 4.0, sat: 1.4, unsat: 2.6, fiber: 1.2, protein: 18.0, carbs: 4.0, icon: '🍲' },
@@ -29554,6 +29565,9 @@ const CAFE_FOOD_DATABASE = [
   { n: 'Chicken Tikka, grilled (1 serving)', cat: 'Indian / Pakistani', fat: 10.0, sat: 3.0, unsat: 7.0, fiber: 0.0, protein: 28.0, carbs: 3.0, icon: '🍢' },
   { n: 'Samosa (1 piece)', cat: 'Indian / Pakistani', fat: 8.0, sat: 2.5, unsat: 5.5, fiber: 1.5, protein: 3.0, carbs: 18.0, icon: '🥟' },
   { n: 'Pakora, mixed vegetable (4-5 pieces)', cat: 'Indian / Pakistani', fat: 12.0, sat: 2.0, unsat: 10.0, fiber: 2.0, protein: 4.0, carbs: 20.0, icon: '🥟' },
+  { n: 'Aloo Paratha (1 piece)', cat: 'Indian / Pakistani', fat: 12.0, sat: 5.0, unsat: 7.0, fiber: 3.0, protein: 6.0, carbs: 42.0, icon: '🫓' },
+  { n: 'Masala Tea / Chai (1 cup)', cat: 'Indian / Pakistani', fat: 3.0, sat: 1.8, unsat: 1.2, fiber: 0.0, protein: 2.0, carbs: 12.0, icon: '🍵' },
+  { n: 'Masala Tea / Chai, kosong (no sugar, 1 cup)', cat: 'Indian / Pakistani', fat: 3.0, sat: 1.8, unsat: 1.2, fiber: 0.0, protein: 2.0, carbs: 3.0, icon: '🍵' },
   { n: 'Har Gow / Shrimp Dumplings (3pc)', cat: 'Dimsum', chef: 'Zaki', fat: 4.0, sat: 1.2, unsat: 2.8, fiber: 0.8, protein: 9.0, carbs: 8.0, icon: '🥟' },
   { n: 'Siu Mai / Pork & Shrimp Dumplings (3pc)', cat: 'Dimsum', chef: 'Zaki', fat: 10.0, sat: 3.0, unsat: 7.0, fiber: 0.8, protein: 11.0, carbs: 6.0, icon: '🥟' },
   { n: 'Vegetarian Siu Mai, mock prawn/cuttlefish (3pc)', cat: 'Dimsum', chef: 'Zaki', fat: 6.0, sat: 1.8, unsat: 4.2, fiber: 0.8, protein: 7.0, carbs: 7.0, icon: '🥟' },
