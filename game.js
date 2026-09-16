@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Cafe: corrected Miki Prune Extract (was estimated as juice, actual label shows a concentrate) + Marigold Vanilla variant from real labels; added Nestle All Purpose Cream, Basmati/Red/Purple Rice)';
+const APP_VERSION = '2026-08-17 (Today tab expanded into a real hub \u2014 added Guild Boss + Brother Corin\u2019s Trial (both daily-reset, previously invisible here), and a "What You Could Do Right Now" suggestions panel: Dragon Hunt, Raid Mode, AFK Adventure, Grind Mode, Voyage when its window is open)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -24024,7 +24024,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.213';
+const BUILD_ID = '2026-08-17.215';
 // =========================
 
 
@@ -27205,6 +27205,41 @@ function rToday() {
   h += '<div class="st" style="text-align:center;">📅 Today</div>';
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Everything worth a quick look, in one place \u2014 for whenever you\'ve got three minutes and nothing else to point them at.</div>';
 
+  // Today's Checklist — Infirmary medicine reminders and Soel's care schedule had zero
+  // visibility on this screen before, and neither has any catch-up safety net if
+  // missed (unlike bounties/daily quests/guild gathering, which Missed-Day Catch-Up
+  // already covers). Surfaced here explicitly so nothing quietly falls through simply
+  // because it wasn't part of the existing catch-up's scope.
+  const todaysReminders = getTodaysReminders();
+  const soelElixirDue = canGiveSoelElixir();
+  const soelWardingDue = canGiveSoelWarding();
+  if (todaysReminders.length > 0 || soelElixirDue || soelWardingDue) {
+    h += '<div class="panel panel-gold">';
+    h += '<div class="panel-title" style="color:var(--gold);margin-bottom:6px;">\u2705 Today\u2019s Checklist</div>';
+    h += '<div class="btn-hint" style="margin-bottom:8px;">No catch-up if these slip \u2014 worth checking off as you go.</div>';
+    for (let key of todaysReminders) {
+      const info = INFIRMARY_REMINDERS[key];
+      const done = isReminderDoneToday(key);
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="toggleWellnessReminder(\'' + key + '\');render();">';
+      h += '<span style="font-size:12px;color:' + (done ? 'var(--success)' : 'var(--text)') + ';">' + (done ? '\u2713 ' : info.icon + ' ') + info.label + '</span>';
+      h += '<span style="font-size:10.5px;color:var(--text-dim);">' + info.desc + '</span>';
+      h += '</div>';
+    }
+    if (soelElixirDue) {
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);">';
+      h += '<span style="font-size:12px;">\u2697\ufe0f Renn\u2019s Spirit Elixir for Soel</span>';
+      h += '<button onclick="giveSoelElixir();render();" class="btn-outline-ghost" style="margin:0;padding:3px 10px;font-size:10.5px;">Give it</button>';
+      h += '</div>';
+    }
+    if (soelWardingDue) {
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;">';
+      h += '<span style="font-size:12px;">\ud83d\udee1\ufe0f Sister Wren\u2019s Warding for Soel</span>';
+      h += '<button onclick="giveSoelWarding();render();" class="btn-outline-ghost" style="margin:0;padding:3px 10px;font-size:10.5px;">Give it</button>';
+      h += '</div>';
+    }
+    h += '</div>';
+  }
+
   // Elixir Quickbar — reapplying a growth elixir between battles previously meant
   // opening the full Inventory screen, tabbing to Potions, and scrolling past every
   // other consumable to find the right duration. This skips all of that: one tap,
@@ -27377,6 +27412,49 @@ function rToday() {
       }
       h += '</div>';
     }
+  }
+
+  // Guild Boss + Temple Trials — both genuinely once-per-day like everything else on
+  // this screen, but previously had zero presence here at all, easy to simply forget
+  // existed on a given day.
+  if (G.guildJoined) {
+    const bossReady = canAttemptGuildBossToday();
+    h += '<div class="panel">';
+    h += '<div class="panel-row"><div class="panel-title">⚔️ Guild Boss</div><span style="font-size:11px;color:' + (bossReady ? 'var(--gold)' : 'var(--text-dim)') + ';">' + (bossReady ? 'Ready' : 'Done today') + '</span></div>';
+    if (bossReady) h += '<button onclick="setS(\'guild_boss\')" class="abtn" style="width:100%;margin-top:6px;">Rally the Guild</button>';
+    h += '</div>';
+  }
+  if (isTempleTrialsUnlocked()) {
+    const trialReady = canAttemptTempleTrialToday();
+    const trialTier = getTempleTrialTier();
+    h += '<div class="panel">';
+    h += '<div class="panel-row"><div class="panel-title">🙏 Brother Corin\u2019s Trial</div><span style="font-size:11px;color:' + (trialReady ? 'var(--gold)' : 'var(--text-dim)') + ';">' + (trialReady ? 'Ready \u2014 Tier ' + G.templeTrial.tier : 'Done today') + '</span></div>';
+    if (trialReady) h += '<button onclick="G.viewingTemple=true;setS(\'rest\');" class="abtn" style="width:100%;margin-top:6px;">Strike the Vigil</button>';
+    h += '</div>';
+  }
+
+  // Suggestions — not daily-reset, always-available systems, but easy to lose track
+  // of when deciding what to actually spend time on. Each shown only when genuinely
+  // relevant right now (Voyage only within its own trading window, etc.), not just a
+  // static list regardless of context.
+  const suggestions = [];
+  if (isDragonHuntUnlocked && isDragonHuntUnlocked()) suggestions.push({ icon: '🐉', label: 'Dragon Hunt', hint: 'A real fight, real stakes.', action: "setS('dragon_hunt')" });
+  suggestions.push({ icon: '🏆', label: 'Raid Mode', hint: 'Multi-stage gauntlets, big rewards.', action: "setS('raid_select')" });
+  suggestions.push({ icon: '🌙', label: 'AFK Adventure', hint: 'Set it and check back later.', action: "setS('afk_adventure')" });
+  suggestions.push({ icon: '⚡', label: 'Grind Mode', hint: 'Minimal-render background farming.', action: "startAfkGrind()" });
+  if (isVoyageWindowOpen()) {
+    suggestions.push({ icon: '⚓', label: 'Voyage', hint: 'Open now \u2014 sail, trade, or explore.', action: "setS('voyage')" });
+  }
+  if (suggestions.length > 0) {
+    h += '<div class="panel">';
+    h += '<div class="panel-title" style="margin-bottom:8px;">\ud83d\udca1 What You Could Do Right Now</div>';
+    for (let s of suggestions) {
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">';
+      h += '<div><div style="font-size:12.5px;font-weight:700;">' + s.icon + ' ' + s.label + '</div><div style="font-size:10.5px;color:var(--text-dim);">' + s.hint + '</div></div>';
+      h += '<button onclick="' + s.action + '" class="btn-outline-ghost" style="margin:0;padding:5px 12px;font-size:11px;">Go</button>';
+      h += '</div>';
+    }
+    h += '</div>';
   }
 
   h += '</div>';
