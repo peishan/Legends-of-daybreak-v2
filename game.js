@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Today tab expanded into a real hub \u2014 added Guild Boss + Brother Corin\u2019s Trial (both daily-reset, previously invisible here), and a "What You Could Do Right Now" suggestions panel: Dragon Hunt, Raid Mode, AFK Adventure, Grind Mode, Voyage when its window is open)';
+const APP_VERSION = '2026-08-17 (Cafe: nutrition tracking removed \u2014 macro totals, carb target, Active Day, and Mediterranean tip all stripped from display since tracking now lives in a different app; full menu browsing kept, logging is flavor-only)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -24024,7 +24024,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.215';
+const BUILD_ID = '2026-08-17.216';
 // =========================
 
 
@@ -29752,10 +29752,13 @@ function logMealFromDatabase(foodIdx) {
   const dk = G.cafeLogDate || todayKey();
   if (!G.mealLog[dk]) G.mealLog[dk] = [];
   const timeLabel = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  // Macro fields kept on the stored entry (harmless, unused) rather than stripped —
+  // nutrition tracking itself now lives in a different app, per an explicit decision,
+  // so this is flavor logging only: no totals, no target, just confirmation of what
+  // was eaten and when.
   G.mealLog[dk].push({ food: food.n, cat: food.cat, fat: food.fat, sat: food.sat || 0, unsat: food.unsat || 0, fiber: food.fiber || 0, protein: food.protein, carbs: food.carbs, time: timeLabel });
-  const totals = getDailyMacroTotals(dk);
   const dayLabel = dk === todayKey() ? 'today' : 'on ' + dk;
-  lg(food.icon + ' ' + food.n + ' logged ' + dayLabel + ' \u2014 ' + totals.carbs.toFixed(1) + 'g carbs (target ' + todaysCarbLimit() + 'g), ' + totals.fiber.toFixed(1) + 'g fiber, ' + totals.sat.toFixed(1) + 'g sat fat, ' + totals.unsat.toFixed(1) + 'g unsat fat, ' + totals.protein.toFixed(1) + 'g protein.');
+  lg(food.icon + ' ' + food.n + ' logged ' + dayLabel + '.');
   render();
 }
 // One-off custom entry — for anything not in the 365+ item database. Never saved to
@@ -29765,26 +29768,16 @@ function logMealFromDatabase(foodIdx) {
 // tracker; never carried over when the food database was ported into the Guild Cafe.
 function logOneOffMeal() {
   const nameEl = document.getElementById('oneOffName');
-  const fatEl = document.getElementById('oneOffFat');
-  const satEl = document.getElementById('oneOffSat');
-  const fiberEl = document.getElementById('oneOffFiber');
-  const proteinEl = document.getElementById('oneOffProtein');
-  const carbsEl = document.getElementById('oneOffCarbs');
   if (!nameEl || !nameEl.value.trim()) { lg('\ud83c\udf7d\ufe0f Give it a name first.'); return; }
   const name = nameEl.value.trim();
-  const fat = parseFloat(fatEl.value) || 0;
-  const sat = Math.min(fat, parseFloat(satEl.value) || 0); // sat can't exceed total fat
-  const unsat = fat - sat;
-  const fiber = parseFloat(fiberEl.value) || 0;
-  const protein = parseFloat(proteinEl.value) || 0;
-  const carbs = parseFloat(carbsEl.value) || 0;
   const dk = G.cafeLogDate || todayKey();
   if (!G.mealLog[dk]) G.mealLog[dk] = [];
   const timeLabel = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-  G.mealLog[dk].push({ food: name, cat: 'One-Off', fat, sat, unsat, fiber, protein, carbs, time: timeLabel });
-  const totals = getDailyMacroTotals(dk);
+  // Macro fields zeroed rather than removed from the stored shape — flavor logging
+  // only now, no numbers asked for or displayed anywhere.
+  G.mealLog[dk].push({ food: name, cat: 'One-Off', fat: 0, sat: 0, unsat: 0, fiber: 0, protein: 0, carbs: 0, time: timeLabel });
   const dayLabel = dk === todayKey() ? 'today' : 'on ' + dk;
-  lg('\ud83c\udf7d\ufe0f ' + name + ' logged ' + dayLabel + ' \u2014 ' + totals.carbs.toFixed(1) + 'g carbs (target ' + todaysCarbLimit() + 'g), ' + totals.fiber.toFixed(1) + 'g fiber, ' + totals.sat.toFixed(1) + 'g sat fat, ' + totals.unsat.toFixed(1) + 'g unsat fat, ' + totals.protein.toFixed(1) + 'g protein.');
+  lg('\ud83c\udf7d\ufe0f ' + name + ' logged ' + dayLabel + '.');
   G.cafeOneOff = false;
   render();
 }
@@ -30091,10 +30084,11 @@ function rGuildCafe() {
   // Fiber leads the display since that's the metric the user's own lipid panel
   // guidance called out specifically. Active Days are explicitly opt-in per date,
   // never automatic — extra carbs for training, not a default state.
+  // Flavor logging only — nutrition tracking now lives in a different app, per an
+  // explicit decision. No macro tracking, no carb target, no Mediterranean tip: just
+  // what was eaten and when, kept for the same reason a tavern log would be kept.
   const logDate = G.cafeLogDate || todayKey();
   const isBacklogging = logDate !== todayKey();
-  const macros = getDailyMacroTotals(logDate);
-  const carbLimit = todaysCarbLimit();
 
   // Backlogging — pick a day within the last week to log a meal you forgot earlier,
   // rather than only ever being able to log against "right now."
@@ -30106,49 +30100,14 @@ function rGuildCafe() {
   h += '</div>';
   if (isBacklogging) h += '<div class="btn-hint" style="margin-bottom:8px;color:var(--gold);">Logging for ' + logDate + ', not today.</div>';
 
-  // Mediterranean diet tip of the day — shown consistently above the nutrition panel,
-  // same rotation every day regardless of backlogging, since it's general guidance
-  // rather than tied to whichever specific date is being logged.
-  h += '<div class="panel" style="margin-bottom:12px;border-left:3px solid var(--accent-light);">';
-  h += '<div class="btn-hint" style="font-weight:700;color:var(--accent-light);margin-bottom:4px;">\ud83e\udd52 Mediterranean Tip</div>';
-  h += '<div class="btn-hint">' + getTodaysMediterraneanTip() + '</div>';
-  h += '</div>';
-
-  // Mediterranean-style tracking — fiber leads, since that's the metric your own
-  // lipid-panel guidance called out specifically ("key for LDL"), not carbs. Carbs are
-  // shown as a soft daily target rather than a hard ceiling with alarm styling, since
-  // this approach treats carbs as a normal part of eating, not something to minimize.
-  // Fat is split sat/unsat rather than one combined number, matching "reduce
-  // saturated, emphasize unsaturated" directly.
-  h += '<div class="panel-title" style="margin:14px 0 8px;">' + (isBacklogging ? 'That Day\u2019s' : 'Today\u2019s') + ' Nutrition</div>';
-  h += '<div class="panel' + (!isBacklogging && isActiveDayToday() ? ' panel-gold' : '') + '" style="margin-bottom:10px;">';
-  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">';
-  h += '<div class="btn-hint">Carb target</div>';
-  h += '<div style="display:flex;gap:4px;">';
-  for (let tier of ['low', 'medium', 'normal']) {
-    const active = G.cafeSettings.carbTier === tier;
-    h += '<button onclick="setCarbTier(\'' + tier + '\')" class="' + (active ? 'abtn' : 'btn-outline-ghost') + '" style="margin:0;padding:3px 8px;font-size:10px;">' + CARB_TIER_LABELS[tier].split(' ')[0] + '</button>';
-  }
-  h += '</div>';
-  h += '</div>';
-  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
-  h += '<div style="font-weight:700;font-size:16px;color:#4ade80;">' + macros.fiber.toFixed(1) + 'g <span style="font-size:11px;color:var(--text-dim);font-weight:400;">fiber</span></div>';
-  h += (!isBacklogging) ? (isActiveDayToday()
-    ? '<button onclick="toggleActiveDay()" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;color:var(--gold);">\ud83c\udfcb\ufe0f Active Day \u2014 on</button>'
-    : '<button onclick="toggleActiveDay()" class="btn-outline-ghost" style="margin:0;padding:4px 10px;font-size:11px;">Turn on Active Day</button>') : '';
-  h += '</div>';
-  h += '<div class="btn-hint" style="margin-bottom:6px;">' + macros.carbs.toFixed(1) + 'g carbs <span style="color:var(--text-dim);">/ ' + carbLimit + 'g target</span> \u00b7 ' + macros.protein.toFixed(1) + 'g protein</div>';
-  h += '<div class="btn-hint">Fat: ' + macros.fat.toFixed(1) + 'g total \u2014 <span style="color:#4ade80;">' + macros.unsat.toFixed(1) + 'g unsat</span> \u00b7 <span style="color:#f87171;">' + macros.sat.toFixed(1) + 'g sat</span></div>';
-  if (!isBacklogging && isActiveDayToday()) h += '<div class="btn-hint" style="margin-top:4px;color:var(--gold);">Extra carbs for training \u2014 back to the normal target tomorrow.</div>';
-  h += '</div>';
-
   const todaysMeals = G.mealLog[logDate] || [];
   if (todaysMeals.length > 0) {
+    h += '<div class="panel-title" style="margin-bottom:8px;">' + (isBacklogging ? 'That Day\u2019s' : 'Today\u2019s') + ' Meals</div>';
     for (let i = 0; i < todaysMeals.length; i++) {
       const meal = todaysMeals[i];
       h += '<div class="panel" style="margin-bottom:6px;">';
       h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
-      h += '<div style="font-size:12.5px;"><b>' + meal.food + '</b><div class="btn-hint">' + meal.carbs.toFixed(1) + 'g carbs \u00b7 ' + (meal.fiber || 0).toFixed(1) + 'g fiber \u00b7 ' + meal.protein.toFixed(1) + 'g protein \u00b7 ' + meal.fat.toFixed(1) + 'g fat \u00b7 ' + meal.time + '</div></div>';
+      h += '<div style="font-size:12.5px;"><b>' + meal.food + '</b><div class="btn-hint">' + meal.time + '</div></div>';
       h += '<button onclick="removeMealEntry(' + i + ')" class="btn-outline-ghost" style="margin:0;padding:2px 8px;font-size:14px;">\u00d7</button>';
       h += '</div></div>';
     }
@@ -30181,7 +30140,7 @@ function rGuildCafe() {
     for (let { f, i } of results) {
       h += '<div class="panel" style="margin-bottom:6px;cursor:pointer;" onclick="logMealFromDatabase(' + i + ')">';
       h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
-      h += '<div><div style="font-weight:700;font-size:12.5px;">' + f.icon + ' ' + f.n + '</div><div class="btn-hint">' + f.carbs.toFixed(1) + 'g carbs \u00b7 ' + (f.fiber || 0).toFixed(1) + 'g fiber \u00b7 ' + f.protein.toFixed(1) + 'g protein \u00b7 ' + f.fat.toFixed(1) + 'g fat</div></div>';
+      h += '<div style="font-weight:700;font-size:12.5px;">' + f.icon + ' ' + f.n + '</div>';
       h += '<span style="font-size:11px;color:var(--accent-light);">Log</span>';
       h += '</div></div>';
     }
@@ -30192,7 +30151,7 @@ function rGuildCafe() {
     for (let { f, i } of items) {
       h += '<div class="panel" style="margin-bottom:6px;cursor:pointer;" onclick="logMealFromDatabase(' + i + ')">';
       h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
-      h += '<div><div style="font-weight:700;font-size:12.5px;">' + f.icon + ' ' + f.n + '</div><div class="btn-hint">' + f.carbs.toFixed(1) + 'g carbs \u00b7 ' + (f.fiber || 0).toFixed(1) + 'g fiber \u00b7 ' + f.protein.toFixed(1) + 'g protein \u00b7 ' + f.fat.toFixed(1) + 'g fat</div></div>';
+      h += '<div style="font-weight:700;font-size:12.5px;">' + f.icon + ' ' + f.n + '</div>';
       h += '<span style="font-size:11px;color:var(--accent-light);">Log</span>';
       h += '</div></div>';
     }
@@ -30211,16 +30170,7 @@ function rGuildCafe() {
     h += '<div class="panel-title" style="margin-bottom:8px;">Log Something Else</div>';
     h += '<div class="btn-hint" style="margin-bottom:10px;">For anything not in the menu \u2014 logged once, not saved to the database.</div>';
     h += '<div class="panel" style="margin-bottom:10px;">';
-    h += '<div style="margin-bottom:8px;"><label class="btn-hint">Name</label><input id="oneOffName" type="text" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);" placeholder="What did you eat?"></div>';
-    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">';
-    h += '<div><label class="btn-hint">Total Fat (g)</label><input id="oneOffFat" type="number" step="0.1" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);" placeholder="0"></div>';
-    h += '<div><label class="btn-hint">...of which Sat Fat (g)</label><input id="oneOffSat" type="number" step="0.1" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);" placeholder="0"></div>';
-    h += '</div>';
-    h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">';
-    h += '<div><label class="btn-hint">Fiber (g)</label><input id="oneOffFiber" type="number" step="0.1" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);" placeholder="0"></div>';
-    h += '<div><label class="btn-hint">Protein (g)</label><input id="oneOffProtein" type="number" step="0.1" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);" placeholder="0"></div>';
-    h += '<div><label class="btn-hint">Carbs (g)</label><input id="oneOffCarbs" type="number" step="0.1" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);" placeholder="0"></div>';
-    h += '</div>';
+    h += '<div><label class="btn-hint">Name</label><input id="oneOffName" type="text" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);" placeholder="What did you eat?"></div>';
     h += '</div>';
     h += '<button onclick="logOneOffMeal()" class="abtn" style="width:100%;margin-bottom:16px;">Log It</button>';
   } else {
