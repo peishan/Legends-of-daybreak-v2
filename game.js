@@ -2,7 +2,7 @@
 // Build timestamp — update this string on every deploy. Shown at the bottom of the
 // Home screen so it's possible to confirm at a glance whether a refresh actually
 // picked up the latest version, rather than a stuck cache silently serving the old one.
-const APP_VERSION = '2026-08-17 (Cafe: nutrition tracking removed \u2014 macro totals, carb target, Active Day, and Mediterranean tip all stripped from display since tracking now lives in a different app; full menu browsing kept, logging is flavor-only)';
+const APP_VERSION = '2026-08-17 (Fix: localStorage quota exceeded \u2014 mealLog was the only log/history array with zero automatic cleanup, growing forever; now trimmed to a 30-day window on load and each day-advance)';
 
 // PWA Install Prompt Handler
 let deferredPrompt = null;
@@ -10912,6 +10912,15 @@ function checkDayAdvance() {
   checkLibraryResearchOutcomes();
   checkLibraryResearchActionOutcomes();
   checkGuildMemberContributions();
+  // mealLog is keyed by date and, unlike every other log/history array in the game
+  // (focusHistory capped at 30, the action log capped at 200, guildChronicle
+  // similarly trimmed), had no automatic cleanup at all — it just grew forever with
+  // every day of logged food, storing full macro data per entry even after nutrition
+  // tracking itself was removed from display. Left unchecked over a long enough play
+  // history, this is a real, credible cause of a localStorage quota error. Backlogging
+  // only ever shows the last 7 days anyway, so keeping 30 is a generous buffer, not a
+  // tight one.
+  trimOldMealLogEntries();
   checkGuildMemberQuestOutcomes();
   checkGuildMemberQuestStart();
 
@@ -24024,7 +24033,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.216';
+const BUILD_ID = '2026-08-17.217';
 // =========================
 
 
@@ -24968,6 +24977,11 @@ G.currentWeather = data.currentWeather || 'clear';
         generateDailyEventDeck(); // no-op if today's deck already exists; backfills older saves
     if (G.p.xp >= G.p.xpN) lvlup(); // catches any save where XP crossed the threshold but a level-up was missed (e.g. the Boss Rush bug)
 
+
+    // Run once immediately on load, not just at the next day-advance — the quota
+    // error can hit on almost any save attempt once mealLog has grown large enough,
+    // so this shouldn't wait for a day boundary to actually take effect.
+    trimOldMealLogEntries();
 
     lg('Game loaded!');
     return true;
@@ -29791,6 +29805,17 @@ function removeMealEntry(index) {
 // carried over when the food database was ported into the Guild Cafe. Limited to the
 // past 7 days rather than unlimited, matching "I forgot to log something recently"
 // rather than open-ended historical editing.
+// Keeps mealLog from growing forever — see the day-advance call site for why this
+// matters. 30-day window, computed fresh each call rather than stored, so it always
+// reflects "30 days before whatever today actually is" even across a long absence.
+function trimOldMealLogEntries() {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 30);
+  const cutoffKey = cutoff.getFullYear() + '-' + String(cutoff.getMonth() + 1).padStart(2, '0') + '-' + String(cutoff.getDate()).padStart(2, '0');
+  for (let dateKey in G.mealLog) {
+    if (dateKey < cutoffKey) delete G.mealLog[dateKey];
+  }
+}
 function getCafeBacklogDates() {
   const dates = [];
   for (let i = 0; i < 7; i++) {
