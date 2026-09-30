@@ -24033,7 +24033,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.217';
+const BUILD_ID = '2026-08-17.218';
 // =========================
 
 
@@ -31373,6 +31373,10 @@ const VERDANT_REACH_TAB = { label: 'The Verdant Reach', min: 56, max: 200 };
 const FRACTURED_WORLDS_TAB = { label: 'The Fractured Worlds', min: 201, max: 360 };
 const BEYOND_THE_ROADS_TAB = { label: 'Beyond the Roads', min: 361, max: 490 };
 const THE_LIBRARY_AND_BEYOND_TAB = { label: 'The Library & Beyond', min: 491, max: 700 };
+// Zones at Lv701-1250 were built but sat outside every tab range above, so Explore never
+// listed them. These cover them, with headroom (to 1500) for whatever comes next.
+const UNFINISHED_ENDINGS_TAB = { label: 'The Unfinished Endings', min: 701, max: 1000 };
+const THE_LAST_ASCENT_TAB = { label: 'The Last Ascent', min: 1001, max: 1500 };
 const VERDANT_REACH_BRIDGE_CHAPTER = 'journal_069'; // "What the World Let Go Of" — comes after the 6 backstory chapters (62-67) and the charging/parents chapter (68). Written and live.
 
 function hasEnteredVerdantReach() {
@@ -31391,7 +31395,7 @@ function isInVerdantReachTabMode() {
 }
 
 function getActiveZoneMapTabs() {
-  return isInVerdantReachTabMode() ? [VERDANT_REACH_TAB, FRACTURED_WORLDS_TAB, BEYOND_THE_ROADS_TAB, THE_LIBRARY_AND_BEYOND_TAB] : ZONE_MAP_TABS;
+  return isInVerdantReachTabMode() ? [VERDANT_REACH_TAB, FRACTURED_WORLDS_TAB, BEYOND_THE_ROADS_TAB, THE_LIBRARY_AND_BEYOND_TAB, UNFINISHED_ENDINGS_TAB, THE_LAST_ASCENT_TAB] : ZONE_MAP_TABS;
 }
 
 function setExploreMapTab(idx) {
