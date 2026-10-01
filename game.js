@@ -7224,7 +7224,7 @@ storyJournal: {
   activeChainQuestId: null,
   strongholds: {}, // claimed strongholds, keyed by STRONGHOLDS id — set true once claimed
   guildHallLevel: {}, // Guild Hall level per stronghold id (1 = just claimed, up to 5)
-  guildJoined: false, // The Guild — separate from any Stronghold, auto-joins at level 5
+  guildJoined: false, // The Guild — opens when the Mended Grove stronghold is claimed (see checkGuildUnlock)
   guildRep: 0, // lifetime reputation total, determines rank, never spent
   // Guild Treasury — a shared pool, separate from San's own gold, funded by direct
   // contribution and a small automatic cut of guild-generated income. Milestones fund
@@ -12731,12 +12731,22 @@ function getGuildBonus(statKey) {
   return total;
 }
 
+// The Guild's hall is in the Mended Grove, so the Guild (and its Hub) only exists once that
+// stronghold has been claimed -- it used to auto-join at level 5, well before that.
+// Other guild systems key off G.guildJoined, so this flag is the single gate. On a save that
+// joined early, the flag is simply switched off until the Grove is claimed; rep, roster and
+// everything else stay in the save untouched and come back as-is on claim.
+function isGuildUnlocked() {
+  return !!(G.strongholds && G.strongholds.mendedGrove);
+}
 function checkGuildUnlock() {
-  if (!G.guildJoined && G.p.lvl >= 5) {
+  if (!G.guildJoined && isGuildUnlocked()) {
     G.guildJoined = true;
-    G.guildFoundedDay = G.gameDay;
-    lg('🛡️ You\'ve joined the Adventurers\' Guild! The Contract Board is open — check it for bigger jobs than the usual bounties.');
+    if (G.guildFoundedDay < 0) G.guildFoundedDay = G.gameDay;
+    lg('🛡️ The Mended Grove\'s hall is open \u2014 you\'ve joined the Adventurers\' Guild! The Contract Board is open, with bigger jobs than the usual bounties.');
     refreshGuildContracts();
+  } else if (G.guildJoined && !isGuildUnlocked()) {
+    G.guildJoined = false;
   }
 }
 
@@ -14558,6 +14568,7 @@ function claimStronghold(id) {
   const alreadyClaimed = G.strongholds[id];
   G.strongholds[id] = true;
   if (!alreadyClaimed) addChronicleEntry('🗼', def.name + ' claimed for the Guild.');
+  if (id === 'mendedGrove') checkGuildUnlock();
   if (!G.guildHallLevel[id]) G.guildHallLevel[id] = 1; // Guild Founded is automatic on claim
   for (let siteId of def.restSiteIds) {
     const site = G.rest.sites.find(s => s.id === siteId);
@@ -24327,7 +24338,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.224';
+const BUILD_ID = '2026-08-17.225';
 // =========================
 
 
@@ -31096,7 +31107,7 @@ function rGuildHub() {
   if (!G.guildJoined) {
     h += '<div class="panel" style="text-align:center;">';
     h += '<div class="panel-title">🔒 Not Yet a Member</div>';
-    h += '<div class="btn-hint" style="margin-top:6px;">The Guild opens its doors at Level 5. Keep adventuring.</div>';
+    h += '<div class="btn-hint" style="margin-top:6px;">The Guild\'s hall is in the Mended Grove. Claim the Grove, past the Unbroken Vale, and its doors open.</div>';
     h += '</div></div>';
     return h;
   }
@@ -31329,7 +31340,7 @@ function rGuild() {
   if (!G.guildJoined) {
     h += '<div class="panel" style="text-align:center;">';
     h += '<div class="panel-title">🔒 Not Yet a Member</div>';
-    h += '<div class="btn-hint" style="margin-top:6px;">The Guild opens its doors at Level 5. Keep adventuring.</div>';
+    h += '<div class="btn-hint" style="margin-top:6px;">The Guild\'s hall is in the Mended Grove. Claim the Grove, past the Unbroken Vale, and its doors open.</div>';
     h += '</div></div>';
     return h;
   }
