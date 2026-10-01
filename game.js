@@ -24350,7 +24350,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.226';
+const BUILD_ID = '2026-08-17.227';
 // =========================
 
 
@@ -26068,6 +26068,10 @@ function render(){
     h+='<button onclick="stopAfkAdventure()" style="background:var(--danger);color:white;border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;">Stop</button>';
     h+='</div>';
   }
+  // Every Guild Hub feature lives behind the Guild (the Mended Grove claim). A few have a second
+  // way in (Garden & Infirmary has its own Home card), so the check is central: anything here
+  // falls back to the Hub, which shows the lock message.
+  if (!G.guildJoined && GUILD_GATED_STATES.includes(G.state)) G.state = 'guild_hub';
   h+=renderNoticeStrip();
   h+='<div class="content">';
   if(G.state=='menu')h+=rMenu();
@@ -31111,6 +31115,9 @@ function rRelationships() {
   h += '</div>';
   return h;
 }
+
+const GUILD_GATED_STATES = ['guild', 'guild_cafe', 'guild_chronicle', 'guild_trophy_room', 'guild_treasury', 'guild_duties',
+  'guild_chest', 'guild_hall_tour', 'guild_bounty_missions', 'guild_boss', 'guild_war', 'guild_war_room', 'garden_infirmary'];
 
 function rGuildHub() {
   let h = '<div class="content">';
