@@ -11428,7 +11428,8 @@ function storyPopupTick() {
   try {
     storyPopupWatch();
     if (_storyPopupQueue.length && isStoryPopupsEnabled() && storyPopupSafeNow()) {
-      const entry = G.storyJournal.entries.find(e => e.id === _storyPopupQueue.shift());
+      const qid = _storyPopupQueue.shift();
+      const entry = G.storyJournal.entries.find(e => e.id === qid);
       if (entry && !G.storyJournal.read.includes(entry.id)) openStoryPopup(entry);
     }
   } catch (e) { console.warn('[StoryPopup]', e); }
@@ -24231,7 +24232,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.220';
+const BUILD_ID = '2026-08-17.221';
 // =========================
 
 
@@ -25720,6 +25721,13 @@ function advanceStory() {
   if(!chapter) { G.story.shown = true; setS('menu'); return; }
   G.story.scene++;
   if(G.story.scene >= chapter.scenes.length) {
+    // The same chapter also exists as a journal entry; the player has just watched it here,
+    // so don't replay it as a story popup a moment later.
+    const twin = G.storyJournal.entries.find(e => e.title === chapter.title);
+    if (twin) {
+      if (!G.storyJournal.read.includes(twin.id)) G.storyJournal.read.push(twin.id);
+      _storyPopupQueue = _storyPopupQueue.filter(id => id !== twin.id);
+    }
     G.story.shown = true;
     G.story.chapter++;
     G.story.scene = 0;
