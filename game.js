@@ -10533,22 +10533,22 @@ function checkNPCUnlocks() {
   for (let npc of G.npcs) {
     if (npc.t === 'trader' && !npc.unlocked && G.p.lvl >= npc.zoneLv) {
       npc.unlocked = true;
-      lg('🧳 New trader unlocked: ' + npc.n + ' at ' + npc.zone + '!');
+      if (!G._npcLegacy) lg('🧳 New trader unlocked: ' + npc.n + ' at ' + npc.zone + '!');
     }
     if (npc.t === 'driver' && !npc.unlocked && G.p.lvl >= npc.zoneLv) {
       npc.unlocked = true;
-      lg('🚗 ' + npc.n + ' pulls up out of nowhere. "' + npc.greeting + '"');
+      if (!G._npcLegacy) lg('🚗 ' + npc.n + ' pulls up out of nowhere. "' + npc.greeting + '"');
     }
     if (npc.t === 'ally' && !npc.unlocked && npc.reqMember) {
       if (G.affinity[npc.reqMember] && G.affinity[npc.reqMember].val >= npc.affinityReq) {
         npc.unlocked = true;
-        lg('🌟 ' + npc.n + ' ' + npc.title + ' has joined as an ally!');
+        if (!G._npcLegacy) lg('🌟 ' + npc.n + ' ' + npc.title + ' has joined as an ally!');
         queueBeat({ kicker: '\uD83C\uDF1F New Ally', title: npc.n + ' joins as an ally', body: npc.greeting || npc.title, btn: 'Continue' });
       }
     }
     if (npc.t === 'ally' && !npc.unlocked && !npc.reqMember && npc.ul && G.p.lvl >= npc.ul) {
       npc.unlocked = true;
-      lg('🌟 ' + npc.n + ' ' + npc.title + ' has joined as an ally!');
+      if (!G._npcLegacy) lg('🌟 ' + npc.n + ' ' + npc.title + ' has joined as an ally!');
       queueBeat({ kicker: '\uD83C\uDF1F New Ally', title: npc.n + ' joins as an ally', body: npc.greeting || npc.title, btn: 'Continue' });
     }
   }
@@ -11753,7 +11753,7 @@ function closeBeatModal() {
 // logging back in -- collapse into ONE "While you were away" digest instead of a modal storm.
 let _beatQueue = [];
 function queueBeat(o) {
-  if (!isStoryPopupsEnabled()) return;
+  if (!isStoryPopupsEnabled() || G._loading || G._npcLegacy) return;
   if (_beatQueue.length >= 20) _beatQueue.shift();
   _beatQueue.push(o);
 }
@@ -24517,7 +24517,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.229';
+const BUILD_ID = '2026-08-17.230';
 // =========================
 
 
@@ -24576,6 +24576,8 @@ function saveGame() {
 
     log: G.log,
     affinity: G.affinity,
+    // NPC/ally unlock state was never saved, so every load re-unlocked (and re-announced) everyone
+    npcs: G.npcs.map(n => ({ n: n.n, unlocked: n.unlocked, visitCount: n.visitCount || 0 })),
     soelBlessing: G.soelBlessing,
     joelReviveUsed: G.joelReviveUsed,
     achievements: G.achievements.map(a => ({ id: a.id, done: a.done, revealed: a.revealed })),
@@ -24794,7 +24796,15 @@ function resetBossContent(bossName) {
   render();
 }
 
+// Catch-up checks run during a load (prestige/ally unlock announcements etc.) describe state the
+// player already knows about, so story beats are held back until loading finishes.
 function loadGame() {
+  G._loading = true;
+  G._npcLegacy = false;
+  try { return _loadGameInner(); }
+  finally { G._loading = false; G._npcLegacy = false; }
+}
+function _loadGameInner() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     // Phase 2 migration: try v4 if v5 not found
@@ -25385,6 +25395,7 @@ function loadGame() {
     if (data.soelCommentCooldown !== undefined) {
       G.soelCommentCooldown = data.soelCommentCooldown;
     }
+    if (!data.npcs) G._npcLegacy = true; // older save: everyone already unlocked is not news
     if (data.npcs) {
       for (let n of G.npcs) {
         const saved = data.npcs.find(sn => sn.n === n.n);
