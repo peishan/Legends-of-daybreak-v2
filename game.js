@@ -7224,7 +7224,7 @@ storyJournal: {
   activeChainQuestId: null,
   strongholds: {}, // claimed strongholds, keyed by STRONGHOLDS id — set true once claimed
   guildHallLevel: {}, // Guild Hall level per stronghold id (1 = just claimed, up to 5)
-  guildJoined: false, // The Guild — separate from any Stronghold, auto-joins at level 5
+  guildJoined: false, // The Guild — opens when the Mended Grove stronghold is claimed (see checkGuildUnlock)
   guildRep: 0, // lifetime reputation total, determines rank, never spent
   // Guild Treasury — a shared pool, separate from San's own gold, funded by direct
   // contribution and a small automatic cut of guild-generated income. Milestones fund
@@ -11625,7 +11625,7 @@ function getNoticeItems() {
     }
     if (isLibraryResearchUnlocked() && Object.values(G.libraryResearch.threads).some(t => !t.pendingOutcome && !t.activeDilemmaId))
       items.push({ icon: '📚', text: 'Library research available', go: 'library_research' });
-    if ((G.disciples || []).some(d => !d.graduated && !d.pendingOutcome))
+    if (isDisciplesUnlocked() && (G.disciples || []).some(d => !d.graduated && !d.pendingOutcome))
       items.push({ icon: '🎓', text: 'A disciple is ready for a lesson', go: 'disciples' });
     const dq = (G.dailyQuests || []).filter(q => !q.done).length;
     if (dq) items.push({ icon: '📅', text: dq + ' daily quest' + (dq > 1 ? 's' : '') + ' open', go: 'today' });
@@ -12074,7 +12074,14 @@ function getActiveDiscipleCount() {
   return G.disciples.filter(d => !d.graduated).length;
 }
 
+// Opens with the Guild (the Mended Grove claim) -- graduates become fieldable Guild members,
+// so this was never meant to be open from level 1.
+function isDisciplesUnlocked() {
+  return !!G.guildJoined;
+}
+
 function recruitDisciple() {
+  if (!isDisciplesUnlocked()) return;
   if (getActiveDiscipleCount() >= DISCIPLE_MAX_SLOTS) {
     lg('📚 Already mentoring ' + DISCIPLE_MAX_SLOTS + ' disciples. Wait for one to graduate first.');
     return;
@@ -12468,6 +12475,11 @@ function rPartySelection() {
 function rDisciples() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">📚 Teach a Disciple</div>';
+  if (!isDisciplesUnlocked()) {
+    h += '<div class="panel" style="text-align:center;"><div class="panel-title">🔒 Not Yet</div>';
+    h += '<div class="btn-hint" style="margin-top:6px;">Disciples come to the Guild. Claim the Mended Grove, past the Unbroken Vale, and its doors open.</div></div></div>';
+    return h;
+  }
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Nothing here resolves right away. What you tell them shapes who they become \u2014 you will not know how until you check back.</div>';
 
   // Active dilemma prompt takes over the screen when one is showing
@@ -12731,12 +12743,22 @@ function getGuildBonus(statKey) {
   return total;
 }
 
+// The Guild's hall is in the Mended Grove, so the Guild (and its Hub) only exists once that
+// stronghold has been claimed -- it used to auto-join at level 5, well before that.
+// Other guild systems key off G.guildJoined, so this flag is the single gate. On a save that
+// joined early, the flag is simply switched off until the Grove is claimed; rep, roster and
+// everything else stay in the save untouched and come back as-is on claim.
+function isGuildUnlocked() {
+  return !!(G.strongholds && G.strongholds.mendedGrove);
+}
 function checkGuildUnlock() {
-  if (!G.guildJoined && G.p.lvl >= 5) {
+  if (!G.guildJoined && isGuildUnlocked()) {
     G.guildJoined = true;
-    G.guildFoundedDay = G.gameDay;
-    lg('🛡️ You\'ve joined the Adventurers\' Guild! The Contract Board is open — check it for bigger jobs than the usual bounties.');
+    if (G.guildFoundedDay < 0) G.guildFoundedDay = G.gameDay;
+    lg('🛡️ The Mended Grove\'s hall is open \u2014 you\'ve joined the Adventurers\' Guild! The Contract Board is open, with bigger jobs than the usual bounties.');
     refreshGuildContracts();
+  } else if (G.guildJoined && !isGuildUnlocked()) {
+    G.guildJoined = false;
   }
 }
 
@@ -14558,6 +14580,7 @@ function claimStronghold(id) {
   const alreadyClaimed = G.strongholds[id];
   G.strongholds[id] = true;
   if (!alreadyClaimed) addChronicleEntry('🗼', def.name + ' claimed for the Guild.');
+  if (id === 'mendedGrove') checkGuildUnlock();
   if (!G.guildHallLevel[id]) G.guildHallLevel[id] = 1; // Guild Founded is automatic on claim
   for (let siteId of def.restSiteIds) {
     const site = G.rest.sites.find(s => s.id === siteId);
@@ -24327,7 +24350,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.224';
+const BUILD_ID = '2026-08-17.227';
 // =========================
 
 
@@ -26045,6 +26068,10 @@ function render(){
     h+='<button onclick="stopAfkAdventure()" style="background:var(--danger);color:white;border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;">Stop</button>';
     h+='</div>';
   }
+  // Every Guild Hub feature lives behind the Guild (the Mended Grove claim). A few have a second
+  // way in (Garden & Infirmary has its own Home card), so the check is central: anything here
+  // falls back to the Hub, which shows the lock message.
+  if (!G.guildJoined && GUILD_GATED_STATES.includes(G.state)) G.state = 'guild_hub';
   h+=renderNoticeStrip();
   h+='<div class="content">';
   if(G.state=='menu')h+=rMenu();
@@ -31089,6 +31116,9 @@ function rRelationships() {
   return h;
 }
 
+const GUILD_GATED_STATES = ['guild', 'guild_cafe', 'guild_chronicle', 'guild_trophy_room', 'guild_treasury', 'guild_duties',
+  'guild_chest', 'guild_hall_tour', 'guild_bounty_missions', 'guild_boss', 'guild_war', 'guild_war_room', 'garden_infirmary'];
+
 function rGuildHub() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">🏰 Guild Hub</div>';
@@ -31096,7 +31126,7 @@ function rGuildHub() {
   if (!G.guildJoined) {
     h += '<div class="panel" style="text-align:center;">';
     h += '<div class="panel-title">🔒 Not Yet a Member</div>';
-    h += '<div class="btn-hint" style="margin-top:6px;">The Guild opens its doors at Level 5. Keep adventuring.</div>';
+    h += '<div class="btn-hint" style="margin-top:6px;">The Guild\'s hall is in the Mended Grove. Claim the Grove, past the Unbroken Vale, and its doors open.</div>';
     h += '</div></div>';
     return h;
   }
@@ -31329,7 +31359,7 @@ function rGuild() {
   if (!G.guildJoined) {
     h += '<div class="panel" style="text-align:center;">';
     h += '<div class="panel-title">🔒 Not Yet a Member</div>';
-    h += '<div class="btn-hint" style="margin-top:6px;">The Guild opens its doors at Level 5. Keep adventuring.</div>';
+    h += '<div class="btn-hint" style="margin-top:6px;">The Guild\'s hall is in the Mended Grove. Claim the Grove, past the Unbroken Vale, and its doors open.</div>';
     h += '</div></div>';
     return h;
   }
@@ -31425,6 +31455,7 @@ function getMenuCardBadge(action) {
     return Object.values(G.libraryResearch.threads).some(t => !t.pendingOutcome && !t.activeDilemmaId);
   }
   if (action === 'disciples') {
+    if (!isDisciplesUnlocked()) return false;
     return (G.disciples || []).some(d => !d.graduated && !d.pendingOutcome);
   }
   if (action === 'today') {
