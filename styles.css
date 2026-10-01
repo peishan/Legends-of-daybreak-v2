@@ -1032,7 +1032,7 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 
 
 /* Story popups — tap-through modal for newly unlocked journal chapters */
-#story-popup { position: fixed; inset: 0; z-index: 2000; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.78); padding: 16px; }
+#story-popup, #beat-modal { position: fixed; inset: 0; z-index: 2000; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.78); padding: 16px; }
 .sp-card { width: min(480px, 100%); max-height: 100%; overflow-y: auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
 .sp-art { display: block; width: 100%; max-height: 34vh; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
 .sp-kicker { font-family: Cinzel, serif; font-size: 12px; letter-spacing: 0.08em; color: var(--accent-light); margin-bottom: 10px; text-align: center; }
