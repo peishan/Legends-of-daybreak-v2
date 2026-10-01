@@ -11484,6 +11484,83 @@ function closeStoryPopup() {
   if (ov) ov.style.display = 'none';
 }
 
+// === STORY BEATS: first-time zone entry + first boss encounter ===
+// Same idea as the chapter popups: key moments get a proper scene instead of a log line.
+// Strictly ONCE per zone / boss (this is a grinding game — repeats would be noise), and
+// governed by the same on/off toggle. Per device, like that toggle. On first run, every
+// zone/boss you've already reached is treated as seen so an existing save isn't flooded.
+const BEAT_SEEN_KEY = 'daybreak_beat_seen';
+let _beatCur = null; // { onContinue }
+function _beatSeen() {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(BEAT_SEEN_KEY)); } catch (e) {}
+  if (!d) {
+    d = { z: [], b: [] };
+    for (const z of G.zones) if (z.lv <= G.p.lvl) d.z.push(z.n);
+    for (const b of G.bosses) if (d.z.includes(b.zone)) d.b.push(b.n);
+    _beatSave(d);
+  }
+  return d;
+}
+function _beatSave(d) { try { localStorage.setItem(BEAT_SEEN_KEY, JSON.stringify(d)); } catch (e) {} }
+function _beatArt(name) { return 'bosses/' + name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.jpg'; }
+
+// Returns true if it showed a modal; the modal's Continue re-enters sc() for the same zone.
+function showZoneIntro(zi) {
+  if (!isStoryPopupsEnabled() || _beatCur) return false;
+  const z = G.zones[zi], seen = _beatSeen();
+  if (seen.z.includes(z.n)) return false;
+  seen.z.push(z.n); _beatSave(seen);
+  openBeatModal({
+    kicker: '🧭 New Zone · Lv.' + z.lv,
+    title: z.n,
+    body: z.d,
+    foot: 'Foes here: ' + (z.en || []).join(', ') + (z.dg ? ' · Danger: ' + z.dg : ''),
+    btn: 'Enter'
+  }, () => sc(zi));
+  return true;
+}
+
+// Boss has already spawned inside combat; hold auto-combat until the player continues.
+function showBossIntro(boss) {
+  if (!isStoryPopupsEnabled() || _beatCur) return;
+  const seen = _beatSeen();
+  if (seen.b.includes(boss.n)) return;
+  seen.b.push(boss.n); _beatSave(seen);
+  const ch = G.storyJournal.entries.find(e => e.unlockType === 'boss' && e.unlockAt === boss.n);
+  const wasAuto = G.cbt.autoCombat;
+  G.cbt.autoCombat = false;
+  openBeatModal({
+    kicker: '⚠️ Boss',
+    title: boss.n,
+    art: _beatArt(boss.n),
+    body: boss.desc || '',
+    foot: ch ? '📖 Defeating it unlocks Chapter ' + ch.chapter + ': ' + ch.title : '',
+    btn: 'Fight'
+  }, () => { if (wasAuto && G.cbt.on) G.cbt.autoCombat = true; render(); });
+}
+
+function openBeatModal(o, onContinue) {
+  _beatCur = { onContinue: onContinue };
+  let ov = document.getElementById('beat-modal');
+  if (!ov) { ov = document.createElement('div'); ov.id = 'beat-modal'; document.body.appendChild(ov); }
+  let h = '<div class="sp-card">';
+  if (o.art) h += '<img class="sp-art" src="' + o.art + '" alt="" onerror="this.style.display=\'none\'">';
+  h += '<div class="sp-kicker">' + o.kicker + '</div>';
+  h += '<div style="font-family:Cinzel,serif;font-size:20px;text-align:center;margin-bottom:10px;">' + o.title + '</div>';
+  if (o.body) h += '<div class="sp-box"><div class="sp-body"><div class="sp-text">' + o.body + '</div></div></div>';
+  if (o.foot) h += '<div style="font-size:12px;color:var(--text-dim);text-align:center;margin-top:10px;">' + o.foot + '</div>';
+  h += '<div class="sp-nav" style="justify-content:center;"><button class="sp-next" onclick="closeBeatModal()">' + o.btn + '</button></div></div>';
+  ov.innerHTML = h;
+  ov.style.display = 'flex';
+}
+function closeBeatModal() {
+  const cur = _beatCur; _beatCur = null;
+  const ov = document.getElementById('beat-modal');
+  if (ov) ov.style.display = 'none';
+  if (cur && cur.onContinue) cur.onContinue();
+}
+
 // One-line "what's next" for Home: the nearest level-gated chapter not yet unlocked.
 function nextStoryObjectiveHtml() {
   if (!G.storyJournal) return '';
@@ -22710,6 +22787,7 @@ handleDefeat = function() {
 
 function sc(zi, skipEvents) {
   const z=G.zones[zi];
+  if (!skipEvents && showZoneIntro(zi)) return;
 
   // Explorer daily quest — tracks unique zones visited today, not just total visits,
   // since the quest specifically asks for 2 *different* zones. Reset alongside the
@@ -22782,6 +22860,7 @@ function sc(zi, skipEvents) {
       G.cbt.en.push(G.currentBoss);
       lg('⚠️ BOSS APPEARS: ' + boss.n + '!');
       lg('   ' + boss.desc);
+      if (!skipEvents) showBossIntro(boss);
     }
   }
 
@@ -24152,7 +24231,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.219';
+const BUILD_ID = '2026-08-17.220';
 // =========================
 
 
