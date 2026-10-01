@@ -10543,11 +10543,13 @@ function checkNPCUnlocks() {
       if (G.affinity[npc.reqMember] && G.affinity[npc.reqMember].val >= npc.affinityReq) {
         npc.unlocked = true;
         lg('🌟 ' + npc.n + ' ' + npc.title + ' has joined as an ally!');
+        queueBeat({ kicker: '\uD83C\uDF1F New Ally', title: npc.n + ' joins as an ally', body: npc.greeting || npc.title, btn: 'Continue' });
       }
     }
     if (npc.t === 'ally' && !npc.unlocked && !npc.reqMember && npc.ul && G.p.lvl >= npc.ul) {
       npc.unlocked = true;
       lg('🌟 ' + npc.n + ' ' + npc.title + ' has joined as an ally!');
+      queueBeat({ kicker: '\uD83C\uDF1F New Ally', title: npc.n + ' joins as an ally', body: npc.greeting || npc.title, btn: 'Continue' });
     }
   }
   checkGuildRecruitment();
@@ -11403,7 +11405,7 @@ function toggleStoryPopups() {
 
 // Safe moments only: never mid-fight, never on top of another story screen.
 function storyPopupSafeNow() {
-  if (!G || !G.p || !G.storyJournal || _storyPopupCur) return false;
+  if (!G || !G.p || !G.storyJournal || _storyPopupCur || _beatCur) return false;
   if (G.cbt && G.cbt.on) return false;
   return ['menu', 'explore', 'party', 'journal'].includes(G.state);
 }
@@ -11427,6 +11429,7 @@ function storyPopupWatch() {
 function storyPopupTick() {
   try {
     storyPopupWatch();
+    beatTick();
     if (_storyPopupQueue.length && isStoryPopupsEnabled() && storyPopupSafeNow()) {
       const qid = _storyPopupQueue.shift();
       const entry = G.storyJournal.entries.find(e => e.id === qid);
@@ -11560,6 +11563,77 @@ function closeBeatModal() {
   const ov = document.getElementById('beat-modal');
   if (ov) ov.style.display = 'none';
   if (cur && cur.onContinue) cur.onContinue();
+}
+
+// === STORY BEAT QUEUE ===
+// Narrative moments that used to be a log line only (guild quests leaving/returning, Library
+// and disciple outcomes, new allies, prestige) now open the same modal as zone/boss intros.
+// They queue and show at safe moments, never mid-fight. Several arriving at once -- e.g. after
+// logging back in -- collapse into ONE "While you were away" digest instead of a modal storm.
+let _beatQueue = [];
+function queueBeat(o) {
+  if (!isStoryPopupsEnabled()) return;
+  if (_beatQueue.length >= 20) _beatQueue.shift();
+  _beatQueue.push(o);
+}
+function beatTick() {
+  if (!_beatQueue.length || _beatCur || _storyPopupCur || !storyPopupSafeNow()) return;
+  if (_beatQueue.length > 3) {
+    const list = _beatQueue.splice(0);
+    openBeatModal({
+      kicker: '📜 While you were away',
+      title: list.length + ' things happened',
+      body: list.map(b => '• <b>' + b.title + '</b> — ' + (b.kicker || '').replace(/^[^A-Za-z]+/, '')).join('<br>'),
+      foot: 'Details are in the Session Log.',
+      btn: 'OK'
+    }, null);
+    return;
+  }
+  openBeatModal(_beatQueue.shift(), null);
+}
+
+// === LOGIN NOTICES ===
+// A strip at the top of the screen listing what's actually waiting on the player. Reads the
+// same signals as the Home card badges, so nothing new needs tracking. Dismissing hides it
+// for this session only; it comes back as soon as the set of items changes.
+const NOTICE_HIDE_STATES = ['combat', 'story', 'ministory', 'journalentry'];
+function getNoticeItems() {
+  const items = [];
+  try {
+    const unread = (G.storyJournal.unlocked || []).filter(id => !(G.storyJournal.read || []).includes(id)).length;
+    if (unread) items.push({ icon: '📖', text: unread + ' new journal chapter' + (unread > 1 ? 's' : ''), go: 'journal' });
+    if (G.guildJoined) {
+      if (isWeeklyGuildRewardAvailable()) items.push({ icon: '🏰', text: 'Weekly guild reward ready', go: 'guild_hub' });
+      if (canCollectGuildMaterials()) items.push({ icon: '🧱', text: 'Guild materials to collect', go: 'guild_hub' });
+      if (isGuildBountyMissionReady && isGuildBountyMissionReady()) items.push({ icon: '📜', text: 'Guild bounty ready', go: 'guild_hub' });
+      const away = Object.keys(G.guildMemberQuests || {}).length;
+      if (away) items.push({ icon: '🧭', text: away + ' guild member' + (away > 1 ? 's' : '') + ' away on a quest', go: 'guild_hub' });
+    }
+    if (isLibraryResearchUnlocked() && Object.values(G.libraryResearch.threads).some(t => !t.pendingOutcome && !t.activeDilemmaId))
+      items.push({ icon: '📚', text: 'Library research available', go: 'library_research' });
+    if ((G.disciples || []).some(d => !d.graduated && !d.pendingOutcome))
+      items.push({ icon: '🎓', text: 'A disciple is ready for a lesson', go: 'disciples' });
+    const dq = (G.dailyQuests || []).filter(q => !q.done).length;
+    if (dq) items.push({ icon: '📅', text: dq + ' daily quest' + (dq > 1 ? 's' : '') + ' open', go: 'today' });
+  } catch (e) { console.warn('[Notices]', e); }
+  return items;
+}
+function renderNoticeStrip() {
+  if (NOTICE_HIDE_STATES.includes(G.state)) return '';
+  const items = getNoticeItems();
+  if (!items.length) return '';
+  const sig = items.map(i => i.text).join('|');
+  let hidden = null;
+  try { hidden = sessionStorage.getItem('daybreak_notice_hidden'); } catch (e) {}
+  if (hidden === sig) return '';
+  let h = '<div class="notice-strip">';
+  for (const i of items) h += '<button class="notice-chip" onclick="setS(\'' + i.go + '\')">' + i.icon + ' ' + i.text + '</button>';
+  h += '<button class="notice-x" onclick="dismissNotices()" aria-label="Dismiss">✕</button></div>';
+  return h;
+}
+function dismissNotices() {
+  try { sessionStorage.setItem('daybreak_notice_hidden', getNoticeItems().map(i => i.text).join('|')); } catch (e) {}
+  render();
 }
 
 // One-line "what's next" for Home: the nearest level-gated chapter not yet unlocked.
@@ -12147,6 +12221,7 @@ function checkGuildMemberQuestStart() {
       const def = getGuildMemberDef(id);
       G.guildMemberQuests[id] = { resolveDay: G.gameDay + q.days };
       lg((def ? def.icon + ' ' : '') + '📖 ' + q.title + ': ' + q.depart);
+      queueBeat({ kicker: '\uD83C\uDFF0 Guild Quest', title: q.title, body: q.depart, foot: ((def && def.npcName) || id) + ' returns in ' + q.days + ' days.', btn: 'Continue' });
       break; // only one departs per check
     }
   }
@@ -12163,6 +12238,7 @@ function checkGuildMemberQuestOutcomes() {
       G.guildTreasury.lifetimeContributed += gold;
       addGuildRep(q.rep);
       lg((def ? def.icon + ' ' : '') + '📖 ' + q.resolve + ' \u2014 +' + gold + 'G to the Treasury, +' + q.rep + ' Guild Rep.');
+      queueBeat({ kicker: '\uD83C\uDFF0 Guild Quest Complete', title: q.title, body: q.resolve, foot: '+' + gold + 'G to the Treasury \u00b7 +' + q.rep + ' Guild Rep', btn: 'Continue' });
     }
     delete G.guildMemberQuests[id];
   }
@@ -12178,6 +12254,7 @@ function checkDiscipleOutcomes() {
     const option = dilemma ? dilemma.options[disciple.pendingOutcome.optionIndex] : null;
     if (option) {
       lg('📚 ' + disciple.name + ': "' + option.outcome + '"');
+      queueBeat({ kicker: '\uD83D\uDCDA Disciple', title: disciple.name, body: option.outcome, btn: 'Continue' });
     }
     disciple.exchangeCount++;
     disciple.pendingOutcome = null;
@@ -12657,10 +12734,12 @@ function checkPrestigeUnlockAnnouncements() {
     const isFirst = (G.prestige.count || 0) === 0;
     lg('🌟 PRESTIGE UNLOCKED! Check the Prestige screen — bank a permanent bonus by resetting to Level 1.' + (isFirst ? '' : ' (Tier ' + ((G.prestige.count || 0) + 1) + ')'));
     showToast('🌟 Prestige unlocked!', 'gold');
+    queueBeat({ kicker: '\uD83C\uDF1F Prestige', title: 'Prestige Unlocked', body: 'Bank a permanent bonus by resetting to Level 1. Gear, gold and story progress are kept. Check the Prestige screen.', btn: 'Continue' });
   }
   if (G.p.lvl === COMPANION_PRESTIGE_UNLOCK) {
     lg('🌟 COMPANION PRESTIGE UNLOCKED! Every companion \u2014 and San\'s own spec paths \u2014 has a permanent choice waiting on their Party card / Skill Tree.');
     showToast('🌟 Companion Prestige unlocked!', 'gold');
+    queueBeat({ kicker: '\uD83C\uDF1F Prestige', title: 'Companion Prestige Unlocked', body: 'Every companion \u2014 and San\u2019s own spec paths \u2014 has a permanent choice waiting on their Party card and Skill Tree.', btn: 'Continue' });
   }
 }
 
@@ -15664,6 +15743,7 @@ function checkLibraryResearchOutcomes() {
     if (option) {
       const names = { san: 'San', mezstorm: 'Mezstorm', eliz: 'Eliz' };
       lg('📖 ' + names[researcher] + '\u2019s thread: ' + option.outcome);
+      queueBeat({ kicker: '\uD83D\uDCD6 The Library', title: names[researcher] + '\u2019s thread', body: option.outcome, foot: '+' + option.breakthroughValue + ' breakthrough' + (option.breakthroughValue === 1 ? '' : 's'), btn: 'Continue' });
       thread.breakthroughs += option.breakthroughValue;
       G.libraryResearch.totalBreakthroughs += option.breakthroughValue;
       checkLibraryResearchMilestones();
@@ -16333,6 +16413,7 @@ function recruitGuildMember(id) {
   G.guildRoster.recruited.push(id);
   G.guildProbation[id] = true;
   lg('🛡️ ' + def.npcName + ' has joined the Guild roster! ' + def.recruitLine);
+  queueBeat({ kicker: '\uD83D\uDEE1\uFE0F Guild', title: def.npcName + ' joins the Guild', body: def.recruitLine, foot: 'On probation until a first Guild War win.', btn: 'Continue' });
   lg('   On probation for now \u2014 a first Guild War win while fielded will make it official.');
   addChronicleEntry('📜', def.npcName + ' joined the Guild roster, on probation.');
 }
@@ -24232,7 +24313,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.222';
+const BUILD_ID = '2026-08-17.223';
 // =========================
 
 
@@ -25950,6 +26031,7 @@ function render(){
     h+='<button onclick="stopAfkAdventure()" style="background:var(--danger);color:white;border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;">Stop</button>';
     h+='</div>';
   }
+  h+=renderNoticeStrip();
   h+='<div class="content">';
   if(G.state=='menu')h+=rMenu();
   else if(G.state=='achievements')h+=rAchievements();
