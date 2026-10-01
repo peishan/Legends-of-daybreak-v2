@@ -68,7 +68,7 @@ const MASTERY=30; // kills in a zone for its mastery bonus (+10% XP & gold there
 // Chapter boss fights happen IN the zone they belong to
 const BOSSES={8:{name:'Bone Tyrant',icon:'💀',zone:'catacomb',hp:2200,atk:48,xp:120},
               9:{name:'Frost Queen',icon:'❄️',img:'../bosses/frostqueen.jpg',zone:'frost',hp:3500,atk:62,xp:200},
-              10:{name:'Abyssal Leviathan',icon:'🐙',img:'../bosses/abyssalleviathan.jpg',zone:'abyss',hp:5500,atk:80,xp:300}};
+              10:{name:'Abyssal Leviathan',icon:'🐙',img:'../bosses/abyssalleviathan.jpg',zone:'abyss',hp:4200,atk:66,xp:300}};
 const NEED_LV={1:1,2:5,3:8,4:10,5:12,6:14,7:16,8:17,9:19,10:21};
 
 const DEF={lvl:1,xp:0,gold:0,done:{},crew:[],read:{},kills:{},loot:{},gear:{atk:0,hp:0},zone:null};
@@ -183,12 +183,12 @@ function paintFight(){
   const f=F;document.getElementById('fightShell').innerHTML='<div class="kick"><span>'+(f.boss?'Boss Battle':G.auto?'Auto-hunt':'Hunt')+'</span><span>'+f.z.icon+' '+f.z.n+'</span></div>'+
    '<div class="foes">'+f.foes.map(x=>'<div class="foe">'+(x.img?'<img src="'+x.img+'" onerror="this.outerHTML=\'<div class=face>'+x.icon+'</div>\'" alt="">':'<div class="face">'+x.icon+'</div>')+'<div>'+x.n+'</div><div class="bar"><i style="width:'+Math.max(0,x.hp/x.mhp*100)+'%;background:var(--red)"></i></div></div>').join('')+'</div>'+
    '<div class="crew" style="margin:8px 0">'+f.party.map(p=>'<div class="mem">'+(portrait(p.n)||'')+'<div class="bar"><i style="width:'+Math.max(0,p.hp/p.mhp*100)+'%"></i></div></div>').join('')+'</div><div id="log">'+f.log.slice(-8).join('<br>')+'</div>'+
-   '<div class="row">'+(G.auto&&!f.over?'<button class="go" onclick="stopAuto();paintFight()">⏹ Stop auto</button>':f.over?'<button class="go" onclick="endFight()">Continue</button>':'<button class="go" onclick="turn(\'a\')">Attack</button><button onclick="turn(\'h\')">Heal (San)</button><button onclick="turn(\'f\')">Flee</button>')+'</div>';
+   '<div class="row">'+(G.auto&&!f.over?'<button class="go" onclick="stopAuto();paintFight()">⏹ Stop auto</button>':f.over?'<button class="go" onclick="endFight()">Continue</button>':'<button class="go" onclick="turn(\'a\')">Attack</button><button onclick="turn(\'h\')">Rally (heal + revive)</button><button onclick="turn(\'f\')">Flee</button>')+'</div>';
   const l=document.getElementById('log');l.scrollTop=l.scrollHeight}
 function turn(m){
   const f=F,san=f.party[0],alive=()=>f.party.filter(p=>p.hp>0),foes=()=>f.foes.filter(x=>x.hp>0);
   if(m==='f'){if(f.boss){f.log.push('You cannot flee a boss!');return paintFight()}stopAuto();F=null;document.getElementById('fight').classList.remove('on');return render()}
-  if(m==='h'){const h=Math.round(san.mhp*.25+(f.party.some(p=>p.n==='Eliz')?20:0));f.party.forEach(p=>{if(p.hp>0)p.hp=Math.min(p.mhp,p.hp+Math.round(h/2))});f.log.push('San rallies the party (+'+h/2+' HP each).')}
+  if(m==='h'){const h=Math.round(san.mhp*.25+(f.party.some(p=>p.n==='Eliz')?20:0));f.party.forEach(p=>{if(p.hp>0)p.hp=Math.min(p.mhp,p.hp+Math.round(h/2));else{p.hp=Math.round(p.mhp*.25);f.log.push(p.n+' gets back up!')}});f.log.push('San rallies the party (+'+Math.round(h/2)+' HP each).')}
   else for(const p of alive()){const t=foes()[0];if(!t)break;let d=Math.round(p.atk*(.85+Math.random()*.3));if(p.n==='Mezstorm'&&Math.random()<.3){d*=2;f.log.push('⚡ Mezstorm calls lightning!')}t.hp-=d;f.log.push(p.n+' hits '+t.n+' for '+d)}
   if(!foes().length){f.over=true;f.win=true;
     const xp=f.foes.reduce((a,x)=>a+x.xp,0),gold=f.foes.reduce((a,x)=>a+x.gold,0);f.log.push('Victory! +'+xp+' XP, +'+gold+' gold');G.gold+=gold;
