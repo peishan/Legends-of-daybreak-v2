@@ -1045,3 +1045,9 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .sp-count { font-size: 11px; color: var(--text-dim); margin-right: auto; }
 .sp-skip, .sp-next { border-radius: 10px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--bg-hover); color: var(--text); }
 .sp-next { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* Login notices — what's waiting, at the top of the screen */
+.notice-strip { display: flex; gap: 6px; align-items: center; overflow-x: auto; padding: 8px 12px; background: rgba(232,197,71,0.08); border-bottom: 1px solid var(--border); }
+.notice-chip { flex-shrink: 0; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); border-radius: 14px; padding: 5px 11px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.notice-chip:hover { border-color: var(--accent); }
+.notice-x { flex-shrink: 0; margin-left: auto; background: none; border: none; color: var(--text-dim); font-size: 14px; cursor: pointer; padding: 4px 6px; }
