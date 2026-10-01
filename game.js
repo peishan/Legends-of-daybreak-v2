@@ -11625,7 +11625,7 @@ function getNoticeItems() {
     }
     if (isLibraryResearchUnlocked() && Object.values(G.libraryResearch.threads).some(t => !t.pendingOutcome && !t.activeDilemmaId))
       items.push({ icon: '📚', text: 'Library research available', go: 'library_research' });
-    if ((G.disciples || []).some(d => !d.graduated && !d.pendingOutcome))
+    if (isDisciplesUnlocked() && (G.disciples || []).some(d => !d.graduated && !d.pendingOutcome))
       items.push({ icon: '🎓', text: 'A disciple is ready for a lesson', go: 'disciples' });
     const dq = (G.dailyQuests || []).filter(q => !q.done).length;
     if (dq) items.push({ icon: '📅', text: dq + ' daily quest' + (dq > 1 ? 's' : '') + ' open', go: 'today' });
@@ -12074,7 +12074,14 @@ function getActiveDiscipleCount() {
   return G.disciples.filter(d => !d.graduated).length;
 }
 
+// Opens with the Guild (the Mended Grove claim) -- graduates become fieldable Guild members,
+// so this was never meant to be open from level 1.
+function isDisciplesUnlocked() {
+  return !!G.guildJoined;
+}
+
 function recruitDisciple() {
+  if (!isDisciplesUnlocked()) return;
   if (getActiveDiscipleCount() >= DISCIPLE_MAX_SLOTS) {
     lg('📚 Already mentoring ' + DISCIPLE_MAX_SLOTS + ' disciples. Wait for one to graduate first.');
     return;
@@ -12468,6 +12475,11 @@ function rPartySelection() {
 function rDisciples() {
   let h = '<div class="content">';
   h += '<div class="st" style="text-align:center;">📚 Teach a Disciple</div>';
+  if (!isDisciplesUnlocked()) {
+    h += '<div class="panel" style="text-align:center;"><div class="panel-title">🔒 Not Yet</div>';
+    h += '<div class="btn-hint" style="margin-top:6px;">Disciples come to the Guild. Claim the Mended Grove, past the Unbroken Vale, and its doors open.</div></div></div>';
+    return h;
+  }
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Nothing here resolves right away. What you tell them shapes who they become \u2014 you will not know how until you check back.</div>';
 
   // Active dilemma prompt takes over the screen when one is showing
@@ -24338,7 +24350,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.225';
+const BUILD_ID = '2026-08-17.226';
 // =========================
 
 
@@ -31436,6 +31448,7 @@ function getMenuCardBadge(action) {
     return Object.values(G.libraryResearch.threads).some(t => !t.pendingOutcome && !t.activeDilemmaId);
   }
   if (action === 'disciples') {
+    if (!isDisciplesUnlocked()) return false;
     return (G.disciples || []).some(d => !d.graduated && !d.pendingOutcome);
   }
   if (action === 'today') {
