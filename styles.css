@@ -1051,3 +1051,27 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .notice-chip { flex-shrink: 0; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); border-radius: 14px; padding: 5px 11px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .notice-chip:hover { border-color: var(--accent); }
 .notice-x { flex-shrink: 0; margin-left: auto; background: none; border: none; color: var(--text-dim); font-size: 14px; cursor: pointer; padding: 4px 6px; }
+
+/* Home v2 — hero "continue" button, progress tiles, collapsible groups */
+.home-cta { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; margin: 12px 0 4px; padding: 16px; border-radius: 16px; border: 1px solid var(--gold); background: linear-gradient(135deg, rgba(124,58,237,0.28), rgba(232,197,71,0.10)); color: var(--text); cursor: pointer; }
+.home-cta-icon { font-size: 34px; flex-shrink: 0; }
+.home-cta-body { flex: 1; min-width: 0; }
+.home-cta-eyebrow { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+.home-cta-title { font-family: Cinzel, serif; font-size: 19px; font-weight: 700; margin: 2px 0; }
+.home-cta-sub { font-size: 12px; color: var(--text-dim); }
+.home-cta-arrow { font-size: 22px; color: var(--gold); }
+.home-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.home-tile { position: relative; text-align: left; padding: 14px; }
+.home-tile-icon { font-size: 22px; }
+.home-tile-title { font-family: Cinzel, serif; font-size: 14px; font-weight: 700; margin-top: 4px; }
+.home-tile-status { font-size: 11px; color: var(--text-dim); margin: 2px 0 8px; min-height: 28px; }
+.home-tile-bar { height: 5px; border-radius: 3px; background: var(--bg-hover); overflow: hidden; }
+.home-tile-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--gold)); }
+.home-badge { position: absolute; top: 10px; right: 10px; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--gold); color: #1a1200; }
+.home-group { margin-bottom: 8px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 0 12px; }
+.home-group summary { cursor: pointer; list-style: none; padding: 12px 0; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
+.home-group summary::-webkit-details-marker { display: none; }
+.home-group summary::after { content: '\25B8'; color: var(--text-dim); margin-left: 8px; }
+.home-group[open] summary::after { content: '\25BE'; }
+.home-group-n { margin-left: auto; font-size: 11px; color: var(--text-dim); font-weight: 400; }
+.home-group .menu-grid-compact { padding-bottom: 12px; }

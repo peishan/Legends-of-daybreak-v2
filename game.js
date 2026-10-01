@@ -24350,7 +24350,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.227';
+const BUILD_ID = '2026-08-17.228';
 // =========================
 
 
@@ -31479,6 +31479,88 @@ const MENU_SECTION_COLORS = {
   '⚙️ Settings': '#6b6560'
 };
 
+// === HOME V2 ===
+// A hub in the style of the experimental Daybreak build: one "Continue" button for whatever is
+// next, a handful of progress tiles for the big areas, and everything else tucked into
+// collapsible groups. Same destinations and click handling as the classic Home (cards keep
+// their data-a), so nothing is lost. Switchable from the bottom of Home.
+const HOME_V2_KEY = 'daybreak_home_v2';
+function isHomeV2() {
+  try { return localStorage.getItem(HOME_V2_KEY) !== 'off'; } catch (e) { return true; }
+}
+function toggleHomeV2() {
+  try { localStorage.setItem(HOME_V2_KEY, isHomeV2() ? 'off' : 'on'); } catch (e) {}
+  render();
+}
+
+// The single most useful next step, in priority order.
+function getHomeCta() {
+  const unread = (G.storyJournal.unlocked || []).filter(id => !(G.storyJournal.read || []).includes(id));
+  let next = null;
+  for (const e of G.storyJournal.entries) {
+    if (e.unlockType === 'level' && e.unlockAt > G.p.lvl && !G.storyJournal.unlocked.includes(e.id)) {
+      if (!next || e.unlockAt < next.unlockAt) next = e;
+    }
+  }
+  const nextLine = next ? 'Next story: ' + next.title + ' at Lv ' + next.unlockAt : '';
+  if (unread.length) {
+    const e = G.storyJournal.entries.find(x => x.id === unread[0]);
+    if (e) return { icon: e.icon || '📖', eyebrow: 'New chapter', title: e.title, sub: unread.length > 1 ? unread.length + ' chapters waiting' : (nextLine || 'Tap to read'), onclick: "replayStoryPopup('" + e.id + "')" };
+  }
+  let zi = -1;
+  G.zones.forEach((z, i) => { if (z.lv <= G.p.lvl && (zi < 0 || z.lv >= G.zones[zi].lv)) zi = i; });
+  if (zi < 0) return { icon: '⚔️', eyebrow: 'Continue Adventure', title: 'Explore', sub: nextLine || 'Choose a zone', onclick: "setS('explore')" };
+  return { icon: '⚔️', eyebrow: 'Continue Adventure', title: G.zones[zi].n, sub: nextLine || ('Lv ' + G.zones[zi].lv + ' zone'), onclick: 'sc(' + zi + ')' };
+}
+
+function _homeTile(icon, title, status, pct, badge, action) {
+  let h = '<div class="card home-tile" data-a="' + action + '">';
+  if (badge) h += '<span class="home-badge">' + badge + '</span>';
+  h += '<div class="home-tile-icon">' + icon + '</div><div class="home-tile-title">' + title + '</div><div class="home-tile-status">' + status + '</div>';
+  h += '<div class="home-tile-bar"><i style="width:' + Math.max(0, Math.min(100, pct)) + '%"></i></div></div>';
+  return h;
+}
+
+function rHomeV2(primary, sections) {
+  let h = '';
+  const cta = getHomeCta();
+  h += '<button class="home-cta" onclick="' + cta.onclick + '"><div class="home-cta-icon">' + cta.icon + '</div><div class="home-cta-body"><div class="home-cta-eyebrow">' + cta.eyebrow + '</div><div class="home-cta-title">' + cta.title + '</div><div class="home-cta-sub">' + cta.sub + '</div></div><div class="home-cta-arrow">→</div></button>';
+
+  const entries = G.storyJournal.entries.length, unlockedN = G.storyJournal.unlocked.length;
+  const unread = unlockedN - G.storyJournal.unlocked.filter(id => (G.storyJournal.read || []).includes(id)).length;
+  const zonesOpen = G.zones.filter(z => z.lv <= G.p.lvl).length;
+  const joined = G.party.filter(p => isPartyMemberUnlocked(p)).length;
+  const dq = G.dailyQuests || [], dqDone = dq.filter(q => q.done).length;
+  const claimed = Object.keys(G.strongholds || {}).filter(id => G.strongholds[id]).length;
+  const rankDef = G.guildJoined ? getGuildRankDef() : null;
+
+  h += '<div class="menu-section-title" style="--section-color:#7c3aed;">Explore</div><div class="home-tiles">';
+  h += _homeTile('⚔️', 'Adventure', zonesOpen + ' of ' + G.zones.length + ' zones open', zonesOpen / G.zones.length * 100, '', 'explore');
+  h += _homeTile('📖', 'Journal', unlockedN + ' of ' + entries + ' chapters', unlockedN / entries * 100, unread ? 'New' : '', 'journal');
+  h += _homeTile('👥', 'Party', joined + ' of ' + G.party.length + ' companions', joined / G.party.length * 100, '', 'party');
+  h += _homeTile('📅', 'Today', dqDone + '/' + dq.length + ' daily quests', dq.length ? dqDone / dq.length * 100 : 0, getMenuCardBadge('today') ? '' : '✓', 'today');
+  h += _homeTile('🏰', 'Guild Hub', G.guildJoined ? (rankDef ? rankDef.name : 'Member') : '🔒 Claim the Mended Grove', G.guildJoined ? 100 : 0, getMenuCardBadge('guild_hub') ? 'Ready' : '', 'guild_hub');
+  h += _homeTile('🗼', 'Strongholds', claimed + ' claimed', claimed / Object.keys(STRONGHOLDS).length * 100, '', 'stronghold');
+  h += _homeTile('🎒', 'Inventory', G.p.gold.toLocaleString() + ' gold', 0, '', 'inventory');
+  h += _homeTile('📜', 'Quests', 'Story & side quests', 0, '', 'quest');
+  h += '</div>';
+
+  const group = (title, items) => {
+    const vis = items.filter(m => m.a);
+    if (!vis.length) return '';
+    let g = '<details class="home-group"><summary>' + title + '<span class="home-group-n">' + vis.length + '</span></summary><div class="menu-grid-compact">';
+    for (const m of vis) {
+      const hasBadge = getMenuCardBadge(m.a);
+      g += '<div class="card card-compact" data-a="' + m.a + '"><div class="cicon-compact">' + m.i + (hasBadge ? '<span class="card-badge-dot"></span>' : '') + '</div><div class="clabel-compact">' + m.l + '</div></div>';
+    }
+    return g + '</div></details>';
+  };
+  h += '<div class="menu-section-title" style="--section-color:#f59e0b;">More</div>';
+  h += group('✨ Ways to Play', primary.map(m => ({ i: m.i, l: m.l, a: m.a })));
+  for (const sec of sections) h += group(sec.title, sec.items);
+  return h;
+}
+
 function rMenu(){
   const primary=[
     {i:'📖',l:'Daily Events',d:'A few short encounters, done in minutes',a:'event_deck'},
@@ -31553,41 +31635,45 @@ function rMenu(){
   ];
 
   let h='';
+  if (isHomeV2()) {
+    h += rHomeV2(primary, sections);
+  } else {
+    h += nextStoryObjectiveHtml();
 
-  h += nextStoryObjectiveHtml();
+    // Today at a Glance — the day's shape in three numbers, no navigating required.
+    // Pure readout of state that already exists elsewhere (focus minutes, daily quest
+    // progress, login streak) — this panel doesn't compute anything new, just surfaces it.
+    const dq = G.dailyQuests || [];
+    const dqDone = dq.filter(q => q.done).length;
+    const focusMin = G.p.focusMinutesToday || 0;
+    const dayStreak = G.loginStreak || 1;
+    h += '<div class="panel" data-a="today" onclick="setS(\'today\')" style="cursor:pointer;">';
+    h += '<div class="panel-title" style="margin-bottom:8px;">📅 Today at a Glance</div>';
+    h += '<div style="display:flex;justify-content:space-between;text-align:center;gap:4px;">';
+    h += '<div style="flex:1;"><div style="font-size:20px;font-weight:700;color:var(--accent);">' + focusMin + 'm</div><div style="font-size:11px;color:var(--text-dim);">Focus Today' + (getFocusedSessionCount() > 0 ? ' \u00b7 \u26a1+' + getFocusedAtkBonus() : '') + '</div></div>';
+    h += '<div style="flex:1;border-left:1px solid var(--border);border-right:1px solid var(--border);"><div style="font-size:20px;font-weight:700;color:var(--gold);">' + dqDone + '/' + dq.length + '</div><div style="font-size:11px;color:var(--text-dim);">Daily Quests</div></div>';
+    h += '<div style="flex:1;"><div style="font-size:20px;font-weight:700;color:var(--success);">🔥' + dayStreak + '</div><div style="font-size:11px;color:var(--text-dim);">Day Streak' + ((G.streakFreezes || 0) > 0 ? ' \u00b7 🧊' + (G.streakFreezes || 0) : '') + '</div></div>';
+    h += '</div>';
+    const edDone = (G.dailyEventDeck || []).filter(id => G.eventDeckProgress && G.eventDeckProgress[id]).length;
+    const edTotal = (G.dailyEventDeck || []).length;
+    if (edTotal > 0) h += '<div style="text-align:center;font-size:11px;color:var(--text-dim);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">📖 Daily Events: ' + edDone + '/' + edTotal + (edDone < edTotal ? ' \u2014 a few minutes, tap Daily Events below' : ' \u2014 done for today') + '</div>';
+    h += '</div>';
 
-  // Today at a Glance — the day's shape in three numbers, no navigating required.
-  // Pure readout of state that already exists elsewhere (focus minutes, daily quest
-  // progress, login streak) — this panel doesn't compute anything new, just surfaces it.
-  const dq = G.dailyQuests || [];
-  const dqDone = dq.filter(q => q.done).length;
-  const focusMin = G.p.focusMinutesToday || 0;
-  const dayStreak = G.loginStreak || 1;
-  h += '<div class="panel" data-a="today" onclick="setS(\'today\')" style="cursor:pointer;">';
-  h += '<div class="panel-title" style="margin-bottom:8px;">📅 Today at a Glance</div>';
-  h += '<div style="display:flex;justify-content:space-between;text-align:center;gap:4px;">';
-  h += '<div style="flex:1;"><div style="font-size:20px;font-weight:700;color:var(--accent);">' + focusMin + 'm</div><div style="font-size:11px;color:var(--text-dim);">Focus Today' + (getFocusedSessionCount() > 0 ? ' \u00b7 \u26a1+' + getFocusedAtkBonus() : '') + '</div></div>';
-  h += '<div style="flex:1;border-left:1px solid var(--border);border-right:1px solid var(--border);"><div style="font-size:20px;font-weight:700;color:var(--gold);">' + dqDone + '/' + dq.length + '</div><div style="font-size:11px;color:var(--text-dim);">Daily Quests</div></div>';
-  h += '<div style="flex:1;"><div style="font-size:20px;font-weight:700;color:var(--success);">🔥' + dayStreak + '</div><div style="font-size:11px;color:var(--text-dim);">Day Streak' + ((G.streakFreezes || 0) > 0 ? ' \u00b7 🧊' + (G.streakFreezes || 0) : '') + '</div></div>';
-  h += '</div>';
-  const edDone = (G.dailyEventDeck || []).filter(id => G.eventDeckProgress && G.eventDeckProgress[id]).length;
-  const edTotal = (G.dailyEventDeck || []).length;
-  if (edTotal > 0) h += '<div style="text-align:center;font-size:11px;color:var(--text-dim);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">📖 Daily Events: ' + edDone + '/' + edTotal + (edDone < edTotal ? ' \u2014 a few minutes, tap Daily Events below' : ' \u2014 done for today') + '</div>';
-  h += '</div>';
-
-  h+='<div class="grid2">';
-  for(let m of primary)h+='<div class="card" data-a="'+m.a+'"><div class="cicon">'+m.i+'</div><div class="clabel">'+m.l+'</div><div class="cdesc">'+m.d+'</div></div>';
-  h+='</div>';
-
-  for(let sec of sections){
-    const secColor = MENU_SECTION_COLORS[sec.title] || '#7c3aed';
-    h+='<div class="menu-section-title" style="--section-color:'+secColor+';">'+sec.title+'</div>';
-    h+='<div class="menu-grid-compact" style="--section-color:'+secColor+';">';
-    for(let m of sec.items){
-      const hasBadge = getMenuCardBadge(m.a);
-      h+='<div class="card card-compact" data-a="'+m.a+'"><div class="cicon-compact">'+m.i+(hasBadge ? '<span class="card-badge-dot"></span>' : '')+'</div><div class="clabel-compact">'+m.l+'</div></div>';
-    }
+    h+='<div class="grid2">';
+    for(let m of primary)h+='<div class="card" data-a="'+m.a+'"><div class="cicon">'+m.i+'</div><div class="clabel">'+m.l+'</div><div class="cdesc">'+m.d+'</div></div>';
     h+='</div>';
+
+    for(let sec of sections){
+      const secColor = MENU_SECTION_COLORS[sec.title] || '#7c3aed';
+      h+='<div class="menu-section-title" style="--section-color:'+secColor+';">'+sec.title+'</div>';
+      h+='<div class="menu-grid-compact" style="--section-color:'+secColor+';">';
+      for(let m of sec.items){
+        const hasBadge = getMenuCardBadge(m.a);
+        h+='<div class="card card-compact" data-a="'+m.a+'"><div class="cicon-compact">'+m.i+(hasBadge ? '<span class="card-badge-dot"></span>' : '')+'</div><div class="clabel-compact">'+m.l+'</div></div>';
+      }
+      h+='</div>';
+    }
+
   }
   // Theme toggle row
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
@@ -31614,6 +31700,11 @@ function rMenu(){
   h+='<button onclick="toggleStoryPopups()" style="background:'+(spOn ? 'var(--accent)' : 'var(--bg-hover)')+';border:1px solid '+(spOn ? 'var(--accent)' : 'var(--border)')+';border-radius:12px;padding:10px 20px;color:'+(spOn ? 'white' : 'var(--text)')+';font-size:13px;font-weight:600;cursor:pointer;">'+(spOn ? '📖 Popups On' : 'Popups Off')+'</button>';
   h+='<div style="font-size:11px;color:var(--text-dim);margin-top:8px;">New chapters play as a tap-through scene between fights.</div>';
   h+='<button onclick="replayBeatIntros()" style="margin-top:10px;background:var(--bg-hover);border:1px solid var(--border);border-radius:10px;padding:7px 14px;color:var(--text);font-size:12px;cursor:pointer;">🔁 Replay zone &amp; boss intros</button>';
+  h+='</div>';
+  const hv2 = isHomeV2();
+  h+='<div style="margin-top:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;">';
+  h+='<h3 style="font-size:14px;margin-bottom:10px;color:var(--accent-light);">🏠 Home Layout</h3>';
+  h+='<button onclick="toggleHomeV2()" style="background:var(--bg-hover);border:1px solid var(--border);border-radius:12px;padding:10px 20px;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;">'+(hv2 ? 'Switch to Classic Home' : 'Try the New Home')+'</button>';
   h+='</div>';
 
   // Auto-Attack default preference
