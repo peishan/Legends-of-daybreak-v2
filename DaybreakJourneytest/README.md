@@ -1,6 +1,6 @@
 # Daybreak: Story Journey (prototype)
 
-Test of a Crimson-Tide-style structure over Daybreak chapters 1–10. Open `index.html` (served from the repo root so `../story-art`, `../portraits`, `../bosses` resolve).
+Test of a Crimson-Tide-style structure over Daybreak chapters 1–10. Live at `/DaybreakJourneytest/` on GitHub Pages (same pattern as `journey2daybreak/`). Locally: serve the repo root so `../story-art`, `../portraits`, `../bosses` resolve).
 
 - **Objective** card is the single source of truth for "what next" (hunt to a level -> read -> boss -> aftermath).
 - **Story Mode**: full-screen, tap-to-advance, art + portraits, replayable.
