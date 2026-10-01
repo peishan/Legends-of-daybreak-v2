@@ -24232,7 +24232,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.221';
+const BUILD_ID = '2026-08-17.222';
 // =========================
 
 
@@ -25737,7 +25737,11 @@ function advanceStory() {
   }
 }
 
+// The old full-screen story system only plays Chapter 1, as the first-launch intro. Chapters
+// 2-11 existed here too, word for word identical to journal_002-012, and used to replay at
+// Lv18-27 on top of the journal. The journal popups own every chapter after the first now.
 function checkStoryUnlock() {
+  if(G.story.chapter >= 1) { G.story.shown = true; return; }
   if(G.story.shown) return;
   const nextChapter = G.storyChapters[G.story.chapter];
   if(!nextChapter) return;
