@@ -11482,6 +11482,14 @@ function advanceStoryPopup() {
 }
 
 // "Later" leaves the chapter unread, so it stays in the Journal as new.
+// Journal: replay any unlocked chapter as the popup scene (also how to try the popups on a
+// save that's already read everything).
+function replayStoryPopup(id) {
+  const entry = G.storyJournal.entries.find(e => e.id === id);
+  if (!entry || !entry.scenes || !entry.scenes.length || _storyPopupCur || _beatCur) return;
+  openStoryPopup(entry);
+}
+
 function closeStoryPopup() {
   _storyPopupCur = null;
   const ov = document.getElementById('story-popup');
@@ -11510,6 +11518,12 @@ function _beatSave(d) { try { localStorage.setItem(BEAT_SEEN_KEY, JSON.stringify
 function _beatArt(name) { return 'bosses/' + name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.jpg'; }
 
 // Returns true if it showed a modal; the modal's Continue re-enters sc() for the same zone.
+// Testing aid: forget which zones/bosses have had their intro, so each shows again once.
+function replayBeatIntros() {
+  _beatSave({ z: [], b: [] });
+  showToast('Zone & boss intros will play again as you reach them', 'gold');
+}
+
 function showZoneIntro(zi) {
   if (!isStoryPopupsEnabled() || _beatCur) return false;
   const z = G.zones[zi], seen = _beatSeen();
@@ -24313,7 +24327,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.223';
+const BUILD_ID = '2026-08-17.224';
 // =========================
 
 
@@ -26547,6 +26561,7 @@ function rJournal(){
       h+='<span style="font-size:11px;color:'+(isRead?'var(--success)':'var(--accent-light)')+';">';
       h+=isRead?'✓ Read':'● Unread';
       h+='</span>';
+      h+='<button class="sp-skip" style="margin-left:auto;padding:4px 10px;font-size:11px;" onclick="event.stopPropagation();replayStoryPopup(\''+entry.id+'\')">▶ Play as scene</button>';
       h+='</div>';
     }else{
       h+='<div style="font-size:11px;color:var(--disabled);margin-top:8px;">';
@@ -31567,6 +31582,7 @@ function rMenu(){
   h+='<h3 style="font-size:14px;margin-bottom:10px;color:var(--accent-light);">📖 Story Popups</h3>';
   h+='<button onclick="toggleStoryPopups()" style="background:'+(spOn ? 'var(--accent)' : 'var(--bg-hover)')+';border:1px solid '+(spOn ? 'var(--accent)' : 'var(--border)')+';border-radius:12px;padding:10px 20px;color:'+(spOn ? 'white' : 'var(--text)')+';font-size:13px;font-weight:600;cursor:pointer;">'+(spOn ? '📖 Popups On' : 'Popups Off')+'</button>';
   h+='<div style="font-size:11px;color:var(--text-dim);margin-top:8px;">New chapters play as a tap-through scene between fights.</div>';
+  h+='<button onclick="replayBeatIntros()" style="margin-top:10px;background:var(--bg-hover);border:1px solid var(--border);border-radius:10px;padding:7px 14px;color:var(--text);font-size:12px;cursor:pointer;">🔁 Replay zone &amp; boss intros</button>';
   h+='</div>';
 
   // Auto-Attack default preference
