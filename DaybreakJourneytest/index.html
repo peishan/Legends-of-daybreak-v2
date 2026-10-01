@@ -33,6 +33,7 @@ button.go{background:var(--accent);border-color:var(--accent);color:#fff}button:
 .modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:16px}.modal.on{display:flex}
 .modal .box{background:var(--card);border:1px solid var(--gold);border-radius:16px;padding:18px;max-width:420px;width:100%;text-align:center}
 .modal h2{margin:0 0 8px;color:var(--gold);font-family:Georgia,serif;font-size:18px}.modal p{color:var(--text);margin:0 0 14px;white-space:pre-line}
+.zone{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--border)}.zone.sel{background:rgba(124,58,237,.08)}.zone.lock{opacity:.5}.zi{font-size:24px;width:30px;text-align:center}.zm{flex:1;min-width:0}.zm small{display:block;color:var(--dim);font-size:11px}
 .foes{display:flex;gap:8px;margin:8px 0}.foe{flex:1;text-align:center;font-size:12px}.foe .face{font-size:30px}.foe img{width:100%;max-height:110px;object-fit:cover;border-radius:10px}
 #log{height:110px;overflow:auto;font-size:12px;color:var(--dim);background:#000;border-radius:8px;padding:6px;margin:8px 0}
 .toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:var(--card);border:1px solid var(--gold);padding:8px 14px;border-radius:12px;z-index:90;font-size:13px;display:none}
@@ -50,42 +51,75 @@ button.go{background:var(--accent);border-color:var(--accent);color:#fff}button:
    Loop per chapter: Objective -> (hunt to level / fight boss) -> Story Mode -> aftermath modal -> next Objective. */
 const SAVE_KEY='daybreak_story_journey_proto';
 const CREW={Soel:{atk:4,hp:30,role:'Spark'},Joel:{atk:9,hp:90,role:'Shield'},Aisyah:{atk:12,hp:50,role:'Blade'},Eliz:{atk:5,hp:45,role:'Healer'},Mezstorm:{atk:14,hp:55,role:'Storm'}};
-// Which chapter's aftermath recruits whom (matches Daybreak's journey data)
 const JOINS={1:'Soel',3:'Joel',4:'Aisyah',6:'Eliz',7:'Mezstorm'};
-// Gate to START each chapter: a level, or a boss fight BEFORE the aftermath
-const BOSSES={8:{name:'Bone Tyrant',icon:'💀',hp:900,atk:34,xp:300,zone:'Cursed Catacombs'},
-              9:{name:'Frost Queen',icon:'❄️',img:'../bosses/frostqueen.jpg',hp:1500,atk:46,xp:500,zone:'Frostspire Ruins'},
-              10:{name:'Abyssal Leviathan',icon:'🐙',img:'../bosses/abyssalleviathan.jpg',hp:2400,atk:62,xp:800,zone:'Abyssal Depths'}};
-const ZONES=[{max:4,n:'Whispering Woods',foes:['Goblin','Wolf','Slime']},{max:9,n:'Cursed Catacombs',foes:['Skeleton','Zombie','Ghost']},{max:13,n:'Crystal Caverns',foes:['Crystal Spider','Gem Golem','Shimmer Bat']},{max:99,n:'Ember Peak',foes:['Fire Imp','Lava Slug','Ash Wraith']}];
-const NEED_LV={1:1,2:5,3:8,4:10,5:12,6:14,7:16,8:16,9:18,10:20};
+// Zones: the first ten of Daybreak's own zones (names/foes/loot from game.js), laid out so each story
+// chapter sits at the END of a grind. needCh = chapter that must be complete to enter. lo-hi = recommended levels.
+const ZONES=[
+ {id:'woods',  n:'Whispering Woods',  icon:'🌲',lo:1, hi:4, needCh:0, ch:'Ch 1–2', foes:['Goblin','Wolf','Slime'],                 loot:['Herb Bundle','Goblin Tooth','Forest Sap']},
+ {id:'caverns',n:'Crystal Caverns',   icon:'💎',lo:5, hi:7, needCh:2, ch:'Ch 3',   foes:['Crystal Spider','Gem Golem','Shimmer Bat'], loot:['Crystal Shard','Silk Thread','Gem Dust']},
+ {id:'ember',  n:'Ember Peak',        icon:'🌋',lo:8, hi:11,needCh:3, ch:'Ch 4–5', foes:['Fire Imp','Lava Slug','Ash Wraith'],        loot:['Fire Essence','Obsidian','Cinder Fragment']},
+ {id:'temple', n:'Sunken Temple',     icon:'🌊',lo:12,hi:13,needCh:5, ch:'Ch 6',   foes:['Drowned Sailor','Sea Serpent','Coral Golem'],loot:['Pearl','Coral Branch','Aqua Pearl']},
+ {id:'storm',  n:'Stormhold',         icon:'⚡',lo:14,hi:15,needCh:6, ch:'Ch 7',   foes:['Storm Wraith','Lightning Hound','Thunder Knight'],loot:['Storm Core','Conductive Wire','Static Orb']},
+ {id:'catacomb',n:'Cursed Catacombs', icon:'💀',lo:16,hi:17,needCh:7, ch:'Ch 8 · Bone Tyrant', foes:['Skeleton','Zombie','Ghost'],  loot:['Iron Ore','Bone Shard','Grave Dust']},
+ {id:'frost',  n:'Frostspire Ruins',  icon:'❄️',lo:18,hi:19,needCh:8, ch:'Ch 9 · Frost Queen', foes:['Ice Elemental','Frost Wolf','Frozen Knight'],loot:['Ice Crystal','Frost Gem','Glacial Shard']},
+ {id:'abyss',  n:'Abyssal Depths',    icon:'🌀',lo:20,hi:23,needCh:9, ch:'Ch 10 · Abyssal Leviathan', foes:['Void Beast','Shadow Demon','Abyssal Horror'],loot:['Void Essence','Dark Crystal','Abyssal Thread']}
+];
+const MASTERY=30; // kills in a zone for its mastery bonus (+10% XP & gold there)
+// Chapter boss fights happen IN the zone they belong to
+const BOSSES={8:{name:'Bone Tyrant',icon:'💀',zone:'catacomb',hp:2200,atk:48,xp:120},
+              9:{name:'Frost Queen',icon:'❄️',img:'../bosses/frostqueen.jpg',zone:'frost',hp:3500,atk:62,xp:200},
+              10:{name:'Abyssal Leviathan',icon:'🐙',img:'../bosses/abyssalleviathan.jpg',zone:'abyss',hp:5500,atk:80,xp:300}};
+const NEED_LV={1:1,2:5,3:8,4:10,5:12,6:14,7:16,8:17,9:19,10:21};
 
-let G=load()||{lvl:1,xp:0,done:{},crew:[],hp:null};
+const DEF={lvl:1,xp:0,gold:0,done:{},crew:[],read:{},kills:{},loot:{},gear:{atk:0,hp:0},zone:null};
+let G=Object.assign({},DEF,load()||{});G.gear=Object.assign({atk:0,hp:0},G.gear);G.auto=false;
 function load(){try{return JSON.parse(localStorage.getItem(SAVE_KEY))}catch(e){return null}}
 function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(G))}catch(e){}}
-const xpN=()=>30+G.lvl*20, maxHp=()=>90+G.lvl*14, sanAtk=()=>8+G.lvl*2;
+const xpN=()=>30+G.lvl*20, maxHp=()=>90+G.lvl*14+G.gear.hp*20, sanAtk=()=>8+G.lvl*2+G.gear.atk*3;
 const nextCh=()=>CHAPTERS.find(c=>!G.done[c.id]);
+const zoneById=id=>ZONES.find(z=>z.id===id);
+const unlocked=z=>(z.needCh===0||G.done[z.needCh])&&G.lvl>=z.lo-1;
+const recZone=()=>[...ZONES].reverse().find(z=>unlocked(z)&&G.lvl>=z.lo)||ZONES[0];
+const huntZone=()=>{const z=zoneById(G.zone);return z&&unlocked(z)?z:recZone()};
+const xpMult=z=>(G.lvl>z.hi?Math.max(.2,1-(G.lvl-z.hi)*.25):1)*((G.kills[z.id]||0)>=MASTERY?1.1:1);
 const portrait=n=>n==='Narrator'?'':'<img src="../portraits/'+(n==='San'?'san':n.toLowerCase().replace(/[\s.]/g,''))+'.jpg" onerror="this.remove()" alt="">';
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2200)}
 
 /* ---------- Objective: single source of truth for "what next" ---------- */
 function objective(){
-  const c=nextCh(); if(!c) return {kind:'end',title:'Chapters 1–10 complete',desc:'The prototype ends here. Your crew: '+(G.crew.join(', ')||'—')+'.'};
-  if(G.lvl<NEED_LV[c.id]) return {kind:'level',ch:c,title:'Reach Level '+NEED_LV[c.id],desc:'Hunt in '+zone().n+' to prepare for Chapter '+c.id+': '+c.title+'.',btn:'Hunt ('+zone().n+')'};
-  if(BOSSES[c.id]&&!G.read?.[c.id]) return {kind:'read',ch:c,title:'Chapter '+c.id+': '+c.title,desc:c.summary,btn:'Read story'};
-  if(BOSSES[c.id]) return {kind:'boss',ch:c,title:'Face the '+BOSSES[c.id].name,desc:'Travel to '+BOSSES[c.id].zone+' and fight.',btn:'Fight '+BOSSES[c.id].name};
+  const c=nextCh(); if(!c) return {kind:'end',title:'Chapters 1–10 complete',desc:'The prototype ends here. Keep grinding zones if you like. Crew: '+(G.crew.join(', ')||'—')+'.'};
+  const bz=BOSSES[c.id]&&zoneById(BOSSES[c.id].zone);
+  if(G.lvl<NEED_LV[c.id]){const z=huntZone();return {kind:'level',ch:c,title:'Reach Level '+NEED_LV[c.id],desc:'Grind in '+z.icon+' '+z.n+' (Lv '+z.lo+'–'+z.hi+') to ready yourself for Chapter '+c.id+': '+c.title+'.',btn:'Hunt '+z.n}}
+  if(BOSSES[c.id]&&!G.read[c.id]) return {kind:'read',ch:c,title:'Chapter '+c.id+': '+c.title,desc:c.summary,btn:'Read story'};
+  if(BOSSES[c.id]) return {kind:'boss',ch:c,title:'Face the '+BOSSES[c.id].name,desc:'Fight in '+bz.icon+' '+bz.n+'.',btn:'Fight '+BOSSES[c.id].name};
   return {kind:'read',ch:c,title:'Chapter '+c.id+': '+c.title,desc:c.summary,btn:'Read story'};
 }
-function zone(){return ZONES.find(z=>G.lvl<=z.max)}
 
 /* ---------- Home ---------- */
+const shopCost=k=>Math.round(40*Math.pow(1.45,G.gear[k]));
+const lootValue=()=>Object.entries(G.loot).reduce((a,[n,q])=>{const zi=ZONES.findIndex(z=>z.loot.includes(n));return a+q*(4+zi*3)},0);
 function render(){
-  const o=objective(),a=document.getElementById('app');
+  const o=objective(),a=document.getElementById('app'),hz=huntZone();
   let h='<h1>Legends of Daybreak</h1><div class="sub">Story Journey · prototype · chapters 1–10</div>';
   h+='<div class="panel obj"><div class="k">Objective</div><div class="t">'+o.title+'</div><div class="d">'+o.desc+'</div>';
-  if(o.btn)h+='<button class="go" onclick="act()">'+o.btn+'</button>';
+  if(o.btn)h+='<div class="row"><button class="go" onclick="act()">'+o.btn+'</button>'+(o.kind==='level'?'<button onclick="startAuto()">⏩ Auto-hunt</button>':'')+'</div>';
   h+='</div>';
-  h+='<div class="panel"><div class="row" style="justify-content:space-between"><b>San · Lv '+G.lvl+'</b><span class="sub" style="margin:0">'+G.xp+' / '+xpN()+' XP</span></div><div class="bar x" style="margin:6px 0 10px"><i style="width:'+(G.xp/xpN()*100)+'%"></i></div><div class="crew">'+
+  h+='<div class="panel"><div class="row" style="justify-content:space-between"><b>San · Lv '+G.lvl+'</b><span class="sub" style="margin:0">💰 '+G.gold+' · '+G.xp+' / '+xpN()+' XP</span></div><div class="bar x" style="margin:6px 0 10px"><i style="width:'+(G.xp/xpN()*100)+'%"></i></div><div class="crew">'+
     ['San'].concat(G.crew).map(n=>'<div class="mem">'+(portrait(n)||'')+'<div>'+n+'</div></div>').join('')+'</div></div>';
+  // Zones
+  h+='<div class="panel"><b>Zones</b><div class="sub" style="text-align:left;margin:2px 0 6px">Grind where your level fits. Story chapters unlock deeper zones.</div>';
+  for(const z of ZONES){const ok=unlocked(z),k=G.kills[z.id]||0,m=k>=MASTERY,rec=ok&&recZone()===z,sel=ok&&hz===z;
+    h+='<div class="zone'+(ok?'':' lock')+(sel?' sel':'')+'"><div class="zi">'+(ok?z.icon:'🔒')+'</div><div class="zm"><div><b>'+z.n+'</b> <span class="tag">Lv '+z.lo+(z.hi>z.lo?'–'+z.hi:'')+'</span>'+(rec?' <span class="tag cur">Recommended</span>':'')+(m?' <span class="tag done">★ Mastered</span>':'')+'</div>'+
+     '<small>'+(ok?z.foes.join(' · ')+' · '+z.ch:(G.done[z.needCh]||z.needCh===0?'Reach Lv '+(z.lo-1):'Complete Chapter '+z.needCh+' to enter'))+'</small>'+
+     (ok?'<div class="bar x" style="margin-top:4px"><i style="width:'+Math.min(100,k/MASTERY*100)+'%"></i></div><small>'+k+' / '+MASTERY+' kills'+(m?'':' to mastery (+10% XP & gold)')+(G.lv>z.hi?'':'')+(G.lvl>z.hi?' · over-leveled: '+Math.round(xpMult(z)*100)+'% XP':'')+'</small>':'')+'</div>'+
+     (ok?'<button '+(sel?'class="go"':'')+' onclick="pickZone(\''+z.id+'\')">'+(sel?'Hunt':'Hunt')+'</button>':'')+'</div>';}
+  h+='</div>';
+  // Gear + loot
+  const lq=Object.values(G.loot).reduce((a,b)=>a+b,0);
+  h+='<div class="panel"><b>Camp</b><div class="row" style="margin-top:8px">'+
+    '<button onclick="buy(\'atk\')" '+(G.gold<shopCost('atk')?'disabled':'')+'>🗡️ Whetstone +3 ATK · 💰'+shopCost('atk')+' (lv '+G.gear.atk+')</button>'+
+    '<button onclick="buy(\'hp\')" '+(G.gold<shopCost('hp')?'disabled':'')+'>🛡️ Padding +20 HP · 💰'+shopCost('hp')+' (lv '+G.gear.hp+')</button>'+
+    '<button onclick="sellLoot()" '+(lq?'':'disabled')+'>🎒 Sell loot ('+lq+') · 💰'+lootValue()+'</button></div></div>';
   h+='<div class="panel"><b>Story</b>';
   for(const c of CHAPTERS){const d=G.done[c.id],cur=nextCh()===c;
     h+='<div class="ch"><div class="n">'+c.id+'</div><div class="m">'+c.icon+' '+c.title+'<small>'+(d?'Complete':cur?'Current':'Locked')+'</small></div>'+
@@ -93,6 +127,9 @@ function render(){
   h+='</div><div style="text-align:center"><button onclick="if(confirm(\'Reset prototype save?\')){localStorage.removeItem(SAVE_KEY);location.reload()}">Reset</button></div>';
   a.innerHTML=h;
 }
+function pickZone(id){G.zone=id;save();startFight(false)}
+function buy(k){const c=shopCost(k);if(G.gold<c)return;G.gold-=c;G.gear[k]++;save();render();toast('Upgraded')}
+function sellLoot(){const v=lootValue();G.gold+=v;G.loot={};save();render();toast('Sold loot for 💰'+v)}
 function act(){const o=objective();
   if(o.kind==='level')startFight(false); else if(o.kind==='boss')startFight(true); else if(o.kind==='read')openStory(o.ch.id,false);}
 
@@ -119,39 +156,59 @@ function queue(t,b){Q.push([t,b]);if(!modalOpen)nextModal()}
 function nextModal(){const m=Q.shift();if(!m){modalOpen=false;return}modalOpen=true;mt.textContent=m[0];mb.textContent=m[1];document.getElementById('modal').classList.add('on')}
 function closeModal(){document.getElementById('modal').classList.remove('on');setTimeout(nextModal,200)}
 
-function gainXp(x){G.xp+=x;let ups=0;while(G.xp>=xpN()){G.xp-=xpN();G.lvl++;ups++}if(ups)queue('Level Up!','San is now Level '+G.lvl+'.')}
+function gainXp(x){G.xp+=x;let ups=0;while(G.xp>=xpN()){G.xp-=xpN();G.lvl++;ups++}
+  if(ups){if(G.auto)toast('⬆️ Level '+G.lvl);else queue('Level Up!','San is now Level '+G.lvl+'.')}}
 function completeChapter(id){
   const c=CHAPTERS.find(x=>x.id===id);G.done[id]=true;
-  const bossXp=BOSSES[id]?0:100+id*40;gainXp(bossXp);
+  const bossXp=BOSSES[id]?0:30+id*10;gainXp(bossXp);
   const j=JOINS[id];let txt='Chapter '+id+' complete.'+(bossXp?'\n+'+bossXp+' XP':'');
   queue(c.title,txt);
   if(j&&!G.crew.includes(j)){G.crew.push(j);queue(j+' joins your crew!',CREW[j].role+' · ATK '+CREW[j].atk+' · HP '+CREW[j].hp)}
   const n=nextCh();queue('New Objective',n?'Next: Chapter '+n.id+' — '+n.title:'You have reached the end of the prototype.');
   save();render()}
 
-/* ---------- Fight (hunt for XP, or boss) ---------- */
-let F=null;
+/* ---------- Fight: grind waves in a zone, or a chapter boss ---------- */
+let F=null,autoT=null;
 function startFight(boss){
-  const o=objective();let foes;
-  if(boss){const b=BOSSES[o.ch.id];foes=[{n:b.name,icon:b.icon,img:b.img,hp:b.hp,mhp:b.hp,atk:b.atk,xp:b.xp,boss:true}]}
-  else{const z=zone();foes=[0,1].map(()=>{const n=z.foes[Math.random()*3|0],hp=30+G.lvl*14;return{n,icon:'👹',hp,mhp:hp,atk:5+G.lvl*2.2,xp:15+G.lvl*5}})}
+  const o=objective();let foes,z;
+  if(boss){const b=BOSSES[o.ch.id];z=zoneById(b.zone);foes=[{n:b.name,icon:b.icon,img:b.img,hp:b.hp,mhp:b.hp,atk:b.atk,xp:b.xp,gold:60+o.ch.id*20,boss:true}]}
+  else{z=huntZone();const L=Math.min(Math.max(G.lvl,z.lo),z.hi),m=xpMult(z);
+    foes=[0,1,2].map(()=>{const hp=Math.round(18+L*8);return{n:z.foes[Math.random()*3|0],icon:'👹',hp,mhp:hp,atk:2.5+L*1.0,xp:Math.max(1,Math.round((3+L*.5)*m)),gold:Math.round((4+L*1.5)*m)}})}
   const party=[{n:'San',hp:maxHp(),mhp:maxHp(),atk:sanAtk()}].concat(G.crew.map(n=>({n,hp:CREW[n].hp+G.lvl*4,mhp:CREW[n].hp+G.lvl*4,atk:CREW[n].atk+G.lvl})));
-  F={foes,party,boss,ch:o.ch,log:['Battle begins!'],over:false};document.getElementById('fight').classList.add('on');paintFight()}
+  F={foes,party,boss,z,ch:o.ch,log:['Battle begins in '+z.n+'!'],over:false};document.getElementById('fight').classList.add('on');paintFight();
+  if(G.auto&&!boss)autoT=setTimeout(autoStep,350)}
+function startAuto(){G.auto=true;startFight(false)}
+function stopAuto(){G.auto=false;clearTimeout(autoT)}
 function paintFight(){
-  const f=F;document.getElementById('fightShell').innerHTML='<div class="kick"><span>'+(f.boss?'Boss Battle':'Hunt')+'</span><span>'+zone().n+'</span></div>'+
+  const f=F;document.getElementById('fightShell').innerHTML='<div class="kick"><span>'+(f.boss?'Boss Battle':G.auto?'Auto-hunt':'Hunt')+'</span><span>'+f.z.icon+' '+f.z.n+'</span></div>'+
    '<div class="foes">'+f.foes.map(x=>'<div class="foe">'+(x.img?'<img src="'+x.img+'" onerror="this.outerHTML=\'<div class=face>'+x.icon+'</div>\'" alt="">':'<div class="face">'+x.icon+'</div>')+'<div>'+x.n+'</div><div class="bar"><i style="width:'+Math.max(0,x.hp/x.mhp*100)+'%;background:var(--red)"></i></div></div>').join('')+'</div>'+
    '<div class="crew" style="margin:8px 0">'+f.party.map(p=>'<div class="mem">'+(portrait(p.n)||'')+'<div class="bar"><i style="width:'+Math.max(0,p.hp/p.mhp*100)+'%"></i></div></div>').join('')+'</div><div id="log">'+f.log.slice(-8).join('<br>')+'</div>'+
-   '<div class="row">'+(f.over?'<button class="go" onclick="endFight()">Continue</button>':'<button class="go" onclick="turn(\'a\')">Attack</button><button onclick="turn(\'h\')">Heal (San)</button><button onclick="turn(\'f\')">Flee</button>')+'</div>';
+   '<div class="row">'+(G.auto&&!f.over?'<button class="go" onclick="stopAuto();paintFight()">⏹ Stop auto</button>':f.over?'<button class="go" onclick="endFight()">Continue</button>':'<button class="go" onclick="turn(\'a\')">Attack</button><button onclick="turn(\'h\')">Heal (San)</button><button onclick="turn(\'f\')">Flee</button>')+'</div>';
   const l=document.getElementById('log');l.scrollTop=l.scrollHeight}
 function turn(m){
   const f=F,san=f.party[0],alive=()=>f.party.filter(p=>p.hp>0),foes=()=>f.foes.filter(x=>x.hp>0);
-  if(m==='f'){if(f.boss){f.log.push('You cannot flee a boss!');return paintFight()}F=null;document.getElementById('fight').classList.remove('on');return render()}
+  if(m==='f'){if(f.boss){f.log.push('You cannot flee a boss!');return paintFight()}stopAuto();F=null;document.getElementById('fight').classList.remove('on');return render()}
   if(m==='h'){const h=Math.round(san.mhp*.25+(f.party.some(p=>p.n==='Eliz')?20:0));f.party.forEach(p=>{if(p.hp>0)p.hp=Math.min(p.mhp,p.hp+Math.round(h/2))});f.log.push('San rallies the party (+'+h/2+' HP each).')}
   else for(const p of alive()){const t=foes()[0];if(!t)break;let d=Math.round(p.atk*(.85+Math.random()*.3));if(p.n==='Mezstorm'&&Math.random()<.3){d*=2;f.log.push('⚡ Mezstorm calls lightning!')}t.hp-=d;f.log.push(p.n+' hits '+t.n+' for '+d)}
-  if(!foes().length){f.over=true;f.win=true;const xp=f.foes.reduce((a,x)=>a+x.xp,0);f.log.push('Victory! +'+xp+' XP');gainXp(xp);if(f.boss){f.log.push('The way forward opens…')}return paintFight()}
-  for(const x of foes()){const t=alive();const tg=t.find(p=>p.n==='Joel')&&Math.random()<.5?t.find(p=>p.n==='Joel'):t[Math.random()*t.length|0];const d=Math.round(x.atk*(.85+Math.random()*.3)*(tg.n==='Joel'?.7:1));tg.hp-=d;f.log.push(x.n+' hits '+tg.n+' for '+d)}
-  if(!alive().length){f.over=true;f.log.push('The party falls… you retreat and recover.')}
+  if(!foes().length){f.over=true;f.win=true;
+    const xp=f.foes.reduce((a,x)=>a+x.xp,0),gold=f.foes.reduce((a,x)=>a+x.gold,0);f.log.push('Victory! +'+xp+' XP, +'+gold+' gold');G.gold+=gold;
+    if(!f.boss){G.kills[f.z.id]=(G.kills[f.z.id]||0)+f.foes.length;
+      for(const x of f.foes)if(Math.random()<.35){const it=f.z.loot[Math.random()*3|0];G.loot[it]=(G.loot[it]||0)+1;f.log.push('Loot: '+it)}
+      if(G.kills[f.z.id]>=MASTERY&&G.kills[f.z.id]-f.foes.length<MASTERY){f.log.push('★ '+f.z.n+' mastered! +10% XP & gold here.');queue('Zone Mastered!',f.z.n+'\n+10% XP & gold from this zone.')}}
+    gainXp(xp);if(f.boss)f.log.push('The way forward opens…');return paintFight()}
+  for(const x of foes()){const t=alive();if(!t.length)break;const tg=t.find(p=>p.n==='Joel')&&Math.random()<.5?t.find(p=>p.n==='Joel'):t[Math.random()*t.length|0];const d=Math.round(x.atk*(.85+Math.random()*.3)*(tg.n==='Joel'?.7:1));tg.hp-=d;f.log.push(x.n+' hits '+tg.n+' for '+d)}
+  if(!alive().length){f.over=true;stopAuto();f.log.push('The party falls… you retreat and recover.')}
   paintFight()}
+function autoStep(){
+  if(!G.auto||!F)return;
+  if(F.over){
+    if(!F.win){return}                                   // loss: stopAuto already ran; player taps Continue
+    F=null;document.getElementById('fight').classList.remove('on');save();render();
+    if(objective().kind!=='level'){stopAuto();toast('Objective ready!');return}
+    autoT=setTimeout(()=>{if(G.auto)startFight(false)},500);return}
+  const low=F.party.reduce((a,p)=>a+p.hp/p.mhp,0)/F.party.length;
+  turn(low<.4&&Math.random()<.6?'h':'a');
+  if(G.auto||F&&F.over)autoT=setTimeout(autoStep,F&&F.over?500:300)}
 function endFight(){const f=F;F=null;document.getElementById('fight').classList.remove('on');
   if(f.win&&f.boss){completeChapter(f.ch.id);return}  // read -> fight -> aftermath
   save();render()}
