@@ -11382,6 +11382,125 @@ function checkJournalLevelUnlocks() {
   }
 }
 
+// === STORY POPUPS ===
+// Newly unlocked journal chapters used to arrive as a toast only, so the story was
+// easy to miss entirely. This plays them as a tap-through modal at the next safe moment
+// instead. Reuses the journal entry's own scenes + the same portrait/color lookups, so
+// no chapter needs any new writing. Opt-out via the Home toggle (per device).
+const STORY_POPUP_KEY = 'daybreak_story_popups';
+let _storyPopupQueue = [];
+let _storyPopupSeen = null; // ids already unlocked when first observed — never popped
+let _storyPopupCur = null;  // { entry, i }
+
+function isStoryPopupsEnabled() {
+  try { return localStorage.getItem(STORY_POPUP_KEY) !== 'off'; } catch (e) { return true; }
+}
+function toggleStoryPopups() {
+  try { localStorage.setItem(STORY_POPUP_KEY, isStoryPopupsEnabled() ? 'off' : 'on'); } catch (e) {}
+  if (!isStoryPopupsEnabled()) _storyPopupQueue = [];
+  render();
+}
+
+// Safe moments only: never mid-fight, never on top of another story screen.
+function storyPopupSafeNow() {
+  if (!G || !G.p || !G.storyJournal || _storyPopupCur) return false;
+  if (G.cbt && G.cbt.on) return false;
+  return ['menu', 'explore', 'party', 'journal'].includes(G.state);
+}
+
+function storyPopupWatch() {
+  if (!G || !G.storyJournal || !G.storyJournal.unlocked) return;
+  const unlocked = G.storyJournal.unlocked;
+  if (!_storyPopupSeen) { _storyPopupSeen = new Set(unlocked); return; }
+  const fresh = unlocked.filter(id => !_storyPopupSeen.has(id));
+  fresh.forEach(id => _storyPopupSeen.add(id));
+  // A big jump in one tick is a save load or catch-up, not a story beat — skip those.
+  if (fresh.length === 0 || fresh.length > 3) return;
+  if (!isStoryPopupsEnabled()) return;
+  for (const id of fresh) {
+    if (G.storyJournal.read.includes(id)) continue;
+    const entry = G.storyJournal.entries.find(e => e.id === id);
+    if (entry && entry.scenes && entry.scenes.length) _storyPopupQueue.push(id);
+  }
+}
+
+function storyPopupTick() {
+  try {
+    storyPopupWatch();
+    if (_storyPopupQueue.length && isStoryPopupsEnabled() && storyPopupSafeNow()) {
+      const entry = G.storyJournal.entries.find(e => e.id === _storyPopupQueue.shift());
+      if (entry && !G.storyJournal.read.includes(entry.id)) openStoryPopup(entry);
+    }
+  } catch (e) { console.warn('[StoryPopup]', e); }
+}
+setInterval(storyPopupTick, 1500);
+
+function openStoryPopup(entry) {
+  _storyPopupCur = { entry: entry, i: 0 };
+  let ov = document.getElementById('story-popup');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'story-popup';
+    document.body.appendChild(ov);
+  }
+  ov.style.display = 'flex';
+  renderStoryPopup();
+}
+
+function renderStoryPopup() {
+  const cur = _storyPopupCur, ov = document.getElementById('story-popup');
+  if (!cur || !ov) return;
+  const e = cur.entry, scene = e.scenes[cur.i];
+  const isDialogue = scene.speaker !== 'Narrator';
+  const portrait = isDialogue ? getSpeakerPortrait(scene.speaker) : '';
+  const color = getSpeakerColor(scene.speaker);
+  const art = getChapterArtFile(e.id) || getChapterArtFile(e.title);
+  const last = cur.i === e.scenes.length - 1;
+  let h = '<div class="sp-card">';
+  if (art) h += '<img class="sp-art" src="story-art/' + art + '" alt="" onerror="this.style.display=\'none\'">';
+  h += '<div class="sp-kicker">' + (e.icon || '📖') + ' Chapter ' + e.chapter + ' · ' + e.title + '</div>';
+  h += '<div class="sp-box" style="' + (color ? '--e-speaker:' + color + ';' : '') + '">';
+  if (portrait) h += '<div class="sp-portrait">' + portrait + '</div>';
+  h += '<div class="sp-body"><div class="sp-speaker">' + scene.speaker + '</div><div class="sp-text">' + scene.text + '</div></div></div>';
+  h += '<div class="sp-nav"><span class="sp-count">' + (cur.i + 1) + ' / ' + e.scenes.length + '</span>';
+  h += '<button class="sp-skip" onclick="closeStoryPopup()">Later</button>';
+  h += '<button class="sp-next" onclick="advanceStoryPopup()">' + (last ? 'Finish' : 'Next ▸') + '</button></div></div>';
+  ov.innerHTML = h;
+}
+
+function advanceStoryPopup() {
+  const cur = _storyPopupCur;
+  if (!cur) return;
+  if (cur.i < cur.entry.scenes.length - 1) { cur.i++; renderStoryPopup(); return; }
+  if (!G.storyJournal.read.includes(cur.entry.id)) G.storyJournal.read.push(cur.entry.id);
+  closeStoryPopup();
+  render();
+}
+
+// "Later" leaves the chapter unread, so it stays in the Journal as new.
+function closeStoryPopup() {
+  _storyPopupCur = null;
+  const ov = document.getElementById('story-popup');
+  if (ov) ov.style.display = 'none';
+}
+
+// One-line "what's next" for Home: the nearest level-gated chapter not yet unlocked.
+function nextStoryObjectiveHtml() {
+  if (!G.storyJournal) return '';
+  const unread = G.storyJournal.unlocked.filter(id => !G.storyJournal.read.includes(id)).length;
+  let next = null;
+  for (const e of G.storyJournal.entries) {
+    if (e.unlockType === 'level' && e.unlockAt > G.p.lvl && !G.storyJournal.unlocked.includes(e.id)) {
+      if (!next || e.unlockAt < next.unlockAt) next = e;
+    }
+  }
+  if (!unread && !next) return '';
+  let t = '';
+  if (unread) t += '<b>' + unread + ' unread chapter' + (unread > 1 ? 's' : '') + '</b> waiting in the Journal';
+  if (next) t += (t ? ' · ' : '') + 'Next story: <b>' + next.title + '</b> at Lv ' + next.unlockAt;
+  return '<div class="panel" onclick="setS(\'journal\')" style="cursor:pointer;font-size:12px;color:var(--text-dim);text-align:center;">📖 ' + t + '</div>';
+}
+
 function checkStoryline() {
   for (let s of G.storyline) {
     if (s.done) continue;
@@ -24033,7 +24152,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.218';
+const BUILD_ID = '2026-08-17.219';
 // =========================
 
 
@@ -31216,6 +31335,8 @@ function rMenu(){
 
   let h='';
 
+  h += nextStoryObjectiveHtml();
+
   // Today at a Glance — the day's shape in three numbers, no navigating required.
   // Pure readout of state that already exists elsewhere (focus minutes, daily quest
   // progress, login streak) — this panel doesn't compute anything new, just surfaces it.
@@ -31267,6 +31388,12 @@ function rMenu(){
     h+='<div style="font-size:11px;color:var(--text-dim);margin-bottom:4px;">Volume</div>';
     h+='<input type="range" min="0" max="1" step="0.05" value="'+getMusicVolume()+'" oninput="setMusicVolume(parseFloat(this.value))" style="width:80%;accent-color:var(--accent);">';
   }
+  h+='</div>';
+  const spOn = isStoryPopupsEnabled();
+  h+='<div style="margin-top:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;">';
+  h+='<h3 style="font-size:14px;margin-bottom:10px;color:var(--accent-light);">📖 Story Popups</h3>';
+  h+='<button onclick="toggleStoryPopups()" style="background:'+(spOn ? 'var(--accent)' : 'var(--bg-hover)')+';border:1px solid '+(spOn ? 'var(--accent)' : 'var(--border)')+';border-radius:12px;padding:10px 20px;color:'+(spOn ? 'white' : 'var(--text)')+';font-size:13px;font-weight:600;cursor:pointer;">'+(spOn ? '📖 Popups On' : 'Popups Off')+'</button>';
+  h+='<div style="font-size:11px;color:var(--text-dim);margin-top:8px;">New chapters play as a tap-through scene between fights.</div>';
   h+='</div>';
 
   // Auto-Attack default preference
