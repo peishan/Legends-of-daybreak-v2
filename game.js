@@ -11467,6 +11467,7 @@ function renderStoryPopup() {
   if (portrait) h += '<div class="sp-portrait">' + portrait + '</div>';
   h += '<div class="sp-body"><div class="sp-speaker">' + scene.speaker + '</div><div class="sp-text">' + scene.text + '</div></div></div>';
   h += '<div class="sp-nav"><span class="sp-count">' + (cur.i + 1) + ' / ' + e.scenes.length + '</span>';
+  if (hasComic(e.id)) h += '<button class="sp-skip" onclick="openComicViewer(\'' + e.id + '\')">\uD83D\uDCD6 Comic</button>';
   h += '<button class="sp-skip" onclick="closeStoryPopup()">Later</button>';
   h += '<button class="sp-next" onclick="advanceStoryPopup()">' + (last ? 'Finish' : 'Next ▸') + '</button></div></div>';
   ov.innerHTML = h;
@@ -11482,6 +11483,172 @@ function advanceStoryPopup() {
 }
 
 // "Later" leaves the chapter unread, so it stays in the Journal as new.
+// === COMIC PAGES ===
+// The illustrated comic from the Journey reader, one full multi-panel page per chapter (a few have
+// 2-4). Keyed by journal id; chapters with no art simply don't get a Read-the-comic button.
+const COMIC_BASE = 'journey2daybreak/assets/comic/';
+const COMIC_PAGES = {
+  journal_001: ['ch001_page1.jpg'],
+  journal_002: ['ch002_page1.jpg'],
+  journal_003: ['ch003_page1.jpg'],
+  journal_004: ['ch004_page1.jpg'],
+  journal_005: ['ch005_page1.jpg'],
+  journal_006: ['ch006_page1.jpg'],
+  journal_007: ['ch007_page1.jpg'],
+  journal_008: ['ch008_page1.jpg'],
+  journal_009: ['ch009_page1.jpg'],
+  journal_010: ['ch010_page1.jpg'],
+  journal_011: ['ch011_page1.jpg'],
+  journal_012: ['ch012_page1.jpg'],
+  journal_013: ['ch013_page1.jpg'],
+  journal_014: ['ch014_page1.jpg'],
+  journal_015: ['ch015_page1.jpg'],
+  journal_016: ['ch016_page1.jpg'],
+  journal_017: ['ch017_page1.jpg'],
+  journal_018: ['ch018_page1.jpg'],
+  journal_019: ['ch019_page1.jpg'],
+  journal_020: ['ch020_page1.jpg'],
+  journal_021: ['ch021_page1.jpg'],
+  journal_022: ['ch022_page1.jpg'],
+  journal_023: ['ch023_page1.jpg'],
+  journal_024: ['ch024_page1.jpg'],
+  journal_025: ['ch025_page1.jpg'],
+  journal_026: ['ch026_page1.jpg'],
+  journal_027: ['ch027_page1.jpg'],
+  journal_028: ['ch028_page1.jpg'],
+  journal_030: ['ch030_page1.jpg'],
+  journal_031: ['ch031_page1.jpg'],
+  journal_032: ['ch032_page1.jpg'],
+  journal_033: ['ch033_page1.jpg'],
+  journal_034: ['ch034_page1.jpg'],
+  journal_035: ['ch035_page1.jpg'],
+  journal_036: ['ch036_page1.jpg'],
+  journal_037: ['ch037_page1.jpg'],
+  journal_038: ['ch038_page1.jpg'],
+  journal_039: ['ch039_page1.jpg'],
+  journal_040: ['ch040_page1.jpg'],
+  journal_041: ['ch041_page1.jpg'],
+  journal_042: ['ch042_page1.jpg','ch042_page2.jpg'],
+  journal_043: ['ch043_page1.jpg','ch043_page2.jpg'],
+  journal_044: ['ch044_page1.jpg'],
+  journal_045: ['ch045_page1.jpg'],
+  journal_046: ['ch046_page1.jpg'],
+  journal_047: ['ch047_page1.jpg','ch047_page2.jpg'],
+  journal_048: ['ch048_page1.jpg','ch048_page2.jpg'],
+  journal_049: ['ch049_page1.jpg'],
+  journal_050: ['ch050_page1.jpg'],
+  journal_051: ['ch051_page1.jpg'],
+  journal_052: ['ch052_page1.jpg'],
+  journal_053: ['ch053_page1.jpg'],
+  journal_054: ['ch054_page1.jpg'],
+  journal_055: ['ch055_page1.jpg'],
+  journal_056: ['ch056_page1.jpg'],
+  journal_057: ['ch057_page1.jpg'],
+  journal_058: ['ch058_page1.jpg'],
+  journal_059: ['ch059_page1.jpg'],
+  journal_060: ['ch060_page1.jpg','ch060_page2.jpg'],
+  journal_061: ['ch061_page1.jpg','ch061_page2.jpg','ch061_page3.jpg'],
+  journal_062: ['ch062_page1.jpg','ch062_page2.jpg','ch062_page3.jpg'],
+  journal_063: ['ch063_page1.jpg','ch063_page2.jpg'],
+  journal_064: ['ch064_page1.jpg','ch064_page2.jpg'],
+  journal_065: ['ch065_page1.jpg','ch065_page2.jpg','ch065_page3.jpg'],
+  journal_066: ['ch066_page1.jpg','ch066_page2.jpg','ch066_page3.jpg'],
+  journal_067: ['ch067_page1.jpg','ch067_page2.jpg'],
+  journal_068: ['ch068_page1.jpg','ch068_page2.jpg'],
+  journal_069: ['ch069_page1.jpg','ch069_page2.jpg'],
+  journal_070: ['ch070_page1.jpg','ch070_page2.jpg','ch070_page3.jpg'],
+  journal_071: ['ch071_page1.jpg','ch071_page2.jpg'],
+  journal_072: ['ch072_page1.jpg','ch072_page2.jpg','ch072_page3.jpg','ch072_page4.jpg'],
+  journal_074: ['ch074_page1.jpg'],
+  journal_076: ['ch076_page1.jpg'],
+  journal_077: ['ch077_page1.jpg'],
+  journal_078: ['ch078_page1.jpg'],
+  journal_079: ['ch079_page1.jpg'],
+  journal_080: ['ch080_page1.jpg'],
+  journal_081: ['ch081_page1.jpg'],
+  journal_082: ['ch082_page1.jpg'],
+  journal_083: ['ch083_page1.jpg'],
+  journal_084: ['ch084_page1.jpg'],
+  journal_085: ['ch085_page1.jpg'],
+  journal_086: ['ch086_page1.jpg'],
+  journal_087: ['ch087_page1.jpg'],
+  journal_088: ['ch088_page1.jpg'],
+  journal_089: ['ch089_page1.jpg'],
+  journal_090: ['ch090_page1.jpg'],
+  journal_091: ['ch091_page1.jpg'],
+  journal_092: ['ch092_page1.jpg'],
+  journal_093: ['ch093_page1.jpg'],
+  journal_094: ['ch094_page1.jpg'],
+  journal_095: ['ch095_page1.jpg'],
+  journal_096: ['ch096_page1.jpg','ch096_page2.jpg'],
+  journal_097: ['ch097_page1.jpg'],
+  journal_098: ['ch098_page1.jpg'],
+  journal_099: ['ch099_page1.jpg'],
+  journal_100: ['ch100_page1.jpg'],
+  journal_101: ['ch101_page1.jpg','ch101_page2.jpg'],
+  journal_102: ['ch102_page1.jpg'],
+  journal_103: ['ch103_page1.jpg'],
+  journal_104: ['ch104_page1.jpg'],
+  journal_105: ['ch105_page1.jpg'],
+  journal_106: ['ch106_page1.jpg'],
+  journal_107: ['ch107_page1.jpg','ch107_page2.jpg'],
+  journal_108: ['ch108_page1.jpg'],
+  journal_109: ['ch109_page1.jpg'],
+  journal_110: ['ch110_page1.jpg'],
+  journal_111: ['ch111_page1.jpg'],
+  journal_112: ['ch112_page1.jpg','ch112_page2.jpg'],
+  journal_113: ['ch113_page1.jpg'],
+  journal_114: ['ch114_page1.jpg'],
+  journal_115: ['ch115_page1.jpg'],
+  journal_116: ['ch116_page1.jpg'],
+  journal_117: ['ch117_page1.jpg'],
+  journal_118: ['ch118_page1.jpg'],
+  journal_119: ['ch119_page1.jpg'],
+  journal_120: ['ch120_page1.jpg'],
+  journal_121: ['ch121_page1.jpg'],
+  journal_122: ['ch122_page1.jpg'],
+  journal_123: ['ch123_page1.jpg'],
+  journal_124: ['ch124_page1.jpg'],
+  journal_125: ['ch125_page1.jpg'],
+  journal_126: ['ch126_page1.jpg'],
+  journal_127: ['ch127_page1.jpg'],
+  journal_128: ['ch128_page1.jpg'],
+  journal_129: ['ch129_page1.jpg'],
+  journal_130: ['ch130_page1.jpg'],
+  journal_131: ['ch131_page1.jpg'],
+  journal_132: ['ch132_page1.jpg'],
+  journal_133: ['ch133_page1.jpg'],
+  journal_134: ['ch134_page1.jpg'],
+  journal_135: ['ch135_page1.jpg'],
+  journal_136: ['ch136_page1.jpg'],
+  journal_137: ['ch137_page1.jpg'],
+  journal_138: ['ch138_page1.jpg']
+};
+let _comicZoom = 1;
+function hasComic(id) { return !!COMIC_PAGES[id]; }
+function openComicViewer(id) {
+  const pages = COMIC_PAGES[id], entry = G.storyJournal.entries.find(e => e.id === id);
+  if (!pages || !entry) return;
+  _comicZoom = 1;
+  let ov = document.getElementById('comic-viewer');
+  if (!ov) { ov = document.createElement('div'); ov.id = 'comic-viewer'; document.body.appendChild(ov); }
+  let h = '<div class="cv-bar"><div class="cv-title">\uD83D\uDCD6 ' + entry.title + '</div>';
+  h += '<button onclick="comicZoom(-0.5)" aria-label="Zoom out">\u2212</button><button onclick="comicZoom(0.5)" aria-label="Zoom in">+</button>';
+  h += '<button onclick="closeComicViewer()" aria-label="Close">\u2715</button></div><div class="cv-body" id="cv-body">';
+  pages.forEach((p, i) => { h += '<img class="cv-page" src="' + COMIC_BASE + p + '" alt="' + entry.title + ' page ' + (i + 1) + '" loading="lazy">' + (pages.length > 1 ? '<div class="cv-pn">Page ' + (i + 1) + ' / ' + pages.length + '</div>' : ''); });
+  h += '</div>';
+  ov.innerHTML = h;
+  ov.style.display = 'flex';
+}
+function comicZoom(d) {
+  _comicZoom = Math.max(1, Math.min(3, _comicZoom + d));
+  document.querySelectorAll('#comic-viewer .cv-page').forEach(i => { i.style.width = (_comicZoom * 100) + '%'; });
+}
+function closeComicViewer() {
+  const ov = document.getElementById('comic-viewer');
+  if (ov) { ov.style.display = 'none'; ov.innerHTML = ''; }
+}
+
 // Journal: replay any unlocked chapter as the popup scene (also how to try the popups on a
 // save that's already read everything).
 function replayStoryPopup(id) {
@@ -24350,7 +24517,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.228';
+const BUILD_ID = '2026-08-17.229';
 // =========================
 
 
@@ -26588,7 +26755,8 @@ function rJournal(){
       h+='<span style="font-size:11px;color:'+(isRead?'var(--success)':'var(--accent-light)')+';">';
       h+=isRead?'✓ Read':'● Unread';
       h+='</span>';
-      h+='<button class="sp-skip" style="margin-left:auto;padding:4px 10px;font-size:11px;" onclick="event.stopPropagation();replayStoryPopup(\''+entry.id+'\')">▶ Play as scene</button>';
+      h+=(hasComic(entry.id)?'<button class="sp-skip" style="margin-left:auto;padding:4px 10px;font-size:11px;" onclick="event.stopPropagation();openComicViewer(\''+entry.id+'\')">📖 Read comic</button>':'');
+      h+='<button class="sp-skip" style="'+(hasComic(entry.id)?'':'margin-left:auto;')+'padding:4px 10px;font-size:11px;" onclick="event.stopPropagation();replayStoryPopup(\''+entry.id+'\')">▶ Play as scene</button>';
       h+='</div>';
     }else{
       h+='<div style="font-size:11px;color:var(--disabled);margin-top:8px;">';

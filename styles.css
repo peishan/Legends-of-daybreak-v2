@@ -1075,3 +1075,12 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .home-group[open] summary::after { content: '\25BE'; }
 .home-group-n { margin-left: auto; font-size: 11px; color: var(--text-dim); font-weight: 400; }
 .home-group .menu-grid-compact { padding-bottom: 12px; }
+
+/* Comic viewer — full-screen, scrollable, zoomable pages */
+#comic-viewer { position: fixed; inset: 0; z-index: 2200; display: none; flex-direction: column; background: #05070c; }
+#comic-viewer .cv-bar { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--bg-card); border-bottom: 1px solid var(--border); }
+#comic-viewer .cv-title { flex: 1; min-width: 0; font-family: Cinzel, serif; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#comic-viewer .cv-bar button { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-hover); color: var(--text); font-size: 18px; cursor: pointer; }
+#comic-viewer .cv-body { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y pinch-zoom; text-align: center; }
+#comic-viewer .cv-page { display: block; width: 100%; height: auto; margin: 0 auto; }
+#comic-viewer .cv-pn { padding: 6px; font-size: 11px; color: var(--text-dim); }
