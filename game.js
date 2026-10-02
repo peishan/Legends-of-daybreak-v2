@@ -24406,6 +24406,7 @@ function setS(s){
   if (G.busyDayAutopilot.active) {
     G.busyDayAutopilot.playerBrowsing = (s !== 'combat');
   }
+  if (s === 'explore') G._mapScrolledTab = undefined; // re-centre the map on the player each visit
   G.state=s;render();
 }
 function flee(){
@@ -24579,7 +24580,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.233';
+const BUILD_ID = '2026-08-17.234';
 // =========================
 
 
@@ -26462,6 +26463,12 @@ if (btnClaimLogin) {
   const btnExport=document.getElementById('btn-export');if(btnExport)btnExport.addEventListener('click',exportSave);
   const btnImport=document.getElementById('btn-import');if(btnImport)btnImport.addEventListener('click',importSave);
   const btnReset=document.getElementById('btn-reset');if(btnReset)btnReset.addEventListener('click',resetGame);
+  // Long regional paths open scrolled to the player's own zone, once per region tab.
+  const hereEl = document.getElementById('map-here');
+  if (hereEl && G._mapScrolledTab !== G.exploreMapTab) {
+    G._mapScrolledTab = G.exploreMapTab;
+    try { hereEl.scrollIntoView({ block: 'center' }); } catch (e) {}
+  }
   document.querySelectorAll('.zcard:not(.locked)').forEach(el=>{
     el.addEventListener('click',()=>{const i=parseInt(el.getAttribute('data-i'));sc(i);});
   });
@@ -32116,6 +32123,47 @@ function rZoneMapTabs() {
   return h;
 }
 
+// Per-region backdrops for the generic zone path (the illustrated maps cover levels up to 95; every
+// region past that used to be the same plain path). Tint only -- cheap, and easy to swap for art.
+const ZONE_MAP_THEMES = [
+  { until: 29,   a: 'rgba(34,197,94,0.10)'  },   // starting lands
+  { until: 55,   a: 'rgba(245,158,11,0.10)' },   // aftermath roads
+  { until: 200,  a: 'rgba(16,185,129,0.12)' },   // verdant reach
+  { until: 360,  a: 'rgba(168,85,247,0.12)' },   // fractured worlds
+  { until: 490,  a: 'rgba(56,189,248,0.12)' },   // beyond the roads
+  { until: 700,  a: 'rgba(250,204,21,0.10)' },   // library & beyond
+  { until: 1000, a: 'rgba(239,68,68,0.10)'  },   // unfinished endings
+  { until: 1e9,  a: 'rgba(232,197,71,0.14)' }    // last ascent
+];
+function _zoneMapTheme(maxLv) { return (ZONE_MAP_THEMES.find(t => maxLv <= t.until) || ZONE_MAP_THEMES[ZONE_MAP_THEMES.length - 1]).a; }
+
+// Zone names that hold a claimed stronghold, via the rest sites that belong to it.
+function _strongholdZoneNames() {
+  const names = new Set();
+  for (const id in STRONGHOLDS) {
+    if (!G.strongholds[id]) continue;
+    for (const siteId of (STRONGHOLDS[id].restSiteIds || [])) {
+      const site = G.rest.sites.find(x => x.id === siteId);
+      if (site && site.zone) names.add(site.zone);
+    }
+  }
+  return names;
+}
+
+// Story chapters that open at a zone or on its boss, keyed by zone name -> chapter numbers still to unlock.
+function _zoneChapterHooks() {
+  const hooks = {};
+  const unlocked = G.storyJournal.unlocked || [];
+  for (const e of G.storyJournal.entries) {
+    if (unlocked.includes(e.id)) continue;
+    let zoneName = null;
+    if (e.unlockType === 'zone') zoneName = e.unlockAt;
+    else if (e.unlockType === 'boss') { const b = G.bosses.find(x => x.n === e.unlockAt); if (b) zoneName = b.zone; }
+    if (zoneName) (hooks[zoneName] = hooks[zoneName] || []).push(e.chapter);
+  }
+  return hooks;
+}
+
 function rZoneMapView() {
   const tabs = getActiveZoneMapTabs();
   if (G.exploreMapTab === undefined || G.exploreMapTab >= tabs.length) G.exploreMapTab = 0;
@@ -32136,7 +32184,13 @@ function rZoneMapView() {
     y: 50 + i * spacingY
   }));
 
-  let h = '<div style="position:relative;width:300px;max-width:100%;margin:0 auto;height:' + height + 'px;">';
+  // "You are here": the furthest zone in this region that's open at the current level.
+  let hereIdx = -1;
+  zonesWithIndex.forEach(({ z }, k) => { if (z.lv <= G.p.lvl) hereIdx = k; });
+  const strongZones = _strongholdZoneNames(), chapterHooks = _zoneChapterHooks();
+  const mapTheme = _zoneMapTheme(range.max);
+
+  let h = '<div class="zone-path" style="position:relative;width:300px;max-width:100%;margin:0 auto;height:' + height + 'px;background:radial-gradient(ellipse at 50% 50%, ' + mapTheme + ', transparent 72%);">';
 
   h += '<svg viewBox="0 0 300 ' + height + '" style="position:absolute;top:0;left:0;width:100%;height:100%;" preserveAspectRatio="none">';
   h += '<polyline points="' + points.map(p => p.x + ',' + p.y).join(' ') + '" fill="none" stroke="var(--border)" stroke-width="3" stroke-dasharray="6,6"/>';
@@ -32150,10 +32204,13 @@ function rZoneMapView() {
     h += '<div class="zcard map-node' + (lk ? ' locked' : '') + '" data-i="' + i + '" style="border-color:' + dc + ';background:radial-gradient(circle at 35% 30%, color-mix(in srgb, ' + dc + ' 20%, var(--bg-card)), var(--bg-card));left:' + p.x + 'px;top:' + p.y + 'px;" title="' + z.n + ' (Lv.' + z.lv + ')">';
     h += '<span class="map-node-icon">' + getZoneIcon(z.n) + '</span>';
     if (isBossZone) h += '<div class="map-node-boss">👑</div>';
+    if (strongZones.has(z.n)) h += '<div class="map-node-hold" title="Stronghold">🗼</div>';
     if (lk) h += '<div class="map-node-lock">🔒</div>';
     h += '</div>';
+    if (idx === hereIdx) h += '<div id="map-here" class="map-here" style="left:' + (p.x - 44) + 'px;top:' + (p.y + 2) + 'px;" title="You are here">' + getSpeakerPortrait('San') + '</div>';
+    const hook = chapterHooks[z.n];
     h += '<div class="map-node-name" style="left:' + p.x + 'px;top:' + (p.y + 34) + 'px;">' + z.n + '</div>';
-    h += '<div class="map-node-sub" style="left:' + p.x + 'px;top:' + (p.y + 46) + 'px;">' + (lk ? 'Lv.' + z.lv : 'Ready') + '</div>';
+    h += '<div class="map-node-sub" style="left:' + p.x + 'px;top:' + (p.y + 46) + 'px;">' + (lk ? 'Lv.' + z.lv : 'Ready') + (hook && !lk ? ' \u00b7 \uD83D\uDCD6 Ch.' + hook[0] : '') + '</div>';
   }
 
   h += '</div>';
