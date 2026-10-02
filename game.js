@@ -11455,6 +11455,7 @@ function renderStoryPopup() {
   const cur = _storyPopupCur, ov = document.getElementById('story-popup');
   if (!cur || !ov) return;
   const e = cur.entry, scene = e.scenes[cur.i];
+  probeComic(e.id);
   const isDialogue = scene.speaker !== 'Narrator';
   const portrait = isDialogue ? getSpeakerPortrait(scene.speaker) : '';
   const color = getSpeakerColor(scene.speaker);
@@ -11626,6 +11627,51 @@ const COMIC_PAGES = {
 };
 let _comicZoom = 1;
 function hasComic(id) { return !!COMIC_PAGES[id]; }
+
+// New chapters need no code change: upload chNNN_page1.jpg (and _page2.._page4 if there are more)
+// to COMIC_BASE, NNN being the chapter number zero-padded to 3 digits, and the game finds them.
+// Anything not in the list above is checked once per session when it's shown. 29, 73 and 75 are
+// excluded: those numbers already hold different stories in the Journey reader, so the files
+// that exist under those names are not these chapters' comics.
+const COMIC_PROBE_EXCLUDE = ['journal_029', 'journal_073', 'journal_075'];
+const _comicProbe = { done: {}, busy: 0, queue: [] };
+function _comicFile(entry, page) { return COMIC_BASE + 'ch' + String(entry.chapter).padStart(3, '0') + '_page' + page + '.jpg'; }
+function _comicTest(url, cb) {
+  const im = new Image();
+  im.onload = () => cb(true);
+  im.onerror = () => cb(false);
+  im.src = url;
+}
+function probeComic(id) {
+  if (COMIC_PAGES[id] || _comicProbe.done[id] || COMIC_PROBE_EXCLUDE.includes(id)) return;
+  _comicProbe.done[id] = true;
+  _comicProbe.queue.push(id);
+  _pumpComicProbe();
+}
+function _pumpComicProbe() {
+  while (_comicProbe.busy < 6 && _comicProbe.queue.length) {
+    const id = _comicProbe.queue.shift();
+    const entry = G.storyJournal.entries.find(e => e.id === id);
+    if (!entry) continue;
+    _comicProbe.busy++;
+    _comicTest(_comicFile(entry, 1), ok => {
+      if (!ok) { _comicProbe.busy--; _pumpComicProbe(); return; }
+      const pages = [_comicFile(entry, 1).slice(COMIC_BASE.length)];
+      const more = n => {
+        if (n > 4) return done();
+        _comicTest(_comicFile(entry, n), ok2 => { if (ok2) { pages.push(_comicFile(entry, n).slice(COMIC_BASE.length)); more(n + 1); } else done(); });
+      };
+      const done = () => {
+        COMIC_PAGES[id] = pages;
+        _comicProbe.busy--;
+        if (G.state === 'journal') render();
+        if (_storyPopupCur && _storyPopupCur.entry.id === id) renderStoryPopup();
+        _pumpComicProbe();
+      };
+      more(2);
+    });
+  }
+}
 function openComicViewer(id) {
   const pages = COMIC_PAGES[id], entry = G.storyJournal.entries.find(e => e.id === id);
   if (!pages || !entry) return;
@@ -24517,7 +24563,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.230';
+const BUILD_ID = '2026-08-17.231';
 // =========================
 
 
@@ -26762,6 +26808,7 @@ function rJournal(){
     h+='<div class="zd">'+(isUnlocked?entry.summary:'???')+'</div>';
     
     if(isUnlocked){
+      probeComic(entry.id);
       h+='<div style="display:flex;gap:8px;align-items:center;margin-top:8px;">';
       h+='<span style="font-size:11px;color:'+(isRead?'var(--success)':'var(--accent-light)')+';">';
       h+=isRead?'✓ Read':'● Unread';
