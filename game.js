@@ -3575,7 +3575,7 @@ storyJournal: {
         unlockType: 'level',
         unlockAt: 56,
         icon: '🌿',
-        summary: 'Ser Aldric asks San and Joel to help him find something himself, for once, instead of needing to be found.',
+        summary: 'Ser Aldric asks San and Joel to help him find something himself, for once, instead of needing to be found — and on the way, finally says why he looked the way he did when you first met.',
         scenes: [
           { speaker: 'Narrator', text: 'Ser Aldric finds you at the edge of the Vale, not summoned, not assigned — the same way he found you once before, except this time there is no hesitation in how he walks toward you.' },
           { speaker: 'Ser Aldric', text: '"I have been hearing things," he says, no preamble. "Old things. A temple, somewhere out past the green, older than the Cult, older maybe than the temple I actually serve. Nobody has been able to find it. I would like to be the one who does."' },
@@ -3584,6 +3584,19 @@ storyJournal: {
           { speaker: 'Joel', text: '"What do you need from us?" Joel asks, already the kind of question that assumes the answer is yes.' },
           { speaker: 'Ser Aldric', text: '"Company," Ser Aldric says. "And whatever this vale throws at anyone who goes looking for something it has not decided to show yet."' },
           { speaker: 'Narrator', text: 'You fall into step beside him without much more discussion than that. It occurs to you, walking, that this is the first time he has asked you to come with him instead of asking you to come get him.' },
+          { speaker: 'Narrator', text: 'The path beyond the Vale opens into older ground — quiet, overgrown, and full of things that time forgot to bury. You are a few minutes into it before you realise what has been nagging at you about the man walking beside you.' },
+          { speaker: 'San', text: '"...You look different," you say, finally.' },
+          { speaker: 'Ser Aldric', text: '"I do," he says, and does not pretend otherwise.' },
+          { speaker: 'Joel', text: '"The first time we met," Joel says slowly, "you looked younger."' },
+          { speaker: 'San', text: '"...Intentional?" you ask.' },
+          { speaker: 'Ser Aldric', text: '"That was intentional," Ser Aldric says. "I could not let the Cult recognize the knight they were hunting."' },
+          { speaker: 'Ser Aldric', text: '"I learned a small piece of old temple magic. It could not heal me. It could only... persuade people to see someone smaller. Weaker. Easier to overlook."' },
+          { speaker: 'Narrator', text: 'The gaunt face. The dirt. The younger features. None of them had truly been Ser Aldric.' },
+          { speaker: 'Ser Aldric', text: '"It kept me alive," he says. "For a while."' },
+          { speaker: 'Narrator', text: 'A disguise carried long enough becomes difficult to distinguish from the person beneath it.' },
+          { speaker: 'San', text: '"So you stopped hiding," you say.' },
+          { speaker: 'Ser Aldric', text: '"I finally had people worth standing beside."' },
+          { speaker: 'Narrator', text: 'The Cult hunted a templar who refused to kneel, so Ser Aldric wore a face they would never think to chase. Now the disguise is gone, and the knight beneath it has finally returned. The search is not over — but for the first time, it is his to choose.' },
         ]
       },
       {
@@ -11561,6 +11574,7 @@ const COMIC_PAGES = {
   journal_070: ['ch070_page1.jpg','ch070_page2.jpg','ch070_page3.jpg'],
   journal_071: ['ch071_page1.jpg','ch071_page2.jpg'],
   journal_072: ['ch072_page1.jpg','ch072_page2.jpg','ch072_page3.jpg','ch072_page4.jpg'],
+  journal_073: ['ch073_page1.jpg'],
   journal_074: ['ch074_page1.jpg'],
   journal_076: ['ch076_page1.jpg'],
   journal_077: ['ch077_page1.jpg'],
@@ -11631,11 +11645,11 @@ function hasComic(id) { return !!COMIC_PAGES[id]; }
 
 // New chapters need no code change: upload chNNN_page1.jpg (and _page2.._page4 if there are more)
 // to COMIC_BASE, NNN being the chapter number zero-padded to 3 digits, and the game finds them.
-// Anything not in the list above is checked once per session when it's shown. 73 and 75 are
-// held back: the art under those numbers doesn't match the chapter text yet (73 shows a disguise
-// reveal that isn't written in the chapter; 75 shows the sanctum, which is chapter 77's content).
-// Remove an id from this list when its comic and text line up. 29 is mapped above.
-const COMIC_PROBE_EXCLUDE = ['journal_073', 'journal_075'];
+// Anything not in the list above is checked once per session when it's shown. 75 is
+// held back: its art shows the sanctum, which is chapter 77's content, not the guardian scene in 75's
+// text.
+// Remove an id from this list when its comic and text line up. 29 and 73 are mapped above.
+const COMIC_PROBE_EXCLUDE = ['journal_075'];
 const _comicProbe = { done: {}, busy: 0, queue: [] };
 function _comicFile(entry, page) { return COMIC_BASE + 'ch' + String(entry.chapter).padStart(3, '0') + '_page' + page + '.jpg'; }
 function _comicTest(url, cb) {
@@ -24565,7 +24579,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.232';
+const BUILD_ID = '2026-08-17.233';
 // =========================
 
 
