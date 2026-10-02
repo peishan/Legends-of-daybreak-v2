@@ -11517,6 +11517,7 @@ const COMIC_PAGES = {
   journal_026: ['ch026_page1.jpg'],
   journal_027: ['ch027_page1.jpg'],
   journal_028: ['ch028_page1.jpg'],
+  journal_029: ['ch029_page1.jpg'],
   journal_030: ['ch030_page1.jpg'],
   journal_031: ['ch031_page1.jpg'],
   journal_032: ['ch032_page1.jpg'],
@@ -11630,10 +11631,11 @@ function hasComic(id) { return !!COMIC_PAGES[id]; }
 
 // New chapters need no code change: upload chNNN_page1.jpg (and _page2.._page4 if there are more)
 // to COMIC_BASE, NNN being the chapter number zero-padded to 3 digits, and the game finds them.
-// Anything not in the list above is checked once per session when it's shown. 29, 73 and 75 are
-// excluded: those numbers already hold different stories in the Journey reader, so the files
-// that exist under those names are not these chapters' comics.
-const COMIC_PROBE_EXCLUDE = ['journal_029', 'journal_073', 'journal_075'];
+// Anything not in the list above is checked once per session when it's shown. 73 and 75 are
+// held back: the art under those numbers doesn't match the chapter text yet (73 shows a disguise
+// reveal that isn't written in the chapter; 75 shows the sanctum, which is chapter 77's content).
+// Remove an id from this list when its comic and text line up. 29 is mapped above.
+const COMIC_PROBE_EXCLUDE = ['journal_073', 'journal_075'];
 const _comicProbe = { done: {}, busy: 0, queue: [] };
 function _comicFile(entry, page) { return COMIC_BASE + 'ch' + String(entry.chapter).padStart(3, '0') + '_page' + page + '.jpg'; }
 function _comicTest(url, cb) {
@@ -24563,7 +24565,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.231';
+const BUILD_ID = '2026-08-17.232';
 // =========================
 
 
