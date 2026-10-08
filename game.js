@@ -7189,7 +7189,7 @@ storyJournal: {
       { id: 'fr_tavern', name: 'The Frozen Hearth', type: 'tavern', zone: 'Frostspire Ruins', zoneLv: 6, desc: 'A tavern that somehow keeps warm in the frozen wastes.', unlocked: false, icon: '🍺', cost: 15 },
       { id: 'ad_camp', name: 'Abyssal Refuge', type: 'camp', zone: 'Abyssal Depths', zoneLv: 8, desc: 'A pocket of reality that the void has not claimed... yet.', unlocked: false, icon: '⛺', cost: 0 },
       { id: 'ad_tavern', name: 'The Last Light', type: 'tavern', zone: 'Abyssal Depths', zoneLv: 8, desc: 'The final tavern before oblivion. Prices are steep.', unlocked: false, icon: '🍺', cost: 25 },
-      { id: 'temple', name: 'Temple of Resurrection', type: 'temple', zone: 'Sanctuary', zoneLv: 1, desc: 'An ancient temple that restores fallen companions to life.', unlocked: true, icon: '⛪', cost: 50 },
+      { id: 'temple', lvl: () => 200, name: 'Temple of Resurrection', type: 'temple', zone: 'Sanctuary', zoneLv: 1, desc: 'An ancient temple that restores fallen companions to life.', unlocked: true, icon: '⛪', cost: 50 },
       { id: 'mended_sanctum', name: 'The Mended Sanctum', type: 'temple', zone: 'The Verdant Choir', zoneLv: 65, desc: 'Small, quiet, and honest about what it is \u2014 the same temple, a second doorway, so much closer when the road out here gets long.', unlocked: false, icon: '\uD83D\uDD6F\uFE0F', cost: 50 },
       { id: 'apt_camp', name: 'Planar Anchor Camp', type: 'camp', zone: 'Arcane Planar Tower', zoneLv: 11, desc: 'A pocket of stable reality anchored by ancient runes. The walls still shimmer.', unlocked: false, icon: '⛺', cost: 0 },
       { id: 'apt_tavern', name: 'The Shifting Spire', type: 'tavern', zone: 'Arcane Planar Tower', zoneLv: 11, desc: 'A tavern that exists in multiple dimensions at once. The bartender may be a future version of yourself.', unlocked: false, icon: '🍺', cost: 30 },
@@ -11934,23 +11934,23 @@ function beatTick() {
 // (a modal for each of ~180 zones would be a lot), and a new region gets the full modal.
 const UNLOCK_TIPS_KEY = 'daybreak_unlock_tips';
 const UNLOCK_TIPS = [
-  { id: 'raid',     icon: '🏆', title: 'Raid Mode is open',  cond: () => G.p.lvl >= 15, go: () => setS('raid_select'),
+  { id: 'raid', lvl: () => 15,     icon: '🏆', title: 'Raid Mode is open',  cond: () => G.p.lvl >= 15, go: () => setS('raid_select'),
     body: 'Raids are multi-stage gauntlets with big rewards. Start with the first one and work up as your level grows.' },
-  { id: 'forge',    icon: '⚒️', title: 'The Forge is open',  cond: () => isForgeUnlocked(), go: () => setS('forge'),
+  { id: 'forge', lvl: () => FORGE_UNLOCK_LEVEL,    icon: '⚒️', title: 'The Forge is open',  cond: () => isForgeUnlocked(), go: () => setS('forge'),
     body: 'Spend gold to upgrade anything you have equipped, level by level. Start with your weapon.' },
-  { id: 'bossrush', icon: '💀', title: 'Boss Rush is open',  cond: () => isBossRushUnlocked(), go: () => setS('boss_rush'),
+  { id: 'bossrush', lvl: () => BOSS_RUSH_UNLOCK_LEVEL, icon: '💀', title: 'Boss Rush is open',  cond: () => isBossRushUnlocked(), go: () => setS('boss_rush'),
     body: 'Fight boss after boss: each win makes the next harder and the reward bigger. Retreat any time and you keep what you’ve banked.' },
-  { id: 'dragon',   icon: '🐉', title: 'Dragon Hunt is open', cond: () => isDragonHuntUnlocked(), go: () => setS('dragon_hunt'),
+  { id: 'dragon', lvl: () => DRAGONS[0].unlockLevel,   icon: '🐉', title: 'Dragon Hunt is open', cond: () => isDragonHuntUnlocked(), go: () => setS('dragon_hunt'),
     body: 'A dragon stirs. These are long, dangerous fights with big payouts, so bring a full party and plenty of potions.' },
-  { id: 'frontier', icon: '🌫️', title: 'The Fraying Frontier is open', cond: () => G.p.lvl >= 100, go: () => setS('fraying_frontier'),
+  { id: 'frontier', lvl: () => 100, icon: '🌫️', title: 'The Fraying Frontier is open', cond: () => G.p.lvl >= 100, go: () => setS('fraying_frontier'),
     body: 'An endless zone whose bosses scale with you. Push as deep as you can; there is no ceiling.' },
-  { id: 'guildwar', icon: '⚔️', title: 'Guild War is open',  cond: () => G.guildJoined && isGuildWarUnlocked(), go: () => setS('guild_war'),
+  { id: 'guildwar', lvl: () => GUILD_WAR_MIN_LEVEL, icon: '⚔️', title: 'Guild War is open',  cond: () => G.guildJoined && isGuildWarUnlocked(), go: () => setS('guild_war'),
     body: 'Field your guild members in a war roster. Recruit and assign members first, then take on the war.' },
   { id: 'temple',   icon: '🙏', title: 'Brother Corin’s Trial is open', cond: () => isTempleTrialsUnlocked(), go: () => { G.viewingTemple = true; setS('rest'); },
     body: 'A trial at the Temple you can attempt once a day. Check the Today screen to see when it’s ready.' },
-  { id: 'blitz',    icon: '⚡', title: 'Mercenary Blitz is open',   cond: () => G.p.lvl >= MERCENARY_BLITZ_MIN_LEVEL, go: () => setS('mercenary'),
+  { id: 'blitz', lvl: () => MERCENARY_BLITZ_MIN_LEVEL,    icon: '⚡', title: 'Mercenary Blitz is open',   cond: () => G.p.lvl >= MERCENARY_BLITZ_MIN_LEVEL, go: () => setS('mercenary'),
     body: 'Once a day, collect the reward of a full mercenary contract at your tier instantly, with no fight.' },
-  { id: 'ship',     icon: '⚓', title: 'The Ship is open',          cond: () => isShipUnlocked(), go: () => setS('ship'),
+  { id: 'ship', lvl: () => 560,     icon: '⚓', title: 'The Ship is open',          cond: () => isShipUnlocked(), go: () => setS('ship'),
     body: 'Bren the Shipwright is setting up on the coast. Build a ship, then sail, trade or explore.' }
 ];
 const UNLOCK_REGIONS = [
@@ -12009,6 +12009,57 @@ function getPrestigeReadiness() {
   const req = getPrestigeRequiredLevel();
   return { req, lvl: G.p.lvl, ready: G.p.lvl >= req, toGo: Math.max(0, req - G.p.lvl),
            xp: +(G.p.lvl * PRESTIGE_XP_PCT_PER_LEVEL).toFixed(1), gold: +(G.p.lvl * PRESTIGE_GOLD_PCT_PER_LEVEL).toFixed(1) };
+}
+
+// === COMING UP ===
+// A look ahead for a grinder: what is waiting for you right now (story chapters behind a zone or
+// boss you can already reach) and what opens next, nearest first. Pure readout of existing data.
+function getWaitingChapters() {
+  const rows = [], unlocked = G.storyJournal.unlocked || [];
+  for (const e of G.storyJournal.entries) {
+    if (unlocked.includes(e.id)) continue;
+    if (e.unlockType === 'zone') {
+      const z = G.zones.find(x => x.n === e.unlockAt);
+      if (z && z.lv <= G.p.lvl) rows.push({ lv: z.lv, text: 'Ch.' + e.chapter + ' ' + e.title + ': visit ' + z.n });
+    } else if (e.unlockType === 'boss') {
+      const b = G.bosses.find(x => x.n === e.unlockAt);
+      const z = b && G.zones.find(x => x.n === b.zone);
+      if (z && z.lv <= G.p.lvl) rows.push({ lv: z.lv, text: 'Ch.' + e.chapter + ' ' + e.title + ': defeat ' + b.n + ' in ' + z.n });
+    }
+  }
+  return rows.sort((a, b) => b.lv - a.lv); // closest to your level first
+}
+
+function getComingUp() {
+  const rows = [], lvl = G.p.lvl, unlocked = G.storyJournal.unlocked || [];
+  const next = G.storyJournal.entries.filter(e => e.unlockType === 'level' && e.unlockAt > lvl && !unlocked.includes(e.id)).sort((a, b) => a.unlockAt - b.unlockAt).slice(0, 2);
+  for (const e of next) rows.push({ lv: e.unlockAt, icon: '📖', text: 'Chapter ' + e.chapter + ': ' + e.title });
+  const zs = G.zones.filter(z => z.lv > lvl).sort((a, b) => a.lv - b.lv);
+  if (zs.length) rows.push({ lv: zs[0].lv, icon: '🗺️', text: 'New zone: ' + zs[0].n });
+  for (const t of UNLOCK_TIPS) {
+    let lv = 0, ok = false; try { lv = t.lvl(); ok = t.cond(); } catch (e) {}
+    if (lv > lvl && !ok) rows.push({ lv, icon: t.icon, text: t.title.replace(' is open', '') + ' opens' });
+  }
+  const reg = UNLOCK_REGIONS.find(r => r.lvl > lvl);
+  if (reg) rows.push({ lv: reg.lvl, icon: '🧭', text: 'New region: ' + reg.label });
+  const pr = getPrestigeReadiness();
+  if (!pr.ready) rows.push({ lv: pr.req, icon: '🌟', text: 'Prestige is ready' });
+  return rows.sort((a, b) => a.lv - b.lv).slice(0, 5);
+}
+
+function rComingUp() {
+  const waiting = getWaitingChapters(), ahead = getComingUp();
+  if (!waiting.length && !ahead.length) return '';
+  let h = '<div class="panel coming-up"><div class="panel-title" style="margin-bottom:6px;">🔭 Coming Up</div>';
+  for (const r of ahead) {
+    h += '<div class="cu-row"><span class="cu-ico">' + r.icon + '</span><span class="cu-txt">' + r.text + '</span><span class="cu-lv">Lv ' + r.lv + ' · ' + (r.lv - G.p.lvl) + ' to go</span></div>';
+  }
+  if (waiting.length) {
+    h += '<div class="panel-title" style="margin:10px 0 6px;color:var(--gold);">⭐ Waiting for you</div>';
+    for (const r of waiting.slice(0, 4)) h += '<div class="cu-row"><span class="cu-ico">📖</span><span class="cu-txt">' + r.text + '</span></div>';
+    if (waiting.length > 4) h += '<div class="btn-hint" style="margin-top:4px;">+' + (waiting.length - 4) + ' more, found by grinding those zones</div>';
+  }
+  return h + '</div>';
 }
 
 // === LOGIN NOTICES ===
@@ -24773,7 +24824,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.236';
+const BUILD_ID = '2026-08-17.237';
 // =========================
 
 
@@ -31972,6 +32023,8 @@ function rHomeV2(primary, sections) {
   const cta = getHomeCta();
   h += '<button class="home-cta" onclick="' + cta.onclick + '"><div class="home-cta-icon">' + cta.icon + '</div><div class="home-cta-body"><div class="home-cta-eyebrow">' + cta.eyebrow + '</div><div class="home-cta-title">' + cta.title + '</div><div class="home-cta-sub">' + cta.sub + '</div></div><div class="home-cta-arrow">→</div></button>';
 
+  h += rComingUp();
+
   const entries = G.storyJournal.entries.length, unlockedN = G.storyJournal.unlocked.length;
   const unread = unlockedN - G.storyJournal.unlocked.filter(id => (G.storyJournal.read || []).includes(id)).length;
   const zonesOpen = G.zones.filter(z => z.lv <= G.p.lvl).length;
@@ -32086,6 +32139,7 @@ function rMenu(){
   if (isHomeV2()) {
     h += rHomeV2(primary, sections);
   } else {
+    h += rComingUp();
     h += nextStoryObjectiveHtml();
 
     // Today at a Glance — the day's shape in three numbers, no navigating required.

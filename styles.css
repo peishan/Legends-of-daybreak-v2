@@ -1090,3 +1090,10 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .map-here img { width: 100%; height: 100%; object-fit: cover; display: block; }
 @keyframes mapHerePulse { 0%, 100% { box-shadow: 0 0 0 3px rgba(232,197,71,0.25); } 50% { box-shadow: 0 0 0 7px rgba(232,197,71,0.08); } }
 .map-node-hold { position: absolute; bottom: -6px; left: -6px; font-size: 14px; }
+
+/* Home: Coming Up look-ahead */
+.coming-up .cu-row { display: flex; align-items: baseline; gap: 8px; padding: 5px 0; border-top: 1px solid var(--border); font-size: 12px; }
+.coming-up .cu-row:first-of-type { border-top: 0; }
+.coming-up .cu-ico { width: 20px; text-align: center; flex-shrink: 0; }
+.coming-up .cu-txt { flex: 1; min-width: 0; }
+.coming-up .cu-lv { font-size: 11px; color: var(--text-dim); white-space: nowrap; }
