@@ -11442,6 +11442,7 @@ function storyPopupWatch() {
 function storyPopupTick() {
   try {
     storyPopupWatch();
+    unlockTipWatch();
     beatTick();
     if (_storyPopupQueue.length && isStoryPopupsEnabled() && storyPopupSafeNow()) {
       const qid = _storyPopupQueue.shift();
@@ -11788,7 +11789,7 @@ function showBossIntro(boss) {
 }
 
 function openBeatModal(o, onContinue) {
-  _beatCur = { onContinue: onContinue };
+  _beatCur = { onContinue: onContinue, go: o.go || null };
   let ov = document.getElementById('beat-modal');
   if (!ov) { ov = document.createElement('div'); ov.id = 'beat-modal'; document.body.appendChild(ov); }
   let h = '<div class="sp-card">';
@@ -11797,15 +11798,18 @@ function openBeatModal(o, onContinue) {
   h += '<div style="font-family:Cinzel,serif;font-size:20px;text-align:center;margin-bottom:10px;">' + o.title + '</div>';
   if (o.body) h += '<div class="sp-box"><div class="sp-body"><div class="sp-text">' + o.body + '</div></div></div>';
   if (o.foot) h += '<div style="font-size:12px;color:var(--text-dim);text-align:center;margin-top:10px;">' + o.foot + '</div>';
-  h += '<div class="sp-nav" style="justify-content:center;"><button class="sp-next" onclick="closeBeatModal()">' + o.btn + '</button></div></div>';
+  h += '<div class="sp-nav" style="justify-content:center;">';
+  if (o.go) h += '<button class="sp-skip" onclick="closeBeatModal(true)">' + (o.goLabel || 'Take me there') + '</button>';
+  h += '<button class="sp-next" onclick="closeBeatModal()">' + o.btn + '</button></div></div>';
   ov.innerHTML = h;
   ov.style.display = 'flex';
 }
-function closeBeatModal() {
+function closeBeatModal(goThere) {
   const cur = _beatCur; _beatCur = null;
   const ov = document.getElementById('beat-modal');
   if (ov) ov.style.display = 'none';
   if (cur && cur.onContinue) cur.onContinue();
+  if (goThere && cur && cur.go) { try { cur.go(); } catch (e) { console.warn('[Beat go]', e); } }
 }
 
 // === STORY BEAT QUEUE ===
@@ -11835,6 +11839,90 @@ function beatTick() {
   openBeatModal(_beatQueue.shift(), null);
 }
 
+// === UNLOCK TIPS ===
+// When a game mode or region opens, say so and say what to do first. Each tip shows once per
+// device. On the first run everything already unlocked is marked seen, so an existing save isn't
+// flooded; levels re-climbed after a Prestige never repeat a tip. New zones get a light toast
+// (a modal for each of ~180 zones would be a lot), and a new region gets the full modal.
+const UNLOCK_TIPS_KEY = 'daybreak_unlock_tips';
+const UNLOCK_TIPS = [
+  { id: 'raid',     icon: '🏆', title: 'Raid Mode is open',  cond: () => G.p.lvl >= 15, go: () => setS('raid_select'),
+    body: 'Raids are multi-stage gauntlets with big rewards. Start with the first one and work up as your level grows.' },
+  { id: 'forge',    icon: '⚒️', title: 'The Forge is open',  cond: () => isForgeUnlocked(), go: () => setS('forge'),
+    body: 'Spend gold to upgrade anything you have equipped, level by level. Start with your weapon.' },
+  { id: 'bossrush', icon: '💀', title: 'Boss Rush is open',  cond: () => isBossRushUnlocked(), go: () => setS('boss_rush'),
+    body: 'Fight boss after boss: each win makes the next harder and the reward bigger. Retreat any time and you keep what you’ve banked.' },
+  { id: 'dragon',   icon: '🐉', title: 'Dragon Hunt is open', cond: () => isDragonHuntUnlocked(), go: () => setS('dragon_hunt'),
+    body: 'A dragon stirs. These are long, dangerous fights with big payouts, so bring a full party and plenty of potions.' },
+  { id: 'frontier', icon: '🌫️', title: 'The Fraying Frontier is open', cond: () => G.p.lvl >= 100, go: () => setS('fraying_frontier'),
+    body: 'An endless zone whose bosses scale with you. Push as deep as you can; there is no ceiling.' },
+  { id: 'guildwar', icon: '⚔️', title: 'Guild War is open',  cond: () => G.guildJoined && isGuildWarUnlocked(), go: () => setS('guild_war'),
+    body: 'Field your guild members in a war roster. Recruit and assign members first, then take on the war.' },
+  { id: 'temple',   icon: '🙏', title: 'Brother Corin’s Trial is open', cond: () => isTempleTrialsUnlocked(), go: () => { G.viewingTemple = true; setS('rest'); },
+    body: 'A trial at the Temple you can attempt once a day. Check the Today screen to see when it’s ready.' },
+  { id: 'blitz',    icon: '⚡', title: 'Mercenary Blitz is open',   cond: () => G.p.lvl >= MERCENARY_BLITZ_MIN_LEVEL, go: () => setS('mercenary'),
+    body: 'Once a day, collect the reward of a full mercenary contract at your tier instantly, with no fight.' },
+  { id: 'ship',     icon: '⚓', title: 'The Ship is open',          cond: () => isShipUnlocked(), go: () => setS('ship'),
+    body: 'Bren the Shipwright is setting up on the coast. Build a ship, then sail, trade or explore.' }
+];
+const UNLOCK_REGIONS = [
+  { lvl: 30,   label: 'The Aftermath Roads' },  { lvl: 56,   label: 'The Verdant Reach' },
+  { lvl: 201,  label: 'The Fractured Worlds' }, { lvl: 361,  label: 'Beyond the Roads' },
+  { lvl: 491,  label: 'The Library & Beyond' }, { lvl: 701,  label: 'The Unfinished Endings' },
+  { lvl: 1001, label: 'The Last Ascent' }
+];
+let _newZoneNames = []; // this session, cleared once Explore is opened
+
+function _unlockTipsState() {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(UNLOCK_TIPS_KEY)); } catch (e) {}
+  if (!d) {
+    d = { tips: [], zoneLv: G.p.lvl, regions: [] };
+    for (const t of UNLOCK_TIPS) { try { if (t.cond()) d.tips.push(t.id); } catch (e) {} }
+    for (const r of UNLOCK_REGIONS) if (G.p.lvl >= r.lvl) d.regions.push(r.lvl);
+    _unlockTipsSave(d);
+  }
+  return d;
+}
+function _unlockTipsSave(d) { try { localStorage.setItem(UNLOCK_TIPS_KEY, JSON.stringify(d)); } catch (e) {} }
+
+function unlockTipWatch() {
+  if (!G || !G.p || G._loading) return;
+  const d = _unlockTipsState();
+  let dirty = false;
+  for (const t of UNLOCK_TIPS) {
+    let ok = false; try { ok = t.cond(); } catch (e) {}
+    if (ok && !d.tips.includes(t.id)) {
+      d.tips.push(t.id); dirty = true;
+      queueBeat({ kicker: '🔓 New', title: t.title, body: t.body, btn: 'Got it', go: t.go, goLabel: 'Take me there' });
+    }
+  }
+  for (const r of UNLOCK_REGIONS) {
+    if (G.p.lvl >= r.lvl && !d.regions.includes(r.lvl)) {
+      d.regions.push(r.lvl); dirty = true;
+      queueBeat({ kicker: '🗺️ New region', title: r.label, body: 'New zones, enemies and loot are open. Check the Explore map: the 📖 tags show where the story continues.', btn: 'Got it', go: () => setS('explore'), goLabel: 'Open the map' });
+    }
+  }
+  if (G.p.lvl > d.zoneLv) {
+    const fresh = G.zones.filter(z => z.lv > d.zoneLv && z.lv <= G.p.lvl);
+    d.zoneLv = G.p.lvl; dirty = true;
+    if (fresh.length) {
+      fresh.forEach(z => _newZoneNames.push(z.n));
+      showToast(fresh.length <= 3 ? '🗺️ New zone open: ' + fresh.map(z => z.n).join(', ') : '🗺️ ' + fresh.length + ' new zones open', 'gold');
+    }
+  }
+  if (dirty) _unlockTipsSave(d);
+}
+
+// === PRESTIGE READINESS ===
+// Shown on Home, in the top strip and on the Prestige screen, rather than only a one-off message
+// at the exact level (which was missed if a level jump skipped over it).
+function getPrestigeReadiness() {
+  const req = getPrestigeRequiredLevel();
+  return { req, lvl: G.p.lvl, ready: G.p.lvl >= req, toGo: Math.max(0, req - G.p.lvl),
+           xp: +(G.p.lvl * PRESTIGE_XP_PCT_PER_LEVEL).toFixed(1), gold: +(G.p.lvl * PRESTIGE_GOLD_PCT_PER_LEVEL).toFixed(1) };
+}
+
 // === LOGIN NOTICES ===
 // A strip at the top of the screen listing what's actually waiting on the player. Reads the
 // same signals as the Home card badges, so nothing new needs tracking. Dismissing hides it
@@ -11854,6 +11942,9 @@ function getNoticeItems() {
     }
     if (isLibraryResearchUnlocked() && Object.values(G.libraryResearch.threads).some(t => !t.pendingOutcome && !t.activeDilemmaId))
       items.push({ icon: '📚', text: 'Library research available', go: 'library_research' });
+    const pr = getPrestigeReadiness();
+    if (pr.ready) items.unshift({ icon: '\uD83C\uDF1F', text: 'Prestige ready: banks +' + pr.xp + '% XP', go: 'prestige' });
+    if (_newZoneNames.length) items.push({ icon: '\uD83D\uDDFA\uFE0F', text: _newZoneNames.length === 1 ? 'New zone: ' + _newZoneNames[0] : _newZoneNames.length + ' new zones open', go: 'explore' });
     if (isDisciplesUnlocked() && (G.disciples || []).some(d => !d.graduated && !d.pendingOutcome))
       items.push({ icon: '🎓', text: 'A disciple is ready for a lesson', go: 'disciples' });
     const dq = (G.dailyQuests || []).filter(q => !q.done).length;
@@ -12995,16 +13086,29 @@ function checkGuildUnlock() {
 // announced these at all, so a player could hit 45 or 50 and have no idea Prestige,
 // all seven companion prestige paths, and San's Tier 4 capstones just became available.
 function checkPrestigeUnlockAnnouncements() {
-  if (G.p.lvl === getPrestigeRequiredLevel()) {
+  // Announce once per tier on reaching OR passing the level (it used to fire only on landing exactly
+  // on it). The last announced tier is kept per device; on first run an already-ready player is
+  // marked as announced, since Home and the top strip show it anyway.
+  const tier = (G.prestige.count || 0) + 1;
+  const r = getPrestigeReadiness();
+  let ann = null;
+  try { ann = JSON.parse(localStorage.getItem('daybreak_prestige_ann')); } catch (e) {}
+  const save = () => { try { localStorage.setItem('daybreak_prestige_ann', JSON.stringify(ann)); } catch (e) {} };
+  if (!ann) { ann = { tier: r.ready ? tier : tier - 1, comp: G.p.lvl >= COMPANION_PRESTIGE_UNLOCK }; save(); return; }
+  if (r.ready && ann.tier < tier) {
+    ann.tier = tier;
     const isFirst = (G.prestige.count || 0) === 0;
-    lg('🌟 PRESTIGE UNLOCKED! Check the Prestige screen — bank a permanent bonus by resetting to Level 1.' + (isFirst ? '' : ' (Tier ' + ((G.prestige.count || 0) + 1) + ')'));
+    lg('🌟 PRESTIGE UNLOCKED! Check the Prestige screen — bank a permanent bonus by resetting to Level 1.' + (isFirst ? '' : ' (Tier ' + tier + ')'));
     showToast('🌟 Prestige unlocked!', 'gold');
-    queueBeat({ kicker: '\uD83C\uDF1F Prestige', title: 'Prestige Unlocked', body: 'Bank a permanent bonus by resetting to Level 1. Gear, gold and story progress are kept. Check the Prestige screen.', btn: 'Continue' });
+    queueBeat({ kicker: '🌟 Prestige', title: 'Prestige Ready' + (isFirst ? '' : ' (Tier ' + tier + ')'), body: 'Resetting now banks +' + r.xp + '% XP and +' + r.gold + '% gold permanently, and you start again at Level 1, faster. Gear, gold and story progress are kept. The higher you go first, the more you bank, so there is no hurry.', btn: 'Later', go: () => setS('prestige'), goLabel: 'See Prestige' });
+    save();
   }
-  if (G.p.lvl === COMPANION_PRESTIGE_UNLOCK) {
-    lg('🌟 COMPANION PRESTIGE UNLOCKED! Every companion \u2014 and San\'s own spec paths \u2014 has a permanent choice waiting on their Party card / Skill Tree.');
+  if (G.p.lvl >= COMPANION_PRESTIGE_UNLOCK && !ann.comp) {
+    ann.comp = true;
+    lg('🌟 COMPANION PRESTIGE UNLOCKED! Every companion — and San\'s own spec paths — has a permanent choice waiting on their Party card / Skill Tree.');
     showToast('🌟 Companion Prestige unlocked!', 'gold');
-    queueBeat({ kicker: '\uD83C\uDF1F Prestige', title: 'Companion Prestige Unlocked', body: 'Every companion \u2014 and San\u2019s own spec paths \u2014 has a permanent choice waiting on their Party card and Skill Tree.', btn: 'Continue' });
+    queueBeat({ kicker: '🌟 Prestige', title: 'Companion Prestige Unlocked', body: 'Every companion — and San’s own spec paths — has a permanent choice waiting on their Party card and Skill Tree.', btn: 'Got it', go: () => setS('party'), goLabel: 'Open Party' });
+    save();
   }
 }
 
@@ -24406,7 +24510,7 @@ function setS(s){
   if (G.busyDayAutopilot.active) {
     G.busyDayAutopilot.playerBrowsing = (s !== 'combat');
   }
-  if (s === 'explore') G._mapScrolledTab = undefined; // re-centre the map on the player each visit
+  if (s === 'explore') { G._mapScrolledTab = undefined; _newZoneNames = []; } // re-centre the map; new zones seen
   G.state=s;render();
 }
 function flee(){
@@ -24580,7 +24684,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.234';
+const BUILD_ID = '2026-08-17.235';
 // =========================
 
 
@@ -28402,7 +28506,10 @@ function rPrestige() {
   h += '<div class="panel-title" style="color:var(--gold);">Current Permanent Bonus</div>';
   h += '<div style="font-size:24px;font-weight:700;margin:8px 0;color:var(--gold);">+' + (G.prestige.xpBonusPct || 0).toFixed(1) + '% XP &nbsp;\u00b7&nbsp; +' + (G.prestige.goldBonusPct || 0).toFixed(1) + '% Gold</div>';
   h += '<div class="btn-hint">' + (G.prestige.count || 0) + ' prestige' + ((G.prestige.count || 0) === 1 ? '' : 's') + ' so far</div>';
-  h += '<div class="btn-hint">Next prestige unlocks at Level ' + getPrestigeRequiredLevel() + '</div>';
+  const prog = getPrestigeReadiness();
+  h += '<div class="btn-hint">Next prestige unlocks at Level ' + prog.req + '</div>';
+  h += '<div class="pbar" style="margin:8px 0 4px;"><div class="pbar-fill" style="width:' + Math.min(100, prog.lvl / prog.req * 100) + '%;"></div></div>';
+  h += '<div class="btn-hint" style="' + (prog.ready ? 'color:var(--gold);font-weight:700;' : '') + '">' + (prog.ready ? 'Ready now \u2014 Level ' + prog.lvl + ' of ' + prog.req : 'Level ' + prog.lvl + ' of ' + prog.req + ' \u00b7 ' + prog.toGo + ' to go') + '</div>';
   h += '</div>';
 
   h += '<div class="panel">';
@@ -31710,6 +31817,7 @@ function getMenuCardBadge(action) {
   if (action === 'today') {
     return (G.dailyQuests || []).some(q => !q.done);
   }
+  if (action === 'prestige') return getPrestigeReadiness().ready;
   return false;
 }
 
@@ -31790,6 +31898,8 @@ function rHomeV2(primary, sections) {
   h += _homeTile('📅', 'Today', dqDone + '/' + dq.length + ' daily quests', dq.length ? dqDone / dq.length * 100 : 0, getMenuCardBadge('today') ? '' : '✓', 'today');
   h += _homeTile('🏰', 'Guild Hub', G.guildJoined ? (rankDef ? rankDef.name : 'Member') : '🔒 Claim the Mended Grove', G.guildJoined ? 100 : 0, getMenuCardBadge('guild_hub') ? 'Ready' : '', 'guild_hub');
   h += _homeTile('🗼', 'Strongholds', claimed + ' claimed', claimed / Object.keys(STRONGHOLDS).length * 100, '', 'stronghold');
+  const pr = getPrestigeReadiness();
+  h += _homeTile('🌟', 'Prestige', pr.ready ? 'Ready: banks +' + pr.xp + '% XP' : pr.toGo + ' levels to Lv ' + pr.req, Math.min(100, pr.lvl / pr.req * 100), pr.ready ? 'Ready' : '', 'prestige');
   h += _homeTile('🎒', 'Inventory', G.p.gold.toLocaleString() + ' gold', 0, '', 'inventory');
   h += _homeTile('📜', 'Quests', 'Story & side quests', 0, '', 'quest');
   h += '</div>';
