@@ -7084,6 +7084,88 @@ storyJournal: {
           { speaker: 'Renn', text: '"Then I would call this a genuine success," Renn says, something quietly proud in it that he does not often let show. "Not the ending of the gap. Simply proof, undeniable now, that it was never as absolute as it looked."' },
           { speaker: 'Narrator', text: 'San writes to Kai that evening, the ordinary way, letter and ink and the same patient distance as always \u2014 and finds, for the first time, that the slowness of it does not weigh on her the way it once did. Some gaps, she is learning, do not need to close completely to stop feeling quite so absolute.' },
         ]
+      },
+      {
+        id: 'journal_238',
+        title: 'What the Oath Was For',
+        chapter: 238,
+        unlockType: 'boss',
+        unlockAt: 'The Original Height, Watching Still',
+        icon: '🦅',
+        summary: 'The thing at the top of the sky was never guarding anything. Once it stops, all that is left is the oath itself.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It does not die so much as finally stop. The wind that has pushed at every step of the climb goes slack all at once, and the silence it leaves has the shape of something very large setting down something very old.' },
+          { speaker: 'Aisyah', text: '"It was never guarding anything," Aisyah says, flat and certain, turning over a feather as long as her forearm. "There is nothing up here to guard. Whatever it swore to protect is long gone. It just kept the oath anyway."' },
+          { speaker: 'Mezstorm', text: '"Some watchfulness gets too old to put down," Mezstorm says, watching the clouds close over the place it stood. "It stops being a duty and becomes the only shape you have left."' },
+          { speaker: 'San', text: '"Then the least we owe it is to say it out loud," you say, quietly. "You can stop now. Whatever you were keeping safe, it is safe."' },
+          { speaker: 'Narrator', text: 'Nothing up here needed winning. It needed someone to tell it, at last, that it was allowed to rest. You leave the top of the sky quieter than you found it.' }
+        ]
+      },
+      {
+        id: 'journal_239',
+        title: 'The Careful Wish',
+        chapter: 239,
+        unlockType: 'boss',
+        unlockAt: 'The First Wish, Still Being Answered',
+        icon: '🪔',
+        summary: 'The first wish is still being answered. San has spent a year learning how to ask for things properly.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It has been answering, patiently and badly, for longer than there has been anyone to mean what they asked. Every wish it ever granted came out slightly wrong, and it has never once been told so.' },
+          { speaker: 'Eliz', text: '"It is only listening to the words," Eliz says, tracing something in the air no one else can feel. "Not to the person saying them. That is why they all went wrong. The words and the wanting were never the same thing."' },
+          { speaker: 'Aisyah', text: '"So do not wish for anything," Aisyah says. "Nothing good ever came out of a lamp."' },
+          { speaker: 'San', text: 'You think about a year of learning to ask properly, of saying exactly what you mean and meaning exactly what you say. "I am not going to wish for something it can misread," you say. "I just want to tell it something true. Thank you, for answering for so long. You can stop now."' },
+          { speaker: 'Narrator', text: 'For the first time in the long history of the place, a wish asks for nothing, and is granted anyway.' }
+        ]
+      },
+      {
+        id: 'journal_240',
+        title: 'Renn Brings Someone',
+        chapter: 240,
+        unlockType: 'level',
+        unlockAt: 1060,
+        icon: '🧒',
+        summary: 'Renn finds your camp at dusk, a day early, with a very small passenger and a very simple explanation.',
+        scenes: [
+          { speaker: 'Narrator', text: 'Renn reaches your camp at the edge of the giants’ country at dusk, which is not when he said he would, with a bundle strapped carefully to his chest that is definitely not a satchel.' },
+          { speaker: 'Renn', text: '"Let me explain before you say anything," Renn says, already apologetic. "He walked to the creek three nights in a row and would not say why. On the fourth he said one word to me, ‘Mama’, and pointed at the road. I checked the direction twice. He was right."' },
+          { speaker: 'Kai', text: '"Hello," Kai says, from inside Renn’s coat, entirely unembarrassed. "We came."' },
+          { speaker: 'San', text: 'You cannot answer for a moment. You take him, and he is exactly the right weight, and smells like the Hall, and you do not trust your voice at all. "Joel," you manage, finally. "Does he know?"' },
+          { speaker: 'Renn', text: '"He could not come, and he knows why. Someone has to stand in the Hall," Renn says. "He sent four lines." He unfolds the paper. "‘Bring him back. Let him listen. He is better at it than any of us. Tell her I am fine.’"' },
+          { speaker: 'Kai', text: '"Still hungry," Kai says, pointing at the far mountains, the same way he pointed at the creek. "Not like before. Lonely."' },
+          { speaker: 'Narrator', text: 'Kai travels with the party now. He does not fight. He listens, and somehow the things you find along the way come out a little better for it.' }
+        ]
+      },
+      {
+        id: 'journal_241',
+        title: 'A Name for the First Thing',
+        chapter: 241,
+        unlockType: 'boss',
+        unlockAt: 'The Size Before It Had a Reason',
+        icon: '🏔️',
+        summary: 'It does not fall like the others. It stops, and waits, and a very small voice tells it what nobody ever did.',
+        scenes: [
+          { speaker: 'Narrator', text: 'It does not fall the way the others did. It stops, and goes very still, and waits, the way something waits when it has never once been asked a question.' },
+          { speaker: 'Kai', text: '"It does not have one," Kai says, matter-of-fact, from San’s arms. "Nobody gave it one. That is the sad part."' },
+          { speaker: 'Renn', text: '"Everything here is older than naming," Renn says, very quietly, setting his notes down without writing a word. "It may be that nobody ever needed to call it anything."' },
+          { speaker: 'Kai', text: 'Kai thinks about it with enormous seriousness, the way he thinks about everything. "Before," he decides. "It was here before. So it is Before."' },
+          { speaker: 'Narrator', text: 'A name does not make the thing any smaller. It makes it less alone. Something that has been vast and nameless since before there were words settles, at last, like a tired animal being called home.' }
+        ]
+      },
+      {
+        id: 'journal_242',
+        title: 'The Quiet at the Top',
+        chapter: 242,
+        unlockType: 'boss',
+        unlockAt: 'What Patience Alone Actually Earns',
+        icon: '🌅',
+        summary: 'The peak is smaller than the climb made it seem, and nothing like what anyone pictured.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The top is smaller than the climb made it seem, and quieter. No door, no light, no sudden understanding. Just a flat place to stand, and the whole long road laid out behind you.' },
+          { speaker: 'Aisyah', text: '"That is it?" Aisyah says, not quite disappointed. "All of that, for a view?"' },
+          { speaker: 'San', text: '"I think it was never going to look like anything," you say. "I think it is just who is still standing here."' },
+          { speaker: 'Kai', text: '"Home," Kai mumbles into your shoulder, half asleep, and Renn, standing nearby, laughs once, softly, the way he does when he has been proven right about something small.' },
+          { speaker: 'Narrator', text: 'There will be another climb after this one. That used to feel like a threat. It does not anymore. You turn, with everyone you came with, and start back down at your own pace.' }
+        ]
       }
     ]
   },
@@ -7863,8 +7945,14 @@ const LOOT_TABLES = {
   ]
 };
 
+// Kai joins the party at journal_240 (Lv1060). He does not fight; he "listens", which shifts every
+// loot rarity roll slightly upward. Same shape as luckBonus below, just always on once he is here.
+function isKaiTravelling() { return !!(G.storyJournal && G.storyJournal.unlocked.includes('journal_240')); }
+const KAI_LUCK = 0.03;
+function getKaiLuck() { return isKaiTravelling() ? KAI_LUCK : 0; }
+
 function rollRarity(zoneLevel, luckBonus = 0) {
-  const roll = Math.random() + luckBonus;
+  const roll = Math.random() + luckBonus + getKaiLuck();
   // Was: tier = min(zoneLevel, 10) — froze drop odds at zone-10 levels forever, so
   // zone 42 and zone 95 rolled identically to zone 10. Rescaled with sqrt so zone 1-10
   // matches the original curve exactly (progress=1 at zone 10), then keeps easing
@@ -24562,6 +24650,7 @@ function portraitFileNameFor(name) {
 // so a missing file just quietly falls back to the letter avatar, never breaks.
 const STORY_SPEAKER_PORTRAITS = {
   'Renn': '#3b82f630',
+  'Kai': '#f472b630',
   'Jovie': '#f59e0b30'
 };
 function getSpeakerPortrait(speaker) {
@@ -24684,7 +24773,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.235';
+const BUILD_ID = '2026-08-17.236';
 // =========================
 
 
@@ -33060,6 +33149,9 @@ function rCompanionPrestigeBadge(memberName) {
 
 function rParty(){
   let h='<div class="party-view"><h2 class="st">Party</h2>';
+  if (isKaiTravelling()) {
+    h += '<div class="panel panel-gold" style="margin-bottom:12px;"><div style="display:flex;gap:12px;align-items:center;"><div style="width:44px;height:44px;flex-shrink:0;">' + getSpeakerPortrait('Kai') + '</div><div><div class="panel-title" style="color:var(--gold);">\uD83E\uDDD2 Kai travels with you</div><div class="btn-hint">He does not fight. He listens, and everything you find comes out a little better: +' + Math.round(KAI_LUCK * 100) + '% better loot rarity on every drop.</div></div></div></div>';
+  }
   // Auto-Equip All — companion counterpart to San's own Auto-Equip Best on the
   // Inventory screen. Computed fresh each render, same reasoning as San's badge:
   // always accurate to current inventory state rather than a stored notification
