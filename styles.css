@@ -1090,6 +1090,7 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .map-here img { width: 100%; height: 100%; object-fit: cover; display: block; }
 @keyframes mapHerePulse { 0%, 100% { box-shadow: 0 0 0 3px rgba(232,197,71,0.25); } 50% { box-shadow: 0 0 0 7px rgba(232,197,71,0.08); } }
 .map-node-hold { position: absolute; bottom: -6px; left: -6px; font-size: 14px; }
+.map-node-quest { position: absolute; bottom: -6px; right: -6px; font-size: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
 
 /* Home: Coming Up look-ahead */
 .coming-up .cu-row { display: flex; align-items: baseline; gap: 8px; padding: 5px 0; border-top: 1px solid var(--border); font-size: 12px; }
