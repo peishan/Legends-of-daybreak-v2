@@ -12062,6 +12062,21 @@ function rComingUp() {
   return h + '</div>';
 }
 
+// A one-line nudge at the exact moment of leveling up, separate from
+// triggerLevelUpAnimation()'s own burst overlay (pure celebration, pointer-events:
+// none, gone in ~2.3s -- not something a player could read a preview inside even
+// if one were stuffed in there). Fires its own toast right after, using the exact
+// same getComingUp() readout the Home screen's "Coming Up" panel already shows --
+// nothing new tracked, just surfaced at a second moment instead of only on Home.
+// Silently does nothing once nothing is left to look forward to (ahead.length===0,
+// e.g. very late game), same "no empty panel" rule rComingUp() already follows.
+function showLevelUpComingUp(newLevel) {
+  const ahead = getComingUp();
+  if (!ahead.length) return;
+  const next = ahead[0];
+  showToast('🔭 Next up: ' + next.text + ' (Lv ' + next.lv + ' · ' + (next.lv - newLevel) + ' to go)', 'gold');
+}
+
 // === LOGIN NOTICES ===
 // A strip at the top of the screen listing what's actually waiting on the player. Reads the
 // same signals as the Home card badges, so nothing new needs tracking. Dismissing hides it
@@ -23892,6 +23907,9 @@ function lvlup(){
   if (G.p.lvl > startLvl && typeof triggerLevelUpAnimation === 'function') {
     triggerLevelUpAnimation(G.p.lvl);
   }
+  if (G.p.lvl > startLvl && typeof showLevelUpComingUp === 'function') {
+    showLevelUpComingUp(G.p.lvl);
+  }
   if (G.p.lvl > startLvl && typeof navigator !== 'undefined' && navigator.vibrate) {
     // Short-long-short pattern reads as more celebratory than a single buzz, and is
     // distinguishable from other haptic feedback (if any gets added later) at a glance.
@@ -32417,6 +32435,35 @@ function _zoneChapterHooks() {
   return hooks;
 }
 
+// === AREA QUEST/BOUNTY INDICATOR ===
+// San's own request: the zone map tells you a zone has a boss (👑) or a stronghold
+// (🗼), but never whether it currently has a quest or bounty worth doing -- bounties
+// in particular rotate daily (refreshBounties()), so "is there something for me
+// here right now" isn't something you could tell just by looking.
+//
+// Neither quests nor bounties carry a zone/area field (confirmed: only `target`,
+// an exact enemy name, links either to a place at all) -- so the only reliable way
+// to answer "does this zone have one" is deriving it from the same two places that
+// already tie an enemy name to a zone: zone.en (its regular spawn list) and
+// G.bosses[].zone (each boss's own zone field). Quests/bounties with no `target`
+// at all (craft, focus, reach_level, rest_with, etc.) have no meaningful zone of
+// their own and are correctly excluded by the `q.target`/`b.target` check below,
+// not just quietly skipped. Stronghold tasks deliberately NOT covered here -- their
+// only zone reference is free-text in their description, not a structured field,
+// too unreliable to parse into a badge.
+function _zoneEnemyNames(zone) {
+  const names = new Set(zone.en || []);
+  for (const b of G.bosses) { if (b.zone === zone.n) names.add(b.n); }
+  return names;
+}
+function zoneHasAvailableTasks(zone) {
+  const names = _zoneEnemyNames(zone);
+  if (!names.size) return false;
+  const hasQuest = G.quests.some(q => !q.done && !(q.hidden && !q.revealed) && q.target && names.has(q.target));
+  if (hasQuest) return true;
+  return G.bounties.some(b => !b.done && b.target && names.has(b.target) && G.p.lvl >= b.minLv && G.p.lvl <= b.maxLv);
+}
+
 function rZoneMapView() {
   const tabs = getActiveZoneMapTabs();
   if (G.exploreMapTab === undefined || G.exploreMapTab >= tabs.length) G.exploreMapTab = 0;
@@ -32458,6 +32505,7 @@ function rZoneMapView() {
     h += '<span class="map-node-icon">' + getZoneIcon(z.n) + '</span>';
     if (isBossZone) h += '<div class="map-node-boss">👑</div>';
     if (strongZones.has(z.n)) h += '<div class="map-node-hold" title="Stronghold">🗼</div>';
+    if (!lk && zoneHasAvailableTasks(z)) h += '<div class="map-node-quest" title="Quest or bounty available here">📜</div>';
     if (lk) h += '<div class="map-node-lock">🔒</div>';
     h += '</div>';
     if (idx === hereIdx) h += '<div id="map-here" class="map-here" style="left:' + (p.x - 44) + 'px;top:' + (p.y + 2) + 'px;" title="You are here">' + getSpeakerPortrait('San') + '</div>';
