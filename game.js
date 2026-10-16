@@ -12077,6 +12077,56 @@ function showLevelUpComingUp(newLevel) {
   showToast('🔭 Next up: ' + next.text + ' (Lv ' + next.lv + ' · ' + (next.lv - newLevel) + ' to go)', 'gold');
 }
 
+// === TODAY'S TO-DO ===
+// One list of the small daily things that are easy to forget: the Rune Vault match, the Daily Events
+// deck, the Kindling Network practice, the Guild Boss rally, and the Voyage window. Each row jumps to
+// where it's done. Also feeds the Home tile and the top strip, so it's visible without opening Today.
+function getVoyageReminder() {
+  if (!(G.ship && G.ship.built)) return null;
+  const open = isVoyageWindowOpen();
+  const fmt = h => (h % 12 || 12) + (h >= 12 ? ' pm' : ' am');
+  return { open, text: open ? 'Voyage window is open until ' + fmt(VOYAGE_WINDOW_END_HOUR) : 'Voyage window opens at ' + fmt(VOYAGE_WINDOW_START_HOUR) };
+}
+function kindlingKnown() {
+  return KINDLING_NETWORK.some(k => { const e = G.storyJournal.entries.find(x => x.chapter === k.metChapter); return e && G.storyJournal.unlocked.includes(e.id); });
+}
+function getTodayTodos() {
+  const items = [];
+  try {
+    if (isRuneVaultAvailableToday()) items.push({ icon: '🔮', label: 'Rune Vault', detail: 'One memory match a day', chip: 'Rune Vault ready', go: 'rune_vault' });
+    const deck = G.dailyEventDeck || [];
+    const left = deck.filter(id => !(G.eventDeckProgress && G.eventDeckProgress[id])).length;
+    if (left > 0) items.push({ icon: '📖', label: 'Daily Events', detail: left + ' of ' + deck.length + ' left', chip: left + ' daily event' + (left > 1 ? 's' : '') + ' left', go: 'event_deck' });
+    if (kindlingKnown()) {
+      ensureKindlingCommissionsCurrent();
+      const lines = 3 - G.kindlingCommissions.linesToday, checks = 2 - G.kindlingCommissions.checksToday;
+      if (lines > 0) items.push({ icon: '🕯️', label: 'Kindling: tend a line', detail: lines + ' of 3 left', chip: 'Kindling: ' + lines + ' line' + (lines > 1 ? 's' : '') + ' to tend', go: 'kindling_network' });
+      if (checks > 0) items.push({ icon: '🦊', label: 'Kindling: check on a pair', detail: checks + ' of 2 left', chip: 'Kindling: ' + checks + ' check-in' + (checks > 1 ? 's' : ''), go: 'kindling_network' });
+    }
+    if (G.guildJoined && canAttemptGuildBossToday()) items.push({ icon: '⚔️', label: 'Guild Boss', detail: 'One tap, then it fights on its own', go: 'guild_boss' });
+    const v = getVoyageReminder();
+    if (v && v.open) items.push({ icon: '⚓', label: 'Voyage', detail: v.text, chip: 'Voyage window open now', go: 'voyage', live: true });
+  } catch (e) { console.warn('[Todos]', e); }
+  return items;
+}
+function rTodayTodoPanel() {
+  const items = getTodayTodos();
+  let h = '<div class="panel' + (items.length ? ' panel-gold' : '') + '">';
+  h += '<div class="panel-title" style="' + (items.length ? 'color:var(--gold);' : '') + 'margin-bottom:6px;">✅ To Do Today</div>';
+  if (!items.length) {
+    const v0 = getVoyageReminder();
+    return h + '<div class="btn-hint">All caught up for today.</div>' + (v0 && !v0.open ? '<div class="btn-hint" style="margin-top:6px;">⚓ ' + v0.text + '</div>' : '') + '</div>';
+  }
+  for (const it of items) {
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">';
+    h += '<div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:700;">' + it.icon + ' ' + it.label + '</div><div style="font-size:10.5px;color:' + (it.live ? 'var(--gold)' : 'var(--text-dim)') + ';">' + it.detail + '</div></div>';
+    h += '<button onclick="setS(\'' + it.go + '\')" class="btn-outline-ghost" style="margin:0;padding:5px 14px;font-size:11px;width:auto;flex:0 0 auto;">Go</button></div>';
+  }
+  const v = getVoyageReminder();
+  if (v && !v.open) h += '<div class="btn-hint" style="margin-top:8px;">⚓ ' + v.text + '</div>';
+  return h + '</div>';
+}
+
 // === LOGIN NOTICES ===
 // A strip at the top of the screen listing what's actually waiting on the player. Reads the
 // same signals as the Home card badges, so nothing new needs tracking. Dismissing hides it
@@ -12096,6 +12146,10 @@ function getNoticeItems() {
     }
     if (isLibraryResearchUnlocked() && Object.values(G.libraryResearch.threads).some(t => !t.pendingOutcome && !t.activeDilemmaId))
       items.push({ icon: '📚', text: 'Library research available', go: 'library_research' });
+    for (const t of getTodayTodos()) {
+      if (t.go === 'guild_boss') continue; // already covered by the guild chips
+      items.push({ icon: t.icon, text: t.chip || t.label, go: t.go });
+    }
     const pr = getPrestigeReadiness();
     if (pr.ready) items.unshift({ icon: '\uD83C\uDF1F', text: 'Prestige ready: banks +' + pr.xp + '% XP', go: 'prestige' });
     if (_newZoneNames.length) items.push({ icon: '\uD83D\uDDFA\uFE0F', text: _newZoneNames.length === 1 ? 'New zone: ' + _newZoneNames[0] : _newZoneNames.length + ' new zones open', go: 'explore' });
@@ -13040,42 +13094,60 @@ function canAttemptGuildBossToday() {
 // purely from the auto-hits.
 let guildBossSessionInterval = null;
 
+// San's own strike, shared by the auto-battle and the optional bonus tap. Same ~0.05%-0.085% of the
+// boss's HP per hit as the old tap, so tapping by hand still just adds to what the auto-battle does.
+function guildBossSanHit() {
+  const tier = getGuildBossTier();
+  const dmg = Math.max(1, Math.floor(tier.hp * (0.0005 + Math.random() * 0.00035)));
+  G.guildBoss.currentHp = Math.max(0, G.guildBoss.currentHp - dmg);
+  G.guildBossSession.tapCount++;
+  G.guildBossSession.sessionDamage += dmg;
+  return dmg;
+}
+
+// One tap on "Rally the Guild" starts it and the whole 90 seconds then plays itself: San strikes
+// GUILD_BOSS_AUTO_HITS_PER_SEC times a second, and every recruited guild member hits every 5 seconds.
+// Tapping ATTACK during the fight is now just an optional bonus.
+const GUILD_BOSS_AUTO_HITS_PER_SEC = 2;
+
 function startGuildBossSession() {
   ensureGuildBossHp();
   if (!canAttemptGuildBossToday()) { lg('⚔️ Already rallied the guild against this today. Come back tomorrow.'); return; }
 
-  G.guildBossSession = { active: true, endTime: Date.now() + 90000, tapCount: 0, sessionDamage: 0 };
+  G.guildBossSession = { active: true, endTime: Date.now() + 90000, tapCount: 0, sessionDamage: 0, ticks: 0, autoDamage: 0 };
   // Locked in immediately, not when the session ends — otherwise reloading mid-session
   // (before the timer completes) would leave canAttemptGuildBossToday() still open,
   // letting a single day's attempt be repeated indefinitely while keeping all damage
   // already dealt.
   G.guildBoss.lastAttemptDay = G.gameDay;
-  lg('⚔️ The guild rallies. 90 seconds \u2014 attack!');
+  lg('⚔️ The guild rallies and fights on its own for 90 seconds.');
   render();
 
   if (guildBossSessionInterval) clearInterval(guildBossSessionInterval);
   guildBossSessionInterval = setInterval(() => {
-    if (!G.guildBossSession.active) { clearInterval(guildBossSessionInterval); guildBossSessionInterval = null; return; }
+    const ses = G.guildBossSession;
+    if (!ses.active) { clearInterval(guildBossSessionInterval); guildBossSessionInterval = null; return; }
 
-    tickGuildBossAutoHits();
+    ses.ticks++;
+    for (let k = 0; k < GUILD_BOSS_AUTO_HITS_PER_SEC && G.guildBoss.currentHp > 0; k++) ses.autoDamage += guildBossSanHit();
+    if (ses.ticks % 5 === 0 && G.guildBoss.currentHp > 0) {
+      lg('⚔️ San lands ' + (GUILD_BOSS_AUTO_HITS_PER_SEC * 5) + ' strikes for ' + ses.autoDamage.toLocaleString() + ' in total.');
+      ses.autoDamage = 0;
+      tickGuildBossAutoHits();
+    }
 
-    if (G.guildBoss.currentHp <= 0 || Date.now() >= G.guildBossSession.endTime) {
+    if (G.guildBoss.currentHp <= 0 || Date.now() >= ses.endTime) {
       endGuildBossSession();
       return;
     }
-    render();
-  }, 5000);
+    if (G.state === 'guild_boss') render();
+  }, 1000);
 }
 
-// San's own attack — called each time the player taps during an active session.
+// Optional bonus strike -- the fight resolves without it.
 function tapGuildBossAttack() {
   if (!G.guildBossSession.active) return;
-  const tier = getGuildBossTier();
-  const playerPct = 0.0005 + Math.random() * 0.00035; // ~0.05%–0.085% per tap
-  const dmg = Math.max(1, Math.floor(tier.hp * playerPct));
-  G.guildBoss.currentHp = Math.max(0, G.guildBoss.currentHp - dmg);
-  G.guildBossSession.tapCount++;
-  G.guildBossSession.sessionDamage += dmg;
+  const dmg = guildBossSanHit();
   lg('⚔️ San strikes for ' + dmg.toLocaleString() + '!');
 
   if (G.guildBoss.currentHp <= 0) {
@@ -24842,7 +24914,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.237';
+const BUILD_ID = '2026-08-17.239';
 // =========================
 
 
@@ -28064,6 +28136,8 @@ function rToday() {
   h += '<div class="st" style="text-align:center;">📅 Today</div>';
   h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Everything worth a quick look, in one place \u2014 for whenever you\'ve got three minutes and nothing else to point them at.</div>';
 
+  h += rTodayTodoPanel();
+
   // Today's Checklist — Infirmary medicine reminders and Soel's care schedule had zero
   // visibility on this screen before, and neither has any catch-up safety net if
   // missed (unlike bounties/daily quests/guild gathering, which Missed-Day Catch-Up
@@ -29831,12 +29905,12 @@ function rGuildBoss() {
     const secondsLeft = Math.max(0, Math.ceil((G.guildBossSession.endTime - Date.now()) / 1000));
     h += '<div class="panel panel-gold" style="text-align:center;">';
     h += '<div style="font-size:28px;font-weight:800;color:var(--gold);">' + secondsLeft + 's</div>';
-    h += '<div class="btn-hint" style="margin-bottom:10px;">Attack as many times as you can before the guild has to fall back!</div>';
-    h += '<button onclick="tapGuildBossAttack()" class="abtn" style="width:100%;font-size:18px;padding:16px;background:var(--danger);">⚔️ ATTACK</button>';
-    h += '<div class="btn-hint" style="margin-top:10px;">' + G.guildBossSession.tapCount + ' attacks \u00b7 ' + G.guildBossSession.sessionDamage.toLocaleString() + ' damage so far this session</div>';
+    h += '<div class="btn-hint" style="margin-bottom:10px;">The guild is fighting on its own. You can step away, or tap for bonus strikes.</div>';
+    h += '<button onclick="tapGuildBossAttack()" class="btn-outline-ghost" style="width:100%;font-size:14px;padding:12px;">⚔️ Bonus strike (optional)</button>';
+    h += '<div class="btn-hint" style="margin-top:10px;">' + G.guildBossSession.tapCount + ' strikes \u00b7 ' + G.guildBossSession.sessionDamage.toLocaleString() + ' damage so far this session</div>';
     h += '</div>';
   } else if (canAttempt) {
-    h += '<button onclick="startGuildBossSession()" class="abtn" style="width:100%;background:var(--danger);">⚔️ Rally the Guild (90-Second Battle)</button>';
+    h += '<button onclick="startGuildBossSession()" class="abtn" style="width:100%;background:var(--danger);">⚔️ Rally the Guild (one tap, 90-second auto-battle)</button>';
   } else {
     h += '<div class="panel" style="text-align:center;"><div class="btn-hint">🕯️ The guild already rallied against this today. Come back tomorrow.</div></div>';
   }
@@ -32055,7 +32129,8 @@ function rHomeV2(primary, sections) {
   h += _homeTile('⚔️', 'Adventure', zonesOpen + ' of ' + G.zones.length + ' zones open', zonesOpen / G.zones.length * 100, '', 'explore');
   h += _homeTile('📖', 'Journal', unlockedN + ' of ' + entries + ' chapters', unlockedN / entries * 100, unread ? 'New' : '', 'journal');
   h += _homeTile('👥', 'Party', joined + ' of ' + G.party.length + ' companions', joined / G.party.length * 100, '', 'party');
-  h += _homeTile('📅', 'Today', dqDone + '/' + dq.length + ' daily quests', dq.length ? dqDone / dq.length * 100 : 0, getMenuCardBadge('today') ? '' : '✓', 'today');
+  const todoN = getTodayTodos().length;
+  h += _homeTile('📅', 'Today', (todoN ? todoN + ' to do \u00b7 ' : '') + dqDone + '/' + dq.length + ' daily quests', dq.length ? dqDone / dq.length * 100 : 0, todoN ? String(todoN) : (getMenuCardBadge('today') ? '' : '✓'), 'today');
   h += _homeTile('🏰', 'Guild Hub', G.guildJoined ? (rankDef ? rankDef.name : 'Member') : '🔒 Claim the Mended Grove', G.guildJoined ? 100 : 0, getMenuCardBadge('guild_hub') ? 'Ready' : '', 'guild_hub');
   h += _homeTile('🗼', 'Strongholds', claimed + ' claimed', claimed / Object.keys(STRONGHOLDS).length * 100, '', 'stronghold');
   const pr = getPrestigeReadiness();
