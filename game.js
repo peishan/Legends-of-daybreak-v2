@@ -85,12 +85,12 @@ if ('serviceWorker' in navigator) {
 // from a later declaration would throw a temporal-dead-zone ReferenceError the moment
 // the game tried to load, since object literal properties evaluate eagerly in order.
 const ELIXIR_BUNDLE_ITEMS = [
-  { n: 'Elixir of Swift Growth', t: 'pot', eff: 'xp_boost', v: 30, boostPct: 0.5, r: 'rare', d: '+50% XP for 30 real minutes. Only one growth elixir can be active at a time.' },
-  { n: 'Elixir of Swift Growth (2 Hour)', t: 'pot', eff: 'xp_boost', v: 120, boostPct: 0.5, r: 'rare', d: '+50% XP for 2 real hours. Only one growth elixir can be active at a time.' },
-  { n: 'Elixir of Swift Growth (4 Hour)', t: 'pot', eff: 'xp_boost', v: 240, boostPct: 0.5, r: 'epic', d: '+50% XP for 4 real hours. Only one growth elixir can be active at a time.' },
-  { n: 'Elixir of Swift Growth (8 Hour)', t: 'pot', eff: 'xp_boost', v: 480, boostPct: 0.5, r: 'epic', d: '+50% XP for 8 real hours. Only one growth elixir can be active at a time.' },
-  { n: 'Elixir of Swift Growth (10 Hour)', t: 'pot', eff: 'xp_boost', v: 600, boostPct: 0.5, r: 'epic', d: '+50% XP for 10 real hours. Only one growth elixir can be active at a time.' },
-  { n: 'Elixir of Swift Growth (12 Hour)', t: 'pot', eff: 'xp_boost', v: 720, boostPct: 0.5, r: 'legendary', d: '+50% XP for a full 12 real hours. Only one growth elixir can be active at a time.' }
+  { n: 'Elixir of Swift Growth', t: 'pot', eff: 'xp_boost', v: 30, boostPct: 0.5, r: 'rare', d: '+50% XP for 30 real minutes. Only one runs at a time; once it is under 5 minutes from ending, use another to top it up.' },
+  { n: 'Elixir of Swift Growth (2 Hour)', t: 'pot', eff: 'xp_boost', v: 120, boostPct: 0.5, r: 'rare', d: '+50% XP for 2 real hours. Only one runs at a time; once it is under 5 minutes from ending, use another to top it up.' },
+  { n: 'Elixir of Swift Growth (4 Hour)', t: 'pot', eff: 'xp_boost', v: 240, boostPct: 0.5, r: 'epic', d: '+50% XP for 4 real hours. Only one runs at a time; once it is under 5 minutes from ending, use another to top it up.' },
+  { n: 'Elixir of Swift Growth (8 Hour)', t: 'pot', eff: 'xp_boost', v: 480, boostPct: 0.5, r: 'epic', d: '+50% XP for 8 real hours. Only one runs at a time; once it is under 5 minutes from ending, use another to top it up.' },
+  { n: 'Elixir of Swift Growth (10 Hour)', t: 'pot', eff: 'xp_boost', v: 600, boostPct: 0.5, r: 'epic', d: '+50% XP for 10 real hours. Only one runs at a time; once it is under 5 minutes from ending, use another to top it up.' },
+  { n: 'Elixir of Swift Growth (12 Hour)', t: 'pot', eff: 'xp_boost', v: 720, boostPct: 0.5, r: 'legendary', d: '+50% XP for a full 12 real hours. Only one runs at a time; once it is under 5 minutes from ending, use another to top it up.' }
 ];
 
 // Session log — deliberately declared OUTSIDE G and never touched by save/load, so it
@@ -11531,6 +11531,7 @@ function storyPopupTick() {
   try {
     storyPopupWatch();
     unlockTipWatch();
+    elixirWarnWatch();
     beatTick();
     if (_storyPopupQueue.length && isStoryPopupsEnabled() && storyPopupSafeNow()) {
       const qid = _storyPopupQueue.shift();
@@ -12127,6 +12128,39 @@ function rTodayTodoPanel() {
   return h + '</div>';
 }
 
+// === GROWTH ELIXIR REFRESH ===
+// One growth elixir runs at a time, but once it is under 5 minutes from ending (the same point the
+// "refresh" warning appears) another can be used to top it up. The time left carries over, so
+// nothing is wasted, and the new bottle's strength applies from then on.
+const ELIXIR_REFRESH_WINDOW_MS = 5 * 60 * 1000;
+function getElixirRemainingMs() {
+  return G.expBooster && G.expBooster.expiresAt > Date.now() ? G.expBooster.expiresAt - Date.now() : 0;
+}
+function elixirInRefreshWindow() {
+  const r = getElixirRemainingMs();
+  return r > 0 && r <= ELIXIR_REFRESH_WINDOW_MS;
+}
+// Returns true if the elixir was applied (the caller then consumes it).
+function applyGrowthElixir(it) {
+  const remain = getElixirRemainingMs();
+  if (remain > ELIXIR_REFRESH_WINDOW_MS) {
+    lg('❌ A growth elixir is already running (' + Math.ceil(remain / 60000) + 'm left). You can top it up once it is under 5 minutes.');
+    return false;
+  }
+  const mins = it.v || 30, pct = it.boostPct || 0.5;
+  G.expBooster = { mult: pct, expiresAt: Date.now() + remain + mins * 60 * 1000 };
+  lg('✨ Used ' + it.n + '! +' + Math.floor(pct * 100) + '% XP for the next ' + mins + ' minutes' + (remain > 0 ? ', plus the time that was left.' : '.'));
+  return true;
+}
+let _elixirWarnedFor = 0;
+function elixirWarnWatch() {
+  const r = getElixirRemainingMs();
+  if (!r || r > ELIXIR_REFRESH_WINDOW_MS || _elixirWarnedFor === G.expBooster.expiresAt) return;
+  _elixirWarnedFor = G.expBooster.expiresAt;
+  const have = G.p.inv.some(x => x.eff === 'xp_boost' && x.q > 0);
+  showToast('⚡ Growth elixir ends in ' + Math.max(1, Math.ceil(r / 60000)) + 'm' + (have ? ' — use another to top it up' : ''), 'gold');
+}
+
 // === LOGIN NOTICES ===
 // A strip at the top of the screen listing what's actually waiting on the player. Reads the
 // same signals as the Home card badges, so nothing new needs tracking. Dismissing hides it
@@ -12150,6 +12184,7 @@ function getNoticeItems() {
       if (t.go === 'guild_boss') continue; // already covered by the guild chips
       items.push({ icon: t.icon, text: t.chip || t.label, go: t.go });
     }
+    if (elixirInRefreshWindow() && G.p.inv.some(x => x.eff === 'xp_boost' && x.q > 0)) items.unshift({ icon: '\u26A1', text: 'XP elixir ending: top it up', go: 'today' });
     const pr = getPrestigeReadiness();
     if (pr.ready) items.unshift({ icon: '\uD83C\uDF1F', text: 'Prestige ready: banks +' + pr.xp + '% XP', go: 'prestige' });
     if (_newZoneNames.length) items.push({ icon: '\uD83D\uDDFA\uFE0F', text: _newZoneNames.length === 1 ? 'New zone: ' + _newZoneNames[0] : _newZoneNames.length + ' new zones open', go: 'explore' });
@@ -12588,12 +12623,12 @@ const TEMPLE_TRINKETS = [
 const TEMPLE_CONSUMABLES = [
   { n: 'Vial of Cleansing', t: 'pot', eff: 'cure_ailment', minRank: 1, cost: 60, r: 'uncommon', d: 'A portable version of the temple\'s own cure \u2014 no need to travel back for a single affliction.' },
   { n: 'Draught of Steady Hands', t: 'pot', eff: 'bless', minRank: 5, cost: 140, r: 'rare', d: 'Temple Chosen only. A blessing you can carry into the field instead of waiting for one.' },
-  { n: 'Elixir of Swift Growth', t: 'pot', eff: 'xp_boost', v: 30, boostPct: 0.5, minRank: 2, cost: 250, r: 'rare', d: '+50% XP for 30 real minutes. Only one can be active at a time \u2014 the Temple will not sell you a second bottle while the first still glows.' },
-  { n: 'Elixir of Swift Growth (2 Hour)', t: 'pot', eff: 'xp_boost', v: 120, boostPct: 0.5, minRank: 2, cost: 900, r: 'rare', d: '+50% XP for 2 real hours. Same blessing, longer bottle. Only one growth elixir can be active at a time.' },
-  { n: 'Elixir of Swift Growth (4 Hour)', t: 'pot', eff: 'xp_boost', v: 240, boostPct: 0.5, minRank: 3, cost: 1600, r: 'epic', d: '+50% XP for 4 real hours. The Temple only trusts this size bottle to Chosen who have actually stuck around a while. Only one growth elixir can be active at a time.' },
-  { n: 'Elixir of Swift Growth (8 Hour)', t: 'pot', eff: 'xp_boost', v: 480, boostPct: 0.5, minRank: 4, cost: 2800, r: 'epic', d: '+50% XP for 8 real hours \u2014 long enough to just leave it running in the background of a whole session. Only one growth elixir can be active at a time.' },
-  { n: 'Elixir of Swift Growth (10 Hour)', t: 'pot', eff: 'xp_boost', v: 600, boostPct: 0.5, minRank: 4, cost: 3300, r: 'epic', d: '+50% XP for 10 real hours. Only one growth elixir can be active at a time.' },
-  { n: 'Elixir of Swift Growth (12 Hour)', t: 'pot', eff: 'xp_boost', v: 720, boostPct: 0.5, minRank: 5, cost: 3800, r: 'legendary', d: '+50% XP for a full 12 real hours. Temple Chosen only \u2014 the biggest bottle they keep behind the counter. Only one growth elixir can be active at a time.' },
+  { n: 'Elixir of Swift Growth', t: 'pot', eff: 'xp_boost', v: 30, boostPct: 0.5, minRank: 2, cost: 250, r: 'rare', d: '+50% XP for 30 real minutes. Only one runs at a time; use another once it is under 5 minutes from ending.' },
+  { n: 'Elixir of Swift Growth (2 Hour)', t: 'pot', eff: 'xp_boost', v: 120, boostPct: 0.5, minRank: 2, cost: 900, r: 'rare', d: '+50% XP for 2 real hours. Same blessing, longer bottle. Only one runs at a time; once it is under 5 minutes from ending, use another to top it up.' },
+  { n: 'Elixir of Swift Growth (4 Hour)', t: 'pot', eff: 'xp_boost', v: 240, boostPct: 0.5, minRank: 3, cost: 1600, r: 'epic', d: '+50% XP for 4 real hours. The Temple only trusts this size bottle to Chosen who have actually stuck around a while. Only one runs at a time; once it is under 5 minutes from ending, use another to top it up.' },
+  { n: 'Elixir of Swift Growth (8 Hour)', t: 'pot', eff: 'xp_boost', v: 480, boostPct: 0.5, minRank: 4, cost: 2800, r: 'epic', d: '+50% XP for 8 real hours \u2014 long enough to just leave it running in the background of a whole session. Only one runs at a time; once it is under 5 minutes from ending, use another to top it up.' },
+  { n: 'Elixir of Swift Growth (10 Hour)', t: 'pot', eff: 'xp_boost', v: 600, boostPct: 0.5, minRank: 4, cost: 3300, r: 'epic', d: '+50% XP for 10 real hours. Only one runs at a time; once it is under 5 minutes from ending, use another to top it up.' },
+  { n: 'Elixir of Swift Growth (12 Hour)', t: 'pot', eff: 'xp_boost', v: 720, boostPct: 0.5, minRank: 5, cost: 3800, r: 'legendary', d: '+50% XP for a full 12 real hours. Temple Chosen only \u2014 the biggest bottle they keep behind the counter. Only one runs at a time; once it is under 5 minutes from ending, use another to top it up.' },
   { n: 'Elixir of Swift Growth: Full Set', t: 'bundle', bundleContents: ELIXIR_BUNDLE_ITEMS, minRank: 5, cost: 10500, r: 'legendary', d: 'One of each bottle the Temple keeps \u2014 30 minutes through the full 12 hours \u2014 for less than buying all six separately. Temple Chosen only.' }
 ];
 
@@ -22564,7 +22599,7 @@ function afkXpBoosterHtml() {
   return '<div style="text-align:center;font-size:12px;font-weight:700;margin-bottom:12px;padding:6px;border-radius:8px;'
     + (lowTime ? 'background:rgba(239,68,68,0.15);border:1px solid var(--danger);color:var(--danger);' : 'background:rgba(245,215,110,0.12);border:1px solid var(--gold);color:var(--gold);')
     + '">\u26A1 XP Boost: +' + Math.floor((G.expBooster.mult || 0.5) * 100) + '% \u2014 ' + timeStr + ' left'
-    + (lowTime ? ' \u2014 refresh soon!' : '') + '</div>';
+    + (lowTime ? ' \u2014 use another elixir to top up' : '') + '</div>';
 }
 
 function renderAfkAdventureBar() {
@@ -24127,10 +24162,7 @@ function useI(ix){
       G.p.buffs.push({n:'Blessed',t:4,atk:Math.ceil(G.p.lvl*0.3)});lg('🙏 Used '+it.n+'! ATK increased for a few turns.');
     }
     else if(it.eff=='xp_boost'){
-      if(G.expBooster && G.expBooster.expiresAt>Date.now()){lg('❌ A growth elixir is already active. Wait for it to run out first.');return;}
-      const durationMs=(it.v||30)*60*1000;
-      G.expBooster={mult:it.boostPct||0.5,expiresAt:Date.now()+durationMs};
-      lg('✨ Used '+it.n+'! +'+Math.floor((it.boostPct||0.5)*100)+'% XP for the next '+(it.v||30)+' minutes.');
+      if(!applyGrowthElixir(it))return;
     }
     else if(it.eff=='stat_boost'){
       if(G.statBooster && G.statBooster.expiresAt>Date.now()){lg('❌ A supplement is already active. Wait for it to run out first.');return;}
@@ -24914,7 +24946,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.239';
+const BUILD_ID = '2026-08-17.240';
 // =========================
 
 
@@ -28185,7 +28217,7 @@ function rToday() {
     h += '<div class="panel-title" style="margin-bottom:6px;">✨ Growth Elixirs</div>';
     if (activeElixir) {
       const minsLeft = Math.ceil((activeElixir.expiresAt - Date.now()) / 60000);
-      h += '<div class="btn-hint" style="margin-bottom:8px;color:var(--gold);">Active: +' + Math.floor(activeElixir.mult * 100) + '% XP \u2014 ' + minsLeft + 'm left</div>';
+      h += '<div class="btn-hint" style="margin-bottom:8px;color:var(--gold);">Active: +' + Math.floor(activeElixir.mult * 100) + '% XP \u2014 ' + minsLeft + 'm left' + (elixirInRefreshWindow() ? ' \u2014 you can top it up now' : '') + '</div>';
     }
     if (ownedElixirs.length > 0) {
       h += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
@@ -34499,13 +34531,7 @@ function usePotionInCombat(invIndex) {
     G.p.buffs.push({ n: 'Blessed', t: 4, atk: Math.ceil(G.p.lvl * 0.3) });
     lg('🙏 Used ' + it.n + '! ATK increased for a few turns.');
   } else if (it.eff === 'xp_boost') {
-    if (G.expBooster && G.expBooster.expiresAt > Date.now()) {
-      lg('❌ A growth elixir is already active. Wait for it to run out first.');
-      G.potionMenu = false; render(); return;
-    }
-    const durationMs = (it.v || 30) * 60 * 1000; // v = minutes, defaults to 30
-    G.expBooster = { mult: it.boostPct || 0.5, expiresAt: Date.now() + durationMs };
-    lg('✨ Used ' + it.n + '! +' + Math.floor((it.boostPct || 0.5) * 100) + '% XP for the next ' + (it.v || 30) + ' minutes.');
+    if (!applyGrowthElixir(it)) { G.potionMenu = false; render(); return; }
   }
 
   it.q--;
