@@ -24441,28 +24441,35 @@ function showSessionSummaryPopup(startTime, startLevel, totalXp, totalGold, lege
   el.className = 'battle-reward-popup session-summary-popup';
   el.style.pointerEvents = 'auto';
 
-  let html = '<div class="brp-session-title">' + (label || 'Session Summary') + '</div>';
+  let html = '<div class="brp-top"><div class="brp-session-title">' + (label || 'Session Summary') + '</div><button class="brp-x" type="button">\u2715 Dismiss</button></div>';
   html += '<div class="brp-detail">\u23F1\uFE0F ' + durationStr + ' away</div>';
   html += '<div class="brp-row"><span class="brp-xp">\u2728 +' + totalXp.toLocaleString() + ' XP</span><span class="brp-gold">\uD83D\uDCB0 +' + totalGold.toLocaleString() + 'G</span></div>';
   html += '<div class="brp-detail">' + (levelsGained > 0 ? '\uD83C\uDF1F +' + levelsGained + ' level' + (levelsGained > 1 ? 's' : '') + ' \u2014 now Lv.' + G.p.lvl : 'Lv.' + G.p.lvl + ' \u2014 no level gained this run') + '</div>';
   if (legendaryItems && legendaryItems.length > 0) {
     const counts = {};
     for (let n of legendaryItems) counts[n] = (counts[n] || 0) + 1;
-    const legendaryLine = Object.entries(counts).map(([n, c]) => n + (c > 1 ? ' x' + c : '')).join(', ');
-    html += '<div class="brp-legendary">\uD83D\uDFE1 Legendary: ' + legendaryLine + '</div>';
+    const entries = Object.entries(counts);
+    // One drop per line inside a box that scrolls, so a long AFK never pushes the popup off screen.
+    html += '<div class="brp-legendary brp-scroll"><div class="brp-leg-title">\uD83D\uDFE1 Legendary drops (' + legendaryItems.length + ')</div>'
+      + entries.map(([n, c]) => '<div>' + n + (c > 1 ? ' \u00d7' + c : '') + '</div>').join('') + '</div>';
   }
-  html += '<div class="brp-dismiss-hint">Tap to dismiss</div>';
   el.innerHTML = html;
 
-  el.addEventListener('click', () => { el.classList.add('brp-fade'); setTimeout(() => el.remove(), 400); });
+  const closePopup = () => { el.classList.add('brp-fade'); setTimeout(() => el.remove(), 400); };
+  el.addEventListener('click', closePopup);
+  el.querySelector('.brp-x').addEventListener('click', e => { e.stopPropagation(); closePopup(); });
+  const scrollBox = el.querySelector('.brp-scroll');
+  if (scrollBox) scrollBox.addEventListener('click', e => e.stopPropagation()); // scrolling the list shouldn't close it
   document.body.appendChild(el);
 
   const hdr = document.querySelector('.hdr');
   const hdrBottom = hdr ? hdr.getBoundingClientRect().bottom : 90;
   el.style.top = (hdrBottom + 10) + 'px';
+  el.style.maxHeight = Math.max(160, window.innerHeight - hdrBottom - 26) + 'px';
 
   if (navigator.vibrate) navigator.vibrate([25, 40, 25]);
-  setTimeout(() => { if (document.body.contains(el)) { el.classList.add('brp-fade'); setTimeout(() => el.remove(), 400); } }, 25000);
+  const lingerMs = (legendaryItems && legendaryItems.length > 8) ? 90000 : 25000; // long lists need longer to read
+  setTimeout(() => { if (document.body.contains(el)) { el.classList.add('brp-fade'); setTimeout(() => el.remove(), 400); } }, lingerMs);
 }
 
 function showToast(text, type) {
@@ -24639,10 +24646,14 @@ function renderSessionRecap() {
   const r = G.sessionRecap;
   const levelsGained = G.p.lvl - (r.startLevel || G.p.lvl);
 
-  let h = '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:var(--bg);">';
+  // margin:auto (not justify-content:center) so a long recap starts at the top and scrolls, instead of
+  // being centred and cut off above the screen.
+  let h = '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px;background:var(--bg);">';
+  h += '<div style="margin:auto 0;width:100%;display:flex;flex-direction:column;align-items:center;">';
   h += '<div style="font-size:32px;margin-bottom:8px;">🌙</div>';
   h += '<div style="font-size:20px;font-weight:700;color:var(--gold);margin-bottom:4px;">Welcome back</div>';
-  h += '<div style="font-size:12px;color:var(--text-dim);margin-bottom:20px;text-align:center;">Here\'s what happened while you were away</div>';
+  h += '<div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;text-align:center;">Here\'s what happened while you were away</div>';
+  h += '<button onclick="dismissSessionRecap()" class="abtn" style="width:100%;max-width:340px;margin-bottom:14px;">Continue</button>';
 
   h += '<div style="width:100%;max-width:340px;">';
 
@@ -24683,7 +24694,7 @@ function renderSessionRecap() {
   }
 
   h += '<button onclick="dismissSessionRecap()" class="abtn" style="width:100%;margin-top:8px;">Continue</button>';
-  h += '</div></div>';
+  h += '</div></div></div>';
 
   a.innerHTML = h;
 }
@@ -24946,7 +24957,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.240';
+const BUILD_ID = '2026-08-17.241';
 // =========================
 
 

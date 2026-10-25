@@ -1098,3 +1098,12 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .coming-up .cu-ico { width: 20px; text-align: center; flex-shrink: 0; }
 .coming-up .cu-txt { flex: 1; min-width: 0; }
 .coming-up .cu-lv { font-size: 11px; color: var(--text-dim); white-space: nowrap; }
+
+/* AFK session summary: dismiss at the top, drop list scrolls inside the popup */
+.session-summary-popup { overflow: hidden; }
+.session-summary-popup .brp-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; width: 100%; }
+.brp-x { flex-shrink: 0; border: 1px solid #d1d5db; background: #f3f4f6; color: #374151; border-radius: 10px; padding: 6px 12px; font-size: 12px; font-weight: 800; cursor: pointer; font-family: inherit; }
+.session-summary-popup .brp-legendary { text-align: left; overflow-y: auto; min-height: 0; flex: 0 1 auto; -webkit-overflow-scrolling: touch; cursor: default; }
+.brp-leg-title { font-weight: 800; margin-bottom: 2px; }
+.session-summary-popup .brp-row { flex-wrap: wrap; justify-content: center; gap: 4px 14px; }
+.session-summary-popup .brp-detail { white-space: normal; text-align: center; }
