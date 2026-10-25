@@ -22596,10 +22596,36 @@ function afkXpBoosterHtml() {
   const remainSec = Math.floor((remainMs % 60000) / 1000);
   const timeStr = remainMin > 0 ? (remainMin + 'm ' + remainSec + 's') : (remainSec + 's');
   const lowTime = remainMs < 5 * 60 * 1000; // under 5 minutes — worth flagging harder
+  // In the last 5 minutes the warning becomes a button: one tap uses the best-matching elixir you
+  // own (same strength as the running one, shortest first) without leaving the AFK screen.
+  const spare = lowTime ? pickRefreshElixir() : null;
+  let refresh = '';
+  if (lowTime) {
+    refresh = spare
+      ? '<div><button onclick="refreshElixirNow()" class="abtn" style="margin-top:6px;width:100%;">\u26A1 Refresh now (+' + fmtElixirMins(spare.v || 30) + ')</button></div>'
+      : '<div style="font-weight:400;margin-top:2px;">No spare elixir to refresh with</div>';
+  }
   return '<div style="text-align:center;font-size:12px;font-weight:700;margin-bottom:12px;padding:6px;border-radius:8px;'
     + (lowTime ? 'background:rgba(239,68,68,0.15);border:1px solid var(--danger);color:var(--danger);' : 'background:rgba(245,215,110,0.12);border:1px solid var(--gold);color:var(--gold);')
     + '">\u26A1 XP Boost: +' + Math.floor((G.expBooster.mult || 0.5) * 100) + '% \u2014 ' + timeStr + ' left'
-    + (lowTime ? ' \u2014 use another elixir to top up' : '') + '</div>';
+    + (lowTime ? ' \u2014 refresh now' : '') + refresh + '</div>';
+}
+
+// Which owned elixir to refresh with: prefer the same strength as the one running, then the shortest,
+// so a big bottle isn't spent topping up the last few minutes.
+function pickRefreshElixir() {
+  const mine = G.p.inv.filter(x => x.eff === 'xp_boost' && x.q > 0);
+  if (!mine.length) return null;
+  const cur = G.expBooster ? G.expBooster.mult : 0.5;
+  mine.sort((a, b) => (Math.abs((a.boostPct || 0.5) - cur) - Math.abs((b.boostPct || 0.5) - cur)) || ((a.v || 30) - (b.v || 30)));
+  return mine[0];
+}
+function fmtElixirMins(m) { return m >= 60 ? (m % 60 ? (m / 60).toFixed(1) : m / 60) + 'h' : m + 'm'; }
+function refreshElixirNow() {
+  const it = pickRefreshElixir();
+  if (!it) return;
+  useI(G.p.inv.indexOf(it));
+  render();
 }
 
 function renderAfkAdventureBar() {
@@ -24957,7 +24983,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.241';
+const BUILD_ID = '2026-08-17.242';
 // =========================
 
 
