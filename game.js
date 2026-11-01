@@ -7421,12 +7421,12 @@ storyJournal: {
   },
   guildChest: { lastOpenedWeek: -1 },
   guildChestUpgrades: {}, // keyed by member id -> { [fieldBuffStat]: bonus }, capped per member
-  // Guild Bounty Missions — dispatch a squad (up to 4, from recruited members not
+  // Guild Bounty Missions — dispatch a squad (up to 5, from recruited members not
   // otherwise occupied) on a job. The job itself resolves fast (5-15 real minutes,
-  // faster with a stronger/more diverse squad); what actually gates repeat use is a
-  // 2-3 hour cooldown *after* collecting, before the next dispatch is allowed. 5
-  // dispatches per real day, one active at a time.
-  guildBountyMission: { dispatchedToday: 0, lastResetDay: -1, cooldownUntil: 0, active: null, selectedMembers: [], lifetimeCompleted: 0 },
+  // faster with a stronger/more diverse squad). Squads aren't limited: send as many as
+  // you have free members for. What gates repeat use is a 2 hour rest per member after
+  // collecting, so rotate to a different squad (no member can be in two).
+  guildBountyMission: { missions: [], memberCooldowns: {}, selectedMembers: [], lifetimeCompleted: 0 }, // any number of squads out at once; each member rests 2h after collecting
   guildCafePairingsTried: [], // tracks which drink-with pairings have been tried at least once
   visionMachine: { lastUseDay: -1, joelLetterCount: 0 }, // Varel Farseer's window — once per real day, 1M gold
   kindlingCommissions: { linesToday: 0, checksToday: 0, refreshDay: 0 }, // bounded daily ritual — 3 lines, 2 checks, resets once per game day
@@ -17082,7 +17082,7 @@ function checkGuildRecruitment() {
 // collected. Used by getIdleGatheringGuildMembers(), toggleGuildWarField(), and the
 // bounty dispatch member-picker itself.
 function isGuildMemberOnBountyDispatch(id) {
-  return G.guildBountyMission.active && G.guildBountyMission.active.memberIds.includes(id);
+  return G.guildBountyMission.missions.some(m => m.memberIds.includes(id));
 }
 
 // === DUTY ASSIGNMENTS ===
@@ -17728,31 +17728,36 @@ function canCollectGuildMaterials() {
 
 // === GUILD BOUNTY MISSIONS ===
 // Squad-dispatch expedition system, distinct from the daily solo Bounty board. Pick up
-// to 4 recruited, unoccupied members, send them out — the job itself resolves fast
-// (5-15 real minutes, scaled down by squad strength and role diversity), but the real
-// gate is a 2-3 hour cooldown *after* collecting before the next dispatch is allowed.
-// 5 dispatches per real day. A member out on a dispatch is unavailable for Guild War
+// to 5 recruited, unoccupied members, send them out — the job itself resolves fast
+// (5-15 real minutes, scaled down by squad strength and role diversity). Several squads
+// can be out at once; the real gate is a 2 hour rest per member after collecting, so
+// the same people can't go again straight away. A member out on a dispatch is unavailable for Guild War
 // fielding or Idle Gathering until the mission is collected (see
 // isGuildMemberOnBountyDispatch()).
-const GUILD_BOUNTY_MAX_SQUAD = 4;
-const GUILD_BOUNTY_MAX_PER_DAY = 5;
+const GUILD_BOUNTY_MAX_SQUAD = 5;
 const GUILD_BOUNTY_BASE_DURATION_MIN = 10; // midpoint of the 5-15 min range
-const GUILD_BOUNTY_BASE_COOLDOWN_MIN = 150; // midpoint of the 2-3 hour range
+const GUILD_BOUNTY_BASE_COOLDOWN_MIN = 120; // per-member rest after collecting
 const GUILD_BOUNTY_ARCHETYPES = ['Tank', 'Support', 'DPS', 'Utility'];
 
-function resetGuildBountyMissionDailyIfNeeded() {
-  if (G.guildBountyMission.lastResetDay !== G.gameDay) {
-    G.guildBountyMission.lastResetDay = G.gameDay;
-    G.guildBountyMission.dispatchedToday = 0;
-  }
+// Older saves had one `active` squad, a global `cooldownUntil` and a daily cap.
+function normalizeGuildBountyMission() {
+  const bm = G.guildBountyMission;
+  if (!Array.isArray(bm.missions)) bm.missions = [];
+  if (!bm.memberCooldowns) bm.memberCooldowns = {};
+  if (!bm.selectedMembers) bm.selectedMembers = [];
+  if (bm.active) { bm.missions.push(bm.active); delete bm.active; }
+  delete bm.cooldownUntil; delete bm.dispatchedToday; delete bm.lastResetDay;
 }
+function getBountyMemberRestUntil(id) { return (G.guildBountyMission.memberCooldowns[id] || 0); }
+function getReadyBountyMissions() { return G.guildBountyMission.missions.filter(m => Date.now() >= m.resolveTime); }
 
 function getAvailableBountyMembers() {
   return GUILD_MEMBERS.filter(def =>
     def.recruitReq.type !== 'always' &&
     isGuildMemberRecruited(def.id) &&
     !G.guildWar.fielded.includes(def.id) &&
-    !isGuildMemberOnBountyDispatch(def.id)
+    !isGuildMemberOnBountyDispatch(def.id) &&
+    Date.now() >= getBountyMemberRestUntil(def.id)
   );
 }
 
@@ -17792,11 +17797,11 @@ function computeBountyMissionPreview(memberIds) {
   const diversityMult = 1 + (diversityCount > 1 ? (diversityCount - 1) * 0.05 : 0); // +5% per distinct archetype beyond the first, up to +15% for all 4
 
   const durationMin = Math.max(5, Math.round(GUILD_BOUNTY_BASE_DURATION_MIN - totalBuff * 20));
-  let cooldownMin = Math.max(120, Math.round(GUILD_BOUNTY_BASE_COOLDOWN_MIN - totalBuff * 100));
-  // Zul's courier speed shaves cooldown further once recruited — same instinct that
+  let cooldownMin = GUILD_BOUNTY_BASE_COOLDOWN_MIN;
+  // Zul's courier speed shaves the rest further once recruited — same instinct that
   // got documents to Finance on time now applies to Bounty Mission turnaround,
   // independent of whether he's actually one of the dispatched members himself.
-  if (isGuildMemberRecruited('zul')) cooldownMin = Math.max(90, Math.round(cooldownMin * 0.85));
+  if (isGuildMemberRecruited('zul')) cooldownMin = Math.round(cooldownMin * 0.85);
 
   const rank = getGuildRank();
   const baseGold = 800 * rank * memberIds.length;
@@ -17808,12 +17813,9 @@ function computeBountyMissionPreview(memberIds) {
 }
 
 function canDispatchGuildBountyMission() {
-  resetGuildBountyMissionDailyIfNeeded();
-  return G.guildJoined &&
-    !G.guildBountyMission.active &&
-    Date.now() >= G.guildBountyMission.cooldownUntil &&
-    G.guildBountyMission.dispatchedToday < GUILD_BOUNTY_MAX_PER_DAY &&
-    G.guildBountyMission.selectedMembers.length > 0;
+  if (!G.guildJoined || !G.guildBountyMission.selectedMembers.length) return false;
+  const free = getAvailableBountyMembers().map(d => d.id);
+  return G.guildBountyMission.selectedMembers.every(id => free.includes(id));
 }
 
 function dispatchGuildBountyMission() {
@@ -17821,15 +17823,14 @@ function dispatchGuildBountyMission() {
   const memberIds = [...G.guildBountyMission.selectedMembers];
   const preview = computeBountyMissionPreview(memberIds);
   const now = Date.now();
-  G.guildBountyMission.active = {
+  G.guildBountyMission.missions.push({
     memberIds,
     startTime: now,
     resolveTime: now + preview.durationMin * 60000,
     gold: preview.gold,
     xp: preview.xp,
     cooldownMin: preview.cooldownMin
-  };
-  G.guildBountyMission.dispatchedToday++;
+  });
   G.guildBountyMission.selectedMembers = [];
   const names = memberIds.map(id => getGuildMemberDef(id).npcName).join(', ');
   lg('🎖️ Squad dispatched (' + names + ') \u2014 back in ' + preview.durationMin + 'm.');
@@ -17837,18 +17838,19 @@ function dispatchGuildBountyMission() {
 }
 
 function isGuildBountyMissionReady() {
-  return G.guildBountyMission.active && Date.now() >= G.guildBountyMission.active.resolveTime;
+  return getReadyBountyMissions().length > 0;
 }
 
-function collectGuildBountyMission() {
-  if (!isGuildBountyMissionReady()) return;
-  const mission = G.guildBountyMission.active;
+function collectGuildBountyMission(idx) {
+  const mission = G.guildBountyMission.missions[idx];
+  if (!mission || Date.now() < mission.resolveTime) return;
   G.p.gold += mission.gold;
   G.p.xp += mission.xp;
   if (G.guildJoined) addGuildRep(30);
   lg('🎖️ Squad returns! +' + mission.gold.toLocaleString() + 'G, +' + mission.xp.toLocaleString() + ' XP' + (G.guildJoined ? ', +30 Guild Rep' : '') + '.');
-  G.guildBountyMission.cooldownUntil = Date.now() + mission.cooldownMin * 60000;
-  G.guildBountyMission.active = null;
+  const restUntil = Date.now() + mission.cooldownMin * 60000;
+  mission.memberIds.forEach(id => { G.guildBountyMission.memberCooldowns[id] = restUntil; });
+  G.guildBountyMission.missions.splice(idx, 1);
   G.guildBountyMission.lifetimeCompleted = (G.guildBountyMission.lifetimeCompleted || 0) + 1;
   checkAchievements();
   lvlup();
@@ -24983,7 +24985,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-08-17.242';
+const BUILD_ID = '2026-11-01.243';
 // =========================
 
 
@@ -25500,6 +25502,7 @@ function _loadGameInner() {
     G.guildChronicle = data.guildChronicle || [];
     G.guildGather.lastCollectedDay = data.guildGatherLastCollectedDay !== undefined ? data.guildGatherLastCollectedDay : -1;
     if (data.guildBountyMission) G.guildBountyMission = data.guildBountyMission;
+    normalizeGuildBountyMission();
     G.guildCafePairingsTried = data.guildCafePairingsTried || [];
     if (data.mercenaryBlitz) G.mercenaryBlitz = data.mercenaryBlitz;
     if (data.dragonHuntBlitz) G.dragonHuntBlitz = data.dragonHuntBlitz;
@@ -29196,66 +29199,66 @@ function rFrayingFrontierRoom() {
   return h;
 }
 
+function fmtBountyRest(ms) {
+  const m = Math.max(1, Math.ceil(ms / 60000));
+  return (m >= 60 ? Math.floor(m / 60) + 'h ' : '') + (m % 60) + 'm';
+}
+
 function rGuildBountyMissions() {
-  resetGuildBountyMissionDailyIfNeeded();
   const bm = G.guildBountyMission;
   let h = '<div class="content">';
-  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">\u2190 Guild Hub</button>';
+  h += '<button onclick="setS(\'guild_hub\')" class="btn-outline-ghost" style="margin-bottom:10px;">← Guild Hub</button>';
   h += '<div class="st" style="text-align:center;">🎖️ Guild Bounty Missions</div>';
-  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Dispatch a squad on a job. The job itself is quick \u2014 what actually takes time is the cooldown after, before the next squad can go out.</div>';
+  h += '<div class="btn-hint" style="text-align:center;margin-bottom:16px;">Send squads of up to ' + GUILD_BOUNTY_MAX_SQUAD + ' on jobs. You can have several out at once, as long as no member is in two. After a squad is collected each member rests for 2 hours, so rotate in different people.</div>';
 
-  h += '<div class="panel panel-gold" style="text-align:center;">';
-  h += '<div class="panel-title" style="color:var(--gold);">' + bm.dispatchedToday + '/' + GUILD_BOUNTY_MAX_PER_DAY + ' dispatched today</div>';
-  h += '</div>';
+  if (bm.missions.length) {
+    h += '<div class="panel-title" style="margin:6px 0 8px;">Squads Out (' + bm.missions.length + ')</div>';
+    bm.missions.forEach((m, i) => {
+      const ready = Date.now() >= m.resolveTime;
+      const names = m.memberIds.map(id => { const d = getGuildMemberDef(id); return d.icon + ' ' + d.npcName; }).join(', ');
+      h += '<div class="panel' + (ready ? ' panel-gold' : '') + '" style="text-align:center;margin-top:8px;">';
+      h += '<div class="panel-title" style="' + (ready ? 'color:var(--gold);' : '') + '">' + (ready ? '✅ Squad Returned' : '⏳ Squad Out') + '</div>';
+      h += '<div class="btn-hint" style="margin:6px 0;">' + names + '</div>';
+      if (ready) {
+        h += '<div class="btn-hint" style="margin:6px 0;">+' + m.gold.toLocaleString() + 'G, +' + m.xp.toLocaleString() + ' XP waiting</div>';
+        h += '<button onclick="collectGuildBountyMission(' + i + ')" class="abtn" style="width:100%;">Collect</button>';
+      } else {
+        const remainMin = Math.ceil((m.resolveTime - Date.now()) / 60000);
+        h += '<div class="btn-hint">Back in ' + remainMin + ' minute' + (remainMin === 1 ? '' : 's') + '.</div>';
+      }
+      h += '</div>';
+    });
+  }
 
-  if (bm.active) {
-    const ready = isGuildBountyMissionReady();
-    const names = bm.active.memberIds.map(id => { const d = getGuildMemberDef(id); return d.icon + ' ' + d.npcName; }).join(', ');
-    h += '<div class="panel' + (ready ? ' panel-gold' : '') + '" style="text-align:center;margin-top:12px;">';
-    h += '<div class="panel-title" style="' + (ready ? 'color:var(--gold);' : '') + '">' + (ready ? '✅ Squad Returned' : '⏳ Squad Out') + '</div>';
-    h += '<div class="btn-hint" style="margin:6px 0;">' + names + '</div>';
-    if (ready) {
-      h += '<div class="btn-hint" style="margin:6px 0;">+' + bm.active.gold.toLocaleString() + 'G, +' + bm.active.xp.toLocaleString() + ' XP waiting</div>';
-      h += '<button onclick="collectGuildBountyMission()" class="abtn" style="width:100%;">Collect</button>';
-    } else {
-      const remainMs = bm.active.resolveTime - Date.now();
-      const remainMin = Math.ceil(remainMs / 60000);
-      h += '<div class="btn-hint">Back in ' + remainMin + ' minute' + (remainMin === 1 ? '' : 's') + '.</div>';
-    }
-    h += '</div>';
-  } else if (Date.now() < bm.cooldownUntil) {
-    const remainMs = bm.cooldownUntil - Date.now();
-    const remainMin = Math.ceil(remainMs / 60000);
-    const h2 = Math.floor(remainMin / 60), m2 = remainMin % 60;
+  const resting = GUILD_MEMBERS.filter(def => def.recruitReq.type !== 'always' && isGuildMemberRecruited(def.id) && Date.now() < getBountyMemberRestUntil(def.id));
+  if (resting.length) {
     h += '<div class="panel" style="text-align:center;margin-top:12px;">';
-    h += '<div class="panel-title">🕐 Squad Resting</div>';
-    h += '<div class="btn-hint">Next dispatch available in ' + (h2 > 0 ? h2 + 'h ' : '') + m2 + 'm.</div>';
+    h += '<div class="panel-title">🕐 Resting</div>';
+    h += '<div class="btn-hint" style="margin-top:6px;">' + resting.map(d => d.icon + ' ' + d.npcName + ' (' + fmtBountyRest(getBountyMemberRestUntil(d.id) - Date.now()) + ')').join(' · ') + '</div>';
     h += '</div>';
-  } else if (bm.dispatchedToday >= GUILD_BOUNTY_MAX_PER_DAY) {
-    h += '<div class="panel" style="text-align:center;margin-top:12px;"><div class="btn-hint">All ' + GUILD_BOUNTY_MAX_PER_DAY + ' dispatches used today. Check back tomorrow.</div></div>';
+  }
+
+  const available = getAvailableBountyMembers();
+  h += '<div class="panel-title" style="margin:14px 0 8px;">Choose a Squad (' + bm.selectedMembers.length + '/' + GUILD_BOUNTY_MAX_SQUAD + ')</div>';
+  if (available.length === 0) {
+    h += '<div class="panel" style="text-align:center;"><div class="btn-hint">No members free right now — collect a returned squad, wait for rests to end, or recruit more.</div></div>';
   } else {
-    const available = getAvailableBountyMembers();
-    h += '<div class="panel-title" style="margin:14px 0 8px;">Choose a Squad (' + bm.selectedMembers.length + '/' + GUILD_BOUNTY_MAX_SQUAD + ')</div>';
-    if (available.length === 0) {
-      h += '<div class="panel" style="text-align:center;"><div class="btn-hint">No members available \u2014 recruit more, or unfield/undispatch someone.</div></div>';
-    } else {
-      for (let def of available) {
-        const selected = bm.selectedMembers.includes(def.id);
-        h += '<div class="panel' + (selected ? ' panel-gold' : '') + '" style="text-align:left;">';
-        h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
-        h += '<div><span style="font-size:16px;">' + def.icon + '</span> <span style="font-weight:700;' + (selected ? 'color:var(--gold);' : '') + '">' + def.npcName + '</span> <span style="font-size:11px;color:var(--text-dim);">' + (def.bountyArchetype || '') + '</span></div>';
-        h += '<button onclick="toggleBountyMemberSelection(\'' + def.id + '\')" class="' + (selected ? 'abtn' : 'btn-outline-ghost') + '" style="margin:0;padding:4px 10px;font-size:11px;">' + (selected ? 'Selected' : 'Add') + '</button>';
-        h += '</div></div>';
-      }
-      if (bm.selectedMembers.length > 0) {
-        const preview = computeBountyMissionPreview(bm.selectedMembers);
-        h += '<div class="panel panel-gold" style="text-align:center;margin-top:10px;">';
-        h += '<div class="panel-title" style="color:var(--gold);">Squad Preview</div>';
-        h += '<div class="btn-hint" style="margin:6px 0;">Job: ~' + preview.durationMin + 'm \u00b7 Cooldown after: ~' + Math.floor(preview.cooldownMin / 60) + 'h ' + (preview.cooldownMin % 60) + 'm</div>';
-        h += '<div class="btn-hint" style="margin:6px 0;">Reward: ~' + preview.gold.toLocaleString() + 'G, ~' + preview.xp.toLocaleString() + ' XP' + (preview.diversityCount > 1 ? ' (+' + Math.floor((preview.diversityMult - 1) * 100) + '% for ' + preview.diversityCount + ' distinct roles)' : '') + '</div>';
-        h += '<button onclick="dispatchGuildBountyMission()" class="abtn" style="width:100%;">Dispatch Squad</button>';
-        h += '</div>';
-      }
+    for (let def of available) {
+      const selected = bm.selectedMembers.includes(def.id);
+      h += '<div class="panel' + (selected ? ' panel-gold' : '') + '" style="text-align:left;">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+      h += '<div><span style="font-size:16px;">' + def.icon + '</span> <span style="font-weight:700;' + (selected ? 'color:var(--gold);' : '') + '">' + def.npcName + '</span> <span style="font-size:11px;color:var(--text-dim);">' + (def.bountyArchetype || '') + '</span></div>';
+      h += '<button onclick="toggleBountyMemberSelection(\'' + def.id + '\')" class="' + (selected ? 'abtn' : 'btn-outline-ghost') + '" style="margin:0;padding:4px 10px;font-size:11px;">' + (selected ? 'Selected' : 'Add') + '</button>';
+      h += '</div></div>';
+    }
+    if (bm.selectedMembers.length > 0) {
+      const preview = computeBountyMissionPreview(bm.selectedMembers);
+      h += '<div class="panel panel-gold" style="text-align:center;margin-top:10px;">';
+      h += '<div class="panel-title" style="color:var(--gold);">Squad Preview</div>';
+      h += '<div class="btn-hint" style="margin:6px 0;">Job: ~' + preview.durationMin + 'm · Rest after: ' + Math.floor(preview.cooldownMin / 60) + 'h ' + (preview.cooldownMin % 60) + 'm each</div>';
+      h += '<div class="btn-hint" style="margin:6px 0;">Reward: ~' + preview.gold.toLocaleString() + 'G, ~' + preview.xp.toLocaleString() + ' XP' + (preview.diversityCount > 1 ? ' (+' + Math.floor((preview.diversityMult - 1) * 100) + '% for ' + preview.diversityCount + ' distinct roles)' : '') + '</div>';
+      h += '<button onclick="dispatchGuildBountyMission()" class="abtn" style="width:100%;">Dispatch Squad</button>';
+      h += '</div>';
     }
   }
 
@@ -31989,17 +31992,14 @@ function rGuildHub() {
   h += '</div>';
 
   // Guild Bounty Missions summary card
-  resetGuildBountyMissionDailyIfNeeded();
   const bm = G.guildBountyMission;
-  h += '<div class="panel' + (isGuildBountyMissionReady() ? ' panel-gold' : '') + '" style="margin-top:12px;text-align:center;">';
-  h += '<div class="panel-title" style="' + (isGuildBountyMissionReady() ? 'color:var(--gold);' : '') + '">🎖️ Guild Bounty Missions</div>';
-  if (bm.active) {
-    h += '<div class="btn-hint" style="margin:6px 0;">' + (isGuildBountyMissionReady() ? 'Squad returned, ready to collect' : 'Squad out') + '</div>';
-  } else if (Date.now() < bm.cooldownUntil) {
-    const remainMin = Math.ceil((bm.cooldownUntil - Date.now()) / 60000);
-    h += '<div class="btn-hint" style="margin:6px 0;">Resting \u2014 next dispatch in ' + Math.floor(remainMin / 60) + 'h ' + (remainMin % 60) + 'm</div>';
+  const bmReady = getReadyBountyMissions().length;
+  h += '<div class="panel' + (bmReady ? ' panel-gold' : '') + '" style="margin-top:12px;text-align:center;">';
+  h += '<div class="panel-title" style="' + (bmReady ? 'color:var(--gold);' : '') + '">🎖️ Guild Bounty Missions</div>';
+  if (bm.missions.length) {
+    h += '<div class="btn-hint" style="margin:6px 0;">' + bm.missions.length + ' squad' + (bm.missions.length === 1 ? '' : 's') + ' out' + (bmReady ? ' \u2014 ' + bmReady + ' returned, ready to collect' : '') + '</div>';
   } else {
-    h += '<div class="btn-hint" style="margin:6px 0;">' + bm.dispatchedToday + '/' + GUILD_BOUNTY_MAX_PER_DAY + ' used today \u2014 ready to dispatch</div>';
+    h += '<div class="btn-hint" style="margin:6px 0;">' + getAvailableBountyMembers().length + ' members free \u2014 ready to dispatch</div>';
   }
   h += '<button onclick="setS(\'guild_bounty_missions\')" class="btn-outline-ghost" style="width:100%;margin-top:8px;">Open Bounty Missions</button>';
   h += '</div>';
