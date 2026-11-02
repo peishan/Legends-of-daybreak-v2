@@ -7136,6 +7136,36 @@ storyJournal: {
         ]
       },
       {
+        id: 'journal_240_1',
+        title: 'What the Giants Built For',
+        chapter: 240.1,
+        unlockType: 'level',
+        unlockAt: 1080,
+        icon: '🗿',
+        summary: 'Kai asks the stone giants a question nobody thought to ask them.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The stone giants never built a wall or a road. Everything they made is a place to stand and look, and none of it points at anything in particular.' },
+          { speaker: 'Renn', text: '"I keep waiting for the purpose," Renn says, notebook shut for once. "A temple, a fortress, a grave. There is nothing. It is just very large and very careful."' },
+          { speaker: 'Kai', text: '"They were lonely," Kai says from San’s shoulders, touching a carved edge as smooth as a pebble. "So they made somewhere for company to sit."' },
+          { speaker: 'San', text: 'You sit, and the stone is warm, and for a while nobody feels the need to say anything else.' }
+        ]
+      },
+      {
+        id: 'journal_240_2',
+        title: 'Roots Older Than the Word Forest',
+        chapter: 240.2,
+        unlockType: 'level',
+        unlockAt: 1110,
+        icon: '🌲',
+        summary: 'The oldest forest does not grow toward light. It grows toward whoever is listening.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The trees here predate the word for them. They lean in as you pass, the way a crowd leans toward a story it has heard before.' },
+          { speaker: 'Eliz', text: '"They are not hostile," Eliz murmurs, one palm flat against a trunk. "They are only very, very slow, and they have never been spoken to by anyone who stayed."' },
+          { speaker: 'Aisyah', text: '"Then we stay a minute," Aisyah says, and drops her pack, and the nearest root shifts to make room.' },
+          { speaker: 'Narrator', text: 'Nothing is solved. The forest is simply less alone for an afternoon, and you leave lighter than you came.' }
+        ]
+      },
+      {
         id: 'journal_241',
         title: 'A Name for the First Thing',
         chapter: 241,
@@ -7149,6 +7179,36 @@ storyJournal: {
           { speaker: 'Renn', text: '"Everything here is older than naming," Renn says, very quietly, setting his notes down without writing a word. "It may be that nobody ever needed to call it anything."' },
           { speaker: 'Kai', text: 'Kai thinks about it with enormous seriousness, the way he thinks about everything. "Before," he decides. "It was here before. So it is Before."' },
           { speaker: 'Narrator', text: 'A name does not make the thing any smaller. It makes it less alone. Something that has been vast and nameless since before there were words settles, at last, like a tired animal being called home.' }
+        ]
+      },
+      {
+        id: 'journal_241_1',
+        title: 'The Shortcut Not Taken',
+        chapter: 241.1,
+        unlockType: 'level',
+        unlockAt: 1170,
+        icon: '🪜',
+        summary: 'A faster way up is on offer. Mezstorm has seen what it costs.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The shortcut is real. A narrow stair of borrowed power rises past a hundred years of training, and every step of it is already worn smooth by people who took it.' },
+          { speaker: 'Mezstorm', text: '"I know exactly where that leads," Mezstorm says, very quietly. "It works. That is the cruel part. It works, and then there is nothing left that is yours."' },
+          { speaker: 'San', text: '"Then we take the long way," you say, and nobody argues, and Kai gives the stair a polite wave as though it might be offended.' },
+          { speaker: 'Narrator', text: 'The long way is slower. It is also the only road where you arrive as the same person who set out.' }
+        ]
+      },
+      {
+        id: 'journal_241_2',
+        title: 'Things That Learned to Want',
+        chapter: 241.2,
+        unlockType: 'level',
+        unlockAt: 1210,
+        icon: '🏺',
+        summary: 'Even the objects up here have started to want something. Kai wants to know what.',
+        scenes: [
+          { speaker: 'Narrator', text: 'The cups, the lamps and the old mirrors in this country have been handled so long that they have started to hope. A hinge creaks like a question as you pass.' },
+          { speaker: 'Kai', text: '"This one wants to be picked up," Kai reports, holding a cracked bowl with great seriousness. "That one wants to be left alone. That one is not sure."' },
+          { speaker: 'Renn', text: '"Wanting is probably the first step," Renn says, writing it down anyway. "Everything up here is a step further than it should be."' },
+          { speaker: 'San', text: 'You carry the bowl a while, because it asked, and set it down gently where the light is better.' }
         ]
       },
       {
@@ -24985,7 +25045,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-11-01.243';
+const BUILD_ID = '2026-11-02.244';
 // =========================
 
 
