@@ -24187,13 +24187,47 @@ function checkQuestChains(){
   }
 }
 
+// Equipment is a unique object per drop and addI() never merged or limited it, so a long
+// AFK grind piled gear into the bag forever and the whole bag is serialized into the save
+// on every write, which is what eventually hit the localStorage quota. Past the cap the
+// pack sells itself down: duplicates and downgrades first (the same set "Sell junk" uses),
+// then the lowest-value non-legendary gear. Sold at Amad's rate, so nothing is lost for free.
+const INV_GEAR_HARD_CAP = 300;
+const INV_GEAR_QUOTA_CAP = 120; // used when a save write has already failed
+function _gearSellPrice(item) { return Math.max(1, item.value ? Math.floor(item.value * 0.5) : Math.floor((item.ilvl || 1) * 4)); }
+function enforceGearCap(cap) {
+  const gearCount = () => G.p.inv.reduce((n, i) => n + (i.slot ? 1 : 0), 0);
+  if (gearCount() <= cap) return 0;
+  let sold = 0, gold = 0;
+  const drop = (entries) => {
+    for (const e of [...entries].sort((a, b) => b.index - a.index)) {
+      if (gearCount() <= cap) break;
+      gold += e.price; sold++; G.p.inv.splice(e.index, 1);
+    }
+  };
+  try { drop(getJunkStashItems()); } catch (e) {}
+  if (gearCount() > cap) { try { drop(getJunkCompanionGearItems()); } catch (e) {} }
+  if (gearCount() > cap) {
+    const rest = [];
+    G.p.inv.forEach((it, index) => { if (it.slot && it.r !== 'legendary') rest.push({ index, price: _gearSellPrice(it) }); });
+    rest.sort((a, b) => a.price - b.price);
+    const need = gearCount() - cap;
+    drop(rest.slice(0, need).sort((a, b) => a.index - b.index));
+  }
+  if (sold > 0) {
+    G.p.gold += gold;
+    lg('🎒 Pack was over its storage limit \u2014 auto-sold ' + sold + ' spare piece' + (sold === 1 ? '' : 's') + ' of gear for ' + gold.toLocaleString() + 'G to keep saves working.');
+  }
+  return sold;
+}
+
 function addI(it){
   // Equipment (identified by .slot) is always a unique instance — it can carry its own
   // sockets/runes, forge upgrades, ilvl, and stat rolls, so it must never be merged into
   // an existing same-named stack (that would silently discard all of that per-item state
   // and just bump a quantity counter on an unrelated copy). Only true stackables (pot/
   // food/drink/mat/revive, identified by .t) should dedupe by quantity.
-  if (it.slot) { G.p.inv.push({...it}); return; }
+  if (it.slot) { G.p.inv.push({...it}); if (G.p.inv.length > INV_GEAR_HARD_CAP) enforceGearCap(INV_GEAR_HARD_CAP); return; }
   const ex=G.p.inv.find(i=>i.n==it.n&&i.t==it.t&&!i.slot);
   if(ex)ex.q+=it.q||1;
   else G.p.inv.push({...it,q:it.q||1});
@@ -25045,7 +25079,7 @@ const CONTENT_VERSION = 4;
 // This tracks the actual game.js build itself — updated every time a new file is
 // deployed, so it's possible to visually confirm which version is actually loaded,
 // rather than guessing from behavior alone.
-const BUILD_ID = '2026-11-02.244';
+const BUILD_ID = '2026-11-22.245';
 // =========================
 
 
@@ -25216,6 +25250,14 @@ function saveGame() {
     lg('Game saved!');
     return true;
   } catch(e) {
+    // Quota hit: shrink the pack hard, then write again once before giving up.
+    if (enforceGearCap(INV_GEAR_QUOTA_CAP) > 0) {
+      try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+        lg('Game saved!');
+        return true;
+      } catch (e2) { e = e2; }
+    }
     lg('Save failed: ' + e.message);
     return false;
   }
@@ -25428,6 +25470,7 @@ function _loadGameInner() {
     // Without this, a save that's already past quota would keep failing to write no
     // matter what gets capped from here on, since the existing bloat never gets touched.
     const runesPruned = pruneRunesToCap();
+    enforceGearCap(INV_GEAR_HARD_CAP);
     if (runesPruned > 0) lg('💎 Rune inventory was over its storage limit \u2014 trimmed ' + runesPruned + ' of the lowest-rarity runes to keep saves working. Higher-rarity runes were kept.');
     G.riftCounter = data.riftCounter || 0;
     G.currentRift = data.currentRift || null;
